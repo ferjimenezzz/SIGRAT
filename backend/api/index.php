@@ -27,6 +27,7 @@ require_once '../controllers/AssetController.php';
 require_once '../controllers/LoanController.php';
 require_once '../controllers/MaintenanceController.php';
 require_once '../controllers/SpaceController.php';
+require_once '../controllers/TagController.php';
 
 use Controllers\InviteController;
 use Controllers\ReservationController;
@@ -35,6 +36,7 @@ use Controllers\AssetController;
 use Controllers\LoanController;
 use Controllers\MaintenanceController;
 use Controllers\SpaceController;
+use Controllers\TagController;
 
 // Obtener la ruta de la petición
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -139,6 +141,48 @@ try {
                     $response = ["success" => true, "data" => $controller->getAll()];
                     $status_code = 200;
                 }
+            }
+            break;
+
+        case 'tags':
+            $controller = new TagController();
+            $last_segment = $uri[count($uri)-1];
+            $second_to_last = $uri[count($uri)-2] ?? null;
+
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                if ($last_segment === 'tags') {
+                    // GET /api/tags -> Listar todos
+                    $response = $controller->getAll();
+                    $status_code = $response['success'] ? 200 : 500;
+                } else {
+                    // GET /api/tags/{id} -> Detalle del tag
+                    $response = $controller->getById($last_segment);
+                    $status_code = $response['success'] ? 200 : 404;
+                }
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // POST /api/tags -> Registrar nuevo tag físico en el catálogo maestro
+                $response = $controller->create($input);
+                $status_code = $response['success'] ? 201 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+                if ($last_segment === 'vincular') {
+                    // PUT /api/tags/{tag_id}/vincular -> Vincular tag a activo/llave/mobiliario
+                    $tag_id = $second_to_last;
+                    $response = $controller->link($tag_id, $input['tipo_objeto'], $input['objeto_id']);
+                    $status_code = $response['success'] ? 200 : 400;
+                } else {
+                    // PUT /api/tags/{id} -> Actualizar estado o vinculación directa
+                    $tag_id = $last_segment;
+                    if (isset($input['tipo_objeto']) && isset($input['objeto_id'])) {
+                        $response = $controller->link($tag_id, $input['tipo_objeto'], $input['objeto_id']);
+                    } else {
+                        $response = $controller->updateStatus($tag_id, $input['estado'] ?? 'Activo');
+                    }
+                    $status_code = $response['success'] ? 200 : 400;
+                }
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                // DELETE /api/tags/{id} -> Eliminar tag del catálogo maestro
+                $response = $controller->delete($last_segment);
+                $status_code = $response['success'] ? 200 : 400;
             }
             break;
     }
