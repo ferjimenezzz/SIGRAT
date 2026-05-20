@@ -28,10 +28,16 @@ class AuthController {
         return password_verify($password, $hash);
     }
 
-    public function generateJWT($payload) {
+    /**
+     * Genera un token JWT firmado digitalmente.
+     * @param array $payload Datos a incluir en el token.
+     * @param int $duration Duración de validez en segundos (por defecto 2 horas).
+     * @return string Token firmado en formato de tres partes (Header.Payload.Signature).
+     */
+    public function generateJWT($payload, $duration = 7200) {
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $payload['iat'] = time();
-        $payload['exp'] = time() + (60 * 60 * 8); 
+        $payload['exp'] = time() + $duration; 
         $payload_json = json_encode($payload);
 
         $base64UrlHeader = $this->base64UrlEncode($header);
@@ -74,11 +80,16 @@ class AuthController {
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
     }
 
+    /**
+     * Limpia las cookies de sesión (auth_token y refresh_token) y destruye la sesión PHP actual.
+     */
     public static function logout() {
         // Limpiar cookie con múltiples variantes de ruta para asegurar efectividad en XAMPP
         $path = '/creaciones%20antigravity/Estadias/';
         setcookie('auth_token', '', time() - 3600, $path);
         setcookie('auth_token', '', time() - 3600, '/');
+        setcookie('refresh_token', '', time() - 3600, $path);
+        setcookie('refresh_token', '', time() - 3600, '/');
         
         if (session_status() === PHP_SESSION_NONE) session_start();
         session_unset();

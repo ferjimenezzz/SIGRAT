@@ -28,8 +28,37 @@ if (isset($_COOKIE['auth_token'])) {
     }
 }
 
-if (!$jwt_valid && isset($_SESSION['us_id'])) {
-    $jwt_valid = true; 
+// Mecanismo de Refresh Silencioso si el access token expiró pero existe un refresh token válido
+if (!$jwt_valid && isset($_COOKIE['refresh_token'])) {
+    $payload = $auth->validateJWT($_COOKIE['refresh_token']);
+    if ($payload) {
+        // Regenerar Access Token (2 horas)
+        $new_token = $auth->generateJWT([
+            'us_id' => $payload['us_id'],
+            'nombre' => $payload['nombre'],
+            'rol' => $payload['rol'],
+            'permisos' => $payload['permisos']
+        ], 7200);
+
+        setcookie('auth_token', $new_token, time() + 7200, '/creaciones%20antigravity/Estadias/', '', false, true);
+        
+        $_SESSION['us_id'] = $payload['us_id'];
+        $_SESSION['nombre'] = $payload['nombre'];
+        $_SESSION['rol'] = $payload['rol'];
+        $_SESSION['permisos'] = $payload['permisos'];
+        $jwt_valid = true;
+    } else {
+        setcookie('refresh_token', '', time() - 3600, '/creaciones%20antigravity/Estadias/');
+    }
+}
+
+// Si la autenticación por token falla, invalidar la sesión local de PHP
+if (!$jwt_valid) {
+    if (isset($_SESSION['us_id'])) {
+        session_unset();
+        session_destroy();
+        if (session_status() === PHP_SESSION_NONE) session_start();
+    }
 }
 
 $currentPage = basename($_SERVER['PHP_SELF']);

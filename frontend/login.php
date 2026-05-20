@@ -33,10 +33,13 @@ if (isset($_POST['login'])) {
             'permisos' => json_decode($user['permisos'], true)
         ];
 
-        $token = $auth->generateJWT($payload);
+        // Generar Access Token (2 horas) y Refresh Token (8 horas)
+        $token = $auth->generateJWT($payload, 7200);
+        $refreshToken = $auth->generateJWT($payload, 28800);
 
-        // Establecer Cookie Segura con ruta codificada (evita el error de espacios)
-        setcookie('auth_token', $token, time() + (60 * 60 * 8), '/creaciones%20antigravity/Estadias/', '', false, true);
+        // Establecer Cookies Seguras con ruta codificada
+        setcookie('auth_token', $token, time() + 7200, '/creaciones%20antigravity/Estadias/', '', false, true);
+        setcookie('refresh_token', $refreshToken, time() + 28800, '/creaciones%20antigravity/Estadias/', '', false, true);
 
         // Población inmediata de sesión (Redundancia de seguridad)
         $_SESSION['us_id'] = $user['us_id'];
