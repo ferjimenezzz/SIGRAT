@@ -82,7 +82,10 @@ INSERT INTO `dispositivo_lector` (`lec_id`, `esp_id`, `ubicacion_desc`) VALUES
 CREATE TABLE `usuario` (
   `us_id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(150) NOT NULL,
+  `apellido` varchar(150) DEFAULT '',
   `correo` varchar(100) NOT NULL,
+  `empresa` varchar(150) DEFAULT '',
+  `rfc_matricula` varchar(50) DEFAULT '',
   `contrasena` varchar(255) NOT NULL,
   `rol_id` int(11) DEFAULT NULL,
   `tag_id` varchar(50) DEFAULT NULL,

@@ -18,7 +18,10 @@ CREATE TABLE ROLES (
 CREATE TABLE USUARIO (
     us_id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(150) NOT NULL,
+    apellido VARCHAR(150) DEFAULT '',
     correo VARCHAR(100) UNIQUE NOT NULL,
+    empresa VARCHAR(150) DEFAULT '',
+    rfc_matricula VARCHAR(50) DEFAULT '',
     contrasena VARCHAR(255) NOT NULL,
     rol_id INT,
     estatus ENUM('Activo', 'Inactivo') DEFAULT 'Activo',
