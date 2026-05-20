@@ -26,6 +26,7 @@ require_once '../controllers/RFIDController.php';
 require_once '../controllers/AssetController.php';
 require_once '../controllers/LoanController.php';
 require_once '../controllers/MaintenanceController.php';
+require_once '../controllers/SpaceController.php';
 
 use Controllers\InviteController;
 use Controllers\ReservationController;
@@ -33,6 +34,7 @@ use Controllers\RFIDController;
 use Controllers\AssetController;
 use Controllers\LoanController;
 use Controllers\MaintenanceController;
+use Controllers\SpaceController;
 
 // Obtener la ruta de la petición
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -116,6 +118,27 @@ try {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = $controller->logMaintenance($input['act_id'], $input['descripcion'], $input['responsable']);
                 $status_code = 201;
+            }
+            break;
+
+        case 'espacios':
+            $controller = new SpaceController();
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                // Comprobamos si la petición finaliza en '/disponibles' para el filtrado temporal
+                if ($uri[count($uri)-1] === 'disponibles') {
+                    // Extraemos parámetros opcionales o definimos rangos por defecto
+                    $fecha = $_GET['fecha'] ?? date('Y-m-d');
+                    $inicio = $_GET['inicio'] ?? '00:00:00';
+                    $fin = $_GET['fin'] ?? '23:59:59';
+                    
+                    // Consultamos espacios sin reservaciones traslapadas en ese bloque temporal
+                    $response = $controller->getUnoccupied($fecha, $inicio, $fin);
+                    $status_code = 200;
+                } else {
+                    // Si no es el sub-recurso '/disponibles', listamos todos los espacios del catálogo
+                    $response = ["success" => true, "data" => $controller->getAll()];
+                    $status_code = 200;
+                }
             }
             break;
     }

@@ -52,6 +52,46 @@ class SpaceController {
     }
 
     /**
+     * Obtiene los espacios que no tienen reservas en una fecha y rango horario específicos.
+     * @param string $fecha Fecha de la consulta (formato YYYY-MM-DD).
+     * @param string $hora_inicio Hora de inicio del bloque solicitado (formato HH:MM:SS).
+     * @param string $hora_fin Hora de fin del bloque solicitado (formato HH:MM:SS).
+     * @return array Estructura de respuesta indicando el éxito y el listado de espacios desocupados o el mensaje de error.
+     */
+    public function getUnoccupied($fecha, $hora_inicio, $hora_fin) {
+        try {
+            // Consulta SQL estructurada con subconsulta NOT IN para excluir los espacios que ya cuenten con reservaciones aprobadas que se traslapen con el horario solicitado
+            $query = "
+                SELECT e.esp_id, e.edificio, e.nombre_numero, e.tipo, e.capacidad
+                FROM espacio e
+                WHERE e.estatus = 'Disponible'
+                  AND e.esp_id NOT IN (
+                      SELECT r.esp_id
+                      FROM reserva r
+                      WHERE r.estatus IN ('Aprobada', 'Aprobado')
+                        AND r.fecha_uso = ?
+                        AND r.hora_ent < ?
+                        AND r.hora_sal > ?
+                  )
+                ORDER BY e.edificio, e.nombre_numero
+            ";
+            
+            // Preparación del statement para mitigar el riesgo de inyecciones SQL (Security Standard)
+            $stmt = $this->db->prepare($query);
+            
+            // Ejecución enviando los parámetros en el orden requerido por los marcadores posicionales (fecha, hora_fin, hora_inicio)
+            $stmt->execute([$fecha, $hora_fin, $hora_inicio]);
+            
+            // Retorno exitoso conteniendo la colección de registros
+            return ["success" => true, "data" => $stmt->fetchAll()];
+        } catch (\PDOException $e) {
+            // Registro en el log del servidor ante fallas en la base de datos
+            error_log("Error en getUnoccupied: " . $e->getMessage());
+            return ["success" => false, "error" => "Error al consultar espacios desocupados."];
+        }
+    }
+
+    /**
      * Elimina un espacio.
      */
     public function delete($id) {
