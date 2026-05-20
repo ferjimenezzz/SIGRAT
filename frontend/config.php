@@ -62,7 +62,10 @@ include 'header.php';
     <div class="card">
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
             <?php foreach ($roles as $rol): ?>
-            <?php $p = json_decode($rol['permisos'] ?? '', true) ?: []; ?>
+            <?php 
+            // Deserializa los permisos del formato JSON almacenado en la BD
+            $p = json_decode($rol['permisos'] ?? '', true) ?: []; 
+            ?>
             <div style="padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background: #f8fafc; position: relative;">
                 <div style="position: absolute; top: 16px; right: 16px; display: flex; gap: 12px;">
                     <button onclick='editRole(<?php echo json_encode($rol); ?>)' style="background: none; border: none; color: var(--active-blue); font-size: 10px; font-weight: 900; cursor: pointer;">EDITAR</button>
@@ -73,9 +76,15 @@ include 'header.php';
                 <p style="font-size: 12px; color: #64748b; margin-bottom: 20px; font-weight: 500;"><?php echo $rol['descripcion']; ?></p>
                 
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                    <?php foreach ($p as $modulo => $acciones): ?>
+                    <?php 
+                    // Iteramos sobre las secciones de permisos definidos en el rol
+                    foreach ($p as $modulo => $acciones): 
+                        // Se previene TypeError en PHP 8 al comprobar si $acciones es arreglo antes de contar
+                        // Si es booleano y es true (ej. en el rol de super admin), se muestra "Todo", de lo contrario se muestra su valor plano
+                        $countVal = is_array($acciones) ? count($acciones) : ($acciones === true ? 'Todo' : htmlspecialchars((string)$acciones));
+                    ?>
                         <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase;">
-                            <?php echo $modulo; ?>: <?php echo count($acciones); ?>
+                            <?php echo htmlspecialchars($modulo); ?>: <?php echo $countVal; ?>
                         </span>
                     <?php endforeach; ?>
                 </div>
@@ -135,35 +144,69 @@ include 'header.php';
 </div>
 
 <script>
+/**
+ * Inicializa y muestra el modal para agregar un nuevo rol en el sistema.
+ * @return {void}
+ */
 function openModal() {
+    // Restablece los campos de texto y selecciones del formulario a sus valores iniciales
     document.getElementById('form-rol').reset();
+    // Limpia el ID del rol para asegurar que la acción posterior sea un INSERT
     document.getElementById('rol_id').value = '';
+    // Ajusta el título para reflejar la intención de crear un rol nuevo
     document.getElementById('modal-title').innerText = 'Configurar Nuevo Rol';
+    // Muestra la ventana modal usando flexbox para centrado automático
     document.getElementById('modal-rol').style.display = 'flex';
 }
 
+/**
+ * Oculta la ventana modal de edición/registro de roles.
+ * @return {void}
+ */
 function closeModal() {
+    // Cambia el display a 'none' para ocultar el modal del DOM visual
     document.getElementById('modal-rol').style.display = 'none';
 }
 
+/**
+ * Carga la información de un rol existente y abre el modal en modo edición.
+ * @param {Object} rol - Objeto que representa los datos del rol obtenidos de la base de datos.
+ * @param {number} rol.rol_id - ID único del rol.
+ * @param {string} rol.nombre - Nombre del rol.
+ * @param {string} rol.descripcion - Descripción funcional del rol.
+ * @param {string} rol.permisos - Cadena JSON que contiene los permisos del rol.
+ * @return {void}
+ */
 function editRole(rol) {
+    // Precarga los datos del rol en los campos ocultos y de texto correspondientes
     document.getElementById('rol_id').value = rol.rol_id;
     document.getElementById('nombre_rol').value = rol.nombre;
     document.getElementById('descripcion_rol').value = rol.descripcion;
     document.getElementById('modal-title').innerText = 'Editar Rol: ' + rol.nombre;
     
-    // Reset checks
+    // Desmarca todos los checkboxes de los permisos para evitar arrastrar selecciones previas
     document.querySelectorAll('.perm-check').forEach(c => c.checked = false);
     
-    // Set checks
-    const permisos = JSON.parse(rol.permisos);
-    for (const mod in permisos) {
-        permisos[mod].forEach(acc => {
-            const check = document.querySelector(`.perm-check[data-mod="${mod}"][data-acc="${acc}"]`);
-            if (check) check.checked = true;
-        });
+    // Intenta decodificar la cadena JSON que almacena los permisos asignados
+    let permisos = {};
+    try {
+        permisos = JSON.parse(rol.permisos) || {};
+    } catch (e) {
+        console.error("Error al parsear permisos JSON", e);
     }
     
+    // Mapea los permisos recuperados y marca los checkboxes correspondientes en el DOM
+    for (const mod in permisos) {
+        // Valida que el permiso del módulo esté estructurado como un arreglo (ej. ['Ver', 'Crear'])
+        if (Array.isArray(permisos[mod])) {
+            permisos[mod].forEach(acc => {
+                const check = document.querySelector(`.perm-check[data-mod="${mod}"][data-acc="${acc}"]`);
+                if (check) check.checked = true;
+            });
+        }
+    }
+    
+    // Muestra el modal para edición
     document.getElementById('modal-rol').style.display = 'flex';
 }
 </script>
