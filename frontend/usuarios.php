@@ -11,10 +11,14 @@ require_once '../backend/controllers/AuthController.php';
 
 use Controllers\AuthController;
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $db = Config\Database::getConnection();
 $inviteController = new Controllers\InviteController();
 
-// 1. Manejar Registro / Edición de Usuario Interno
+// 1. Manejar Registro / Edición de Usuario Interno e Invitaciones
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'save_user') {
         $nombre = $_POST['nombre'];
@@ -35,6 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $pass]);
         }
         header("Location: usuarios.php?success=1");
+        exit();
+    } elseif ($_POST['action'] === 'generate_code') {
+        $nombre_visita = $_POST['nombre_visita'];
+        $correo_visita = $_POST['correo_visita'];
+        $anfitrion_id = $_SESSION['us_id'] ?? null;
+
+        if ($anfitrion_id) {
+            $inviteController->generate($nombre_visita, $correo_visita, $anfitrion_id);
+            header("Location: usuarios.php?tab=externos&success_invite=1");
+        } else {
+            header("Location: usuarios.php?tab=externos&error_invite=no_session");
+        }
         exit();
     }
 }
@@ -255,6 +271,11 @@ include 'header.php';
         document.getElementById('user-modal-title').innerText = 'Editar Usuario';
         document.getElementById('modal-usuario').style.display = 'flex';
     }
+
+    // Mantener la pestaña activa después de recargar si viene en el GET
+    const urlParams = new URLSearchParams(window.location.search);
+    let activeTab = urlParams.get('tab') || 'internos';
+    switchTab(activeTab);
 </script>
 
 <?php include 'footer.php'; ?>
