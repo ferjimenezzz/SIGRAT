@@ -1,0 +1,15 @@
+# Purpose: Exclude sensitive, environment-specific, and temporary files from version control.
+
+# Environment files containing local credentials
+backend/.env
+.env
+
+# Dependencies
+vendor/
+backend/vendor/
+node_modules/
+
+# OS/System files
+.DS_Store
+Thumbs.db
+Desktop.ini

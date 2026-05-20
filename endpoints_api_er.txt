@@ -1,0 +1,140 @@
+================================================================================
+          DOCUMENTACIÓN DE ENDPOINTS - SISTEMA SIGRAT (BASADO EN ER)
+================================================================================
+Módulo: Arquitectura Base
+Descripción: Mapeo completo de las rutas de la API RESTful para el sistema
+SIGRAT, derivado directamente del modelo Entidad-Relación proporcionado.
+================================================================================
+
+1. MÓDULO DE USUARIOS Y ROLES
+--------------------------------------------------------------------------------
+-- Roles (roles)
+GET    /api/roles                 -> Obtener lista de todos los roles
+GET    /api/roles/{id}            -> Obtener detalles de un rol específico
+POST   /api/roles                 -> Crear un nuevo rol
+PUT    /api/roles/{id}            -> Actualizar un rol
+DELETE /api/roles/{id}            -> Eliminar un rol
+
+-- Usuarios (usuario)
+GET    /api/usuarios              -> Obtener todos los usuarios
+GET    /api/usuarios/{id}         -> Obtener detalles de un usuario
+POST   /api/usuarios              -> Registrar un nuevo usuario
+PUT    /api/usuarios/{id}         -> Actualizar datos de usuario
+DELETE /api/usuarios/{id}         -> Eliminar o dar de baja un usuario (soft delete recomendado)
+GET    /api/usuarios/{id}/reservas-> Obtener historial de reservas del usuario
+
+
+2. MÓDULO DE INFRAESTRUCTURA Y ESPACIOS
+--------------------------------------------------------------------------------
+-- Espacios (espacio)
+GET    /api/espacios              -> Listar todos los espacios (aulas, labs, etc.)
+GET    /api/espacios/{id}         -> Detalles de un espacio específico
+POST   /api/espacios              -> Registrar nuevo espacio
+PUT    /api/espacios/{id}         -> Modificar datos del espacio
+DELETE /api/espacios/{id}         -> Dar de baja un espacio (soft delete)
+GET    /api/espacios/{id}/activos -> Listar inventario/activos vinculados a este espacio
+
+-- Antenas RFID (antena)
+GET    /api/antenas               -> Listar antenas instaladas
+GET    /api/antenas/{id}          -> Detalles de una antena
+POST   /api/antenas               -> Registrar nueva antena
+PUT    /api/antenas/{id}          -> Actualizar datos de antena
+DELETE /api/antenas/{id}          -> Eliminar antena
+
+-- Lectores RFID (lector)
+GET    /api/lectores              -> Listar lectores registrados
+GET    /api/lectores/{id}         -> Detalle de un lector
+POST   /api/lectores              -> Registrar lector
+PUT    /api/lectores/{id}         -> Actualizar lector
+DELETE /api/lectores/{id}         -> Eliminar lector
+
+
+3. MÓDULO DE INVENTARIO Y ACTIVOS
+--------------------------------------------------------------------------------
+-- Activos (activo)
+GET    /api/activos               -> Listar todos los activos (equipos)
+GET    /api/activos/{id}          -> Detalles de un activo
+POST   /api/activos               -> Registrar nuevo activo
+PUT    /api/activos/{id}          -> Modificar activo
+DELETE /api/activos/{id}          -> Dar de baja activo
+
+-- Mobiliario (mobiliario)
+GET    /api/mobiliario            -> Listar mobiliario
+GET    /api/mobiliario/{id}       -> Detalles de mobiliario
+POST   /api/mobiliario            -> Registrar mobiliario
+PUT    /api/mobiliario/{id}       -> Actualizar mobiliario
+DELETE /api/mobiliario/{id}       -> Dar de baja mobiliario
+
+-- Llaves (llave)
+GET    /api/llaves                -> Listar llaves de espacios
+GET    /api/llaves/{id}           -> Detalle de una llave
+POST   /api/llaves                -> Registrar nueva llave
+PUT    /api/llaves/{id}           -> Actualizar llave
+DELETE /api/llaves/{id}           -> Eliminar llave
+
+-- Mantenimiento (mantenimiento)
+GET    /api/mantenimientos        -> Listar registros de mantenimiento
+GET    /api/mantenimientos/{id}   -> Detalle de un mantenimiento
+POST   /api/mantenimientos        -> Registrar mantenimiento a un activo
+PUT    /api/mantenimientos/{id}   -> Actualizar estatus de mantenimiento
+DELETE /api/mantenimientos/{id}   -> Eliminar registro de mantenimiento
+
+
+4. MÓDULO DE RESERVAS Y PRESTAMOS
+--------------------------------------------------------------------------------
+-- Reservas (reserva)
+GET    /api/reservas              -> Listar todas las reservas
+GET    /api/reservas/{id}         -> Detalle de reserva
+POST   /api/reservas              -> Crear solicitud de reserva
+PUT    /api/reservas/{id}         -> Modificar reserva
+DELETE /api/reservas/{id}         -> Cancelar reserva
+
+-- Aprobaciones (aprobacion)
+GET    /api/aprobaciones          -> Listar aprobaciones (pendientes/realizadas)
+POST   /api/aprobaciones          -> Aprobar o rechazar una reserva
+GET    /api/aprobaciones/{id}     -> Detalle de una aprobación
+
+-- Préstamos (prestamo)
+GET    /api/prestamos             -> Listar préstamos de activos/equipos
+GET    /api/prestamos/{id}        -> Detalle de préstamo
+POST   /api/prestamos             -> Registrar nuevo préstamo
+PUT    /api/prestamos/{id}        -> Actualizar préstamo (ej. marcar como devuelto)
+
+
+5. MÓDULO DE SEGUIMIENTO RFID (ACTIVOS, LLAVES Y MOBILIARIO)
+--------------------------------------------------------------------------------
+-- Tags RFID (tag_rfid)
+GET    /api/tags                  -> Listar tags registrados (exclusivo para inventario)
+GET    /api/tags/{id}             -> Detalle de un tag
+POST   /api/tags                  -> Registrar nuevo tag (Solo asignable a Activo, Llave o Mobiliario)
+PUT    /api/tags/{id}             -> Actualizar estado del tag
+DELETE /api/tags/{id}             -> Dar de baja tag
+
+-- Movimientos RFID (movimiento_rfid)
+GET    /api/movimientos           -> Listar todos los movimientos detectados
+POST   /api/movimientos           -> Registrar movimiento (normalmente por hardware/IoT)
+GET    /api/movimientos/{id}      -> Detalle de movimiento específico
+
+-- Visitas (visita)
+GET    /api/visitas               -> Listar visitantes registrados
+GET    /api/visitas/{id}          -> Detalle de visita
+POST   /api/visitas               -> Registrar nueva visita (y generar código de acceso)
+PUT    /api/visitas/{id}          -> Actualizar estatus de visita
+
+
+6. MÓDULO DE AUDITORÍA Y REPORTES
+--------------------------------------------------------------------------------
+-- Bitácora (bitacora)
+GET    /api/bitacora              -> Listar registros de auditoría (logs del sistema)
+POST   /api/bitacora              -> Registrar acción en sistema (uso interno del backend)
+
+-- Reportes (reporte)
+GET    /api/reportes              -> Listar reportes generados
+GET    /api/reportes/{id}         -> Detalle de metadatos de un reporte
+POST   /api/reportes              -> Generar nuevo reporte analítico
+
+-- Archivos (archivo)
+GET    /api/archivos              -> Listar metadatos de archivos generados por el sistema (ej. Reportes PDF)
+GET    /api/archivos/{id}/dl      -> Descargar archivo físico generado
+# Nota de Arquitectura: No existe endpoint POST público para subida manual. 
+# Los archivos son creados y guardados automáticamente por el backend al generar reportes.

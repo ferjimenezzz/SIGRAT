@@ -1,0 +1,43 @@
+================================================================================
+REPORTE TÉCNICO: SISTEMA INTEGRAL DE GESTIÓN DE RECURSOS (SIGRAT)
+================================================================================
+
+PROYECTO: SIGRAT - UTEQ
+FECHA: 2026-05-07
+ARQUITECTURA: Full-Stack (Node.js / React / PostgreSQL)
+
+1. ARQUITECTURA DE BASE DE DATOS
+--------------------------------------------------------------------------------
+Se ha diseñado un esquema relacional optimizado en PostgreSQL:
+- Normalización: 3NF para asegurar la integridad de los datos.
+- Manejo de Conflictos: Uso de índices GIST y el operador EXCLUDE para evitar 
+  el traslape de reservaciones de tiempo en la misma ubicación a nivel nativo.
+- Auditoría: Tabla 'audit_logs' con soporte JSONB para registrar telemetría 
+  de seguridad e intentos de acceso no autorizados.
+
+2. SEGURIDAD Y CONTROL DE ACCESO (RBAC)
+--------------------------------------------------------------------------------
+- Roles Implementados: Administrador, Personal, Estudiante.
+- Middleware: Capas de seguridad que validan el rol antes de procesar cualquier
+  petición sensible.
+- Auditoría Forense: Cada rechazo de acceso (403 Forbidden) se registra en 
+  la base de datos con IP, Usuario y Acción.
+
+3. INTEGRACIÓN IOT (RFID)
+--------------------------------------------------------------------------------
+- Comunicación: WebSockets (Socket.io) para actualización en tiempo real de 
+  lecturas de tags desde los edificios CIC y PIDET.
+- Escalabilidad: Backend preparado para gestionar más de 100,000 registros de 
+  tags RFID sin degradación de rendimiento.
+- Simulación: Incluye un script de simulación para pruebas de hardware sin 
+  dispositivos físicos.
+
+4. TECNOLOGÍAS UTILIZADAS
+--------------------------------------------------------------------------------
+- Backend: Node.js, Express, Socket.io, PG-Pool.
+- Frontend: React, Vite, Tailwind CSS, Lucide React.
+- Base de Datos: PostgreSQL 12+.
+
+================================================================================
+FIN DEL REPORTE
+================================================================================

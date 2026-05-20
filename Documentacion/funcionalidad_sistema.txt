@@ -1,0 +1,37 @@
+============================================================
+           FUNCIONALIDAD DEL SISTEMA SIGRAT (v3.0)
+============================================================
+
+1. GESTIÓN DE USUARIOS Y GOBERNANZA (Módulo: USUARIO)
+   - Registro y control de usuarios internos con roles dinámicos (ROLES).
+   - Gestión de visitas y externos (VISITA) con flujo de validación.
+   - Auditoría en tiempo real de acciones administrativas (BITACORA).
+
+2. RESERVACIONES ACADÉMICAS Y ADMINISTRATIVAS (Módulo: RESERVA)
+   - Solicitud de espacios en edificios CIC y PIDET (ESPACIO).
+   - Control de conflictos de horario por fecha, hora de entrada y salida.
+   - Flujo de autorización formal por administradores (APROBACION).
+   - Soporte para reservaciones de invitados externos vinculados a visitas.
+
+3. CONTROL DE INVENTARIO Y ACTIVOS (Módulo: ACTIVO)
+   - Enrolamiento masivo de tags RFID para equipo de cómputo y mobiliario.
+   - Clasificación técnica por tipo, marca, modelo y número de serie/inventario.
+   - Gestión de llaves físicas vinculadas a espacios y reservaciones (LLAVE).
+
+4. PRÉSTAMOS Y MANTENIMIENTO (Módulo: OPERATIVO)
+   - Registro de salida y entrada de activos a usuarios (PRESTAMO).
+   - Seguimiento de activos en mantenimiento preventivo o correctivo (MANTENIMIENTO).
+   - Alertas automáticas para devoluciones atrasadas o equipo fuera de servicio.
+
+5. INTELIGENCIA Y SEGURIDAD RFID (Módulo: HARDWARE)
+   - Monitoreo de antenas (ANTENA) y lectores (LECTOR).
+   - Trazabilidad total de movimientos de personas y objetos (MOVIMIENTO_RFID).
+   - Detección automática de sentido (ENTRADA/SALIDA) basada en historial.
+
+6. REPORTES Y ARCHIVISTICA (Módulo: REPORTE)
+   - Generación de reportes PDF/Excel por usuario, espacio o fecha (REPORTE).
+   - Repositorio digital de documentos generados por el sistema (ARCHIVO).
+
+Arquitectura: PHP Nativo (SSR) + MySQL (3NF - 18 Tablas)
+Diseño: Material Design Premium / Outfit Font
+============================================================

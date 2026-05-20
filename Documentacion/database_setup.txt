@@ -1,0 +1,103 @@
+-- SIGRAT: SCRIPT COMPLETO DE CONFIGURACIÓN INICIAL (POSTGRESQL) --
+
+/**
+ * PASO 0: CREACIÓN DE LA BASE DE DATOS Y USUARIO (Ejecutar en postgres o como superusuario)
+ */
+
+-- 1. Crear la base de datos
+CREATE DATABASE sigrat_db;
+
+-- 2. (Opcional) Crear un usuario específico para la aplicación
+CREATE USER Fernand0 WITH ENCRYPTED PASSWORD 'Fjamnr050';
+GRANT ALL PRIVILEGES ON DATABASE Fernand0 TO Fernand0;
+
+-- 3. Conectarse a la base de datos recién creada
+\c Fernand0
+
+/**
+ * PASO 1: CONFIGURACIÓN DE EXTENSIONES Y SEGURIDAD
+ */
+
+-- Habilitar extensiones para UUID y validaciones de rango (GIST)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+/**
+ * PASO 2: CREACIÓN DE ESTRUCTURAS RELACIONALES (SIGRAT)
+ */
+
+-- Estructura de Ubicaciones (Edificios CIC y PIDET)
+CREATE TABLE locations (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    building VARCHAR(50) CHECK (building IN ('CIC', 'PIDET')) NOT NULL
+);
+
+-- Usuarios y Roles del Sistema
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    matricula VARCHAR(20) UNIQUE NOT NULL,
+    role VARCHAR(30) CHECK (role IN ('Admin', 'Personal', 'Estudiante')) NOT NULL,
+    rfid_tag_id VARCHAR(50) UNIQUE
+);
+
+-- Inventario de Activos RFID (+100,000 registros proyectados)
+CREATE TABLE assets (
+    id SERIAL PRIMARY KEY,
+    description TEXT NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    rfid_tag_id VARCHAR(50) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'disponible' CHECK (status IN ('disponible', 'prestado', 'mantenimiento', 'extraviado'))
+);
+
+-- Historial de Asistencia y Movimiento RFID
+CREATE TABLE attendance_logs (
+    id BIGSERIAL PRIMARY KEY,
+    tag_id VARCHAR(50) REFERENCES users(rfid_tag_id),
+    location_id INTEGER REFERENCES locations(id),
+    log_type VARCHAR(10) CHECK (log_type IN ('IN', 'OUT')),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reservaciones con Bloqueo de Traslape a nivel de DB
+CREATE TABLE reservations (
+    id SERIAL PRIMARY KEY,
+    location_id INTEGER REFERENCES locations(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    software_required JSONB,
+    status VARCHAR(20) DEFAULT 'confirmada',
+    CONSTRAINT no_overlap EXCLUDE USING GIST (location_id WITH =, tsrange(start_time, end_time) WITH &&)
+);
+
+-- Bitácora de Auditoría Forense (Seguridad)
+CREATE TABLE audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    module VARCHAR(50) NOT NULL,
+    details JSONB,
+    ip_address VARCHAR(45),
+    status VARCHAR(20),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+/**
+ * PASO 3: ÍNDICES DE RENDIMIENTO (OPTIMIZACIÓN)
+ */
+
+CREATE INDEX idx_attendance_time ON attendance_logs (timestamp DESC);
+CREATE INDEX idx_assets_tag ON assets (rfid_tag_id);
+CREATE INDEX idx_audit_module ON audit_logs (module);
+
+/**
+ * PASO 4: DATOS SEMILLA (INICIALIZACIÓN)
+ */
+
+INSERT INTO locations (name, building) VALUES ('Laboratorio de Redes', 'CIC');
+INSERT INTO locations (name, building) VALUES ('Aula de Posgrado 1', 'PIDET');
+INSERT INTO users (name, matricula, role, rfid_tag_id) VALUES ('Admin SIGRAT', 'ADMIN001', 'Admin', 'ABC123XYZ');
+
+-- FIN DEL SCRIPT --

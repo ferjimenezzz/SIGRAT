@@ -1,0 +1,41 @@
+================================================================================
+MANUAL DE INSTALACIÓN Y PUESTA EN MARCHA - SIGRAT
+================================================================================
+
+Siga estos pasos para configurar el entorno de desarrollo local:
+
+1. REQUISITOS DEL SISTEMA
+--------------------------------------------------------------------------------
+- Node.js instalado (v16.x o superior).
+- PostgreSQL instalado y configurado.
+- Editor de código (VS Code recomendado).
+
+2. CONFIGURACIÓN DE LA BASE DE DATOS
+--------------------------------------------------------------------------------
+- Abra su cliente de PostgreSQL (pgAdmin o terminal).
+- Cree la base de datos: CREATE DATABASE sigrat_db;
+- Ejecute el contenido del archivo 'database_setup.txt' ubicado en esta carpeta.
+
+3. CONFIGURACIÓN DEL BACKEND
+--------------------------------------------------------------------------------
+- Abra una terminal en la carpeta 'backend/'.
+- Ejecute: npm install
+- Configure el archivo '.env' con sus credenciales de base de datos.
+- Inicie el servidor: node server.js
+
+4. CONFIGURACIÓN DEL FRONTEND
+--------------------------------------------------------------------------------
+- Abra una terminal en la carpeta 'frontend/'.
+- Ejecute: npm install
+- Inicie la aplicación: npm run dev
+- Abra en su navegador la URL: http://localhost:5173
+
+5. PRUEBAS DE SIMULACIÓN RFID
+--------------------------------------------------------------------------------
+- Con el backend y frontend corriendo, abra una tercera terminal en 'backend/'.
+- Ejecute: node scripts/simulate_hardware.js
+- Observe en el dashboard de la web cómo se registran los tags instantáneamente.
+
+================================================================================
+SOPORTE TÉCNICO: CREACIONES ANTIGRAVITY - ESTADIAS DTAI
+================================================================================
