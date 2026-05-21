@@ -90,7 +90,12 @@ include 'header.php';
                     </div>
                     <div>
                         <label style="display: block; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">Tipo de Área</label>
-                        <input type="text" name="tipo" required placeholder="Ej: Laboratorio, Aula, Taller" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                        <select name="tipo" required style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; font-weight: 700; color: #334155;">
+                            <option value="">Seleccione un tipo...</option>
+                            <?php foreach ($spaceController->getTiposPermitidos() as $tipoEnum): ?>
+                            <option value="<?php echo htmlspecialchars($tipoEnum); ?>"><?php echo htmlspecialchars($tipoEnum); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div>
                         <label style="display: block; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">Capacidad</label>

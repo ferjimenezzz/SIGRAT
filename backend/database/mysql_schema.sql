@@ -65,7 +65,7 @@ CREATE TABLE ESPACIO (
     esp_id INT PRIMARY KEY AUTO_INCREMENT,
     edificio ENUM('CIC', 'PIDET') NOT NULL,
     nombre_numero VARCHAR(50) NOT NULL,
-    tipo VARCHAR(50),
+    tipo ENUM('Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas'),
     capacidad INT,
     inv_asociado VARCHAR(50),
     estatus VARCHAR(20) DEFAULT 'Disponible'

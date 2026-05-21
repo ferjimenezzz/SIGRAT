@@ -33,7 +33,7 @@ CREATE TABLE `espacio` (
   `esp_id` int(11) NOT NULL AUTO_INCREMENT,
   `edificio` enum('CIC','PIDET') NOT NULL,
   `nombre_numero` varchar(50) NOT NULL,
-  `tipo` varchar(50) DEFAULT NULL,
+  `tipo` enum('Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas') DEFAULT NULL,
   `capacidad` int(11) DEFAULT NULL,
   `estatus` enum('Disponible','Ocupado','Mantenimiento','Inactivo') DEFAULT 'Disponible',
   `eliminado` tinyint(1) DEFAULT 0,
