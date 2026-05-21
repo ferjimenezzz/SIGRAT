@@ -130,6 +130,7 @@ CREATE TABLE `rfid_logs_lectura` (
   CONSTRAINT `fk_log_lec` FOREIGN KEY (`lec_id`) REFERENCES `dispositivo_lector` (`lec_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Updated reservation table with approval workflow
 CREATE TABLE `reserva` (
   `re_id` int(11) NOT NULL AUTO_INCREMENT,
   `us_id` int(11) DEFAULT NULL,
@@ -137,10 +138,13 @@ CREATE TABLE `reserva` (
   `fecha_uso` date NOT NULL,
   `hora_ent` time NOT NULL,
   `hora_sal` time NOT NULL,
-  `estatus` varchar(20) DEFAULT 'Aprobado',
+  `status` ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `approved_by` int(11) NULL,
+  `approved_at` DATETIME NULL,
   PRIMARY KEY (`re_id`),
   CONSTRAINT `fk_res_user` FOREIGN KEY (`us_id`) REFERENCES `usuario` (`us_id`),
-  CONSTRAINT `fk_res_esp` FOREIGN KEY (`esp_id`) REFERENCES `espacio` (`esp_id`)
+  CONSTRAINT `fk_res_esp` FOREIGN KEY (`esp_id`) REFERENCES `espacio` (`esp_id`),
+  CONSTRAINT `fk_res_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `usuario` (`us_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `bitacora` (
