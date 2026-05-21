@@ -116,6 +116,7 @@ if (!function_exists('hasPermission')) {
             <a href="reservas.php" class="nav-item <?php echo $currentPage == 'reservas.php' ? 'active' : ''; ?>"><i data-lucide="calendar" style="width:18px;"></i> Calendario</a>
             
             <?php if (hasPermission('all')): ?>
+            <a href="aprobacion_reservas.php" class="nav-item <?php echo $currentPage == 'aprobacion_reservas.php' ? 'active' : ''; ?>"><i data-lucide="check-square" style="width:18px;"></i> Aprobaciones</a>
             <a href="usuarios.php" class="nav-item <?php echo $currentPage == 'usuarios.php' ? 'active' : ''; ?>"><i data-lucide="users" style="width:18px;"></i> Usuarios</a>
             <?php endif; ?>
             
