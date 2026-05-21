@@ -27,6 +27,27 @@ class ReservationApprovalController
     }
 
     /**
+     * Get all pending reservations.
+     *
+     * @return array List of pending reservations.
+     */
+    public function getPending(): array
+    {
+        // Join with usuario and espacio to get readable names
+        $stmt = $this->pdo->prepare("
+            SELECT r.re_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.status,
+                   u.nombre AS usuario_nombre, e.nombre_numero AS espacio_nombre
+            FROM reserva r
+            LEFT JOIN usuario u ON r.us_id = u.us_id
+            LEFT JOIN espacio e ON r.esp_id = e.esp_id
+            WHERE r.status = 'pending'
+            ORDER BY r.fecha_uso ASC, r.hora_ent ASC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Approve a reservation.
      *
      * @param int $reservationId ID of the reservation to approve.
