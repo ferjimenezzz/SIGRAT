@@ -67,6 +67,14 @@ try {
             break;
 
         case 'reservations':
+            // Módulo de aprobación de reservas
+            $action_url = end($uri);
+            if (in_array($action_url, ['pending', 'approve', 'reject'])) {
+                require_once '../routes.php';
+                handleReservationApproval($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+                break;
+            }
+
             $controller = new ReservationController();
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Crear reservación - El input debe traer esp_id, fecha_uso, hora_ent, hora_sal, etc.
