@@ -1,0 +1,81 @@
+<?php
+/**
+ * routes.php
+ *
+ * Backend routing definitions for reservation approval module.
+ * Registers API endpoints for approving and rejecting reservations.
+ */
+
+require_once __DIR__ . '/ReservationApprovalController.php';
+require_once __DIR__ . '/../api/index.php'; // Ensure this file is included when API is accessed.
+
+// Simple router function to handle approval actions.
+function handleReservationApproval(string $method, string $path)
+{
+    // Expected patterns:
+    // POST /api/reservations/{id}/approve
+    // POST /api/reservations/{id}/reject
+    $segments = explode('/', trim($path, '/'));
+    // Find the index of "reservations" in the URL.
+    $resIdx = array_search('reservations', $segments);
+    if ($resIdx === false || !isset($segments[$resIdx + 1])) {
+        return false; // Not a reservation approval route.
+    }
+
+    $reservationId = $segments[$resIdx + 1];
+    $action = $segments[$resIdx + 2] ?? null;
+
+    if (!ctype_digit($reservationId) || ($action !== 'approve' && $action !== 'reject')) {
+        return false;
+    }
+
+    $controller = new Backend\ReservationApprovalController(getPDO());
+    // Assuming a session holds the admin user ID and role.
+    $adminId = $_SESSION['user_id'] ?? null;
+    $role   = $_SESSION['user_role'] ?? null;
+
+    // Authorization check – only admin or manager may act.
+    if (!in_array($role, ['admin', 'manager'])) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Forbidden: insufficient role']);
+        exit;
+    }
+
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    try {
+        if ($action === 'approve') {
+            $controller->approve((int)$reservationId, (int)$adminId);
+            $response = ['message' => 'Reservation approved'];
+        } else {
+            $reason = $input['reason'] ?? null;
+            $controller->reject((int)$reservationId, (int)$adminId, $reason);
+            $response = ['message' => 'Reservation rejected'];
+        }
+        http_response_code(200);
+        echo json_encode($response);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    exit;
+}
+
+/**
+ * Helper to obtain a PDO connection (singleton pattern).
+ *
+ * @return PDO
+ */
+function getPDO(): PDO
+{
+    static $pdo = null;
+    if ($pdo === null) {
+        // Credentials should be stored securely; placeholders used here.
+        $dsn = 'mysql:host=localhost;dbname=sigrat_db;charset=utf8mb4';
+        $user = 'root';
+        $pass = '';
+        $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    }
+    return $pdo;
+}
+?>
