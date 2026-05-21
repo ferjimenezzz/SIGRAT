@@ -7,7 +7,6 @@
  */
 
 require_once __DIR__ . '/ReservationApprovalController.php';
-require_once __DIR__ . '/../api/index.php'; // Ensure this file is included when API is accessed.
 
 // Simple router function to handle approval actions.
 function handleReservationApproval(string $method, string $path)
@@ -34,14 +33,34 @@ function handleReservationApproval(string $method, string $path)
     }
 
     $controller = new Backend\ReservationApprovalController(getPDO());
-    // Assuming a session holds the admin user ID and role.
-    $adminId = $_SESSION['user_id'] ?? null;
-    $role   = $_SESSION['user_role'] ?? null;
+    // The session is populated by login.php with 'us_id' and 'rol'.
+    $adminId = $_SESSION['us_id'] ?? null;
+    $role   = $_SESSION['rol'] ?? null;
 
-    // Authorization check – only admin or manager may act.
-    if (!in_array($role, ['admin', 'manager'])) {
+    // Fallback: Validate JWT token directly if session is lost
+    if (!$adminId && isset($_COOKIE['auth_token'])) {
+        require_once __DIR__ . '/controllers/AuthController.php';
+        $auth = new \Controllers\AuthController();
+        $payload = $auth->validateJWT($_COOKIE['auth_token']);
+        if ($payload) {
+            $adminId = $payload['us_id'];
+            $role = $payload['rol'];
+            
+            // Repopulate session
+            $_SESSION['us_id'] = $adminId;
+            $_SESSION['rol'] = $role;
+            $_SESSION['nombre'] = $payload['nombre'];
+            $_SESSION['permisos'] = $payload['permisos'];
+        }
+    }
+
+    $userRol = strtoupper(trim((string)$role));
+    $isAdmin = strpos($userRol, 'ADMIN') !== false;
+
+    // Authorization check – allow any admin or 'Personal Académico'.
+    if (!$isAdmin && $role !== 'Personal Académico') {
         http_response_code(403);
-        echo json_encode(['error' => 'Forbidden: insufficient role']);
+        echo json_encode(['error' => "Forbidden: insufficient role or expired session. User Role: " . ($role ?: 'None')]);
         exit;
     }
 

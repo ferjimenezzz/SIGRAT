@@ -49,9 +49,12 @@ include 'header.php';
             setLoading(true);
             try {
                 // Llamada a nuestro nuevo endpoint
-                const response = await fetch('../backend/api/index.php/reservations/pending');
+                const response = await fetch('../backend/api/index.php/reservations/pending', {
+                    credentials: 'same-origin'
+                });
                 if (!response.ok) {
-                    throw new Error("Error al obtener las reservas pendientes del servidor.");
+                    const errorText = await response.text();
+                    throw new Error(`Error del servidor (${response.status}): ${errorText}`);
                 }
                 const data = await response.json();
                 setReservations(Array.isArray(data) ? data : []);
