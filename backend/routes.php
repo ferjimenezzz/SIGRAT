@@ -62,20 +62,13 @@ function handleReservationApproval(string $method, string $path)
 }
 
 /**
- * Helper to obtain a PDO connection (singleton pattern).
+ * Helper to obtain a PDO connection using the existing config.
  *
  * @return PDO
  */
 function getPDO(): PDO
 {
-    static $pdo = null;
-    if ($pdo === null) {
-        // Credentials should be stored securely; placeholders used here.
-        $dsn = 'mysql:host=localhost;dbname=sigrat_db;charset=utf8mb4';
-        $user = 'root';
-        $pass = '';
-        $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-    }
-    return $pdo;
+    require_once __DIR__ . '/config/Database.php';
+    return \Config\Database::getConnection();
 }
 ?>
