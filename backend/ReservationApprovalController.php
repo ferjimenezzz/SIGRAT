@@ -56,25 +56,73 @@ class ReservationApprovalController
      */
     public function approve(int $reservationId, int $adminId): void
     {
-        // Verify reservation exists and is pending
-        $stmt = $this->pdo->prepare(
-            "SELECT status FROM reserva WHERE re_id = :id FOR UPDATE"
-        );
-        $stmt->execute([':id' => $reservationId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            throw new Exception('Reservation not found');
-        }
-        if ($row['status'] !== 'pending') {
-            throw new Exception('Only pending reservations can be approved');
-        }
+        try {
+            $this->pdo->beginTransaction();
 
-        // Update status, audit fields
-        $update = $this->pdo->prepare(
-            "UPDATE reserva SET status = 'approved', approved_by = :admin, approved_at = NOW() WHERE re_id = :id"
-        );
-        $update->execute([':admin' => $adminId, ':id' => $reservationId]);
-        $this->logAction($adminId, 'Aprobó reserva', 'reserva');
+            // Verify reservation exists and is pending
+            $stmt = $this->pdo->prepare(
+                "SELECT status, esp_id, fecha_uso, hora_ent, hora_sal FROM reserva WHERE re_id = :id FOR UPDATE"
+            );
+            $stmt->execute([':id' => $reservationId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$row) {
+                throw new Exception('La reserva no existe.');
+            }
+            if ($row['status'] !== 'pending') {
+                throw new Exception('Solo las reservas pendientes pueden ser aprobadas.');
+            }
+
+            // Check for overlapping approved reservations
+            $overlapStmt = $this->pdo->prepare(
+                "SELECT COUNT(*) FROM reserva 
+                 WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso 
+                 AND status = 'approved' AND hora_ent < :hora_sal AND hora_sal > :hora_ent"
+            );
+            $overlapStmt->execute([
+                ':esp_id' => $row['esp_id'],
+                ':fecha_uso' => $row['fecha_uso'],
+                ':hora_sal' => $row['hora_sal'],
+                ':hora_ent' => $row['hora_ent']
+            ]);
+            
+            if ($overlapStmt->fetchColumn() > 0) {
+                throw new Exception('El espacio ya cuenta con una reservación aprobada en este horario.');
+            }
+
+            // Update status to approved
+            $update = $this->pdo->prepare(
+                "UPDATE reserva SET status = 'approved', estatus = 'Aprobada', approved_by = :admin, approved_at = NOW() WHERE re_id = :id"
+            );
+            $update->execute([':admin' => $adminId, ':id' => $reservationId]);
+            $this->logAction($adminId, 'Aprobó reserva #' . $reservationId, 'reserva');
+
+            // Automatically reject overlapping pending reservations
+            $rejectStmt = $this->pdo->prepare(
+                "UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', approved_by = :admin, approved_at = NOW() 
+                 WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso 
+                 AND status = 'pending' AND hora_ent < :hora_sal AND hora_sal > :hora_ent AND re_id != :id"
+            );
+            $rejectStmt->execute([
+                ':admin' => $adminId,
+                ':esp_id' => $row['esp_id'],
+                ':fecha_uso' => $row['fecha_uso'],
+                ':hora_sal' => $row['hora_sal'],
+                ':hora_ent' => $row['hora_ent'],
+                ':id' => $reservationId
+            ]);
+
+            $rejectedCount = $rejectStmt->rowCount();
+            if ($rejectedCount > 0) {
+                $this->logAction($adminId, "Rechazo automático de $rejectedCount reserva(s) por empalme con reserva #" . $reservationId, 'reserva');
+            }
+
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -102,7 +150,7 @@ class ReservationApprovalController
 
         // Update status, audit fields
         $update = $this->pdo->prepare(
-            "UPDATE reserva SET status = 'rejected', approved_by = :admin, approved_at = NOW() WHERE re_id = :id"
+            "UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', approved_by = :admin, approved_at = NOW() WHERE re_id = :id"
         );
         $update->execute([':admin' => $adminId, ':id' => $reservationId]);
         $this->logAction($adminId, 'Rechazó reserva' . ($reason ? ': ' . $reason : ''), 'reserva');

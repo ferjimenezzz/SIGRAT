@@ -94,7 +94,14 @@ $inventario = $db->query("SELECT a.act_id, a.tipo, a.modelo, e.edificio
                         </td>
                         <td style="padding: 20px 24px; font-size: 13px; font-weight: 600; color: #64748b;"><?php echo $res['user_name'] ?: 'Visita Externa'; ?></td>
                         <td style="padding: 20px 24px;">
-                            <span style="padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 900; background: #fef3c7; color: #92400e;"><?php echo $res['estatus']; ?></span>
+                            <?php 
+                            $bg = '#fef3c7'; $col = '#92400e';
+                            if ($res['estatus'] === 'Aprobada') { $bg = '#d1fae5'; $col = '#065f46'; }
+                            elseif ($res['estatus'] === 'Rechazada') { $bg = '#fee2e2'; $col = '#991b1b'; }
+                            ?>
+                            <span style="padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 900; background: <?php echo $bg; ?>; color: <?php echo $col; ?>;">
+                                <?php echo strtoupper($res['estatus']); ?>
+                            </span>
                         </td>
                     </tr>
                     <?php endforeach; ?>

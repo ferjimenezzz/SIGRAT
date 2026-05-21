@@ -4,6 +4,7 @@
  * @summary Punto de entrada único (Router) para la API de SIGRAT en PHP.
  * @description Centraliza las peticiones, gestiona CORS, decodifica JSON y despacha a los controladores correspondientes.
  */
+session_start();
 
 // Configuración de encabezados para API REST y CORS
 header("Access-Control-Allow-Origin: *");
@@ -39,9 +40,15 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode('/', $uri);
 
 // Extraer el recurso (ej: invites, reservations, hardware)
-// Dependiendo de la configuración de Apache, el índice puede variar. 
-// Asumimos /Estadias/backend/api/index.php/recurso
-$resource = $uri[array_search('api', $uri) + 1] ?? null;
+$apiIndex = array_search('api', $uri);
+$resource = null;
+if ($apiIndex !== false) {
+    if (isset($uri[$apiIndex + 1]) && $uri[$apiIndex + 1] === 'index.php') {
+        $resource = $uri[$apiIndex + 2] ?? null;
+    } else {
+        $resource = $uri[$apiIndex + 1] ?? null;
+    }
+}
 
 // Obtener el cuerpo de la petición si es JSON
 $input = json_decode(file_get_contents("php://input"), true);
