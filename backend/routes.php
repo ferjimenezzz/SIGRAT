@@ -22,10 +22,14 @@ function handleReservationApproval(string $method, string $path)
         return false; // Not a reservation approval route.
     }
 
-    $reservationId = $segments[$resIdx + 1];
+    $reservationId = $segments[$resIdx + 1] ?? null;
     $action = $segments[$resIdx + 2] ?? null;
 
-    if (!ctype_digit($reservationId) || ($action !== 'approve' && $action !== 'reject')) {
+    // Support GET /reservations/pending (no ID)
+    if ($reservationId === 'pending' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $action = 'pending';
+        $reservationId = null;
+    } elseif (!ctype_digit($reservationId) || ($action !== 'approve' && $action !== 'reject')) {
         return false;
     }
 
@@ -44,16 +48,25 @@ function handleReservationApproval(string $method, string $path)
     $input = json_decode(file_get_contents('php://input'), true);
 
     try {
-        if ($action === 'approve') {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'pending') {
+            $pending = $controller->getPending();
+            http_response_code(200);
+            echo json_encode($pending);
+        } elseif ($action === 'approve') {
             $controller->approve((int)$reservationId, (int)$adminId);
             $response = ['message' => 'Reservation approved'];
-        } else {
+            http_response_code(200);
+            echo json_encode($response);
+        } elseif ($action === 'reject') {
             $reason = $input['reason'] ?? null;
             $controller->reject((int)$reservationId, (int)$adminId, $reason);
             $response = ['message' => 'Reservation rejected'];
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid action']);
         }
-        http_response_code(200);
-        echo json_encode($response);
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['error' => $e->getMessage()]);
