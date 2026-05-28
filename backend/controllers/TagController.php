@@ -181,4 +181,67 @@ class TagController {
             return ["success" => false, "error" => "Error al realizar la vinculación en la base de datos."];
         }
     }
+
+    /**
+     * Registra un lote de TAGs manualmente de forma masiva.
+     * @param array $tags Arreglo de strings con los UIDs de los tags.
+     * @return array Resultado de la operación detallando cuantos se insertaron.
+     */
+    public function enrollManualBatch(array $tags) {
+        $tags = array_unique(array_filter(array_map('trim', $tags)));
+        if (empty($tags)) return ["success" => false, "error" => "No hay tags válidos para enrolar."];
+
+        try {
+            $this->db->beginTransaction();
+            $stmt = $this->db->prepare("INSERT INTO TAG_RFID (tag_id, tipo_tag, estado) VALUES (?, 'Activo', 'Activo')");
+
+            $enrolledCount = 0;
+            foreach ($tags as $tag) {
+                try {
+                    $stmt->execute([$tag]);
+                    $enrolledCount++;
+                } catch (PDOException $e) {
+                    // Ignorar errores de llave duplicada (SQLSTATE 23505 para Postgres, 23000 para MySQL)
+                    if ($e->getCode() != '23505' && $e->getCode() != '23000') {
+                        throw $e;
+                    }
+                }
+            }
+            
+            $this->db->commit();
+            $this->audit->log(1, "Enrolados $enrolledCount tags manualmente.", "RFID");
+            return ["success" => true, "enrolled" => $enrolledCount];
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return ["success" => false, "error" => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Obtiene los TAGs que no han sido asociados a ningún elemento (Disponibles).
+     * Utiliza un LEFT JOIN masivo sobre ACTIVO, LLAVE y MOBILIARIO.
+     * @return array Arreglo con la clave data conteniendo los strings de tag_id.
+     */
+    public function getAvailableTags() {
+        try {
+            // Buscamos tags que no estén referenciados en ninguna tabla hija y estén activos
+            $query = "
+                SELECT t.tag_id 
+                FROM TAG_RFID t
+                LEFT JOIN ACTIVO a ON t.tag_id = a.tag_id
+                LEFT JOIN LLAVE l ON t.tag_id = l.tag_id
+                LEFT JOIN MOBILIARIO m ON t.tag_id = m.tag_id
+                WHERE a.tag_id IS NULL 
+                  AND l.tag_id IS NULL 
+                  AND m.tag_id IS NULL
+                  AND t.estado = 'Activo'
+                ORDER BY t.fecha_activacion DESC
+            ";
+            $stmt = $this->db->query($query);
+            return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_COLUMN)];
+        } catch (PDOException $e) {
+            error_log("Error al obtener tags disponibles: " . $e->getMessage());
+            return ["success" => false, "error" => "Error al consultar tags disponibles."];
+        }
+    }
 }
