@@ -193,7 +193,7 @@ class TagController {
 
         try {
             $this->db->beginTransaction();
-            $stmt = $this->db->prepare("INSERT INTO TAG_RFID (tag_id, tipo_tag, estado) VALUES (?, 'Activo', 'Activo')");
+            $stmt = $this->db->prepare("INSERT INTO TAG_RFID (tag_id, tipo_tag, estado) VALUES (?, 'Sin Asignar', 'Activo')");
 
             $enrolledCount = 0;
             foreach ($tags as $tag) {

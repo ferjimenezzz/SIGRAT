@@ -9,12 +9,14 @@ require_once '../backend/config/Database.php';
 require_once '../backend/controllers/AssetController.php';
 require_once '../backend/controllers/SpaceController.php';
 require_once '../backend/controllers/TagController.php';
+require_once '../backend/controllers/BatchController.php';
 
 $db = Config\Database::getConnection();
 
 $assetController = new Controllers\AssetController();
 $spaceController = new Controllers\SpaceController();
 $tagController = new Controllers\TagController();
+$batchController = new Controllers\BatchController();
 
 $allSpaces = $spaceController->getAll();
 
@@ -92,12 +94,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     exit();
 }
+// Manejar creación rápida desde la vista
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'new_asset') {
     $res = $assetController->create($_POST);
     if (!$res['success']) {
         header("Location: enrolamiento.php?tab=inventario&error=" . urlencode($res['error']));
     } else {
         header("Location: enrolamiento.php?tab=inventario");
+    }
+    exit();
+}
+
+// Manejar Asignación Masiva
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'batch_assign') {
+    $tagsToAssign = [];
+    $mode = $_POST['batch_mode'] ?? 'list';
+    
+    if ($mode === 'range') {
+        $prefixForm = trim($_POST['batch_range_prefix'] ?? '');
+        $startStrRaw = trim($_POST['batch_range_start'] ?? '');
+        $endStrRaw = trim($_POST['batch_range_end'] ?? '');
+        
+        preg_match('/^(.*?)(\d+)$/', $startStrRaw, $startMatches);
+        preg_match('/^(.*?)(\d+)$/', $endStrRaw, $endMatches);
+        
+        $startPrefix = $startMatches[1] ?? '';
+        $startNumStr = $startMatches[2] ?? $startStrRaw;
+        $endNumStr = $endMatches[2] ?? $endStrRaw;
+        $finalPrefix = $prefixForm . $startPrefix;
+        $start = (int)$startNumStr;
+        $end = (int)$endNumStr;
+        $padLength = strlen($startNumStr);
+        
+        if ($start > 0 && $end >= $start) {
+            $limit = min($end, $start + 1000);
+            for ($i = $start; $i <= $limit; $i++) {
+                $tagsToAssign[] = $finalPrefix . str_pad((string)$i, $padLength, '0', STR_PAD_LEFT);
+            }
+        }
+    } elseif ($mode === 'list' && !empty($_POST['batch_tags_text'])) {
+        $tagsToAssign = explode("\n", $_POST['batch_tags_text']);
+        $tagsToAssign = array_map('trim', $tagsToAssign);
+        $tagsToAssign = array_filter($tagsToAssign);
+    }
+
+    if (empty($tagsToAssign)) {
+        header("Location: enrolamiento.php?tab=inventario&error=" . urlencode("Datos inválidos para asignación masiva."));
+        exit();
+    }
+
+    $targetTable = $_POST['target_table'] ?? 'LLAVE';
+    $res = $batchController->assignBulkTags($targetTable, $_POST, $tagsToAssign);
+    
+    if ($res['success']) {
+        header("Location: enrolamiento.php?tab=inventario&success_batch=" . $res['count']);
+    } else {
+        header("Location: enrolamiento.php?tab=inventario&error=" . urlencode($res['error']));
     }
     exit();
 }
@@ -132,6 +184,11 @@ include 'header.php';
             <?php if(isset($_GET['error']) && $_GET['tab'] === 'inventario'): ?>
                 <div style="background: #fee2e2; color: #b91c1c; padding: 16px; border-radius: 8px; font-weight: bold; font-size: 14px;">
                     Error: <?php echo htmlspecialchars($_GET['error']); ?>
+                </div>
+            <?php endif; ?>
+            <?php if(isset($_GET['success_batch']) && $_GET['tab'] === 'inventario'): ?>
+                <div style="background: #dcfce3; color: #166534; padding: 16px; border-radius: 8px; font-weight: bold; font-size: 14px;">
+                    Se asignaron y crearon exitosamente <?php echo htmlspecialchars($_GET['success_batch']); ?> registros en lote.
                 </div>
             <?php endif; ?>
             <div class="card" style="padding: 0; overflow: hidden;">
@@ -172,51 +229,118 @@ include 'header.php';
             </div>
         </main>
 
-        <aside class="card">
-            <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 24px;">Nuevo Activo</h3>
-            <form method="POST">
-                <input type="hidden" name="action" value="new_asset">
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div>
-                        <label>Tipo de Activo</label>
-                        <input type="text" name="tipo" required placeholder="Ej: Laptop, Monitor" class="form-control">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 32px;">
+            <aside class="card">
+                <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 24px;">Nuevo Activo</h3>
+                <form method="POST">
+                    <input type="hidden" name="action" value="new_asset">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
                         <div>
-                            <label>Marca</label>
-                            <input type="text" name="marca" required class="form-control">
+                            <label>Tipo de Activo</label>
+                            <input type="text" name="tipo" required placeholder="Ej: Laptop, Monitor" class="form-control">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label>Marca</label>
+                                <input type="text" name="marca" required class="form-control">
+                            </div>
+                            <div>
+                                <label>Modelo</label>
+                                <input type="text" name="modelo" required class="form-control">
+                            </div>
                         </div>
                         <div>
-                            <label>Modelo</label>
-                            <input type="text" name="modelo" required class="form-control">
+                            <label>Número de Serie</label>
+                            <input type="text" name="num_serie" required class="form-control">
                         </div>
+                        <div>
+                            <label>Número de Inventario</label>
+                            <input type="text" name="num_inv" required placeholder="Ej: INV-2024-001" class="form-control">
+                        </div>
+                        <div style="position: relative;">
+                            <label>UID TAG (RFID)</label>
+                            <input type="text" name="tag_id" id="new_tag_id" autocomplete="off" placeholder="Busca o Escanea el TAG..." class="form-control" style="font-family: 'JetBrains Mono', monospace; color: var(--active-blue); width: 100%; box-sizing: border-box;" required>
+                            <div id="new_tag_dropdown" class="custom-dropdown"></div>
+                        </div>
+                        <div>
+                            <label>Espacio Asignado</label>
+                            <select name="esp_asignado" class="form-control">
+                                <option value="">Seleccionar Área...</option>
+                                <?php foreach ($allSpaces as $sp): ?>
+                                <option value="<?php echo $sp['esp_id']; ?>"><?php echo $sp['edificio']; ?> - <?php echo $sp['nombre_numero']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">REGISTRAR ACTIVO</button>
                     </div>
-                    <div>
-                        <label>Número de Serie</label>
-                        <input type="text" name="num_serie" required class="form-control">
+                </form>
+            </aside>
+
+            <!-- Nueva Card: Asignación Masiva -->
+            <aside class="card" style="background: #f8fafc; border: 2px dashed #cbd5e1;">
+                <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 8px;">Asignación Masiva</h3>
+                <p style="font-size: 11px; color: #64748b; margin-bottom: 24px; line-height: 1.5;">Usa esta opción para asociar múltiples TAGs "Sin Asignar" a un lote de llaves o mobiliario genérico de un solo golpe.</p>
+                
+                <form method="POST">
+                    <input type="hidden" name="action" value="batch_assign">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div>
+                            <label>Destino</label>
+                            <select name="target_table" class="form-control" style="background: white;" onchange="toggleBatchTarget(this.value)">
+                                <option value="LLAVE">Llaves (Ej: Llaveros)</option>
+                                <option value="MOBILIARIO">Mobiliario Genérico (Ej: Sillas)</option>
+                                <option value="ACTIVO">Activos Genéricos (Ej: Cables)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Descripción / Tipo</label>
+                            <input type="text" name="tipo" placeholder="Ej: Llave Aula, Silla, Adaptador" class="form-control" required style="background: white;">
+                        </div>
+
+                        <div id="batch_espacio_div">
+                            <label>Espacio Asignado (Obligatorio para Llaves)</label>
+                            <select name="esp_id" class="form-control" style="background: white;">
+                                <option value="">Seleccionar Área...</option>
+                                <?php foreach ($allSpaces as $sp): ?>
+                                <option value="<?php echo $sp['esp_id']; ?>"><?php echo $sp['edificio']; ?> - <?php echo $sp['nombre_numero']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Tags a Asociar</label>
+                            <select name="batch_mode" id="batch_mode" class="form-control" onchange="toggleBatchMode()" style="background: white;">
+                                <option value="list">Pegar Lista de TAGs</option>
+                                <option value="range">Rango Automático</option>
+                            </select>
+                        </div>
+
+                        <!-- Lote Lista -->
+                        <div id="batch-mode-list" style="display: block;">
+                            <textarea name="batch_tags_text" rows="4" placeholder="Pega los códigos de los TAGs..." class="form-control" style="width: 100%; font-family: 'JetBrains Mono', monospace; resize: vertical; background: white;"></textarea>
+                        </div>
+
+                        <!-- Lote Rango -->
+                        <div id="batch-mode-range" style="display: none; background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <div>
+                                    <label style="font-size: 9px;">Número Inicial</label>
+                                    <input type="text" name="batch_range_start" class="form-control" style="font-family: 'JetBrains Mono', monospace;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 9px;">Número Final</label>
+                                    <input type="text" name="batch_range_end" class="form-control" style="font-family: 'JetBrains Mono', monospace;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;">CREAR LOTE MASIVO</button>
                     </div>
-                    <div>
-                        <label>Número de Inventario</label>
-                        <input type="text" name="num_inv" required placeholder="Ej: INV-2024-001" class="form-control">
-                    </div>
-                    <div style="position: relative;">
-                        <label>UID TAG (RFID)</label>
-                        <input type="text" name="tag_id" id="new_tag_id" autocomplete="off" placeholder="Busca o Escanea el TAG..." class="form-control" style="font-family: 'JetBrains Mono', monospace; color: var(--active-blue); width: 100%; box-sizing: border-box;" required>
-                        <div id="new_tag_dropdown" class="custom-dropdown"></div>
-                    </div>
-                    <div>
-                        <label>Espacio Asignado</label>
-                        <select name="esp_asignado" class="form-control">
-                            <option value="">Seleccionar Área...</option>
-                            <?php foreach ($allSpaces as $sp): ?>
-                            <option value="<?php echo $sp['esp_id']; ?>"><?php echo $sp['edificio']; ?> - <?php echo $sp['nombre_numero']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">REGISTRAR ACTIVO</button>
-                </div>
-            </form>
-        </aside>
+                </form>
+            </aside>
+        </div>
+
     </div>
 
     <!-- Sección: Enrolamiento -->
@@ -530,6 +654,17 @@ include 'header.php';
         document.getElementById('mode-single').style.display = mode === 'single' ? 'block' : 'none';
         document.getElementById('mode-range').style.display = mode === 'range' ? 'block' : 'none';
         document.getElementById('mode-list').style.display = mode === 'list' ? 'block' : 'none';
+    }
+
+    function toggleBatchMode() {
+        const mode = document.getElementById('batch_mode').value;
+        document.getElementById('batch-mode-list').style.display = mode === 'list' ? 'block' : 'none';
+        document.getElementById('batch-mode-range').style.display = mode === 'range' ? 'block' : 'none';
+    }
+
+    function toggleBatchTarget(target) {
+        // En un futuro se podría ocultar o mostrar campos según sea Llave, Activo o Mobiliario
+        // Por ahora, 'esp_id' es útil para Llaves y Activos, y 'dimensiones' para Mobiliario (omitido por simplicidad)
     }
 
     function switchAssetTab(tab) {
