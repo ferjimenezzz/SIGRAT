@@ -70,7 +70,7 @@ include 'header.php';
         </div>
         <div style="display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 12px;">
             <button onclick="switchTab('enrolamiento')" id="tab-enrolamiento" class="btn-tab active">ENROLAMIENTO</button>
-            <button onclick="switchTab('simulador')" id="tab-simulador" class="btn-tab">SIMULADOR HW</button>
+            <button onclick="switchTab('simulador')" id="tab-simulador" class="btn-tab">LECTOR USB / SIMULADOR</button>
         </div>
     </header>
 
@@ -147,7 +147,16 @@ include 'header.php';
     <!-- Sección: Simulador -->
     <div id="section-simulador" style="display: none; flex-direction: column; gap: 32px; max-width: 800px; margin: 0 auto; width: 100%;">
         <div class="card">
-            <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 24px;">Simulador de Escaneo Hardware</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-weight: 800; color: #1e293b; margin: 0;">Lector Físico y Simulador (HW)</h3>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span id="serial-status" style="font-size: 11px; font-weight: 900; color: #ef4444; text-transform: uppercase;">Desconectado</span>
+                    <button type="button" onclick="connectSerial()" class="btn-secondary" style="padding: 6px 12px; font-size: 10px; cursor: pointer; text-decoration: none;">CONECTAR ARDUINO (USB)</button>
+                </div>
+            </div>
+            
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 24px;">Conecta tu placa Arduino por USB, presiona el botón "Conectar" y acerca un TAG al lector RC522. Alternativamente, escribe un UID manual para simularlo.</p>
+
             <div style="display: flex; flex-direction: column; gap: 20px;">
                 <div>
                     <label style="display: block; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">ID del Tag (RFID)</label>
@@ -209,6 +218,61 @@ include 'header.php';
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('tab') || 'enrolamiento';
     switchTab(activeTab);
+
+    let serialPort;
+    let serialReader;
+
+    async function connectSerial() {
+        if (!('serial' in navigator)) {
+            alert("Tu navegador no soporta Web Serial API. Usa Google Chrome o Microsoft Edge en tu PC.");
+            return;
+        }
+        
+        try {
+            serialPort = await navigator.serial.requestPort();
+            await serialPort.open({ baudRate: 9600 });
+            
+            const decoder = new TextDecoderStream();
+            serialPort.readable.pipeTo(decoder.writable);
+            const inputStream = decoder.readable;
+            serialReader = inputStream.getReader();
+            
+            document.getElementById('serial-status').innerText = "CONECTADO AL COM";
+            document.getElementById('serial-status').style.color = "#10b981";
+            
+            readSerialLoop();
+        } catch (e) {
+            console.error(e);
+            alert("Error al conectar con el lector USB: " + e.message);
+        }
+    }
+
+    async function readSerialLoop() {
+        let buffer = "";
+        while (true) {
+            const { value, done } = await serialReader.read();
+            if (done) {
+                serialReader.releaseLock();
+                break;
+            }
+            buffer += value;
+            if (buffer.includes("\n")) {
+                let lines = buffer.split("\n");
+                buffer = lines.pop(); // Guarda la línea incompleta
+                for (let line of lines) {
+                    line = line.trim();
+                    // Filtra la cadena "UID de la tarjeta: " que emite el script de Arduino C++
+                    if (line.includes("UID de la tarjeta:")) {
+                        let uid = line.split("UID de la tarjeta:")[1].trim().replace(/\s/g, "").toUpperCase();
+                        
+                        // Llenar el input del formulario y enviar la petición REST
+                        document.getElementById('sim-tag').value = uid;
+                        simularEscaneo();
+                    }
+                }
+            }
+        }
+    }
 
     async function simularEscaneo() {
         const tag = document.getElementById('sim-tag').value;
