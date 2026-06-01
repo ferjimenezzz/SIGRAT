@@ -18,6 +18,14 @@ class AuthController {
 
     public function __construct() {
         $this->db = Database::getConnection();
+        // Cargar JWT_SECRET desde el archivo .env si existe
+        $env_file = dirname(__DIR__) . '/.env';
+        if (file_exists($env_file)) {
+            $env = parse_ini_file($env_file);
+            if (isset($env['JWT_SECRET']) && !empty($env['JWT_SECRET'])) {
+                $this->secret_key = $env['JWT_SECRET'];
+            }
+        }
     }
 
     public static function hashPassword($password) {
@@ -75,10 +83,24 @@ class AuthController {
     }
 
     public static function logout() {
-        // Limpiar cookie con múltiples variantes de ruta para asegurar efectividad en XAMPP
-        $path = '/creaciones%20antigravity/Estadias/';
-        setcookie('auth_token', '', time() - 3600, $path);
+        // Limpiar cookie a nivel de dominio
         setcookie('auth_token', '', time() - 3600, '/');
+        
+        // Limpiar cookie en la ruta de script actual dinámicamente para mayor seguridad en subdirectorios
+        if (isset($_SERVER['SCRIPT_NAME'])) {
+            $script_dir = dirname($_SERVER['SCRIPT_NAME']);
+            $script_dir = str_replace('\\', '/', $script_dir);
+            $script_dir = rtrim($script_dir, '/');
+            if (!empty($script_dir)) {
+                // Codificar cada segmento del path para evitar errores por espacios en setcookie()
+                $segments = explode('/', $script_dir);
+                $encoded_segments = array_map('rawurlencode', $segments);
+                $encoded_dir = implode('/', $encoded_segments);
+                
+                setcookie('auth_token', '', time() - 3600, $encoded_dir . '/');
+                setcookie('auth_token', '', time() - 3600, $encoded_dir);
+            }
+        }
         
         if (session_status() === PHP_SESSION_NONE) session_start();
         session_unset();

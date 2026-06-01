@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Autoload manual (Simulando PSR-4 para simplicidad en XAMPP sin Composer)
 require_once '../config/Database.php';
+require_once '../controllers/AuthController.php';
 require_once '../controllers/InviteController.php';
 require_once '../controllers/ReservationController.php';
 require_once '../controllers/RFIDController.php';
@@ -28,12 +29,37 @@ require_once '../controllers/AssetController.php';
 require_once '../controllers/LoanController.php';
 require_once '../controllers/MaintenanceController.php';
 
+use Controllers\AuthController;
 use Controllers\InviteController;
 use Controllers\ReservationController;
 use Controllers\RFIDController;
 use Controllers\AssetController;
 use Controllers\LoanController;
 use Controllers\MaintenanceController;
+
+// --- CONTROL DE ACCESO MEDIANTE TOKENS (JWT) ---
+$auth = new AuthController();
+$token = null;
+
+// Obtener token desde la cabecera Authorization o desde la Cookie
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? null;
+if ($authHeader && preg_match('/Bearer\s(\S+)/i', $authHeader, $matches)) {
+    $token = $matches[1];
+} elseif (isset($_COOKIE['auth_token'])) {
+    $token = $_COOKIE['auth_token'];
+}
+
+$userPayload = null;
+if ($token) {
+    $userPayload = $auth->validateJWT($token);
+    if ($userPayload) {
+        // Sincronizar payload del token con la sesión PHP para los controladores y rutas
+        $_SESSION['us_id'] = $userPayload['us_id'];
+        $_SESSION['rol'] = $userPayload['rol'];
+        $_SESSION['nombre'] = $userPayload['nombre'];
+        $_SESSION['permisos'] = $userPayload['permisos'];
+    }
+}
 
 // Obtener la ruta de la petición
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -47,6 +73,33 @@ if ($apiIndex !== false) {
         $resource = $uri[$apiIndex + 2] ?? null;
     } else {
         $resource = $uri[$apiIndex + 1] ?? null;
+    }
+}
+
+// Clasificar si el endpoint es público o privado
+$is_public = false;
+
+// 1. invites/validate es público (GET)
+if ($resource === 'invites' && $_SERVER['REQUEST_METHOD'] === 'GET' && isset($uri[count($uri)-2]) && $uri[count($uri)-2] === 'validate') {
+    $is_public = true;
+}
+
+// 2. Consultar disponibilidad es público (GET /reservations)
+if ($resource === 'reservations' && $_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['esp_id'])) {
+    $is_public = true;
+}
+
+// 3. Procesar escaneo de RFID es público (POST /hardware/rfid-scan)
+if ($resource === 'hardware' && $_SERVER['REQUEST_METHOD'] === 'POST' && end($uri) === 'rfid-scan') {
+    $is_public = true;
+}
+
+// Bloquear el acceso a endpoints protegidos si no hay un token válido
+if (!$is_public) {
+    if (!$userPayload) {
+        http_response_code(401);
+        echo json_encode(["error" => "No autorizado. Token JWT inválido, expirado o ausente."]);
+        exit();
     }
 }
 
@@ -84,6 +137,10 @@ try {
 
             $controller = new ReservationController();
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Asegurar la integridad inyectando el ID de usuario autenticado desde el token JWT
+                if (isset($_SESSION['us_id'])) {
+                    $input['us_id'] = $_SESSION['us_id'];
+                }
                 // Crear reservación - El input debe traer esp_id, fecha_uso, hora_ent, hora_sal, etc.
                 $response = $controller->create($input);
                 $status_code = $response['success'] ? 201 : 400;

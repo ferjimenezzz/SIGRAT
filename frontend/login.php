@@ -35,8 +35,9 @@ if (isset($_POST['login'])) {
 
         $token = $auth->generateJWT($payload);
 
-        // Establecer Cookie Segura con ruta codificada (evita el error de espacios)
-        setcookie('auth_token', $token, time() + (60 * 60 * 8), '/creaciones%20antigravity/Estadias/', '', false, true);
+        // Establecer Cookie Segura a nivel de dominio para asegurar transmisión a todos los directorios
+       setcookie('auth_token', $token, time() + 3600, '/', '', false, true);
+
 
         // Población inmediata de sesión (Redundancia de seguridad)
         $_SESSION['us_id'] = $user['us_id'];
