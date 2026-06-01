@@ -60,4 +60,36 @@ class DashboardController {
             'PIDET' => (int)$pidet
         ];
     }
+
+    /**
+     * Obtiene el total de reservas agrupado por los últimos 7 días.
+     * @return array
+     */
+    public function getReservationsByDay() {
+        $query = "
+            SELECT fecha_uso, COUNT(*) as total 
+            FROM reserva 
+            WHERE fecha_uso >= CURRENT_DATE - INTERVAL '7 days'
+            GROUP BY fecha_uso 
+            ORDER BY fecha_uso ASC
+        ";
+        try {
+            return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene la distribución de estatus de las visitas.
+     * @return array
+     */
+    public function getVisitsStats() {
+        $query = "SELECT estatus, COUNT(*) as total FROM visita GROUP BY estatus";
+        try {
+            return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 }

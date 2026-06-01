@@ -8,9 +8,16 @@ USE sigrat_db;
 
 -- 1. Insertar Roles iniciales
 INSERT INTO ROLES (nombre, descripcion, permisos) VALUES 
-('Administrador', 'Acceso total al sistema y auditoría', '{"all": true}'),
-('Personal Académico', 'Gestión de espacios y préstamos básicos', '{"reservations": true, "loans": true}'),
-('Estudiante', 'Solo consulta y solicitudes de reservación', '{"reservations": "create"}');
+(
+    'Administrador', 
+    'Acceso total al sistema y auditoría', 
+    '{"Inventario": {"create": true, "read": true, "update": true, "delete": true}, "Espacios": {"create": true, "read": true, "update": true, "delete": true}, "Visitas": {"create": true, "read": true, "update": true, "delete": true}, "RFID": {"create": true, "read": true, "update": true, "delete": true}, "Usuarios": {"create": true, "read": true, "update": true, "delete": true}, "Auditorias": {"create": true, "read": true, "update": true, "delete": true}}'
+),
+(
+    'Usuario', 
+    'Acceso operativo estándar', 
+    '{"Inventario": {"create": false, "read": true, "update": false, "delete": false}, "Espacios": {"create": false, "read": true, "update": false, "delete": false}, "Visitas": {"create": true, "read": true, "update": false, "delete": false}, "RFID": {"create": false, "read": false, "update": false, "delete": false}, "Usuarios": {"create": false, "read": false, "update": false, "delete": false}, "Auditorias": {"create": false, "read": false, "update": false, "delete": false}}'
+);
 
 -- 2. Insertar Usuario Administrador (Password: admin123 - Hashear en producción)
 INSERT INTO USUARIO (nombre, correo, contrasena, rol_id, estatus) VALUES 

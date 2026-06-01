@@ -41,13 +41,22 @@ if (!$jwt_valid && in_array($currentPage, $protected_pages)) {
 }
 
 if (!function_exists('hasPermission')) {
-    function hasPermission($perm) {
+    function hasPermission($modulo, $accion = 'read') {
         if (!isset($_SESSION['rol'])) return false;
         $userRol = strtoupper(trim($_SESSION['rol']));
+        // Si es Admin superuser
         if (strpos($userRol, 'ADMIN') !== false) return true;
         if (!isset($_SESSION['permisos'])) return false;
-        if (isset($_SESSION['permisos']['all']) && $_SESSION['permisos']['all'] === true) return true;
-        return isset($_SESSION['permisos'][$perm]) && $_SESSION['permisos'][$perm] !== false;
+        
+        $permisos = $_SESSION['permisos'];
+        if (is_string($permisos)) {
+            $permisos = json_decode($permisos, true) ?: [];
+        }
+        
+        if (isset($permisos[$modulo]) && isset($permisos[$modulo][$accion])) {
+            return $permisos[$modulo][$accion] === true;
+        }
+        return false;
     }
 }
 ?>
@@ -113,27 +122,29 @@ if (!function_exists('hasPermission')) {
         </div>
         <nav class="nav-menu">
             <a href="index.php" class="nav-item <?php echo $currentPage == 'index.php' ? 'active' : ''; ?>"><i data-lucide="layout-dashboard" style="width:18px;"></i> Dashboard</a>
-            <a href="reservas.php" class="nav-item <?php echo $currentPage == 'reservas.php' ? 'active' : ''; ?>"><i data-lucide="calendar" style="width:18px;"></i> Calendario</a>
-            <a href="aprobacion_reservas.php" class="nav-item <?php echo $currentPage == 'aprobacion_reservas.php' ? 'active' : ''; ?>"><i data-lucide="check-square" style="width:18px;"></i> Aprobaciones</a>
             
-            <?php if (hasPermission('all')): ?>
-            <a href="usuarios.php" class="nav-item <?php echo $currentPage == 'usuarios.php' ? 'active' : ''; ?>"><i data-lucide="users" style="width:18px;"></i> Usuarios</a>
+            <?php if (hasPermission('Inventario')): ?>
+            <a href="inventario.php" class="nav-item <?php echo $currentPage == 'inventario.php' ? 'active' : ''; ?>"><i data-lucide="package" style="width:18px;"></i> Inventario</a>
             <?php endif; ?>
-            
-            <?php if (hasPermission('reservations')): ?>
+
+            <?php if (hasPermission('Espacios')): ?>
             <a href="espacios.php" class="nav-item <?php echo $currentPage == 'espacios.php' ? 'active' : ''; ?>"><i data-lucide="map-pin" style="width:18px;"></i> Espacios</a>
             <?php endif; ?>
-            
-            <?php if (hasPermission('loans')): ?>
-            <a href="enrolamiento.php" class="nav-item <?php echo $currentPage == 'enrolamiento.php' ? 'active' : ''; ?>"><i data-lucide="package" style="width:18px;"></i> Inventario</a>
+
+            <?php if (hasPermission('Visitas')): ?>
+            <a href="visitas.php" class="nav-item <?php echo $currentPage == 'visitas.php' ? 'active' : ''; ?>"><i data-lucide="user-check" style="width:18px;"></i> Visitas</a>
             <?php endif; ?>
-            
-            <?php if (hasPermission('all')): ?>
-            <a href="auditoria.php" class="nav-item <?php echo $currentPage == 'auditoria.php' ? 'active' : ''; ?>"><i data-lucide="shield-check" style="width:18px;"></i> Auditoría</a>
+
+            <?php if (hasPermission('RFID')): ?>
+            <a href="rfid.php" class="nav-item <?php echo $currentPage == 'rfid.php' ? 'active' : ''; ?>"><i data-lucide="radio" style="width:18px;"></i> RFID</a>
             <?php endif; ?>
-            
-            <?php if (hasPermission('all')): ?>
-            <a href="config.php" class="nav-item <?php echo $currentPage == 'config.php' ? 'active' : ''; ?>"><i data-lucide="settings" style="width:18px;"></i> Configuración</a>
+
+            <?php if (hasPermission('Usuarios')): ?>
+            <a href="usuarios.php" class="nav-item <?php echo $currentPage == 'usuarios.php' ? 'active' : ''; ?>"><i data-lucide="users" style="width:18px;"></i> Usuarios</a>
+            <?php endif; ?>
+
+            <?php if (hasPermission('Auditorias')): ?>
+            <a href="auditoria.php" class="nav-item <?php echo $currentPage == 'auditoria.php' ? 'active' : ''; ?>"><i data-lucide="shield-check" style="width:18px;"></i> Auditorías</a>
             <?php endif; ?>
         </nav>
     </aside>

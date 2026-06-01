@@ -32,12 +32,17 @@ if (isset($_SESSION['us_id'])) {
         $recentLogs = $auditController->getFiltered(null, null, null); 
         $stats = $dashController->getStats();
         $usage = $dashController->getSpaceUsage();
+        $resByDay = $dashController->getReservationsByDay();
+        $visitStats = $dashController->getVisitsStats();
     } catch (Exception $e) {
         $stats = ['reservas_hoy' => 0, 'activos_uso' => 0, 'alertas_stock' => 0, 'incidentes' => 0];
         $usage = ['CIC' => 0, 'PIDET' => 0];
         $recentLogs = [];
+        $resByDay = [];
+        $visitStats = [];
     }
     ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div style="display: flex; flex-direction: column; gap: 32px;">
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
             <a href="reservas.php" class="card" style="border-left: 4px solid #3b82f6; text-decoration: none;">
@@ -58,22 +63,92 @@ if (isset($_SESSION['us_id'])) {
             </a>
         </div>
 
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div class="card">
+                <h3 style="font-size: 16px; font-weight: 800; color: #334155; margin-bottom: 24px;">Reservas (Últimos 7 días)</h3>
+                <canvas id="reservationsChart" height="100"></canvas>
+            </div>
+            <div class="card">
+                <h3 style="font-size: 16px; font-weight: 800; color: #334155; margin-bottom: 24px;">Estatus de Visitas</h3>
+                <canvas id="visitsChart" height="200"></canvas>
+            </div>
+        </div>
+
         <div class="card">
-            <h3 style="font-size: 16px; font-weight: 800; color: #334155; margin-bottom: 24px;">Resumen de Ocupación</h3>
+            <h3 style="font-size: 16px; font-weight: 800; color: #334155; margin-bottom: 24px;">Resumen de Ocupación Global</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
                 <?php foreach ($usage as $building => $count): ?>
                 <div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span style="font-size: 12px; font-weight: 800; color: #64748b;"><?php echo $building; ?></span>
-                        <span style="font-size: 12px; font-weight: 900; color: #3b82f6;"><?php echo $count; ?> Reservas</span>
+                        <span style="font-size: 12px; font-weight: 900; color: #3b82f6;"><?php echo $count; ?> Reservas Totales</span>
                     </div>
                     <div style="width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden;">
-                        <div style="width: <?php echo ($count > 0 ? 50 : 0); ?>%; height: 100%; background: #3b82f6;"></div>
+                        <div style="width: <?php echo min(100, $count * 5); /* visual multiplier */ ?>%; height: 100%; background: #3b82f6;"></div>
                     </div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
+    </div>
+    
+    <script>
+    // Configuración para la gráfica de Reservas
+    const resDataRaw = <?php echo json_encode($resByDay); ?>;
+    const resLabels = resDataRaw.map(d => d.fecha_uso);
+    const resValues = resDataRaw.map(d => d.total);
+
+    const ctxRes = document.getElementById('reservationsChart').getContext('2d');
+    new Chart(ctxRes, {
+        type: 'line',
+        data: {
+            labels: resLabels.length ? resLabels : ['Sin datos'],
+            datasets: [{
+                label: 'Reservas Aprobadas / Programadas',
+                data: resValues.length ? resValues : [0],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
+        }
+    });
+
+    // Configuración para la gráfica de Visitas
+    const visitDataRaw = <?php echo json_encode($visitStats); ?>;
+    const visitLabels = visitDataRaw.map(d => d.estatus);
+    const visitValues = visitDataRaw.map(d => d.total);
+
+    const ctxVisit = document.getElementById('visitsChart').getContext('2d');
+    new Chart(ctxVisit, {
+        type: 'doughnut',
+        data: {
+            labels: visitLabels.length ? visitLabels : ['Sin datos'],
+            datasets: [{
+                data: visitValues.length ? visitValues : [1],
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#cbd5e1'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '75%',
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: "'Outfit', sans-serif", weight: 700 } } }
+            }
+        }
+    });
+    </script>
     </div>
     <?php include 'footer.php'; ?>
     <?php

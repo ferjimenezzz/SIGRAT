@@ -32,65 +32,15 @@ if ($filtro === 'alerta') {
 $query .= " ORDER BY a.act_id DESC";
 $assets = $db->query($query)->fetchAll();
 
-// Manejar enrolamiento masivo
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'enroll_tags') {
-    $tagsToEnroll = [];
-    $mode = $_POST['enroll_mode'] ?? 'list';
-    
-    if ($mode === 'single' && !empty($_POST['single_tag'])) {
-        $tagsToEnroll[] = trim($_POST['single_tag']);
-    } elseif ($mode === 'range') {
-        $prefixForm = trim($_POST['range_prefix'] ?? '');
-        $startStrRaw = trim($_POST['range_start'] ?? '');
-        $endStrRaw = trim($_POST['range_end'] ?? '');
-        
-        // Extracción inteligente para tags alfanuméricos (ej: 141C01972116)
-        preg_match('/^(.*?)(\d+)$/', $startStrRaw, $startMatches);
-        preg_match('/^(.*?)(\d+)$/', $endStrRaw, $endMatches);
-        
-        $startPrefix = $startMatches[1] ?? '';
-        $startNumStr = $startMatches[2] ?? $startStrRaw;
-        $endNumStr = $endMatches[2] ?? $endStrRaw;
-        
-        $finalPrefix = $prefixForm . $startPrefix;
-        
-        $start = (int)$startNumStr;
-        $end = (int)$endNumStr;
-        
-        $padLength = strlen($startNumStr);
-        
-        if ($start > 0 && $end >= $start) {
-            $limit = min($end, $start + 100000); // Límite de seguridad
-            for ($i = $start; $i <= $limit; $i++) {
-                // str_pad mantiene los ceros a la izquierda, y si no los necesita no altera el número.
-                $tagsToEnroll[] = $finalPrefix . str_pad((string)$i, $padLength, '0', STR_PAD_LEFT);
-            }
-        }
-    } elseif ($mode === 'list' && !empty($_POST['tags_text'])) {
-        $tagsToEnroll = explode("\n", $_POST['tags_text']);
-    }
 
-    if (empty($tagsToEnroll)) {
-        header("Location: enrolamiento.php?tab=enrolamiento&error=" . urlencode("Datos inválidos para enrolar."));
-        exit();
-    }
-
-    $res = $tagController->enrollManualBatch($tagsToEnroll);
-    if ($res['success']) {
-        header("Location: enrolamiento.php?tab=enrolamiento&success=" . $res['enrolled']);
-    } else {
-        header("Location: enrolamiento.php?tab=enrolamiento&error=" . urlencode($res['error']));
-    }
-    exit();
-}
 
 // Manejar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_asset') {
     $res = $assetController->update($_POST['act_id'], $_POST);
     if (!$res['success']) {
-        header("Location: enrolamiento.php?tab=inventario&error=" . urlencode($res['error']));
+        header("Location: inventario.php?tab=inventario&error=" . urlencode($res['error']));
     } else {
-        header("Location: enrolamiento.php?tab=inventario");
+        header("Location: inventario.php?tab=inventario");
     }
     exit();
 }
@@ -98,66 +48,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'new_asset') {
     $res = $assetController->create($_POST);
     if (!$res['success']) {
-        header("Location: enrolamiento.php?tab=inventario&error=" . urlencode($res['error']));
+        header("Location: inventario.php?tab=inventario&error=" . urlencode($res['error']));
     } else {
         header("Location: enrolamiento.php?tab=inventario");
     }
     exit();
 }
 
-// Manejar Asignación Masiva
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'batch_assign') {
-    $tagsToAssign = [];
-    $mode = $_POST['batch_mode'] ?? 'list';
-    
-    if ($mode === 'range') {
-        $prefixForm = trim($_POST['batch_range_prefix'] ?? '');
-        $startStrRaw = trim($_POST['batch_range_start'] ?? '');
-        $endStrRaw = trim($_POST['batch_range_end'] ?? '');
-        
-        preg_match('/^(.*?)(\d+)$/', $startStrRaw, $startMatches);
-        preg_match('/^(.*?)(\d+)$/', $endStrRaw, $endMatches);
-        
-        $startPrefix = $startMatches[1] ?? '';
-        $startNumStr = $startMatches[2] ?? $startStrRaw;
-        $endNumStr = $endMatches[2] ?? $endStrRaw;
-        $finalPrefix = $prefixForm . $startPrefix;
-        $start = (int)$startNumStr;
-        $end = (int)$endNumStr;
-        $padLength = strlen($startNumStr);
-        
-        if ($start > 0 && $end >= $start) {
-            $limit = min($end, $start + 1000);
-            for ($i = $start; $i <= $limit; $i++) {
-                $tagsToAssign[] = $finalPrefix . str_pad((string)$i, $padLength, '0', STR_PAD_LEFT);
-            }
-        }
-    } elseif ($mode === 'list' && !empty($_POST['batch_tags_text'])) {
-        $tagsToAssign = explode("\n", $_POST['batch_tags_text']);
-        $tagsToAssign = array_map('trim', $tagsToAssign);
-        $tagsToAssign = array_filter($tagsToAssign);
-    }
 
-    if (empty($tagsToAssign)) {
-        header("Location: enrolamiento.php?tab=inventario&error=" . urlencode("Datos inválidos para asignación masiva."));
-        exit();
-    }
-
-    $targetTable = $_POST['target_table'] ?? 'LLAVE';
-    $res = $batchController->assignBulkTags($targetTable, $_POST, $tagsToAssign);
-    
-    if ($res['success']) {
-        header("Location: enrolamiento.php?tab=inventario&success_batch=" . $res['count']);
-    } else {
-        header("Location: enrolamiento.php?tab=inventario&error=" . urlencode($res['error']));
-    }
-    exit();
-}
 
 // Manejar eliminación
 if (isset($_GET['delete_id'])) {
     $assetController->delete($_GET['delete_id']);
-    header("Location: enrolamiento.php?tab=inventario");
+    header("Location: inventario.php?tab=inventario");
     exit();
 }
 
@@ -172,7 +75,7 @@ include 'header.php';
         </div>
         <div style="display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 12px;">
             <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active">INVENTARIO</button>
-            <button onclick="switchAssetTab('enrolamiento')" id="tab-enrolamiento" class="btn-tab">ENROLAMIENTO</button>
+
             <button onclick="switchAssetTab('prestamos')" id="tab-prestamos" class="btn-tab">PRÉSTAMOS</button>
             <button onclick="switchAssetTab('mantenimiento')" id="tab-mantenimiento" class="btn-tab">MANTENIMIENTO</button>
         </div>
@@ -186,11 +89,7 @@ include 'header.php';
                     Error: <?php echo htmlspecialchars($_GET['error']); ?>
                 </div>
             <?php endif; ?>
-            <?php if(isset($_GET['success_batch']) && $_GET['tab'] === 'inventario'): ?>
-                <div style="background: #dcfce3; color: #166534; padding: 16px; border-radius: 8px; font-weight: bold; font-size: 14px;">
-                    Se asignaron y crearon exitosamente <?php echo htmlspecialchars($_GET['success_batch']); ?> registros en lote.
-                </div>
-            <?php endif; ?>
+
             <div class="card" style="padding: 0; overflow: hidden;">
             <table style="width: 100%; border-collapse: collapse; text-align: left;">
                 <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
@@ -276,143 +175,12 @@ include 'header.php';
                 </form>
             </aside>
 
-            <!-- Nueva Card: Asignación Masiva -->
-            <aside class="card" style="background: #f8fafc; border: 2px dashed #cbd5e1;">
-                <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 8px;">Asignación Masiva</h3>
-                <p style="font-size: 11px; color: #64748b; margin-bottom: 24px; line-height: 1.5;">Usa esta opción para asociar múltiples TAGs "Sin Asignar" a un lote de llaves o mobiliario genérico de un solo golpe.</p>
-                
-                <form method="POST">
-                    <input type="hidden" name="action" value="batch_assign">
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <div>
-                            <label>Destino</label>
-                            <select name="target_table" class="form-control" style="background: white;" onchange="toggleBatchTarget(this.value)">
-                                <option value="LLAVE">Llaves (Ej: Llaveros)</option>
-                                <option value="MOBILIARIO">Mobiliario Genérico (Ej: Sillas)</option>
-                                <option value="ACTIVO">Activos Genéricos (Ej: Cables)</option>
-                            </select>
-                        </div>
 
-                        <div>
-                            <label>Descripción / Tipo</label>
-                            <input type="text" name="tipo" placeholder="Ej: Llave Aula, Silla, Adaptador" class="form-control" required style="background: white;">
-                        </div>
-
-                        <div id="batch_espacio_div">
-                            <label>Espacio Asignado (Obligatorio para Llaves)</label>
-                            <select name="esp_id" class="form-control" style="background: white;">
-                                <option value="">Seleccionar Área...</option>
-                                <?php foreach ($allSpaces as $sp): ?>
-                                <option value="<?php echo $sp['esp_id']; ?>"><?php echo $sp['edificio']; ?> - <?php echo $sp['nombre_numero']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Tags a Asociar</label>
-                            <select name="batch_mode" id="batch_mode" class="form-control" onchange="toggleBatchMode()" style="background: white;">
-                                <option value="list">Pegar Lista de TAGs</option>
-                                <option value="range">Rango Automático</option>
-                            </select>
-                        </div>
-
-                        <!-- Lote Lista -->
-                        <div id="batch-mode-list" style="display: block;">
-                            <textarea name="batch_tags_text" rows="4" placeholder="Pega los códigos de los TAGs..." class="form-control" style="width: 100%; font-family: 'JetBrains Mono', monospace; resize: vertical; background: white;"></textarea>
-                        </div>
-
-                        <!-- Lote Rango -->
-                        <div id="batch-mode-range" style="display: none; background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                                <div>
-                                    <label style="font-size: 9px;">Número Inicial</label>
-                                    <input type="text" name="batch_range_start" class="form-control" style="font-family: 'JetBrains Mono', monospace;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 9px;">Número Final</label>
-                                    <input type="text" name="batch_range_end" class="form-control" style="font-family: 'JetBrains Mono', monospace;">
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;">CREAR LOTE MASIVO</button>
-                    </div>
-                </form>
-            </aside>
         </div>
 
     </div>
 
-    <!-- Sección: Enrolamiento -->
-    <div id="section-enrolamiento" style="display: none; grid-template-columns: 1fr; gap: 32px;">
-        <main class="card" style="max-width: 800px; margin: 0 auto; width: 100%;">
-            <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 24px;">Enrolamiento Manual de TAGs</h3>
-            
-            <?php if(isset($_GET['success']) && $_GET['tab'] === 'enrolamiento'): ?>
-                <div style="background: #dcfce3; color: #166534; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-weight: bold;">
-                    Se enrolaron exitosamente <?php echo htmlspecialchars($_GET['success']); ?> TAG(s).
-                </div>
-            <?php endif; ?>
-            
-            <?php if(isset($_GET['error']) && $_GET['tab'] === 'enrolamiento'): ?>
-                <div style="background: #fee2e2; color: #b91c1c; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-weight: bold;">
-                    Error: <?php echo htmlspecialchars($_GET['error']); ?>
-                </div>
-            <?php endif; ?>
 
-            <p style="font-size: 14px; color: #64748b; margin-bottom: 24px; line-height: 1.6;">
-                Selecciona la modalidad para dar de alta los identificadores. Estos quedarán como "Disponibles" en tu base de datos listos para asociarse a equipos físicos o llaves.
-            </p>
-            <form method="POST">
-                <input type="hidden" name="action" value="enroll_tags">
-                
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Modo de Captura</label>
-                    <select name="enroll_mode" id="enroll_mode" class="form-control" onchange="toggleEnrollMode()" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; width: 100%; font-weight: 700; color: #334155;">
-                        <option value="range">Lote Secuencial (Rango Automático)</option>
-                        <option value="single">Unidad Única (Captura Manual o Escáner)</option>
-                        <option value="list">Lista Manual (Copiar/Pegar Lote)</option>
-                    </select>
-                </div>
-
-                <!-- MODO RANGE -->
-                <div id="mode-range" style="display: block; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                    <h4 style="font-size: 14px; font-weight: 800; color: #334155; margin-bottom: 16px;">Generación Cíclica</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="display: block; font-size: 10px; font-weight: 800; color: #64748b; margin-bottom: 6px;">Prefijo (Opcional)</label>
-                            <input type="text" name="range_prefix" class="form-control" placeholder="Ej: TAG-" style="font-family: 'JetBrains Mono', monospace;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 10px; font-weight: 800; color: #64748b; margin-bottom: 6px;">Número Inicial</label>
-                            <input type="text" name="range_start" class="form-control" placeholder="Ej: 001" style="font-family: 'JetBrains Mono', monospace;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 10px; font-weight: 800; color: #64748b; margin-bottom: 6px;">Número Final</label>
-                            <input type="text" name="range_end" class="form-control" placeholder="Ej: 100" style="font-family: 'JetBrains Mono', monospace;">
-                        </div>
-                    </div>
-                    <p style="font-size: 11px; color: #94a3b8; margin-top: 12px; font-weight: 600;">Ejemplo: Prefijo "TAG-" con inicio "001" y fin "100" generará 100 códigos desde TAG-001 hasta TAG-100 automáticamente.</p>
-                </div>
-
-                <!-- MODO SINGLE -->
-                <div id="mode-single" style="display: none; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 8px;">UID de la Tarjeta</label>
-                    <input type="text" name="single_tag" class="form-control" placeholder="Haz clic aquí y pasa la tarjeta por la antena..." style="font-family: 'JetBrains Mono', monospace; font-size: 16px; padding: 16px; color: var(--active-blue);">
-                </div>
-
-                <!-- MODO LIST -->
-                <div id="mode-list" style="display: none; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 8px;">Pegar Lista de Códigos</label>
-                    <textarea name="tags_text" rows="8" placeholder="E200001B&#10;A100001B&#10;K500001B" class="form-control" style="width: 100%; font-family: 'JetBrains Mono', monospace; padding: 16px; resize: vertical;"></textarea>
-                </div>
-
-                <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
-                    <button type="submit" class="btn-primary" style="padding: 12px 32px; font-size: 14px;">EJECUTAR ENROLAMIENTO</button>
-                </div>
-            </form>
-        </main>
-    </div>
 
     <!-- Sección: Préstamos -->
     <div id="section-prestamos" style="display: none; grid-template-columns: 1fr 2fr; gap: 32px;">
@@ -656,20 +424,11 @@ include 'header.php';
         document.getElementById('mode-list').style.display = mode === 'list' ? 'block' : 'none';
     }
 
-    function toggleBatchMode() {
-        const mode = document.getElementById('batch_mode').value;
-        document.getElementById('batch-mode-list').style.display = mode === 'list' ? 'block' : 'none';
-        document.getElementById('batch-mode-range').style.display = mode === 'range' ? 'block' : 'none';
-    }
 
-    function toggleBatchTarget(target) {
-        // En un futuro se podría ocultar o mostrar campos según sea Llave, Activo o Mobiliario
-        // Por ahora, 'esp_id' es útil para Llaves y Activos, y 'dimensiones' para Mobiliario (omitido por simplicidad)
-    }
 
     function switchAssetTab(tab) {
         document.getElementById('section-inventario').style.display = tab === 'inventario' ? 'grid' : 'none';
-        document.getElementById('section-enrolamiento').style.display = tab === 'enrolamiento' ? 'grid' : 'none';
+
         document.getElementById('section-prestamos').style.display = tab === 'prestamos' ? 'grid' : 'none';
         document.getElementById('section-mantenimiento').style.display = tab === 'mantenimiento' ? 'block' : 'none';
         
