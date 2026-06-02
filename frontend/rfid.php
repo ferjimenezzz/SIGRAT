@@ -261,9 +261,9 @@ include 'header.php';
                 buffer = lines.pop(); // Guarda la línea incompleta
                 for (let line of lines) {
                     line = line.trim();
-                    // Filtra la cadena "UID de la tarjeta: " que emite el script de Arduino C++
-                    if (line.includes("UID de la tarjeta:")) {
-                        let uid = line.split("UID de la tarjeta:")[1].trim().replace(/\s/g, "").toUpperCase();
+                    // Filtra la cadena "Card UID:" que emite el nuevo script de Arduino
+                    if (line.includes("Card UID:")) {
+                        let uid = line.split("Card UID:")[1].trim().replace(/\s/g, "").toUpperCase();
                         
                         // Llenar el input del formulario y enviar la petición REST
                         document.getElementById('sim-tag').value = uid;
