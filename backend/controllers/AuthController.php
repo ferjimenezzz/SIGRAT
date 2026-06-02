@@ -75,9 +75,7 @@ class AuthController {
     }
 
     public static function logout() {
-        // Limpiar cookie con múltiples variantes de ruta para asegurar efectividad en XAMPP
-        $path = '/creaciones%20antigravity/Estadias/';
-        setcookie('auth_token', '', time() - 3600, $path);
+        // Limpiar cookie con ruta genérica
         setcookie('auth_token', '', time() - 3600, '/');
         
         if (session_status() === PHP_SESSION_NONE) session_start();

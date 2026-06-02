@@ -1,10 +1,9 @@
 # REDIRECCIÓN TEMPORAL PARA EVITAR CACHÉ AGRESIVA DEL NAVEGADOR
 RewriteEngine On
-RewriteBase "/creaciones antigravity/Estadias/"
 
 # 1. Usamos R=302 (Temporal) en lugar de 301 para que el navegador no lo guarde por siempre
 RewriteRule ^$ frontend/index.php [R=302,L]
 
 # 2. Redirección de archivos .php a la carpeta frontend si se piden desde la raíz
-RewriteCond %{REQUEST_URI} !^/creaciones\ antigravity/Estadias/frontend/
+RewriteCond %{REQUEST_URI} !/frontend/
 RewriteRule ^([^/]+\.php)$ frontend/$1 [R=302,L]

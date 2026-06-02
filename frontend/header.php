@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$base_path = "C:/xampp/htdocs/creaciones antigravity/Estadias";
+$base_path = dirname(__DIR__);
 require_once $base_path . '/backend/controllers/AuthController.php';
 
 use Controllers\AuthController;
@@ -24,7 +24,7 @@ if (isset($_COOKIE['auth_token'])) {
         $_SESSION['permisos'] = $payload['permisos'];
         $jwt_valid = true;
     } else {
-        setcookie('auth_token', '', time() - 3600, '/creaciones%20antigravity/Estadias/');
+        setcookie('auth_token', '', time() - 3600, '/');
     }
 }
 

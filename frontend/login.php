@@ -35,8 +35,8 @@ if (isset($_POST['login'])) {
 
         $token = $auth->generateJWT($payload);
 
-        // Establecer Cookie Segura con ruta codificada (evita el error de espacios)
-        setcookie('auth_token', $token, time() + (60 * 60 * 8), '/creaciones%20antigravity/Estadias/', '', false, true);
+        // Establecer Cookie Segura con ruta genérica
+        setcookie('auth_token', $token, time() + (60 * 60 * 8), '/', '', false, true);
 
         // Población inmediata de sesión (Redundancia de seguridad)
         $_SESSION['us_id'] = $user['us_id'];
@@ -44,7 +44,7 @@ if (isset($_POST['login'])) {
         $_SESSION['rol'] = $user['rol_nombre'];
         $_SESSION['permisos'] = json_decode($user['permisos'], true);
         
-        header("Location: /creaciones%20antigravity/Estadias/frontend/index.php");
+        header("Location: index.php");
         exit();
     } else {
         $error = "Credenciales incorrectas o usuario inactivo.";

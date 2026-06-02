@@ -10,7 +10,7 @@ require_once '../backend/config/Database.php';
 
 $auditController = new Controllers\AuditController();
 $db = Config\Database::getConnection();
-$web_root = "/creaciones%20antigravity/Estadias/";
+
 
 // Capturar filtros
 $fecha_inicio = $_GET['fecha_inicio'] ?? null;
@@ -31,7 +31,7 @@ include 'header.php';
             <h1 style="font-size: 32px; font-weight: 800; color: #1e293b; letter-spacing: -1px;">Bitácora de Auditoría</h1>
             <p style="font-size: 14px; color: #94a3b8; font-weight: 500;">Trazabilidad completa de acciones y movimientos del sistema.</p>
         </div>
-        <a href="<?php echo $web_root; ?>backend/reports/audit_pdf.php?<?php echo $_SERVER['QUERY_STRING']; ?>" target="_blank" class="btn-primary" style="background: #ef4444; display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; color: white;">
+        <a href="../backend/reports/audit_pdf.php?<?php echo $_SERVER['QUERY_STRING']; ?>" target="_blank" class="btn-primary" style="background: #ef4444; display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; color: white;">
             <i data-lucide="file-text"></i> EXPORTAR PDF
         </a>
     </header>
