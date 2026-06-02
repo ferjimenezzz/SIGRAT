@@ -28,12 +28,12 @@ if (isset($_COOKIE['auth_token'])) {
         setcookie('auth_token', $_COOKIE['auth_token'], time() + (60 * 60 * 8), '/', '', false, true);
     } else {
         // Token inválido o expirado -> limpiar sesión y cookies
-        AuthController::logout();
+        \Controllers\AuthController::logout();
     }
 } else {
     // Si no existe la cookie del token, invalidar la sesión de PHP existente
     if (isset($_SESSION['us_id'])) {
-        AuthController::logout();
+        \Controllers\AuthController::logout();
     }
 }
 
