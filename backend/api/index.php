@@ -94,6 +94,11 @@ if ($resource === 'hardware' && $_SERVER['REQUEST_METHOD'] === 'POST' && end($ur
     $is_public = true;
 }
 
+// 4. Registro de usuario es público (POST /auth/register)
+if ($resource === 'auth' && $_SERVER['REQUEST_METHOD'] === 'POST' && end($uri) === 'register') {
+    $is_public = true;
+}
+
 // Bloquear el acceso a endpoints protegidos si no hay un token válido
 if (!$is_public) {
     if (!$userPayload) {
@@ -123,6 +128,19 @@ try {
                 $data = $controller->validate($code);
                 $response = ["valid" => (bool)$data, "invite" => $data];
                 $status_code = 200;
+            }
+            break;
+
+        case 'auth':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'register') {
+                $response = $auth->register(
+                    $input['nombre'] ?? '', 
+                    $input['correo'] ?? '', 
+                    $input['telefono'] ?? '', 
+                    $input['carrera'] ?? '', 
+                    $input['password'] ?? ''
+                );
+                $status_code = $response['success'] ? 201 : 400;
             }
             break;
 

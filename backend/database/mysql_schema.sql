@@ -19,6 +19,8 @@ CREATE TABLE USUARIO (
     us_id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(150) NOT NULL,
     correo VARCHAR(100) UNIQUE NOT NULL,
+    telefono VARCHAR(15),
+    carrera VARCHAR(100),
     contrasena VARCHAR(255) NOT NULL,
     rol_id INT,
     estatus ENUM('Activo', 'Inactivo') DEFAULT 'Activo',

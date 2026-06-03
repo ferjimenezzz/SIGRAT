@@ -82,6 +82,50 @@ class AuthController {
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
     }
 
+    /**
+     * @summary Registra un nuevo usuario en la base de datos.
+     * @description Verifica si el correo ya existe, busca un rol por defecto, hashea la contraseña e inserta el registro.
+     * @param string $nombre Nombre completo del usuario.
+     * @param string $correo Correo institucional.
+     * @param string $telefono Número telefónico.
+     * @param string $carrera Carrera o área.
+     * @param string $password Contraseña en texto plano.
+     * @return array Arreglo asociativo con success (booleano) y message (string).
+     */
+    public function register($nombre, $correo, $telefono, $carrera, $password) {
+        try {
+            // 1. Verificar si el correo ya está en uso
+            $stmt = $this->db->prepare("SELECT us_id FROM USUARIO WHERE correo = ?");
+            $stmt->execute([$correo]);
+            if ($stmt->fetch()) {
+                return ['success' => false, 'message' => 'El correo ya está registrado.'];
+            }
+
+            // 2. Determinar el rol_id por defecto (ej. Estudiante o Usuario)
+            $rol_id = 1; // Fallback
+            $stmtRole = $this->db->prepare("SELECT rol_id FROM ROLES WHERE nombre IN ('Estudiante', 'Usuario', 'Alumno') LIMIT 1");
+            $stmtRole->execute();
+            if ($rol = $stmtRole->fetch()) {
+                $rol_id = $rol['rol_id'];
+            }
+
+            // 3. Hashear la contraseña por seguridad
+            $hashedPassword = self::hashPassword($password);
+
+            // 4. Insertar el nuevo registro
+            $stmtInsert = $this->db->prepare("INSERT INTO USUARIO (nombre, correo, telefono, carrera, contrasena, rol_id, estatus) VALUES (?, ?, ?, ?, ?, ?, 'Activo')");
+            $success = $stmtInsert->execute([$nombre, $correo, $telefono, $carrera, $hashedPassword, $rol_id]);
+
+            if ($success) {
+                return ['success' => true, 'message' => 'Usuario registrado exitosamente.'];
+            } else {
+                return ['success' => false, 'message' => 'No se pudo insertar el usuario en la base de datos.'];
+            }
+        } catch (\PDOException $e) {
+            return ['success' => false, 'message' => 'Error de base de datos: ' . $e->getMessage()];
+        }
+    }
+
     public static function logout() {
         // Limpiar cookie con ruta genérica
         // Limpiar cookie a nivel de dominio
