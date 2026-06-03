@@ -1,10 +1,10 @@
 
 RewriteEngine On
-RewriteBase "/SIGRAT/"
+RewriteBase "/Estadias/SIGRAT/"
 
 # Página principal
 RewriteRule ^$ frontend/index.php [R=302,L]
 
 # Archivos PHP
-RewriteCond %{REQUEST_URI} !^/SIGRAT/frontend/
+RewriteCond %{REQUEST_URI} !^/Estadias/SIGRAT/frontend/
 RewriteRule ^([^/]+\.php)$ frontend/$1 [R=302,L]

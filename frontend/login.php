@@ -118,9 +118,9 @@
         </button>
 
         <!--reserva sin cuenta-->
-        <button class="btn btn-guest">
+        <a href="externo.php" class="btn btn-guest text-center" style="text-decoration:none;">
             RESERVAR SIN CUENTA
-        </button>
+        </a>
     </div>
 </div>
 
