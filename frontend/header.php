@@ -7,14 +7,14 @@ ini_set('display_errors', 1);
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
+// Ruta dinámica relativa al directorio actual
 $base_path = dirname(__DIR__);
 require_once $base_path . '/backend/controllers/AuthController.php';
 
-use Controllers\AuthController;
-
-$auth = new AuthController();
+$auth = new \Controllers\AuthController();
 $jwt_valid = false;
 
+// Control de sesión estricto mediante token JWT
 if (isset($_COOKIE['auth_token'])) {
     $payload = $auth->validateJWT($_COOKIE['auth_token']);
     if ($payload) {
@@ -23,17 +23,31 @@ if (isset($_COOKIE['auth_token'])) {
         $_SESSION['rol'] = $payload['rol'];
         $_SESSION['permisos'] = $payload['permisos'];
         $jwt_valid = true;
+        
+        // Sliding Expiration: Renovar la cookie por otros 8 horas para mantener la sesión activa
+        setcookie('auth_token', $_COOKIE['auth_token'], time() + (60 * 60 * 8), '/', '', false, true);
     } else {
-        setcookie('auth_token', '', time() - 3600, '/');
+        // Token inválido o expirado -> limpiar sesión y cookies
+        \Controllers\AuthController::logout();
+    }
+} else {
+    // Si no existe la cookie del token, invalidar la sesión de PHP existente
+    if (isset($_SESSION['us_id'])) {
+        \Controllers\AuthController::logout();
     }
 }
 
-if (!$jwt_valid && isset($_SESSION['us_id'])) {
-    $jwt_valid = true; 
-}
-
 $currentPage = basename($_SERVER['PHP_SELF']);
-$protected_pages = ['usuarios.php', 'espacios.php', 'enrolamiento.php', 'auditoria.php', 'config.php', 'test_rfid.php'];
+// Lista completa de páginas protegidas (incluyendo aprobacion_reservas.php)
+$protected_pages = [
+    'usuarios.php', 
+    'espacios.php', 
+    'enrolamiento.php', 
+    'auditoria.php', 
+    'config.php', 
+    'test_rfid.php',
+    'aprobacion_reservas.php'
+];
 
 if (!$jwt_valid && in_array($currentPage, $protected_pages)) {
     header("Location: login.php");

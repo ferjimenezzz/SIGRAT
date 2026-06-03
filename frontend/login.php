@@ -139,7 +139,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" required minlength="3">
+                            <input type="text" id="nombreRegistro" class="form-control" required minlength="3">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Correo Institucional</label>
@@ -149,11 +149,11 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Número Telefónico</label>
-                            <input type="tel" class="form-control" pattern="[0-9]{10}" maxlength="10" required>
+                            <input type="tel" id="telefonoRegistro" class="form-control" pattern="[0-9]{10}" maxlength="10" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Carrera / Área</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" id="carreraRegistro" class="form-control" required>
                         </div>
                     </div>
                     <div class="row">
@@ -181,16 +181,24 @@
 
 <script>
 function registrarUsuario(){
+    let nombre = document.getElementById("nombreRegistro").value;
     let correo = document.getElementById("correoRegistro").value;
+    let telefono = document.getElementById("telefonoRegistro").value;
+    let carrera = document.getElementById("carreraRegistro").value;
     let password = document.getElementById("passwordRegistro").value;
     let confirmPassword = document.getElementById("confirmPassword").value;
+
+    if(!nombre || !correo || !telefono || !carrera || !password) {
+        alert("Por favor, completa todos los campos.");
+        return;
+    }
 
     if(!correo.endsWith("@uteq.edu.mx")){
         alert("Debes utilizar un correo institucional @uteq.edu.mx");
         return;
     }
 
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}$/;
     if(!regex.test(password)){
         alert("La contraseña debe tener mínimo 8 caracteres, una mayúscula, un número y un carácter especial.");
         return;
@@ -201,13 +209,36 @@ function registrarUsuario(){
         return;
     }
 
-    alert("Usuario registrado correctamente.");
-    document.getElementById("formRegistro").reset();
-    
-    var modal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
-    if(modal) {
-        modal.hide();
-    }
+    fetch("../backend/api/index.php/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            nombre: nombre,
+            correo: correo,
+            telefono: telefono,
+            carrera: carrera,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            alert(data.message);
+            document.getElementById("formRegistro").reset();
+            var modal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
+            if(modal) {
+                modal.hide();
+            }
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error al registrar:", error);
+        alert("Hubo un error al intentar registrar el usuario.");
+    });
 }
 </script>
 
