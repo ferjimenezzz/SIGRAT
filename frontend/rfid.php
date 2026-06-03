@@ -4,7 +4,7 @@
  * @summary Módulo de Gestión RFID.
  * @description Permite el enrolamiento manual de tags y la simulación de hardware.
  */
-
+require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/TagController.php';
 

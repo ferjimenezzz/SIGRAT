@@ -4,7 +4,7 @@
  * @summary Interfaz de enrolamiento masivo de activos RFID en PHP.
  * @description Permite la captura de tags en tiempo real y el registro por lotes.
  */
-
+require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/AssetController.php';
 require_once '../backend/controllers/SpaceController.php';
