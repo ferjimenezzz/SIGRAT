@@ -101,9 +101,9 @@ class AuthController {
                 return ['success' => false, 'message' => 'El correo ya está registrado.'];
             }
 
-            // 2. Determinar el rol_id por defecto (ej. Estudiante o Usuario)
+            // 2. Determinar el rol_id por defecto (Usuario)
             $rol_id = 1; // Fallback
-            $stmtRole = $this->db->prepare("SELECT rol_id FROM ROLES WHERE nombre IN ('Estudiante', 'Usuario', 'Alumno') LIMIT 1");
+            $stmtRole = $this->db->prepare("SELECT rol_id FROM ROLES WHERE nombre = 'Usuario' LIMIT 1");
             $stmtRole->execute();
             if ($rol = $stmtRole->fetch()) {
                 $rol_id = $rol['rol_id'];
