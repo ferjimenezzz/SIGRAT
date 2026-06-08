@@ -158,19 +158,16 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-    <label class="form-label">Carrera / Área</label>
+    <label class="form-label">División / Área</label>
     <select id="carreraRegistro" class="form-select" required>
         <option value="" selected disabled>Seleccione una opción</option>
 
-        <optgroup label="Carreras">
-            <option value="Ingeniería en Software">Ingeniería en Software</option>
-            <option value="Ingeniería en Redes Inteligentes y Ciberseguridad">Ingeniería en Redes Inteligentes y Ciberseguridad</option>
-            <option value="Ingeniería Industrial">Ingeniería Industrial</option>
-            <option value="Ingeniería Mecatrónica">Ingeniería Mecatrónica</option>
-            <option value="Ingeniería en Nanotecnología">Ingeniería en Nanotecnología</option>
-            <option value="Ingeniería en Energía y Desarrollo Sostenible">Ingeniería en Energía y Desarrollo Sostenible</option>
-            <option value="Licenciatura en Innovación de Negocios y Mercadotecnia">Licenciatura en Innovación de Negocios y Mercadotecnia</option>
-            <option value="Licenciatura en Gestión del Capital Humano">Licenciatura en Gestión del Capital Humano</option>
+        <optgroup label="Divisiones">
+            <option value="División Económico - Administrativa">División Económico - Administrativa</option>
+            <option value="División de Tecnologías de Automatización e Información">División de Tecnologías de Automatización e Información</option>
+            <option value="División Industrial">División Industrial</option>
+            <option value="División de Tecnología Ambiental">División de Tecnología Ambiental</option>
+            <option value="División de Idiomas">División de Idiomas</option>
         </optgroup>
 
         <optgroup label="Áreas Administrativas">

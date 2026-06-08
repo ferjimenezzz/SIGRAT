@@ -38,8 +38,18 @@ class ReservationController {
             $stmt->execute([$data['esp_id'], $data['fecha_uso'], $data['hora_sal'], $data['hora_ent'], $data['hora_sal'], $data['hora_ent'], $data['hora_ent'], $data['hora_sal']]);
             if ($stmt->fetch()) throw new \Exception("Conflicto de horario.");
 
-            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pendiente')");
-            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']]);
+            // Revisar el tipo de acceso del espacio para determinar estatus inicial
+            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio->execute([$data['esp_id']]);
+            $espacio = $stmtEspacio->fetch();
+            
+            $estatus_inicial = 'Aprobada'; // Auto-aprobación por defecto para General y División
+            if ($espacio && $espacio['acceso_tipo'] === 'Restringido') {
+                $estatus_inicial = 'Pendiente'; // Requiere revisión del admin
+            }
+
+            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial]);
             $this->db->commit();
             
             // Auditoría

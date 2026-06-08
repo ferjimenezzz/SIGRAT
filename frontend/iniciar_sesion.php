@@ -30,6 +30,7 @@ if (isset($_POST['login'])) {
             'us_id' => $user['us_id'],
             'nombre' => $user['nombre'],
             'rol' => $user['rol_nombre'],
+            'carrera' => $user['carrera'],
             'permisos' => json_decode($user['permisos'], true)
         ];
 
@@ -43,6 +44,7 @@ if (isset($_POST['login'])) {
         $_SESSION['nombre'] = $user['nombre'];
         $_SESSION['rol'] = $user['rol_nombre'];
         $_SESSION['permisos'] = json_decode($user['permisos'], true);
+        $_SESSION['division'] = $user['carrera'];
         
         // Registrar última conexión en la BD
         $stmtUpdate = $db->prepare("UPDATE USUARIO SET ultima_conexion = NOW() WHERE us_id = ?");

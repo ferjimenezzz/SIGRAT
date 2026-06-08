@@ -46,14 +46,23 @@ class SpaceController {
 
         try {
             // Preparamos la consulta de inserción para el nuevo espacio
-            $query = "INSERT INTO ESPACIO (edificio, nombre_numero, tipo, capacidad, estatus) VALUES (?, ?, ?, ?, 'Disponible')";
+            $query = "INSERT INTO ESPACIO (edificio, nombre_numero, tipo, capacidad, estatus, acceso_tipo, division_restringida) VALUES (?, ?, ?, ?, 'Disponible', ?, ?)";
             $stmt = $this->db->prepare($query);
+            
+            $acceso_tipo = $data['acceso_tipo'] ?? 'General';
+            $division = null;
+            if ($acceso_tipo === 'Division') {
+                $division = !empty($data['division_restringida']) ? $data['division_restringida'] : null;
+            }
+
             // Ejecutamos la inserción usando parámetros seguros
             $stmt->execute([
                 $data['edificio'],
                 $data['nombre_numero'],
                 $data['tipo'],
-                $data['capacidad']
+                $data['capacidad'],
+                $acceso_tipo,
+                $division
             ]);
             
             // Registramos el evento en bitácora (hardcodeando ID de admin = 1 por el momento)
@@ -112,6 +121,45 @@ class SpaceController {
             // Registro en el log del servidor ante fallas en la base de datos
             error_log("Error en getUnoccupied: " . $e->getMessage());
             return ["success" => false, "error" => "Error al consultar espacios desocupados."];
+        }
+    }
+
+    /**
+     * Actualiza un espacio existente.
+     * @param int $esp_id El identificador del espacio.
+     * @param array $data Los datos a actualizar.
+     * @return array Resultado de la operación.
+     */
+    public function update($esp_id, $data) {
+        $tiposPermitidos = $this->getTiposPermitidos();
+        if (!in_array($data['tipo'], $tiposPermitidos)) {
+            return ["success" => false, "error" => "Tipo de espacio no válido."];
+        }
+
+        try {
+            $query = "UPDATE ESPACIO SET edificio = ?, nombre_numero = ?, tipo = ?, capacidad = ?, acceso_tipo = ?, division_restringida = ? WHERE esp_id = ?";
+            $stmt = $this->db->prepare($query);
+            
+            $acceso_tipo = $data['acceso_tipo'] ?? 'General';
+            $division = null;
+            if ($acceso_tipo === 'Division') {
+                $division = !empty($data['division_restringida']) ? $data['division_restringida'] : null;
+            }
+
+            $stmt->execute([
+                $data['edificio'],
+                $data['nombre_numero'],
+                $data['tipo'],
+                $data['capacidad'],
+                $acceso_tipo,
+                $division,
+                $esp_id
+            ]);
+
+            $this->audit->log(1, "Actualizado espacio ID: " . $esp_id, "ESPACIOS");
+            return ["success" => true];
+        } catch (\Exception $e) {
+            return ["success" => false, "error" => $e->getMessage()];
         }
     }
 

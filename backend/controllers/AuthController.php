@@ -109,6 +109,8 @@ class AuthController {
                 $rol_id = $rol['rol_id'];
             }
 
+
+
             // 3. Hashear la contraseña por seguridad
             $hashedPassword = self::hashPassword($password);
 

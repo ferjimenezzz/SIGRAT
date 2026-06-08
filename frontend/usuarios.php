@@ -145,6 +145,7 @@ $inv_tasa_uso = $inv_total_generados > 0 ? round(($inv_total_ocupados / $inv_tot
 $modulos = [
     'Inventario' => ['read', 'create', 'update', 'delete'],
     'Espacios' => ['read', 'create', 'update', 'delete'],
+    'Reservas' => ['read', 'create', 'update', 'delete'],
     'Visitas' => ['read', 'create', 'update', 'delete'],
     'RFID' => ['read', 'create', 'update', 'delete'],
     'Usuarios' => ['read', 'create', 'update', 'delete'],

@@ -64,6 +64,7 @@ if ($token) {
         $_SESSION['rol'] = $userPayload['rol'];
         $_SESSION['nombre'] = $userPayload['nombre'];
         $_SESSION['permisos'] = $userPayload['permisos'];
+        $_SESSION['division'] = $userPayload['carrera'] ?? null;
     }
 }
 
