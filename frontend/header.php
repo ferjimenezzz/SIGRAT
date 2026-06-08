@@ -87,7 +87,7 @@ if (!function_exists('hasPermission')) {
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --sidebar-navy: #0c1e35; --active-blue: #3b82f6; --bg-main: #f8fafc; --text-slate: #475569; }
+        :root { --sidebar-navy: #1e293b; --active-blue: #3b82f6; --bg-main: #f8fafc; --text-slate: #475569; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-slate); display: flex; min-height: 100vh; }
         .sidebar { width: 260px; background-color: var(--sidebar-navy); color: #94a3b8; height: 100vh; position: fixed; z-index: 100; display: flex; flex-direction: column; }

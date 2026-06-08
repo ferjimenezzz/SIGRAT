@@ -44,6 +44,10 @@ if (isset($_POST['login'])) {
         $_SESSION['rol'] = $user['rol_nombre'];
         $_SESSION['permisos'] = json_decode($user['permisos'], true);
         
+        // Registrar última conexión en la BD
+        $stmtUpdate = $db->prepare("UPDATE USUARIO SET ultima_conexion = NOW() WHERE us_id = ?");
+        $stmtUpdate->execute([$user['us_id']]);
+
         header("Location: index.php");
         exit();
     } else {
