@@ -95,6 +95,11 @@
         .btn-close{
             filter:invert(1);
         }
+
+        .form-select{
+    border-radius: 8px;
+    height: 38px;
+}
     </style>
 </head>
 
@@ -151,22 +156,78 @@
                             <label class="form-label">Número Telefónico</label>
                             <input type="tel" id="telefonoRegistro" class="form-control" pattern="[0-9]{10}" maxlength="10" required>
                         </div>
+
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Carrera / Área</label>
-                            <input type="text" id="carreraRegistro" class="form-control" required>
-                        </div>
+    <label class="form-label">Carrera / Área</label>
+    <select id="carreraRegistro" class="form-select" required>
+        <option value="" selected disabled>Seleccione una opción</option>
+
+        <optgroup label="Carreras">
+            <option value="Ingeniería en Software">Ingeniería en Software</option>
+            <option value="Ingeniería en Redes Inteligentes y Ciberseguridad">Ingeniería en Redes Inteligentes y Ciberseguridad</option>
+            <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+            <option value="Ingeniería Mecatrónica">Ingeniería Mecatrónica</option>
+            <option value="Ingeniería en Nanotecnología">Ingeniería en Nanotecnología</option>
+            <option value="Ingeniería en Energía y Desarrollo Sostenible">Ingeniería en Energía y Desarrollo Sostenible</option>
+            <option value="Licenciatura en Innovación de Negocios y Mercadotecnia">Licenciatura en Innovación de Negocios y Mercadotecnia</option>
+            <option value="Licenciatura en Gestión del Capital Humano">Licenciatura en Gestión del Capital Humano</option>
+        </optgroup>
+
+        <optgroup label="Áreas Administrativas">
+            <option value="Docente">Docente</option>
+            <option value="Dirección Académica">Dirección Académica</option>
+            <option value="Servicios Escolares">Servicios Escolares</option>
+            <option value="Recursos Materiales">Recursos Materiales</option>
+            <option value="TI">Tecnologías de la Información</option>
+            <option value="Biblioteca">Biblioteca</option>
+            <option value="Administración">Administración</option>
+            <option value="Otro">Otro</option>
+        </optgroup>
+    </select>
+</div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Contraseña</label>
-                            <input type="password" id="passwordRegistro" class="form-control" required>
-                            <small class="text-muted">Mínimo 8 caracteres, una mayúscula, un número y un carácter especial.</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Confirmar Contraseña</label>
-                            <input type="password" id="confirmPassword" class="form-control" required>
-                        </div>
-                    </div>
+                    
+                       <div class="row">
+
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Contraseña</label>
+
+        <div class="input-group">
+            <input type="password"
+                   id="passwordRegistro"
+                   class="form-control"
+                   required>
+
+            <button class="btn btn-outline-secondary"
+                    type="button"
+                    onclick="togglePassword('passwordRegistro', this)">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+
+        <small class="text-muted">
+            Mínimo 8 caracteres
+        </small>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Confirmar Contraseña</label>
+
+        <div class="input-group">
+            <input type="password"
+                   id="confirmPassword"
+                   class="form-control"
+                   required>
+
+            <button class="btn btn-outline-secondary"
+                    type="button"
+                    onclick="togglePassword('confirmPassword', this)">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+
+</div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -239,6 +300,24 @@ function registrarUsuario(){
         console.error("Error al registrar:", error);
         alert("Hubo un error al intentar registrar el usuario.");
     });
+
+}
+
+function togglePassword(inputId, button) {
+
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector("i");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+    }
+
 }
 </script>
 
