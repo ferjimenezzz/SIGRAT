@@ -13,6 +13,12 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, x-user-role");
 
+// --- DEBUG LOG PARA ESP32 ---
+$logData = date('Y-m-d H:i:s') . " - " . $_SERVER['REQUEST_METHOD'] . " " . $_SERVER['REQUEST_URI'] . "\n";
+$logData .= "Cuerpo: " . file_get_contents("php://input") . "\n";
+file_put_contents(__DIR__ . '/debug_esp32.log', $logData, FILE_APPEND);
+// ----------------------------
+
 // Manejo de peticiones preflight OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -89,8 +95,8 @@ if ($resource === 'reservations' && $_SERVER['REQUEST_METHOD'] === 'GET' && isse
     $is_public = true;
 }
 
-// 3. Procesar escaneo de RFID es público (POST /hardware/rfid-scan)
-if ($resource === 'hardware' && $_SERVER['REQUEST_METHOD'] === 'POST' && end($uri) === 'rfid-scan') {
+// 3. Procesar escaneo y monitor de RFID es público (/hardware/*)
+if ($resource === 'hardware') {
     $is_public = true;
 }
 
@@ -174,8 +180,8 @@ try {
                 $controller = new RFIDController();
                 // El input debe traer tag_id y lec_id
                 $response = $controller->processScan($input['tag_id'], $input['lec_id']);
-                $status_code = 200;
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $uri[count($uri)-1] === 'recent-scans') {
+                $status_code = (isset($response['success']) && $response['success']) ? 200 : 403;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'recent-scans') {
                 $controller = new RFIDController();
                 $response = $controller->getRecentScans();
                 $status_code = 200;

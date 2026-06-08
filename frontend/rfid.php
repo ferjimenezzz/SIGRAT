@@ -4,7 +4,7 @@
  * @summary Módulo de Gestión RFID.
  * @description Permite el enrolamiento manual de tags y la simulación de hardware.
  */
-
+require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/TagController.php';
 
@@ -71,6 +71,7 @@ include 'header.php';
         <div style="display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 12px;">
             <button onclick="switchTab('enrolamiento')" id="tab-enrolamiento" class="btn-tab active">ENROLAMIENTO</button>
             <button onclick="switchTab('simulador')" id="tab-simulador" class="btn-tab">LECTOR USB / SIMULADOR</button>
+            <button onclick="switchTab('monitor')" id="tab-monitor" class="btn-tab">MONITOR EN VIVO</button>
         </div>
     </header>
 
@@ -189,7 +190,69 @@ include 'header.php';
             </div>
         </div>
     </div>
+
+    <!-- Sección: Monitor en Vivo -->
+    <div id="section-monitor" style="display: none; flex-direction: column; gap: 32px; max-width: 800px; margin: 0 auto; width: 100%;">
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="font-weight: 800; color: #1e293b; margin: 0;">Escaneos Recientes</h3>
+                    <p style="font-size: 12px; color: #94a3b8; margin: 4px 0 0 0;">Actualización automática en tiempo real <span id="monitor-time" style="font-weight: bold; color: #3b82f6;"></span></p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 900; color: #10b981; background: #dcfce3; padding: 6px 12px; border-radius: 20px;">
+                    <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                    ONLINE
+                </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                    <tr>
+                        <th style="padding: 16px 24px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Tag ID</th>
+                        <th style="padding: 16px 24px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Acción</th>
+                        <th style="padding: 16px 24px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Ubicación</th>
+                        <th style="padding: 16px 24px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Hora</th>
+                    </tr>
+                </thead>
+                <tbody id="monitor-tbody">
+                    <?php
+                    try {
+                        require_once __DIR__ . '/../backend/config/Database.php';
+                        $dbObj = \Config\Database::getConnection();
+                        $stmt = $dbObj->query("
+                            SELECT m.*, l.ant_id, a.ubicacion 
+                            FROM MOVIMIENTO_RFID m
+                            JOIN LECTOR l ON m.lec_id = l.lec_id
+                            LEFT JOIN ANTENA a ON l.ant_id = a.ant_id
+                            ORDER BY m.fecha_hora DESC LIMIT 15
+                        ");
+                        $rows = $stmt->fetchAll();
+                        if(count($rows) > 0) {
+                            foreach($rows as $scan) {
+                                $color = $scan['tipo_mov'] === 'ENTRADA' ? '#10b981' : '#f59e0b';
+                                $ubi = $scan['ubicacion'] ?: 'Desconocida';
+                                echo '<tr style="border-bottom: 1px solid #f1f5f9;">';
+                                echo '<td style="padding: 16px 24px; font-family: \'JetBrains Mono\', monospace; font-size: 13px; font-weight: 700; color: #334155;">' . htmlspecialchars($scan['tag_id']) . '</td>';
+                                echo '<td style="padding: 16px 24px;"><span style="background: '.$color.'22; color: '.$color.'; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900;">' . htmlspecialchars($scan['tipo_mov']) . '</span></td>';
+                                echo '<td style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #64748b;">' . htmlspecialchars($ubi) . '</td>';
+                                echo '<td style="padding: 16px 24px; font-size: 13px; color: #94a3b8;">' . htmlspecialchars($scan['fecha_hora']) . '</td>';
+                                echo '</tr>';
+                            }
+                        } else {
+                            echo '<tr><td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-weight: 600;">Aún no hay escaneos en la Base de Datos...</td></tr>';
+                        }
+                    } catch (Exception $e) {
+                        echo '<tr><td colspan="4">Error conectando a DB desde PHP: '.$e->getMessage().'</td></tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+<style>
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+</style>
 
 <style>
     .btn-tab {
@@ -210,17 +273,17 @@ include 'header.php';
     function switchTab(tab) {
         document.getElementById('section-enrolamiento').style.display = tab === 'enrolamiento' ? 'grid' : 'none';
         document.getElementById('section-simulador').style.display = tab === 'simulador' ? 'flex' : 'none';
+        document.getElementById('section-monitor').style.display = tab === 'monitor' ? 'flex' : 'none';
         
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + tab).classList.add('active');
     }
 
+    var serialPort = null;
+    var serialReader = null;
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('tab') || 'enrolamiento';
     switchTab(activeTab);
-
-    let serialPort;
-    let serialReader;
 
     async function connectSerial() {
         if (!('serial' in navigator)) {

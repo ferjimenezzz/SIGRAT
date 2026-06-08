@@ -3,7 +3,7 @@
  * @file espacios.php
  * @summary Gestión Unificada de Espacios, Reservas y Aprobaciones.
  */
-
+require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/SpaceController.php';
 require_once '../backend/controllers/ReservationController.php';

@@ -37,7 +37,7 @@ class RFIDController {
             $tag = $stmt->fetch();
 
             if (!$tag) {
-                return ["success" => false, "error" => "Tag no registrado en el sistema."];
+                return ["success" => false, "error" => "Tag no registrado en el sistema. Acceso denegado."];
             }
 
             if ($tag['estado'] !== 'Activo') {

@@ -4,7 +4,7 @@
  * @summary Módulo Administrativo de Visitas.
  * @description Permite a los administradores visualizar el registro de visitantes y gestionar su estatus. Ajustado para PostgreSQL.
  */
-
+require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 
 $db = Config\Database::getConnection();

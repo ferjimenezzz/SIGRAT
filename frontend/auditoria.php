@@ -4,7 +4,7 @@
  * @summary Módulo de Auditoría y Trazabilidad con Filtros y Exportación.
  * @description Permite visualizar y filtrar los movimientos del sistema, con opción de reporte.
  */
-
+require_once 'seguridad.php';
 require_once '../backend/controllers/AuditController.php';
 require_once '../backend/config/Database.php';
 
