@@ -523,7 +523,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </a>
             <?php endif; ?>
 
-            <a href="#" class="nav-item <?php echo $currentPage == 'prestamos.php' ? 'active' : ''; ?>">
+            <a href="prestamos.php" class="nav-item <?php echo $currentPage == 'prestamos.php' ? 'active' : ''; ?>">
                 <i class="bi bi-arrow-left-right"></i> Préstamos
             </a>
 

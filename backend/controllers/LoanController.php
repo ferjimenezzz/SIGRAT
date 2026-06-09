@@ -58,4 +58,48 @@ class LoanController {
             return ["success" => false, "error" => $e->getMessage()];
         }
     }
+
+    /**
+     * Obtiene todos los préstamos con detalles del equipo y del usuario.
+     */
+    public function getAllLoans() {
+        $query = "
+            SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus,
+                   a.tipo, a.marca, a.modelo, a.num_serie, a.act_id,
+                   u.nombre as solicitante_nombre, u.correo as solicitante_correo, u.us_id
+            FROM PRESTAMO p
+            JOIN ACTIVO a ON p.act_id = a.act_id
+            JOIN USUARIO u ON p.us_id = u.us_id
+            ORDER BY p.fecha_pres DESC
+        ";
+        try {
+            return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene activos disponibles para préstamo.
+     */
+    public function getAvailableAssets() {
+        $query = "SELECT act_id, tipo, marca, modelo, num_serie FROM ACTIVO WHERE estatus = 'Disponible'";
+        try {
+            return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene usuarios registrados para asignarles el préstamo.
+     */
+    public function getUsers() {
+        $query = "SELECT us_id, nombre, correo, carrera FROM USUARIO WHERE estatus = 'Activo'";
+        try {
+            return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 }
