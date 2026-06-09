@@ -257,7 +257,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                             <?php endif; ?>
                         </td>
                         <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: #475569;">
-                            <?php echo htmlspecialchars($asset['num_inv']); ?>
+                            <?php echo htmlspecialchars($asset['num_inv'] ?? ''); ?>
                         </td>
                         <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: #2563eb;">
                             <?php echo htmlspecialchars($asset['tag_id'] ?? 'Sin asignar'); ?>
