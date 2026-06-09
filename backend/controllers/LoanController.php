@@ -38,6 +38,66 @@ class LoanController {
     }
 
     /**
+     * Crea un préstamo a partir de datos dinámicos (creando usuario y equipo si no existen).
+     */
+    public function createDynamicLoan($equipo, $categoria, $serie, $nombre, $correo, $area, $fecha_pres, $fecha_ent, $estatus, $obs) {
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Gestionar Usuario
+            $stmtUs = $this->db->prepare("SELECT us_id FROM USUARIO WHERE correo = ?");
+            $stmtUs->execute([$correo]);
+            $us_id = $stmtUs->fetchColumn();
+
+            if (!$us_id) {
+                // Crear usuario
+                $stmtNewUs = $this->db->prepare("INSERT INTO USUARIO (nombre, correo, carrera, contrasena, estatus) VALUES (?, ?, ?, '12345', 'Activo')");
+                $stmtNewUs->execute([$nombre, $correo, $area]);
+                $us_id = $this->db->lastInsertId();
+            }
+
+            // 2. Gestionar Equipo
+            if (empty($serie)) {
+                $serie = 'SIN-SERIE-' . date('YmdHis') . '-' . rand(1000, 9999);
+            }
+
+            $stmtAct = $this->db->prepare("SELECT act_id FROM ACTIVO WHERE num_serie = ?");
+            $stmtAct->execute([$serie]);
+            $act_id = $stmtAct->fetchColumn();
+
+            if (!$act_id) {
+                // Crear activo
+                $estado_activo = ($estatus === 'Activo') ? 'Prestado' : 'Disponible';
+                $stmtNewAct = $this->db->prepare("INSERT INTO ACTIVO (tipo, marca, num_serie, estatus) VALUES (?, ?, ?, ?)");
+                // Trataremos "equipo" como tipo y "categoria" como marca (o agruparemos todo)
+                $stmtNewAct->execute([$equipo, $categoria, $serie, $estado_activo]);
+                $act_id = $this->db->lastInsertId();
+            } else {
+                // Si el activo existe, actualizar su estado a Prestado si el prestamo es Activo
+                if ($estatus === 'Activo') {
+                    $this->db->prepare("UPDATE ACTIVO SET estatus = 'Prestado' WHERE act_id = ?")->execute([$act_id]);
+                }
+            }
+
+            // 3. Crear Préstamo
+            $fecha_ent_val = empty($fecha_ent) ? null : $fecha_ent;
+            
+            // La BD actualmente no tiene campo para 'observaciones', se podría añadir,
+            // pero si no hay, la ignoramos o la enviamos solo si se altera la BD.
+            
+            $queryPres = "INSERT INTO PRESTAMO (act_id, us_id, fecha_pres, fecha_ent, estatus) VALUES (?, ?, ?, ?, ?)";
+            $stmtPres = $this->db->prepare($queryPres);
+            $stmtPres->execute([$act_id, $us_id, $fecha_pres, $fecha_ent_val, $estatus]);
+
+            $this->db->commit();
+            return ["success" => true, "id" => $this->db->lastInsertId()];
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return ["success" => false, "error" => $e->getMessage()];
+        }
+    }
+
+    /**
      * Registra el retorno de un activo.
      */
     public function returnAsset($pres_id) {
@@ -100,6 +160,57 @@ class LoanController {
             return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             return [];
+        }
+    }
+
+    /**
+     * Actualiza un préstamo existente (fechas y estado).
+     */
+    public function updateLoan($pres_id, $estatus, $fecha_pres, $fecha_ent) {
+        try {
+            // Manejar fechas vacías
+            $fecha_ent = empty($fecha_ent) ? null : $fecha_ent;
+            
+            $query = "UPDATE PRESTAMO SET estatus = ?, fecha_pres = ?, fecha_ent = ? WHERE pres_id = ?";
+            $this->db->prepare($query)->execute([$estatus, $fecha_pres, $fecha_ent, $pres_id]);
+            
+            // Actualizar estatus del activo según el estado del préstamo
+            $stmt = $this->db->prepare("SELECT act_id FROM PRESTAMO WHERE pres_id = ?");
+            $stmt->execute([$pres_id]);
+            $act_id = $stmt->fetchColumn();
+
+            if ($act_id) {
+                if ($estatus === 'Finalizado' || $estatus === 'Devuelto') {
+                    $this->db->prepare("UPDATE ACTIVO SET estatus = 'Disponible' WHERE act_id = ?")->execute([$act_id]);
+                } else {
+                    $this->db->prepare("UPDATE ACTIVO SET estatus = 'Prestado' WHERE act_id = ?")->execute([$act_id]);
+                }
+            }
+            
+            return ["success" => true];
+        } catch (\Exception $e) {
+            return ["success" => false, "error" => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Elimina un préstamo y libera el activo.
+     */
+    public function deleteLoan($pres_id) {
+        try {
+            $stmt = $this->db->prepare("SELECT act_id FROM PRESTAMO WHERE pres_id = ?");
+            $stmt->execute([$pres_id]);
+            $act_id = $stmt->fetchColumn();
+
+            $this->db->prepare("DELETE FROM PRESTAMO WHERE pres_id = ?")->execute([$pres_id]);
+            
+            if ($act_id) {
+                $this->db->prepare("UPDATE ACTIVO SET estatus = 'Disponible' WHERE act_id = ?")->execute([$act_id]);
+            }
+            
+            return ["success" => true];
+        } catch (\Exception $e) {
+            return ["success" => false, "error" => $e->getMessage()];
         }
     }
 }
