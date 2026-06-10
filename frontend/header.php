@@ -700,11 +700,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
                 function fetchNotifications() {
                     // Primero forzar chequeo de préstamos por vencer (silenciosamente)
-                    fetch('../backend/api/index.php/api/notifications/check_expiring', {
+                    fetch('../backend/api/index.php/notifications/check_expiring', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     }).then(() => {
-                        return fetch('../backend/api/index.php/api/notifications/unread');
+                        return fetch('../backend/api/index.php/notifications/unread');
                     })
                     .then(res => res.json())
                     .then(data => {
@@ -724,7 +724,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                                     a.addEventListener('click', function(e) {
                                         e.preventDefault();
                                         // Marcar como leída y luego redirigir
-                                        fetch('../backend/api/index.php/api/notifications/read', {
+                                        fetch('../backend/api/index.php/notifications/read', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ not_id: n.not_id })
