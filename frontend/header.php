@@ -117,7 +117,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --accent-blue: #2563eb;
+            --topbar-bg: #ffffff;
         }
+
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -625,19 +627,17 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </a>
             <?php endif; ?>
 
-            <a href="#" class="nav-item <?php echo $currentPage == 'configuracion.php' ? 'active' : ''; ?>">
-                <i class="bi bi-gear"></i> Configuración
-            </a>
+
         </nav>
 
         <!-- User section -->
-        <div class="sidebar-user">
+        <a href="perfil.php" class="sidebar-user" style="text-decoration: none; cursor: pointer; transition: background 0.2s; border-radius: 10px;">
             <div class="sidebar-user-avatar"><?php echo $inicialesUsuario; ?></div>
             <div class="sidebar-user-info">
                 <div class="sidebar-user-name"><?php echo $nombreUsuario; ?></div>
                 <div class="sidebar-user-role"><?php echo ucfirst($rolUsuario); ?></div>
             </div>
-        </div>
+        </a>
         <a href="logout.php" class="sidebar-logout">
             <i class="bi bi-box-arrow-left"></i> Cerrar sesión
         </a>
@@ -650,10 +650,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <p>Resumen general del sistema</p>
             </div>
             <div class="topbar-right">
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Buscar...">
-                </div>
                 <div class="topbar-icon-btn" id="notifBtn">
                     <i class="bi bi-bell"></i>
                     <div class="notification-badge" id="notifBadge"></div>
@@ -668,6 +664,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                         </div>
                     </div>
                 </div>
+
                 <div class="topbar-date">
                     <i class="bi bi-calendar4-week"></i>
                     <div class="topbar-date-text">
@@ -677,7 +674,12 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 </div>
             </div>
         </header>
-        </main>
+
+        <!-- Limpieza de modo oscuro residual -->
+        <script>
+        localStorage.removeItem('sigrat_dark');
+        document.body.classList.remove('dark-mode');
+        </script>
         
         <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -769,4 +771,4 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
         });
         </script>
-
+        <main class="content-padding">
