@@ -205,7 +205,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </select>
             </div>
             <div class="filters-right">
-                <button class="btn-outline" id="filtersBtn" onclick="toggleFiltersDrawer(event)">
+                <button class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()">
                     <i class="bi bi-funnel"></i>
                     Filtros
                 </button>
@@ -213,120 +213,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <i class="bi bi-download"></i>
                     Exportar
                 </button>
-
-                <!-- Cajón Lateral de Filtros (Drawer) -->
-                <div id="filtersDrawer" class="filters-drawer">
-                    <div class="drawer-header">
-                        <h3>Filtros de inventario</h3>
-                        <button class="close-drawer-btn" onclick="toggleFiltersDrawer(event)">✕</button>
-                    </div>
-
-                    <!-- Sección 1 y 2: Estado del Activo y Edificio (en 2 columnas) -->
-                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
-                        <div class="drawer-section">
-                            <h4>Estado del activo</h4>
-                            <div class="checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="status-checkbox" value="Disponible" checked>
-                                    Disponible
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="status-checkbox" value="En uso" checked>
-                                    En uso
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="status-checkbox" value="Prestado" checked>
-                                    Prestado
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="status-checkbox" value="Mantenimiento" checked>
-                                    Mantenimiento
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="status-checkbox" value="Extraviado">
-                                    Inactivo / baja
-                                </label>
-                            </div>
-                        </div>
-                        <div class="drawer-section">
-                            <h4>Edificio</h4>
-                            <div class="checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="edificio-checkbox" value="CIC" checked>
-                                    CIC
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="edificio-checkbox" value="PIDET" checked>
-                                    PIDET
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sección 3: Tipo de Activo -->
-                    <div class="drawer-section">
-                        <h4>Tipo de activo</h4>
-                        <select id="drawerTypeFilter" class="select-filter" style="width: 100%;">
-                            <option value="">Seleccionar tipo</option>
-                            <option value="Equipo">Equipo</option>
-                            <option value="Mobiliario">Mobiliario</option>
-                        </select>
-                    </div>
-
-                    <!-- Sección 4: Espacio / Aula / Laboratorio -->
-                    <div class="drawer-section">
-                        <h4>Espacio / Aula / Laboratorio</h4>
-                        <select id="drawerLocationFilter" class="select-filter" style="width: 100%;">
-                            <option value="">Seleccionar espacio</option>
-                            <?php foreach($allSpaces as $sp): ?>
-                                <option value="<?php echo htmlspecialchars($sp['nombre_numero']); ?>"><?php echo htmlspecialchars($sp['nombre_numero'] . ' (' . $sp['edificio'] . ')'); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Sección 5: Disponibilidad -->
-                    <div class="drawer-section">
-                        <h4>Disponibilidad</h4>
-                        <label class="toggle-switch-label">
-                            Mostrar solo disponibles
-                            <span style="position: relative; display: inline-block;">
-                                <input type="checkbox" id="showOnlyAvailable" class="switch-input">
-                                <span class="switch-slider"></span>
-                            </span>
-                        </label>
-                    </div>
-
-                    <!-- Sección 6: RFID (Tag) -->
-                    <div class="drawer-section">
-                        <h4>RFID (Tag)</h4>
-                        <input type="text" id="drawerRfidInput" class="form-control" placeholder="Buscar por RFID o tag..." style="font-size: 13px; padding: 8px 12px;">
-                    </div>
-
-                    <!-- Sección 7: Fecha de registro -->
-                    <div class="drawer-section">
-                        <h4>Fecha de registro del activo</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                            <div>
-                                <label style="font-size: 9px; margin-bottom: 4px;">Desde</label>
-                                <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
-                            </div>
-                            <div>
-                                <label style="font-size: 9px; margin-bottom: 4px;">Hasta</label>
-                                <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer del Drawer -->
-                    <div class="drawer-footer">
-                        <button type="button" class="btn-secondary" onclick="clearDrawerFilters()" style="justify-content: center; padding: 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-                            <i class="bi bi-arrow-counterclockwise"></i> Limpiar filtros
-                        </button>
-                        <button type="button" class="btn-primary" onclick="applyFilters();" style="justify-content: center; padding: 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-                            <i class="bi bi-funnel"></i> Aplicar filtros
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -439,20 +325,18 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     </div>
 
     <!-- Columna Derecha: Barra Lateral de Estadísticas -->
-    <div class="stats-sidebar">
+    <div class="stats-sidebar" id="statsSidebar">
 
         <!-- Panel 1: Estado del inventario (Donut Chart) -->
         <div class="sidebar-card">
             <h3>Estado del inventario</h3>
             <div class="donut-chart-container">
-                <!-- Gráfico de Donut usando CSS conic-gradient -->
                 <div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#10b981 0% <?php echo $pctDisp; ?>%, #2563eb <?php echo $pctDisp; ?>% <?php echo $pctDisp+$pctPres; ?>%, #ef4444 <?php echo $pctDisp+$pctPres; ?>% <?php echo $pctDisp+$pctPres+$pctMant; ?>%, #6b7280 <?php echo $pctDisp+$pctPres+$pctMant; ?>% 100%); display: flex; align-items: center; justify-content: center; position: relative;">
                     <div style="width: 90px; height: 90px; border-radius: 50%; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                         <span class="donut-number"><?php echo $totalAssets; ?></span>
                         <span class="donut-label">Activos</span>
                     </div>
                 </div>
-                <!-- Leyendas del Donut -->
                 <div class="donut-legends">
                     <div class="legend-item">
                         <div class="legend-dot" style="background: #10b981;"></div>
@@ -478,7 +362,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <div class="sidebar-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3 style="margin-bottom: 0;">Activos por categoría</h3>
-                <a href="javascript:void(0)" onclick="alert('Detalle de categorías próximamente')" style="font-size: 11px; font-weight: 700; color: #2563eb; text-decoration: none;">Ver detalles</a>
             </div>
             <div class="category-list">
                 <div class="category-item">
@@ -524,7 +407,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <div class="sidebar-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3 style="margin-bottom: 0;">Ubicación de activos</h3>
-                <a href="javascript:void(0)" onclick="alert('Mapa de ubicaciones próximamente')" style="font-size: 11px; font-weight: 700; color: #2563eb; text-decoration: none;">Ver mapa</a>
             </div>
             <div class="location-list">
                 <?php if (empty($topLocations)): ?>
@@ -558,6 +440,122 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             </div>
         </div>
 
+    </div>
+
+    <!-- Columna Derecha: Panel de Filtros (reemplaza stats al abrir) -->
+    <div class="filters-sidebar" id="filtersSidebar" style="display: none;">
+        <div class="sidebar-card filters-panel-card">
+            <div class="drawer-header">
+                <h3>Filtros de inventario</h3>
+                <button class="close-drawer-btn" onclick="toggleFiltersPanel()">✕</button>
+            </div>
+
+            <!-- Estado del Activo y Edificio -->
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+                <div class="drawer-section">
+                    <h4>Estado del activo</h4>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="status-checkbox" value="Disponible" checked>
+                            Disponible
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="status-checkbox" value="En uso" checked>
+                            En uso
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="status-checkbox" value="Prestado" checked>
+                            Prestado
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="status-checkbox" value="Mantenimiento" checked>
+                            Mantenimiento
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="status-checkbox" value="Extraviado">
+                            Inactivo / baja
+                        </label>
+                    </div>
+                </div>
+                <div class="drawer-section">
+                    <h4>Edificio</h4>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="edificio-checkbox" value="CIC" checked>
+                            CIC
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="edificio-checkbox" value="PIDET" checked>
+                            PIDET
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tipo de Activo -->
+            <div class="drawer-section">
+                <h4>Tipo de activo</h4>
+                <select id="drawerTypeFilter" class="select-filter" style="width: 100%;">
+                    <option value="">Seleccionar tipo</option>
+                    <option value="Equipo">Equipo</option>
+                    <option value="Mobiliario">Mobiliario</option>
+                </select>
+            </div>
+
+            <!-- Espacio / Aula / Laboratorio -->
+            <div class="drawer-section">
+                <h4>Espacio / Aula / Laboratorio</h4>
+                <select id="drawerLocationFilter" class="select-filter" style="width: 100%;">
+                    <option value="">Seleccionar espacio</option>
+                    <?php foreach($allSpaces as $sp): ?>
+                        <option value="<?php echo htmlspecialchars($sp['nombre_numero']); ?>"><?php echo htmlspecialchars($sp['nombre_numero'] . ' (' . $sp['edificio'] . ')'); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <!-- Disponibilidad -->
+            <div class="drawer-section">
+                <h4>Disponibilidad</h4>
+                <label class="toggle-switch-label">
+                    Mostrar solo disponibles
+                    <span style="position: relative; display: inline-block;">
+                        <input type="checkbox" id="showOnlyAvailable" class="switch-input">
+                        <span class="switch-slider"></span>
+                    </span>
+                </label>
+            </div>
+
+            <!-- RFID (Tag) -->
+            <div class="drawer-section">
+                <h4>RFID (Tag)</h4>
+                <input type="text" id="drawerRfidInput" class="form-control" placeholder="Buscar por RFID o tag..." style="font-size: 13px; padding: 8px 12px;">
+            </div>
+
+            <!-- Fecha de registro -->
+            <div class="drawer-section">
+                <h4>Fecha de registro del activo</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div>
+                        <label style="font-size: 9px; margin-bottom: 4px;">Desde</label>
+                        <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 9px; margin-bottom: 4px;">Hasta</label>
+                        <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="drawer-footer">
+                <button type="button" class="btn-secondary" onclick="clearDrawerFilters()" style="justify-content: center; padding: 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Limpiar filtros
+                </button>
+                <button type="button" class="btn-primary" onclick="applyFilters();" style="justify-content: center; padding: 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="bi bi-funnel"></i> Aplicar filtros
+                </button>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -1068,26 +1066,43 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         color: #64748b;
     }
 
-    /* Cajón de Filtros Deslizante (Drawer) */
-    .filters-drawer {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        width: 350px;
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        display: none;
-        padding: 20px;
+    /* Panel lateral de Filtros */
+    .filters-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: filterSlideIn 0.3s ease;
+    }
+    @keyframes filterSlideIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .filters-panel-card {
+        display: flex;
         flex-direction: column;
         gap: 16px;
-        max-height: 480px;
-        overflow-y: auto;
+        max-height: none;
+        overflow-y: visible;
     }
-    .filters-drawer.open {
-        display: flex;
+    .filters-panel-card::-webkit-scrollbar {
+        width: 4px;
+    }
+    .filters-panel-card::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    .filters-panel-card::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    /* Active state for filters button */
+    .btn-outline.filters-active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+    .btn-outline.filters-active:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
     }
     .drawer-header {
         display: flex;
@@ -1488,21 +1503,23 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         }
     });
 
-    function toggleFiltersDrawer(event) {
-        if (event) event.stopPropagation();
-        const drawer = document.getElementById("filtersDrawer");
-        drawer.classList.toggle("open");
-    }
-
-    document.addEventListener('click', (e) => {
-        const drawer = document.getElementById("filtersDrawer");
+    function toggleFiltersPanel() {
+        const stats = document.getElementById("statsSidebar");
+        const filters = document.getElementById("filtersSidebar");
         const btn = document.getElementById("filtersBtn");
-        if (drawer && drawer.classList.contains("open")) {
-            if (!drawer.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                drawer.classList.remove("open");
-            }
+        
+        if (filters.style.display === 'none' || filters.style.display === '') {
+            // Mostrar filtros, ocultar stats
+            stats.style.display = 'none';
+            filters.style.display = 'flex';
+            btn.classList.add('filters-active');
+        } else {
+            // Ocultar filtros, mostrar stats
+            filters.style.display = 'none';
+            stats.style.display = 'flex';
+            btn.classList.remove('filters-active');
         }
-    });
+    }
 
     function clearDrawerFilters() {
         document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = false);
