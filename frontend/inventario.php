@@ -151,17 +151,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <p>Gestiona y controla los activos y mobiliario institucional</p>
     </div>
     <div class="premium-header-right">
-        <div class="premium-top-search">
-            <i class="bi bi-search"></i>
-            <input type="text" id="topSearchInput" placeholder="Buscar activo, serie, tag RFID...">
-        </div>
         <button class="bell-btn" onclick="alert('No hay notificaciones nuevas')">
             <i class="bi bi-bell"></i>
             <span class="bell-badge">3</span>
-        </button>
-        <button class="btn-primary" onclick="document.getElementById('newAssetModal').style.display='flex'">
-            <i class="bi bi-plus-lg"></i>
-            Nuevo activo
         </button>
     </div>
 </div>
@@ -170,9 +162,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 <div class="tabs-row">
     <div class="tabs-container">
         <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active">INVENTARIO</button>
-        <button onclick="switchAssetTab('prestamos')" id="tab-prestamos" class="btn-tab">PRÉSTAMOS</button>
         <button onclick="switchAssetTab('mantenimiento')" id="tab-mantenimiento" class="btn-tab">MANTENIMIENTO</button>
     </div>
+    <button class="btn-primary" onclick="document.getElementById('newAssetModal').style.display='flex'">
+        <i class="bi bi-plus-lg"></i>
+        Nuevo activo
+    </button>
 </div>
 
 <!-- Sección de Inventario Principal -->
@@ -210,7 +205,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </select>
             </div>
             <div class="filters-right">
-                <button class="btn-outline" onclick="toggleFiltersDrawer(true)">
+                <button class="btn-outline" id="filtersBtn" onclick="toggleFiltersDrawer(event)">
                     <i class="bi bi-funnel"></i>
                     Filtros
                 </button>
@@ -218,9 +213,119 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <i class="bi bi-download"></i>
                     Exportar
                 </button>
-                <div class="view-toggles">
-                    <button class="view-btn active" title="Vista de Tabla"><i class="bi bi-list-ul"></i></button>
-                    <button class="view-btn" title="Vista de Cuadrícula" onclick="alert('Vista de cuadrícula próximamente')"><i class="bi bi-grid-fill"></i></button>
+
+                <!-- Cajón Lateral de Filtros (Drawer) -->
+                <div id="filtersDrawer" class="filters-drawer">
+                    <div class="drawer-header">
+                        <h3>Filtros de inventario</h3>
+                        <button class="close-drawer-btn" onclick="toggleFiltersDrawer(event)">✕</button>
+                    </div>
+
+                    <!-- Sección 1 y 2: Estado del Activo y Edificio (en 2 columnas) -->
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+                        <div class="drawer-section">
+                            <h4>Estado del activo</h4>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="status-checkbox" value="Disponible" checked>
+                                    Disponible
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="status-checkbox" value="En uso" checked>
+                                    En uso
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="status-checkbox" value="Prestado" checked>
+                                    Prestado
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="status-checkbox" value="Mantenimiento" checked>
+                                    Mantenimiento
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="status-checkbox" value="Extraviado">
+                                    Inactivo / baja
+                                </label>
+                            </div>
+                        </div>
+                        <div class="drawer-section">
+                            <h4>Edificio</h4>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="edificio-checkbox" value="CIC" checked>
+                                    CIC
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="edificio-checkbox" value="PIDET" checked>
+                                    PIDET
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 3: Tipo de Activo -->
+                    <div class="drawer-section">
+                        <h4>Tipo de activo</h4>
+                        <select id="drawerTypeFilter" class="select-filter" style="width: 100%;">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Equipo">Equipo</option>
+                            <option value="Mobiliario">Mobiliario</option>
+                        </select>
+                    </div>
+
+                    <!-- Sección 4: Espacio / Aula / Laboratorio -->
+                    <div class="drawer-section">
+                        <h4>Espacio / Aula / Laboratorio</h4>
+                        <select id="drawerLocationFilter" class="select-filter" style="width: 100%;">
+                            <option value="">Seleccionar espacio</option>
+                            <?php foreach($allSpaces as $sp): ?>
+                                <option value="<?php echo htmlspecialchars($sp['nombre_numero']); ?>"><?php echo htmlspecialchars($sp['nombre_numero'] . ' (' . $sp['edificio'] . ')'); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Sección 5: Disponibilidad -->
+                    <div class="drawer-section">
+                        <h4>Disponibilidad</h4>
+                        <label class="toggle-switch-label">
+                            Mostrar solo disponibles
+                            <span style="position: relative; display: inline-block;">
+                                <input type="checkbox" id="showOnlyAvailable" class="switch-input">
+                                <span class="switch-slider"></span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Sección 6: RFID (Tag) -->
+                    <div class="drawer-section">
+                        <h4>RFID (Tag)</h4>
+                        <input type="text" id="drawerRfidInput" class="form-control" placeholder="Buscar por RFID o tag..." style="font-size: 13px; padding: 8px 12px;">
+                    </div>
+
+                    <!-- Sección 7: Fecha de registro -->
+                    <div class="drawer-section">
+                        <h4>Fecha de registro del activo</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label style="font-size: 9px; margin-bottom: 4px;">Desde</label>
+                                <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 9px; margin-bottom: 4px;">Hasta</label>
+                                <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer del Drawer -->
+                    <div class="drawer-footer">
+                        <button type="button" class="btn-secondary" onclick="clearDrawerFilters()" style="justify-content: center; padding: 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="bi bi-arrow-counterclockwise"></i> Limpiar filtros
+                        </button>
+                        <button type="button" class="btn-primary" onclick="applyFilters();" style="justify-content: center; padding: 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="bi bi-funnel"></i> Aplicar filtros
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -295,16 +400,13 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                                 <?php echo htmlspecialchars($est); ?>
                             </span>
                         </td>
-                        <td>
-                            <div style="position: relative; display: inline-block;">
-                                <button class="table-action" onclick="toggleRowMenu(event, <?php echo $asset['act_id']; ?>)" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 4px;">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <div id="menu-<?php echo $asset['act_id']; ?>" class="row-action-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); z-index: 10; width: 100px;">
-                                    <a href="javascript:void(0)" onclick='openEditModal(<?php echo json_encode($asset); ?>)' style="display: block; padding: 8px 12px; font-size: 12.5px; color: #334155; text-decoration: none; font-weight: 600;">Editar</a>
-                                    <a href="?delete_id=<?php echo $asset['act_id']; ?>" onclick="return confirm('¿Eliminar activo?')" style="display: block; padding: 8px 12px; font-size: 12.5px; color: #ef4444; text-decoration: none; font-weight: 600; border-top: 1px solid #f1f5f9;">Eliminar</a>
-                                </div>
-                            </div>
+                        <td style="white-space: nowrap;">
+                            <button class="btn-primary" onclick='openEditModal(<?php echo json_encode($asset); ?>)' style="padding: 6px 12px; font-size: 12.5px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-right: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </button>
+                            <a href="?delete_id=<?php echo $asset['act_id']; ?>" onclick="return confirm('¿Eliminar activo?')" style="padding: 6px 12px; font-size: 12.5px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -462,35 +564,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
 
 
-    <!-- Sección: Préstamos -->
-    <div id="section-prestamos" style="display: none; grid-template-columns: 1fr 2fr; gap: 32px;">
-        <aside class="card">
-            <h3 style="font-weight: 800; color: #334155; margin-bottom: 24px;">Registrar Salida</h3>
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <div>
-                    <label style="display: block; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Activo (ID/RFID)</label>
-                    <input type="text" placeholder="Ej: LPT-001" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px;">
-                </div>
-                <div>
-                    <label style="display: block; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Usuario (Matrícula)</label>
-                    <input type="text" placeholder="Ej: 20213045" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px;">
-                </div>
-                <button class="btn-primary" style="width: 100%; justify-content: center;">REGISTRAR PRÉSTAMO</button>
-            </div>
-        </aside>
-        <main class="card">
-            <h3 style="font-size: 14px; font-weight: 800; color: #334155; margin-bottom: 24px;">Préstamos Activos</h3>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="padding: 16px; background: #f8fafc; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <p style="font-size: 14px; font-weight: 800;">Laptop Dell Latitude (LPT-44)</p>
-                        <p style="font-size: 11px; color: #94a3b8;">Prestado a: Juan Perez • Vence: 16:00</p>
-                    </div>
-                    <button class="btn-primary" style="background: #10b981; font-size: 9px; padding: 6px 12px;">RETORNAR</button>
-                </div>
-            </div>
-        </main>
-    </div>
+
 
     <!-- Sección: Mantenimiento -->
     <div id="section-mantenimiento" style="display: none;">
@@ -589,12 +663,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         justify-content: space-between;
         align-items: center;
         background: #ffffff;
-        padding: 20px 28px;
+        padding: 10px 28px;
         border-bottom: 1px solid #e2e8f0;
         margin-left: -28px;
         margin-right: -28px;
         margin-top: -24px;
-        margin-bottom: 24px;
+        margin-bottom: 12px;
     }
     .premium-header-left h1 {
         font-size: 24px;
@@ -611,27 +685,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         display: flex;
         align-items: center;
         gap: 16px;
-    }
-    .premium-top-search {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 8px 14px;
-        width: 260px;
-    }
-    .premium-top-search i {
-        color: #94a3b8;
-    }
-    .premium-top-search input {
-        background: transparent;
-        border: none;
-        outline: none;
-        width: 100%;
-        font-size: 13px;
-        font-weight: 500;
     }
     .bell-btn {
         width: 38px;
@@ -672,7 +725,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+        margin-bottom: 12px;
     }
     .tabs-container {
         display: flex;
@@ -702,7 +755,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .inventory-grid {
         display: grid;
         grid-template-columns: 1fr 340px;
-        gap: 24px;
+        gap: 16px;
         align-items: start;
     }
 
@@ -752,6 +805,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         display: flex;
         align-items: center;
         gap: 8px;
+        position: relative;
     }
     .btn-outline {
         background: #ffffff;
@@ -771,25 +825,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         background: #f8fafc;
         border-color: #cbd5e1;
     }
-    .view-toggles {
-        display: flex;
-        border: 1px solid #e2e8f0;
-        background: white;
-        border-radius: 10px;
-        padding: 2px;
-    }
-    .view-btn {
-        border: none;
-        background: none;
-        padding: 6px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        color: #94a3b8;
-    }
-    .view-btn.active {
-        background: #f1f5f9;
-        color: #0f172a;
-    }
 
     /* Tabla Premium */
     .premium-table-card {
@@ -805,7 +840,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
     .premium-table th {
         background: #f8fafc;
-        padding: 14px 18px;
+        padding: 8px 12px;
         font-size: 11px;
         font-weight: 700;
         color: #475569;
@@ -814,7 +849,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         border-bottom: 1px solid #e2e8f0;
     }
     .premium-table td {
-        padding: 14px 18px;
+        padding: 8px 12px;
         border-bottom: 1px solid #f1f5f9;
         color: #334155;
         font-size: 13.5px;
@@ -894,26 +929,26 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .stats-sidebar {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 12px;
     }
     .sidebar-card {
         background: white;
         border-radius: 16px;
         border: 1px solid #e2e8f0;
-        padding: 20px;
+        padding: 12px 16px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .sidebar-card h3 {
         font-size: 14px;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
     }
     .donut-chart-container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 16px;
+        gap: 10px;
     }
     .donut-svg-wrapper {
         position: relative;
@@ -1034,33 +1069,25 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     /* Cajón de Filtros Deslizante (Drawer) */
-    .drawer-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.3);
-        backdrop-filter: blur(2px);
-        z-index: 999;
-        display: none;
-    }
     .filters-drawer {
-        position: fixed;
-        top: 0;
+        position: absolute;
+        top: calc(100% + 8px);
         right: 0;
-        bottom: 0;
         width: 350px;
         background: white;
-        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         z-index: 1000;
-        transform: translateX(100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 24px;
-        display: flex;
+        display: none;
+        padding: 20px;
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
+        max-height: 480px;
         overflow-y: auto;
     }
     .filters-drawer.open {
-        transform: translateX(0);
+        display: flex;
     }
     .drawer-header {
         display: flex;
@@ -1113,7 +1140,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .checkbox-label input {
         width: 16px;
         height: 16px;
-        accent-color: #2563eb;
+        accent-color: #10b981;
     }
     .drawer-footer {
         display: grid;
@@ -1361,8 +1388,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
     function switchAssetTab(tab) {
         document.getElementById('section-inventario').style.display = tab === 'inventario' ? 'grid' : 'none';
-
-        document.getElementById('section-prestamos').style.display = tab === 'prestamos' ? 'grid' : 'none';
         document.getElementById('section-mantenimiento').style.display = tab === 'mantenimiento' ? 'block' : 'none';
         
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
@@ -1395,7 +1420,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     
     // Search inventory & Filters Logic
     const searchInventory = document.getElementById("searchInventory");
-    const topSearchInput = document.getElementById("topSearchInput");
     const quickTypeFilter = document.getElementById("quickTypeFilter");
     const statusFilter = document.getElementById("statusFilter");
     const quickLocationFilter = document.getElementById("quickLocationFilter");
@@ -1406,7 +1430,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     const showOnlyAvailable = document.getElementById("showOnlyAvailable");
 
     function applyFilters() {
-        const topSearchVal = topSearchInput.value.toLowerCase();
         const searchVal = searchInventory.value.toLowerCase();
         
         const statusBoxes = document.querySelectorAll('.status-checkbox:checked');
@@ -1428,14 +1451,21 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const rowLoc = row.dataset.ubicacion;
             const rowEdificio = row.dataset.edificio;
             
-            const matchesText = text.includes(searchVal) && text.includes(topSearchVal);
+            const matchesText = text.includes(searchVal);
             const matchesType = !typeVal || rowTipo === typeVal;
 
             let matchesStatus = true;
             if (statusVal) {
                 matchesStatus = (rowStatus === statusVal);
             } else if (selectedStatuses.length > 0) {
-                matchesStatus = selectedStatuses.includes(rowStatus);
+                matchesStatus = selectedStatuses.some(sel => {
+                    if (sel === 'Disponible' && rowStatus === 'Disponible') return true;
+                    if (sel === 'En uso' && (rowStatus === 'En uso' || rowStatus === 'Prestado' || rowStatus === 'En préstamo')) return true;
+                    if (sel === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo')) return true;
+                    if (sel === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) return true;
+                    if (sel === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) return true;
+                    return false;
+                });
             }
 
             const matchesEdificio = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
@@ -1451,24 +1481,28 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         });
     }
 
-    [searchInventory, topSearchInput, quickTypeFilter, statusFilter, quickLocationFilter].forEach(el => {
+    [searchInventory, quickTypeFilter, statusFilter, quickLocationFilter].forEach(el => {
         if(el) {
             el.addEventListener('input', applyFilters);
             el.addEventListener('change', applyFilters);
         }
     });
 
-    function toggleFiltersDrawer(show) {
+    function toggleFiltersDrawer(event) {
+        if (event) event.stopPropagation();
         const drawer = document.getElementById("filtersDrawer");
-        const overlay = document.getElementById("drawerOverlay");
-        if(show) {
-            drawer.classList.add("open");
-            overlay.style.display = "block";
-        } else {
-            drawer.classList.remove("open");
-            overlay.style.display = "none";
-        }
+        drawer.classList.toggle("open");
     }
+
+    document.addEventListener('click', (e) => {
+        const drawer = document.getElementById("filtersDrawer");
+        const btn = document.getElementById("filtersBtn");
+        if (drawer && drawer.classList.contains("open")) {
+            if (!drawer.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                drawer.classList.remove("open");
+            }
+        }
+    });
 
     function clearDrawerFilters() {
         document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = false);
@@ -1478,7 +1512,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         drawerRfidInput.value = "";
         showOnlyAvailable.checked = false;
         applyFilters();
-        toggleFiltersDrawer(false);
     }
 
     // Export Table to CSV
@@ -1505,22 +1538,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.body.removeChild(downloadLink);
     }
 
-    // Row dropdown menu toggle
-    function toggleRowMenu(event, id) {
-        event.stopPropagation();
-        const menu = document.getElementById('menu-' + id);
-        const allMenus = document.querySelectorAll('.row-action-menu');
-        allMenus.forEach(m => {
-            if (m !== menu) m.style.display = 'none';
-        });
-        if(menu) {
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-        }
-    }
 
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.row-action-menu').forEach(m => m.style.display = 'none');
-    });
 
     // Space filtering based on Building in Modals
     function setupSpaceFilter(edificioSelectId, spaceSelectId) {
@@ -1547,116 +1565,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     });
 </script>
 
-<!-- Cajón Lateral de Filtros (Drawer) -->
-<div id="drawerOverlay" class="drawer-overlay" onclick="toggleFiltersDrawer(false)"></div>
-<div id="filtersDrawer" class="filters-drawer">
-    <div class="drawer-header">
-        <h3>Filtros de inventario</h3>
-        <button class="close-drawer-btn" onclick="toggleFiltersDrawer(false)">✕</button>
-    </div>
 
-    <!-- Sección 1: Estado del Activo -->
-    <div class="drawer-section">
-        <h4>Estado del activo</h4>
-        <div class="checkbox-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="status-checkbox" value="Disponible" checked>
-                Disponible
-            </label>
-            <label class="checkbox-label">
-                <input type="checkbox" class="status-checkbox" value="Prestado" checked>
-                En uso / Prestado
-            </label>
-            <label class="checkbox-label">
-                <input type="checkbox" class="status-checkbox" value="Mantenimiento" checked>
-                Mantenimiento
-            </label>
-            <label class="checkbox-label">
-                <input type="checkbox" class="status-checkbox" value="Extraviado">
-                Extraviado
-            </label>
-        </div>
-    </div>
-
-    <!-- Sección 2: Edificio -->
-    <div class="drawer-section">
-        <h4>Edificio</h4>
-        <div class="checkbox-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="edificio-checkbox" value="CIC" checked>
-                CIC
-            </label>
-            <label class="checkbox-label">
-                <input type="checkbox" class="edificio-checkbox" value="PIDET" checked>
-                PIDET
-            </label>
-        </div>
-    </div>
-
-    <!-- Sección 3: Tipo de Activo -->
-    <div class="drawer-section">
-        <h4>Tipo de activo</h4>
-        <select id="drawerTypeFilter" class="select-filter" style="width: 100%;">
-            <option value="">Seleccionar tipo</option>
-            <option value="Equipo">Equipo</option>
-            <option value="Mobiliario">Mobiliario</option>
-        </select>
-    </div>
-
-    <!-- Sección 4: Espacio / Aula / Laboratorio -->
-    <div class="drawer-section">
-        <h4>Espacio / Aula / Laboratorio</h4>
-        <select id="drawerLocationFilter" class="select-filter" style="width: 100%;">
-            <option value="">Seleccionar espacio</option>
-            <?php foreach($allSpaces as $sp): ?>
-                <option value="<?php echo htmlspecialchars($sp['nombre_numero']); ?>"><?php echo htmlspecialchars($sp['nombre_numero'] . ' (' . $sp['edificio'] . ')'); ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
-    <!-- Sección 5: Disponibilidad -->
-    <div class="drawer-section">
-        <h4>Disponibilidad</h4>
-        <label class="toggle-switch-label">
-            Mostrar solo disponibles
-            <span style="position: relative; display: inline-block;">
-                <input type="checkbox" id="showOnlyAvailable" class="switch-input">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-    </div>
-
-    <!-- Sección 6: RFID (Tag) -->
-    <div class="drawer-section">
-        <h4>RFID (Tag)</h4>
-        <input type="text" id="drawerRfidInput" class="form-control" placeholder="Buscar por RFID o tag..." style="font-size: 13px; padding: 8px 12px;">
-    </div>
-
-    <!-- Sección 7: Fecha de registro -->
-    <div class="drawer-section">
-        <h4>Fecha de registro del activo</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <div>
-                <label style="font-size: 9px; margin-bottom: 4px;">Desde</label>
-                <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
-            </div>
-            <div>
-                <label style="font-size: 9px; margin-bottom: 4px;">Hasta</label>
-                <input type="date" class="form-control" style="font-size: 12px; padding: 6px 8px;">
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer del Drawer -->
-    <div class="drawer-footer">
-        <button class="btn-secondary" onclick="clearDrawerFilters()" style="justify-content: center; padding: 10px; font-size: 12px;">
-            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
-        </button>
-        <button class="btn-primary" onclick="applyFilters(); toggleFiltersDrawer(false);" style="justify-content: center; padding: 10px; font-size: 12px;">
-            <i class="bi bi-funnel"></i> Aplicar
-        </button>
-    </div>
-</div>
 
 <!-- Modal de Nuevo Activo Premium -->
 <div id="newAssetModal" class="custom-modal">
