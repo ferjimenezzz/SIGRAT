@@ -215,6 +215,31 @@ try {
                 $status_code = 201;
             }
             break;
+
+        case 'notifications':
+            require_once '../controllers/NotificationController.php';
+            $controller = new \Controllers\NotificationController();
+            
+            if (!isset($_SESSION['us_id'])) {
+                $status_code = 401;
+                $response = ["error" => "No autorizado"];
+                break;
+            }
+            
+            $action = end($uri);
+            if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'unread') {
+                $response = $controller->getUnreadNotifications($_SESSION['us_id']);
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'read') {
+                $success = $controller->markAsRead($input['not_id'], $_SESSION['us_id']);
+                $response = ["success" => $success];
+                $status_code = $success ? 200 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'check_expiring') {
+                $controller->checkExpiringLoans();
+                $response = ["success" => true];
+                $status_code = 200;
+            }
+            break;
     }
 } catch (\Exception $e) {
     $response = ["error" => $e->getMessage()];

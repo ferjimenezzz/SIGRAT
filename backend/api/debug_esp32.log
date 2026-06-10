@@ -26,11 +26,327 @@ Cuerpo:
 Cuerpo: 
 2026-06-08 18:52:29 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-09 16:48:43 - GET /SIGRAT/backend/api/index.php/reservations/pending
+2026-06-09 20:40:09 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-09 16:51:42 - GET /SIGRAT/backend/api/index.php/reservations/pending
+2026-06-09 20:42:13 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-09 17:17:29 - GET /SIGRAT/backend/api/index.php/reservations/pending
+2026-06-10 16:41:51 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-10 17:02:45 - GET /SIGRAT/backend/api/index.php/reservations/pending
+2026-06-10 16:44:09 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:06:26 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:06:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:06:33 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:06:34 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:07:34 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:07:34 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:08:33 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:08:34 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:09:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:09:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:10:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:10:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:10:50 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:10:51 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:11:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:11:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:11:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:11:30 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:11:31 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:11:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:11:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:11:57 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:11:57 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:12:30 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:12:30 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:13:17 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:13:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:13:50 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:13:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:14:30 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:14:31 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:14:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:14:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:14:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:14:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:14:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:15:28 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:15:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:16:09 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:16:09 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:16:23 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:16:23 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:16:41 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:16:41 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:17:00 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:17:00 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:17:05 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:17:05 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:18:05 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:18:05 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:18:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:18:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:19:06 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:19:06 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:19:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:19:43 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:19:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:20:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:20:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:20:18 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:20:19 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:20:38 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:20:39 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:21:02 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:21:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:21:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:22:02 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:22:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:22:26 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:22:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:23:26 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:23:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:23:35 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:23:36 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:24:02 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:24:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:24:09 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:24:10 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:25:09 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:25:10 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:25:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:25:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:26:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:26:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:27:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:27:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:28:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:28:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:29:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:29:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:30:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:30:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:31:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:31:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:32:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:32:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:33:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:33:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:34:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:34:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:35:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:35:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:35:50 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:35:51 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:10 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:10 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:19 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:22 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:23 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:36:23 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:36 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:36 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:36:37 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:41 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:36:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:52 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-10 17:36:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:36:55 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:36:55 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:37:04 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:37:05 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:38:04 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:38:05 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:38:55 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:38:56 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:39:55 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:39:56 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:40:55 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:40:56 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:41:55 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:41:56 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:42:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:42:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:42:59 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:43:00 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:43:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:43:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:44:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:44:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:45:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:45:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:46:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:46:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:47:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:47:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:47:46 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:47:47 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:47:59 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:48:00 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:48:38 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:48:38 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
+Cuerpo: 
+2026-06-10 17:48:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/check_expiring
+Cuerpo: 
+2026-06-10 17:48:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/api/notifications/unread
 Cuerpo: 

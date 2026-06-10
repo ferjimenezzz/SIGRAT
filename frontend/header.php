@@ -413,6 +413,92 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             background: #2563eb;
             border-radius: 50%;
             border: 2px solid white;
+            display: none;
+        }
+
+        /* ==================== NOTIFICATIONS ==================== */
+        .notif-panel {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .notif-panel.show {
+            display: flex;
+        }
+
+        .notif-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .notif-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .notif-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notif-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            text-decoration: none;
+            display: block;
+            transition: background 0.2s;
+        }
+
+        .notif-item:hover {
+            background: #f8fafc;
+        }
+
+        .notif-item.unread {
+            background: #eff6ff;
+        }
+
+        .notif-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .notif-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .notif-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: block;
+        }
+        
+        .notif-empty {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
         .topbar-date {
@@ -568,9 +654,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     <i class="bi bi-search"></i>
                     <input type="text" placeholder="Buscar...">
                 </div>
-                <div class="topbar-icon-btn">
+                <div class="topbar-icon-btn" id="notifBtn">
                     <i class="bi bi-bell"></i>
-                    <div class="notification-badge"></div>
+                    <div class="notification-badge" id="notifBadge"></div>
+                    
+                    <!-- Dropdown Notificaciones -->
+                    <div class="notif-panel" id="notifPanel">
+                        <div class="notif-header">
+                            <h3>Notificaciones</h3>
+                        </div>
+                        <div class="notif-list" id="notifList">
+                            <!-- Items insertados vía JS -->
+                        </div>
+                    </div>
                 </div>
                 <div class="topbar-date">
                     <i class="bi bi-calendar4-week"></i>
@@ -581,4 +677,76 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 </div>
             </div>
         </header>
-        <main class="content-padding">
+        </main>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifBtn = document.getElementById('notifBtn');
+            const notifPanel = document.getElementById('notifPanel');
+            const notifBadge = document.getElementById('notifBadge');
+            const notifList = document.getElementById('notifList');
+
+            if(notifBtn) {
+                notifBtn.addEventListener('click', function(e) {
+                    if(e.target.closest('.notif-list')) return; // No cerrar si cliquean un item
+                    notifPanel.classList.toggle('show');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!notifBtn.contains(e.target)) {
+                        notifPanel.classList.remove('show');
+                    }
+                });
+
+                function fetchNotifications() {
+                    // Primero forzar chequeo de préstamos por vencer (silenciosamente)
+                    fetch('../backend/api/index.php/api/notifications/check_expiring', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    }).then(() => {
+                        return fetch('../backend/api/index.php/api/notifications/unread');
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(Array.isArray(data)) {
+                            if(data.length > 0) {
+                                notifBadge.style.display = 'block';
+                                notifList.innerHTML = '';
+                                data.forEach(n => {
+                                    const a = document.createElement('a');
+                                    a.href = n.enlace ? n.enlace : '#';
+                                    a.className = 'notif-item unread';
+                                    a.innerHTML = `
+                                        <div class="notif-title">${n.tipo}</div>
+                                        <div class="notif-text">${n.mensaje}</div>
+                                        <span class="notif-time">${new Date(n.fecha_creacion).toLocaleString()}</span>
+                                    `;
+                                    a.addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        // Marcar como leída y luego redirigir
+                                        fetch('../backend/api/index.php/api/notifications/read', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ not_id: n.not_id })
+                                        }).then(() => {
+                                            window.location.href = a.href;
+                                        });
+                                    });
+                                    notifList.appendChild(a);
+                                });
+                            } else {
+                                notifBadge.style.display = 'none';
+                                notifList.innerHTML = '<div class="notif-empty">No tienes notificaciones nuevas</div>';
+                            }
+                        }
+                    }).catch(err => console.error("Error fetching notifications", err));
+                }
+
+                // Cargar notificaciones al iniciar
+                fetchNotifications();
+                // Refrescar cada minuto
+                setInterval(fetchNotifications, 60000);
+            }
+        });
+        </script>
+

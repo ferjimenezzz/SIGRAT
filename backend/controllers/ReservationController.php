@@ -9,9 +9,11 @@ namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
 require_once 'AuditController.php';
+require_once 'NotificationController.php';
 
 use Config\Database;
 use Controllers\AuditController;
+use Controllers\NotificationController;
 use PDO;
 
 class ReservationController {
@@ -50,12 +52,28 @@ class ReservationController {
 
             $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial]);
+            
+            $new_res_id = $this->db->lastInsertId();
             $this->db->commit();
             
             // Auditoría
-            $this->audit->log($us_id, "Creada nueva reservación ID: " . $this->db->lastInsertId(), "RESERVAS", $vis_id);
+            $this->audit->log($us_id, "Creada nueva reservación ID: " . $new_res_id, "RESERVAS", $vis_id);
             
-            return ["success" => true, "id" => $this->db->lastInsertId()];
+            // Notificar a administradores si requiere aprobación
+            if ($estatus_inicial === 'Pendiente') {
+                try {
+                    $notifCtrl = new NotificationController();
+                    $stmtAdmins = $this->db->query("SELECT us_id FROM USUARIO WHERE rol_id IN (SELECT rol_id FROM ROLES WHERE UPPER(nombre) LIKE '%ADMIN%')");
+                    $admins = $stmtAdmins->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($admins as $admin_id) {
+                        $notifCtrl->createNotification($admin_id, 'Reserva', "Nueva reserva pendiente de aprobación (ID: $new_res_id).", 'aprobacion_reservas.php');
+                    }
+                } catch (\Exception $e) {
+                    error_log("Error notificando reserva pendiente: " . $e->getMessage());
+                }
+            }
+
+            return ["success" => true, "id" => $new_res_id];
         } catch (\Exception $e) {
             $this->db->rollBack();
             return ["success" => false, "error" => $e->getMessage()];
@@ -72,6 +90,19 @@ class ReservationController {
 
             // Auditoría
             $this->audit->log($admin_id, "Aprobada reservación ID: $id", "RESERVAS");
+
+            // Notificar al usuario
+            try {
+                $notifCtrl = new NotificationController();
+                $stmtUs = $this->db->prepare("SELECT us_id FROM RESERVA WHERE re_id = ?");
+                $stmtUs->execute([$id]);
+                $us_id = $stmtUs->fetchColumn();
+                if ($us_id) {
+                    $notifCtrl->createNotification($us_id, 'Reserva', "Tu reserva (ID: $id) ha sido aprobada.", 'espacios.php');
+                }
+            } catch (\Exception $e) {
+                error_log("Error notificando aprobación de reserva: " . $e->getMessage());
+            }
 
             return ["success" => true];
         } catch (\Exception $e) {

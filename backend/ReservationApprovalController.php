@@ -96,6 +96,20 @@ class ReservationApprovalController
             $update->execute([':admin' => $adminId, ':id' => $reservationId]);
             $this->logAction($adminId, 'Aprobó reserva #' . $reservationId, 'reserva');
 
+            // Notify user
+            try {
+                require_once __DIR__ . '/controllers/NotificationController.php';
+                $notifCtrl = new \Controllers\NotificationController();
+                $stmtUser = $this->pdo->prepare("SELECT us_id FROM reserva WHERE re_id = :id");
+                $stmtUser->execute([':id' => $reservationId]);
+                $resUsId = $stmtUser->fetchColumn();
+                if ($resUsId) {
+                    $notifCtrl->createNotification($resUsId, 'Reserva', 'Tu reserva #' . $reservationId . ' ha sido aprobada.', 'espacios.php');
+                }
+            } catch (Exception $e) {
+                error_log("Error notificando aprobación (ApprovalController): " . $e->getMessage());
+            }
+
             // Automatically reject overlapping pending reservations
             $rejectStmt = $this->pdo->prepare(
                 "UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', approved_by = :admin, approved_at = NOW() 
@@ -154,6 +168,22 @@ class ReservationApprovalController
         );
         $update->execute([':admin' => $adminId, ':id' => $reservationId]);
         $this->logAction($adminId, 'Rechazó reserva' . ($reason ? ': ' . $reason : ''), 'reserva');
+
+        // Notify user
+        try {
+            require_once __DIR__ . '/controllers/NotificationController.php';
+            $notifCtrl = new \Controllers\NotificationController();
+            $stmtUser = $this->pdo->prepare("SELECT us_id FROM reserva WHERE re_id = :id");
+            $stmtUser->execute([':id' => $reservationId]);
+            $resUsId = $stmtUser->fetchColumn();
+            if ($resUsId) {
+                $msg = 'Tu reserva #' . $reservationId . ' ha sido rechazada.';
+                if ($reason) $msg .= ' Motivo: ' . $reason;
+                $notifCtrl->createNotification($resUsId, 'Reserva', $msg, 'espacios.php');
+            }
+        } catch (Exception $e) {
+            error_log("Error notificando rechazo (ApprovalController): " . $e->getMessage());
+        }
     }
 
     /**

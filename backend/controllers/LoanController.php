@@ -8,8 +8,10 @@
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/NotificationController.php';
 
 use Config\Database;
+use Controllers\NotificationController;
 use PDO;
 
 class LoanController {
@@ -31,7 +33,21 @@ class LoanController {
             // Actualizar estado del activo
             $this->db->prepare("UPDATE ACTIVO SET estatus = 'Prestado' WHERE act_id = ?")->execute([$act_id]);
             
-            return ["success" => true, "id" => $this->db->lastInsertId()];
+            $new_pres_id = $this->db->lastInsertId();
+
+            // Notificar a los administradores
+            try {
+                $notifCtrl = new NotificationController();
+                $stmtAdmins = $this->db->query("SELECT us_id FROM USUARIO WHERE rol_id IN (SELECT rol_id FROM ROLES WHERE UPPER(nombre) LIKE '%ADMIN%')");
+                $admins = $stmtAdmins->fetchAll(PDO::FETCH_COLUMN);
+                foreach ($admins as $admin_id) {
+                    $notifCtrl->createNotification($admin_id, 'Prestamo', 'Se ha registrado un nuevo préstamo en el sistema.', 'prestamos.php');
+                }
+            } catch (\Exception $e) {
+                error_log("Error al enviar notificación de préstamo: " . $e->getMessage());
+            }
+
+            return ["success" => true, "id" => $new_pres_id];
         } catch (\Exception $e) {
             return ["success" => false, "error" => $e->getMessage()];
         }
@@ -89,8 +105,22 @@ class LoanController {
             $stmtPres = $this->db->prepare($queryPres);
             $stmtPres->execute([$act_id, $us_id, $fecha_pres, $fecha_ent_val, $estatus]);
 
+            $new_pres_id = $this->db->lastInsertId();
+
+            // Notificar a los administradores
+            try {
+                $notifCtrl = new NotificationController();
+                $stmtAdmins = $this->db->query("SELECT us_id FROM USUARIO WHERE rol_id IN (SELECT rol_id FROM ROLES WHERE UPPER(nombre) LIKE '%ADMIN%')");
+                $admins = $stmtAdmins->fetchAll(PDO::FETCH_COLUMN);
+                foreach ($admins as $admin_id) {
+                    $notifCtrl->createNotification($admin_id, 'Prestamo', 'Se ha registrado un nuevo préstamo (Dinámico).', 'prestamos.php');
+                }
+            } catch (\Exception $e) {
+                error_log("Error al enviar notificación de préstamo dinámico: " . $e->getMessage());
+            }
+
             $this->db->commit();
-            return ["success" => true, "id" => $this->db->lastInsertId()];
+            return ["success" => true, "id" => $new_pres_id];
         } catch (\Exception $e) {
             $this->db->rollBack();
             return ["success" => false, "error" => $e->getMessage()];
