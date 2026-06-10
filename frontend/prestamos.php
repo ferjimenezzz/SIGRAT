@@ -4,7 +4,7 @@
  * @summary Interfaz de gestión de préstamos.
  * @description Módulo administrativo para listar, buscar, filtrar y registrar préstamos de equipo.
  */
-
+require_once 'seguridad.php';
 require_once 'header.php';
 require_once '../backend/controllers/LoanController.php';
 
