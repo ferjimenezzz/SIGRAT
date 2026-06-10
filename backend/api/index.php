@@ -230,6 +230,9 @@ try {
             if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'unread') {
                 $response = $controller->getUnreadNotifications($_SESSION['us_id']);
                 $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'all') {
+                $response = $controller->getAllNotifications($_SESSION['us_id']);
+                $status_code = 200;
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'read') {
                 $success = $controller->markAsRead($input['not_id'], $_SESSION['us_id']);
                 $response = ["success" => $success];

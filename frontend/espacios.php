@@ -10,6 +10,9 @@ require_once '../backend/controllers/ReservationController.php';
 
 $db = Config\Database::getConnection();
 
+$isAdmin = isset($_SESSION['rol']) && strpos(strtoupper(trim($_SESSION['rol'])), 'ADMIN') !== false;
+$us_id_sesion = $_SESSION['us_id'] ?? null;
+
 // --- 1. Lógica de Espacios ---
 $spaceController = new Controllers\SpaceController();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'new_space') {
@@ -251,8 +254,13 @@ $tab = $_GET['tab'] ?? 'espacios';
                             </td>
                             <td style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #475569;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($res['user_name'] ?: 'Visita'); ?>&background=random&color=fff&rounded=true&size=24" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
-                                    <?php echo $res['user_name'] ?: 'Visita Externa'; ?>
+                                    <?php if ($isAdmin || $res['us_id'] == $us_id_sesion): ?>
+                                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($res['user_name'] ?: 'Visita'); ?>&background=random&color=fff&rounded=true&size=24" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
+                                        <?php echo $res['user_name'] ?: 'Visita Externa'; ?>
+                                    <?php else: ?>
+                                        <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center;"><i data-lucide="lock" style="width: 12px; height: 12px; color: #94a3b8;"></i></div>
+                                        <span style="color: #94a3b8; font-style: italic;">Ocupado</span>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                             <td style="padding: 16px 24px;">

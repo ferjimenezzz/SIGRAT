@@ -25,8 +25,10 @@ if (!$userData) {
 }
 
 // 3. Si el token es válido, vinculamos los datos a la sesión global
-// Esto asegura que $_SESSION['us_id'] esté disponible para archivos como usuarios.php
+// Esto asegura que $_SESSION['us_id'] y $_SESSION['rol'] estén disponibles
 if (!isset($_SESSION['us_id']) && isset($userData['us_id'])) {
     $_SESSION['us_id'] = $userData['us_id'];
+    $_SESSION['rol'] = $userData['rol'] ?? '';
+    $_SESSION['permisos'] = $userData['permisos'] ?? [];
 }
 ?>

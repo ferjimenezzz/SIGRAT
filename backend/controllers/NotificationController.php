@@ -53,6 +53,21 @@ class NotificationController {
     }
 
     /**
+     * @param int $us_id
+     * @return array
+     */
+    public function getAllNotifications($us_id) {
+        try {
+            $query = "SELECT * FROM NOTIFICACION WHERE us_id = ? ORDER BY fecha_creacion DESC LIMIT 50";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$us_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
      * @param int $not_id
      * @param int $us_id Validar pertenencia
      */

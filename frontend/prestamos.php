@@ -10,8 +10,18 @@ require_once '../backend/controllers/LoanController.php';
 
 $loanController = new \Controllers\LoanController();
 
+$isAdmin = false;
+if (isset($_SESSION['rol']) && strpos(strtoupper(trim($_SESSION['rol'])), 'ADMIN') !== false) {
+    $isAdmin = true;
+}
+$us_id_sesion = $_SESSION['us_id'] ?? null;
+
 // Manejar POST (Nuevo, Editar, Eliminar)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if (!$isAdmin) {
+        echo "<script>alert('Acción no permitida.'); window.location.href='prestamos.php';</script>";
+        exit;
+    }
     if ($_POST['action'] === 'new_loan_dynamic') {
         $fecha_ent = empty($_POST['fecha_ent']) ? null : $_POST['fecha_ent'];
         $res = $loanController->createDynamicLoan(
@@ -35,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-$loans = $loanController->getAllLoans();
+$loans = $loanController->getAllLoans($us_id_sesion, $isAdmin);
 $availableAssets = $loanController->getAvailableAssets();
 $users = $loanController->getUsers();
 
@@ -129,9 +139,11 @@ foreach ($loans as $l) {
             <i class="bi bi-search" style="color: var(--text-muted);"></i>
             <input type="text" id="searchInput" placeholder="Buscar equipo o serie..." onkeyup="filterTable()" style="border: none; outline: none; font-size: 13px;">
         </div>
+        <?php if ($isAdmin): ?>
         <button class="btn-primary" onclick="openModal('newLoanModal')">
             <i class="bi bi-plus-lg"></i> Nuevo préstamo
         </button>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -204,12 +216,14 @@ foreach ($loans as $l) {
                     <td>
                         <div class="action-btns">
                             <button class="btn-icon" title="Ver detalles" onclick="openViewModal(<?php echo $loanData; ?>)"><i class="bi bi-eye"></i></button>
+                            <?php if ($isAdmin): ?>
                             <button class="btn-icon" title="Editar préstamo" onclick="openEditModal(<?php echo $loanData; ?>)"><i class="bi bi-pencil-square"></i></button>
                             <form method="POST" style="display:inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este préstamo? El equipo quedará libre.');">
                                 <input type="hidden" name="action" value="delete_loan">
                                 <input type="hidden" name="pres_id" value="<?php echo $loan['pres_id']; ?>">
                                 <button type="submit" class="btn-icon delete" title="Eliminar préstamo"><i class="bi bi-trash"></i></button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>

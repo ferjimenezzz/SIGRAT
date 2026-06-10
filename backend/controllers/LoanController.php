@@ -152,7 +152,7 @@ class LoanController {
     /**
      * Obtiene todos los préstamos con detalles del equipo y del usuario.
      */
-    public function getAllLoans() {
+    public function getAllLoans($us_id = null, $isAdmin = true) {
         $query = "
             SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus,
                    a.tipo, a.marca, a.modelo, a.num_serie, a.act_id,
@@ -160,10 +160,20 @@ class LoanController {
             FROM PRESTAMO p
             JOIN ACTIVO a ON p.act_id = a.act_id
             JOIN USUARIO u ON p.us_id = u.us_id
-            ORDER BY p.fecha_pres DESC
         ";
+        
+        $params = [];
+        if (!$isAdmin && $us_id) {
+            $query .= " WHERE p.us_id = ? ";
+            $params[] = $us_id;
+        }
+
+        $query .= " ORDER BY p.fecha_pres DESC";
+
         try {
-            return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->db->prepare($query);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             return [];
         }

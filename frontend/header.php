@@ -704,18 +704,34 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     }).then(() => {
-                        return fetch('../backend/api/index.php/notifications/unread');
+                        return fetch('../backend/api/index.php/notifications/all');
                     })
                     .then(res => res.json())
                     .then(data => {
                         if(Array.isArray(data)) {
-                            if(data.length > 0) {
+                            // Calcular no leídas (Postgres puede devolver booleanos como t/f, o 0/1)
+                            const unreadCount = data.filter(n => n.leido === false || n.leido === 0 || n.leido === "0" || n.leido === "f").length;
+                            
+                            if(unreadCount > 0) {
                                 notifBadge.style.display = 'block';
+                            } else {
+                                notifBadge.style.display = 'none';
+                            }
+
+                            if(data.length > 0) {
                                 notifList.innerHTML = '';
                                 data.forEach(n => {
                                     const a = document.createElement('a');
                                     a.href = n.enlace ? n.enlace : '#';
-                                    a.className = 'notif-item unread';
+                                    const isRead = n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t";
+                                    a.className = 'notif-item ' + (isRead ? 'read' : 'unread');
+                                    
+                                    // Estilo para las leídas
+                                    if(isRead) {
+                                        a.style.opacity = '0.6';
+                                        a.style.background = '#f8fafc';
+                                    }
+
                                     a.innerHTML = `
                                         <div class="notif-title">${n.tipo}</div>
                                         <div class="notif-text">${n.mensaje}</div>
@@ -723,23 +739,27 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                                     `;
                                     a.addEventListener('click', function(e) {
                                         e.preventDefault();
-                                        // Marcar como leída y luego redirigir
-                                        fetch('../backend/api/index.php/notifications/read', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ not_id: n.not_id })
-                                        }).then(() => {
+                                        if(!isRead) {
+                                            // Marcar como leída y luego redirigir
+                                            fetch('../backend/api/index.php/notifications/read', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ not_id: n.not_id })
+                                            }).then(() => {
+                                                window.location.href = a.href;
+                                            });
+                                        } else {
                                             window.location.href = a.href;
-                                        });
+                                        }
                                     });
                                     notifList.appendChild(a);
                                 });
                             } else {
-                                notifBadge.style.display = 'none';
-                                notifList.innerHTML = '<div class="notif-empty">No tienes notificaciones nuevas</div>';
+                                notifList.innerHTML = '<div class="notif-empty">No tienes notificaciones recientes</div>';
                             }
                         }
-                    }).catch(err => console.error("Error fetching notifications", err));
+                    })
+                    .catch(e => console.error('Error fetching notifications', e));
                 }
 
                 // Cargar notificaciones al iniciar
