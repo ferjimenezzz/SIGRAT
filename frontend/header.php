@@ -62,10 +62,13 @@ if (!function_exists('hasPermission')) {
     function hasPermission($modulo, $accion = 'read') {
         if (!isset($_SESSION['rol'])) return false;
         $userRol = strtoupper(trim($_SESSION['rol']));
-        // Si es Admin superuser
-        if (strpos($userRol, 'ADMIN') !== false) return true;
+        
+        // 2. Privilegios de SuperUsuario/Admin
+        if (strpos($userRol, 'ADMIN') !== false || strpos($userRol, 'SUPERUSUARIO') !== false) return true;
+        
         if (!isset($_SESSION['permisos'])) return false;
         
+        // 3. Permisos heredados del Rol Base
         $permisos = $_SESSION['permisos'];
         if (is_string($permisos)) {
             $permisos = json_decode($permisos, true) ?: [];
@@ -608,6 +611,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             <?php if (hasPermission('Espacios')): ?>
             <a href="espacios.php" class="nav-item <?php echo $currentPage == 'espacios.php' ? 'active' : ''; ?>">
                 <i class="bi bi-geo-alt"></i> Espacios
+            </a>
+            <a href="aprobacion_reservas.php" class="nav-item <?php echo $currentPage == 'aprobacion_reservas.php' ? 'active' : ''; ?>">
+                <i class="bi bi-check2-square"></i> Aprobaciones
             </a>
             <?php endif; ?>
 

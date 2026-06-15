@@ -428,509 +428,771 @@ Cuerpo:
 Cuerpo: 
 2026-06-10 18:05:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:06 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:06:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:08 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:06:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:07:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:12 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:07:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:13 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:08:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:14 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:08:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:17 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:09:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:18 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:09:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:20 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:10:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:21 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:10:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:25 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:11:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:26 - GET /SIGRAT/backend/api/index.php/reservations/pending
+2026-06-10 18:11:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:12:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:07:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:12:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:07:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:13:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:08:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:13:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:08:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:14:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:09:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:14:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:09:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:15:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:10:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:15:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:10:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:16:35 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:11:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:16:36 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:11:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:17:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:12:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:17:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:12:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:18:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:13:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:18:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:13:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:19:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:14:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:19:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:14:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:20:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:14:43 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:20:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:14:44 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:21:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:15:39 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:21:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:15:40 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:22:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:16:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:22:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:16:10 - GET /SIGRAT/backend/api/index.php/reservations/pending
+2026-06-10 18:23:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:16:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:23:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:17:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:24:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:17:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:24:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:18:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:25:45 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:18:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:25:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:19:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:26:19 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:19:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:26:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/unread
 Cuerpo: 
-2026-06-10 23:20:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:26:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:20:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:26:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:21:10 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:26:32 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:21:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:26:33 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:22:10 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:26:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:22:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:26:43 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:23:10 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:26:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:23:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:26:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:24:11 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:27:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:24:12 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:27:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:25:12 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:28:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:25:13 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:28:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:26:13 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:29:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:26:14 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:29:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:27:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:30:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:27:15 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:30:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:28:15 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:31:53 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:28:16 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:31:54 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:29:16 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:32:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:29:17 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:32:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:30:17 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:33:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:30:18 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:33:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:31:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:34:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:31:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:34:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:32:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:35:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:32:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:35:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:33:10 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:36:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:33:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:36:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:34:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:37:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:34:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:37:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:35:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:38:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:35:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:38:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:36:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:39:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:36:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:39:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:37:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:40:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:37:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:40:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:38:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:41:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:38:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:41:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:39:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:42:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:39:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:42:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:40:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:43:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:40:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:43:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:41:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:44:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:41:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:44:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:42:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:45:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:42:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:45:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:43:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:46:53 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:43:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:46:54 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:44:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 18:54:22 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:44:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 18:54:23 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-10 23:45:09 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 19:01:36 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-10 23:45:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 19:01:36 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:09:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 23:46:41 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:09:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 23:46:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:09:18 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 23:46:53 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:09:19 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 23:46:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:09:30 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-10 23:47:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:09:31 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-10 23:47:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:09:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 16:55:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:09:54 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 16:55:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:10:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 16:56:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:10:54 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 16:56:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:11:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 16:57:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:11:54 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 16:57:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:12:54 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 16:58:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:13:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 16:58:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:13:54 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 16:59:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:13:54 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 16:59:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:14:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:00:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:15:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:00:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:15:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:01:29 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:15:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:01:30 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:16:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:01:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:16:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:01:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:17:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:02:20 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:17:55 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:02:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:18:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:03:20 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:18:55 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:03:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:19:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:20 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:19:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:21 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:20:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:22 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:20:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:22 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:21:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:29 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:21:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:30 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:22:57 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:38 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:22:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:39 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 17:23:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:39 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:24:00 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:47 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:24:59 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:25:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:26:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:26:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:04:56 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:26:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:04:57 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:26:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:05:07 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:27:53 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:05:08 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:27:54 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:05:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:28:03 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:05:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:28:05 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:05:18 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:28:11 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:05:19 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 17:28:12 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:05:19 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:28:20 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:05:33 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:28:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:05:34 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:28:23 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:06:11 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:28:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:06:12 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:28:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:07:12 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:28:30 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:07:13 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:28:38 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:08:12 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:28:39 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:08:13 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:30:35 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:09:12 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:30:36 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:09:13 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:30:40 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:09:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:30:41 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:09:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:31:40 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:10:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:31:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:10:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:31:42 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:11:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:31:43 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:11:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:32:10 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:12:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:32:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:12:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:32:16 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:13:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:32:17 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:13:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:32:18 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:14:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:33:16 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:14:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:33:22 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:15:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:33:47 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:15:50 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:33:48 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:17:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:33:49 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:17:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:34:47 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:18:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:34:48 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:18:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:35:47 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:19:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:35:48 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:19:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:36:46 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:20:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:36:47 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:20:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:36:48 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:21:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:37:45 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:21:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:37:46 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:22:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:38:45 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:22:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:38:46 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:23:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:39:08 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:23:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:39:09 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:23:59 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:39:10 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:24:00 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:40:08 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:24:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:40:09 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:24:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:41:08 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:25:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:41:09 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:25:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:42:08 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:26:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:42:09 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:26:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:42:21 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:27:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:42:23 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:27:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:42:24 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:27:07 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:43:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:27:08 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:43:22 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:27:15 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:44:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:27:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:44:22 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:28:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:45:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:28:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:45:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:29:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:46:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:29:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:46:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:29:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:47:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:29:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:47:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:30:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:48:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:30:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:48:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:30:37 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:49:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:30:38 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:49:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:30:53 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:50:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:30:54 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:50:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:31:53 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:51:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:31:54 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:51:22 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:32:44 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:52:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:32:45 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:52:23 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:32:55 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:53:21 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:32:56 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:53:22 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:32:59 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:53:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:32:59 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 17:53:42 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:33:00 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:53:43 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:33:06 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:54:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:33:07 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:54:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:33:14 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:55:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:33:14 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 17:55:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:33:15 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:56:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:34:14 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:56:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:34:15 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:57:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:34:34 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:57:43 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:34:35 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 17:58:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:34:35 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 17:58:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:35:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 17:59:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:35:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 17:59:43 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:35:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:00:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:35:08 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:00:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:35:08 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:01:42 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:35:09 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:01:43 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:36:06 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:02:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:36:06 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:02:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:36:07 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:03:41 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:36:19 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:03:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:36:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:04:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:36:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:04:15 - GET /SIGRAT/backend/api/index.php/calendar/events
+2026-06-15 17:36:24 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:04:16 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:36:25 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:05:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:36:26 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:05:15 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:37:25 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:06:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:37:26 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:06:16 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:38:16 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:07:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:38:16 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:07:16 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:38:17 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:08:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:38:21 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:08:16 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:38:22 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:09:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:38:23 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:09:15 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:38:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:10:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:38:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
 Cuerpo: 
-2026-06-15 18:10:15 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:38:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-06-15 18:11:14 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+2026-06-15 17:39:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-06-15 18:11:16 - GET /SIGRAT/backend/api/index.php/notifications/all
+2026-06-15 17:39:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-15 17:39:04 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:39:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:39:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-15 17:39:29 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:40:27 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:40:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:41:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:41:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:41:07 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:41:07 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-15 17:41:08 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:41:12 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:41:12 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:41:17 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:41:18 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-15 17:41:18 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:41:26 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:41:27 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:41:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:41:43 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:42:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:42:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:43:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:43:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:44:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:44:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:45:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:45:44 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:46:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:46:43 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:47:43 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:47:43 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:49:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:49:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:50:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:50:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:51:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:51:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:52:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:52:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:53:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:53:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:54:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:54:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:55:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:55:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:56:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:56:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:57:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:57:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:58:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:58:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 17:59:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 17:59:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:00:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:00:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:01:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:01:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:02:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:02:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:03:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:03:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:04:03 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:04:03 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:04:58 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:04:58 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:05:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:05:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:06:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:06:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:07:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:07:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:08:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:08:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:09:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:09:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:10:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:10:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:11:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:11:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:12:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:12:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:13:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:13:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:14:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:14:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:15:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:15:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:16:42 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:16:42 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:18:28 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:18:28 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:20:26 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:20:26 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:21:58 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:21:58 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:22:01 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:22:01 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:22:02 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:22:02 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:22:20 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:22:20 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:22:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:22:31 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:23:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:23:31 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:24:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:24:31 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:25:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:25:31 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:25:46 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:25:46 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:25:49 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:25:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:25:51 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:25:51 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:25:51 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-15 18:25:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:25:52 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:26:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:26:52 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:27:52 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:27:53 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:28:31 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:28:32 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:28:41 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:28:41 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:28:47 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:28:48 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 18:29:48 - POST /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 18:29:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 

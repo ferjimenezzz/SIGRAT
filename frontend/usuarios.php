@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $pass]);
         }
         header("Location: usuarios.php?tab=usuarios&success=1");
+        header("Location: usuarios.php?tab=usuarios&success=1");
         exit();
     } elseif ($_POST['action'] === 'save_role') {
         $nombre = $_POST['nombre_rol'];
@@ -316,7 +317,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
                         <span style="font-size: 13px; font-weight: 700; color: #1e293b;"><?php echo getRelativeTime($u['ultima_conexion'] ?? null); ?></span>
                     </td>
                     <td style="padding: 16px 24px; text-align: center;">
-                        <button onclick='editUser(<?php echo json_encode($u); ?>)' style="background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #475569; cursor: pointer; transition: all 0.2s; margin-right: 8px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
+                        <button onclick='editUser(<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES, "UTF-8"); ?>)' style="background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #475569; cursor: pointer; transition: all 0.2s; margin-right: 8px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
                             <i data-lucide="edit-2" style="width: 16px; height: 16px;"></i>
                         </button>
                         <a href="?delete_user=<?php echo $u['us_id']; ?>" onclick="return confirm('¿Baja de este usuario?')" style="display: inline-block; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">
