@@ -209,9 +209,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <i class="bi bi-funnel"></i>
                     Filtros
                 </button>
-                <button class="btn-outline" onclick="exportToCSV()">
-                    <i class="bi bi-download"></i>
-                    Exportar
+                <button class="btn-outline" onclick="window.open('../backend/reports/inventory_pdf.php', '_blank')">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    Exportar PDF
                 </button>
             </div>
         </div>
@@ -1531,7 +1531,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         applyFilters();
     }
 
-    // Export Table to CSV
     function exportToCSV() {
         let csv = [];
         const rows = document.querySelectorAll("#inventoryTable tr");
@@ -1553,6 +1552,188 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+    }
+
+    function exportToPDF() {
+        const title = "Reporte de Inventario de Activos - SIGRAT";
+        const headers = ["Activo", "Tipo", "Nº Inventario", "Tag RFID", "Ubicación", "Estado"];
+        let rowsHtml = "";
+
+        const rows = document.querySelectorAll("#inventoryTable tbody tr");
+        rows.forEach(row => {
+            if (row.style.display === "none") return;
+            
+            const cols = row.querySelectorAll("td");
+            if (cols.length < 6) return;
+            
+            const activeName = cols[0].querySelector("div:first-child")?.innerText || "";
+            const activeSerie = cols[0].querySelector("div:nth-child(2)")?.innerText || "";
+            const activeCell = `<div><strong>${activeName}</strong></div><div style="font-size: 10px; color: #64748b;">${activeSerie}</div>`;
+            
+            const tipo = cols[1].innerText.trim();
+            const invNum = cols[2].innerText.trim();
+            const rfid = cols[3].innerText.trim();
+            const location = cols[4].innerText.trim();
+            
+            const status = cols[5].innerText.trim();
+            let badgeClass = "badge-inactivo";
+            if (status.toLowerCase().includes("disponible")) {
+                badgeClass = "badge-disponible";
+            } else if (status.toLowerCase().includes("prestado")) {
+                badgeClass = "badge-prestado";
+            }
+            const statusCell = `<span class="badge ${badgeClass}">${status}</span>`;
+            
+            rowsHtml += `
+                <tr>
+                    <td>${activeCell}</td>
+                    <td>${tipo}</td>
+                    <td><code style="font-family: monospace; font-size:12px;">${invNum}</code></td>
+                    <td>${rfid}</td>
+                    <td>${location}</td>
+                    <td>${statusCell}</td>
+                </tr>
+            `;
+        });
+
+        const headersHtml = headers.map(h => `<th>${h}</th>`).join("");
+        
+        // Usar iframe oculto para evitar bloqueo de popups del navegador
+        let printFrame = document.getElementById('_pdf_print_frame');
+        if (printFrame) printFrame.remove();
+        printFrame = document.createElement('iframe');
+        printFrame.id = '_pdf_print_frame';
+        printFrame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;';
+        document.body.appendChild(printFrame);
+        const doc = printFrame.contentWindow.document;
+        doc.open();
+        doc.write(\`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>\${title}</title>
+                <style>
+                    body {
+                        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                        color: #1e293b;
+                        margin: 0;
+                        padding: 40px;
+                        background-color: #ffffff;
+                    }
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #2563eb;
+                        padding-bottom: 20px;
+                        margin-bottom: 30px;
+                    }
+                    .logo-area h1 {
+                        font-size: 28px;
+                        font-weight: 800;
+                        color: #2563eb;
+                        margin: 0;
+                        letter-spacing: -1px;
+                    }
+                    .logo-area p {
+                        font-size: 11px;
+                        color: #64748b;
+                        margin: 4px 0 0 0;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                    }
+                    .meta-info {
+                        text-align: right;
+                        font-size: 13px;
+                        color: #475569;
+                    }
+                    .meta-info h2 {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #1e293b;
+                        margin: 0 0 6px 0;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 10px;
+                    }
+                    th {
+                        background-color: #f8fafc;
+                        color: #475569;
+                        font-weight: 700;
+                        font-size: 11px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        padding: 12px 14px;
+                        border: 1px solid #e2e8f0;
+                        text-align: left;
+                    }
+                    td {
+                        padding: 12px 14px;
+                        font-size: 13px;
+                        color: #334155;
+                        border: 1px solid #e2e8f0;
+                    }
+                    tr:nth-child(even) td {
+                        background-color: #f8fafc;
+                    }
+                    .footer {
+                        margin-top: 50px;
+                        font-size: 11px;
+                        color: #94a3b8;
+                        text-align: center;
+                        border-top: 1px solid #e2e8f0;
+                        padding-top: 20px;
+                    }
+                    .badge {
+                        display: inline-block;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: 700;
+                    }
+                    .badge-disponible { background-color: #dcfce7; color: #15803d; }
+                    .badge-prestado { background-color: #fef3c7; color: #d97706; }
+                    .badge-inactivo { background-color: #f3f4f6; color: #4b5563; }
+                    @media print {
+                        body { padding: 0; }
+                        .no-print { display: none !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="logo-area">
+                        <h1>SIGRAT</h1>
+                        <p>Control Integral</p>
+                    </div>
+                    <div class="meta-info">
+                        <h2>\${title}</h2>
+                        <div>Generado el: \${new Date().toLocaleString()}</div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>\${headersHtml}</tr>
+                    </thead>
+                    <tbody>
+                        \${rowsHtml}
+                    </tbody>
+                </table>
+                <div class="footer">
+                    Este documento es un reporte de inventario generado por el Sistema de Gestión de Reservas y Actividades Tecnológicas (SIGRAT).
+                </div>
+            </body>
+            </html>
+        \`);
+        doc.close();
+        // Pequeño delay para que el iframe cargue el contenido antes de imprimir
+        setTimeout(() => {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+        }, 400);
     }
 
 

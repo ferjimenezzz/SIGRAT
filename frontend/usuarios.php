@@ -179,7 +179,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
             <p style="font-size: 13px; color: #64748b; font-weight: 500;">Administra usuarios y permisos del sistema</p>
         </div>
         <div style="display: flex; gap: 12px;">
-            <a href="?action=export_usuarios" id="btn-export" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #e2e8f0; color: #1e293b; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px;"><i data-lucide="download" style="width: 16px;"></i> Exportar</a>
+            <button onclick="window.open('../backend/reports/users_pdf.php', '_blank')" id="btn-export" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #e2e8f0; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="file-text" style="width: 16px;"></i> Exportar PDF</button>
             <button onclick="openUserModal()" id="btn-action-user" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'usuarios' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo usuario</button>
             <button onclick="openRoleModal()" id="btn-action-role" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'roles' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo rol</button>
         </div>
@@ -516,7 +516,10 @@ $tab = $_GET['tab'] ?? 'usuarios';
 </style>
 
 <script>
+    let currentActiveTab = '<?php echo $tab; ?>';
+
     function switchTab(tab) {
+        currentActiveTab = tab;
         document.getElementById('tab-usuarios').style.display = tab === 'usuarios' ? 'block' : 'none';
         document.getElementById('tab-roles').style.display = tab === 'roles' ? 'block' : 'none';
         document.getElementById('tab-invitaciones').style.display = tab === 'invitaciones' ? 'grid' : 'none';
@@ -524,9 +527,6 @@ $tab = $_GET['tab'] ?? 'usuarios';
         // Mostrar u ocultar estadísticas
         document.getElementById('stats-usuarios').style.display = (tab === 'usuarios' || tab === 'roles') ? 'grid' : 'none';
         document.getElementById('stats-invitaciones').style.display = tab === 'invitaciones' ? 'grid' : 'none';
-
-        // Actualizar URL de Exportar
-        document.getElementById('btn-export').href = '?action=export_' + tab;
         
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
         if(document.getElementById('btn-' + tab)) document.getElementById('btn-' + tab).classList.add('active');
@@ -534,6 +534,221 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('btn-action-user').style.display = tab === 'usuarios' ? 'flex' : 'none';
         document.getElementById('btn-action-role').style.display = tab === 'roles' ? 'flex' : 'none';
     }
+
+    function exportToPDF() {
+        let title = "";
+        let headers = [];
+        let rowsHtml = "";
+
+        if (currentActiveTab === 'usuarios') {
+            title = "Reporte de Usuarios - SIGRAT";
+            headers = ["Usuario", "Rol", "Estado", "Última Conexión"];
+            
+            const rows = document.querySelectorAll("#usersTable tbody tr");
+            rows.forEach(row => {
+                if (row.style.display === "none") return;
+                
+                const name = row.querySelector(".user-name")?.innerText || "";
+                const email = row.querySelector(".user-email")?.innerText || "";
+                const detailText = row.querySelector("p[style*='text-transform: uppercase']")?.innerText || "";
+                
+                const userCell = `<div><strong>${name}</strong></div><div style="font-size: 11px; color: #475569;">${email}</div><div style="font-size: 10px; color: #64748b;">${detailText}</div>`;
+                const rol = row.querySelector("td:nth-child(2) span")?.innerText || "";
+                const status = row.querySelector("td:nth-child(3)")?.innerText || "";
+                const badgeClass = status.trim().toLowerCase() === 'activo' ? 'badge-activo' : 'badge-inactivo';
+                const statusCell = `<span class="badge ${badgeClass}">${status}</span>`;
+                const lastConn = row.querySelector("td:nth-child(4) span")?.innerText || "";
+                
+                rowsHtml += `
+                    <tr>
+                        <td>${userCell}</td>
+                        <td><span class="badge" style="background:#f1f5f9; color:#475569;">${rol}</span></td>
+                        <td>${statusCell}</td>
+                        <td>${lastConn}</td>
+                    </tr>
+                `;
+            });
+        } else if (currentActiveTab === 'roles') {
+            title = "Reporte de Roles y Permisos - SIGRAT";
+            headers = ["Rol", "Descripción", "Permisos"];
+            
+            const roleCards = document.querySelectorAll("#tab-roles > div > div");
+            roleCards.forEach(card => {
+                const name = card.querySelector("h4")?.innerText || "";
+                const desc = card.querySelector("p")?.innerText || "";
+                const badges = Array.from(card.querySelectorAll("span")).map(s => s.innerText).join(", ");
+                
+                rowsHtml += `
+                    <tr>
+                        <td><strong>${name}</strong></td>
+                        <td>${desc}</td>
+                        <td style="font-size: 11px; line-height: 1.4;">${badges}</td>
+                    </tr>
+                `;
+            });
+        } else if (currentActiveTab === 'invitaciones') {
+            title = "Reporte de Invitaciones - SIGRAT";
+            headers = ["Invitado", "Código de Acceso", "Anfitrión"];
+            
+            const rows = document.querySelectorAll("#tab-invitaciones table tbody tr");
+            rows.forEach(row => {
+                const guestName = row.querySelector("td:first-child p:first-child")?.innerText || "";
+                const guestEmail = row.querySelector("td:first-child p:nth-child(2)")?.innerText || "";
+                const code = row.querySelector("td:nth-child(2) code")?.innerText || "";
+                const host = row.querySelector("td:nth-child(3)")?.innerText || "";
+                
+                rowsHtml += `
+                    <tr>
+                        <td>
+                            <div><strong>${guestName}</strong></div>
+                            <div style="font-size: 11px; color: #475569;">${guestEmail}</div>
+                        </td>
+                        <td><code style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-family: monospace;">${code}</code></td>
+                        <td>${host}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        const headersHtml = headers.map(h => `<th>${h}</th>`).join("");
+        
+        // Usar iframe oculto para evitar bloqueo de popups del navegador
+        let printFrame = document.getElementById('_pdf_print_frame');
+        if (printFrame) printFrame.remove();
+        printFrame = document.createElement('iframe');
+        printFrame.id = '_pdf_print_frame';
+        printFrame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;';
+        document.body.appendChild(printFrame);
+        const doc = printFrame.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>${title}</title>
+                <style>
+                    body {
+                        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                        color: #1e293b;
+                        margin: 0;
+                        padding: 40px;
+                        background-color: #ffffff;
+                    }
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #2563eb;
+                        padding-bottom: 20px;
+                        margin-bottom: 30px;
+                    }
+                    .logo-area h1 {
+                        font-size: 28px;
+                        font-weight: 800;
+                        color: #2563eb;
+                        margin: 0;
+                        letter-spacing: -1px;
+                    }
+                    .logo-area p {
+                        font-size: 11px;
+                        color: #64748b;
+                        margin: 4px 0 0 0;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                    }
+                    .meta-info {
+                        text-align: right;
+                        font-size: 13px;
+                        color: #475569;
+                    }
+                    .meta-info h2 {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #1e293b;
+                        margin: 0 0 6px 0;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 10px;
+                    }
+                    th {
+                        background-color: #f8fafc;
+                        color: #475569;
+                        font-weight: 700;
+                        font-size: 11px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        padding: 12px 14px;
+                        border: 1px solid #e2e8f0;
+                        text-align: left;
+                    }
+                    td {
+                        padding: 12px 14px;
+                        font-size: 13px;
+                        color: #334155;
+                        border: 1px solid #e2e8f0;
+                    }
+                    tr:nth-child(even) td {
+                        background-color: #f8fafc;
+                    }
+                    .footer {
+                        margin-top: 50px;
+                        font-size: 11px;
+                        color: #94a3b8;
+                        text-align: center;
+                        border-top: 1px solid #e2e8f0;
+                        padding-top: 20px;
+                    }
+                    .badge {
+                        display: inline-block;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: 700;
+                    }
+                    .badge-activo { background-color: #dcfce7; color: #166534; }
+                    .badge-inactivo { background-color: #f3f4f6; color: #4b5563; }
+                    @media print {
+                        body { padding: 0; }
+                        .no-print { display: none !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="logo-area">
+                        <h1>SIGRAT</h1>
+                        <p>Control Integral</p>
+                    </div>
+                    <div class="meta-info">
+                        <h2>${title}</h2>
+                        <div>Generado el: ${new Date().toLocaleString()}</div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>${headersHtml}</tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+                <div class="footer">
+                    Este documento es un reporte generado por el Sistema de Gestión de Reservas y Actividades Tecnológicas (SIGRAT).
+                </div>
+            </body>
+            </html>
+        `);
+        doc.close();
+        // Pequeño delay para que el iframe cargue el contenido antes de imprimir
+        setTimeout(() => {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+        }, 400);
+    }
+
 
     // Filtros en vivo JS
     const searchInput = document.getElementById('searchInput');
