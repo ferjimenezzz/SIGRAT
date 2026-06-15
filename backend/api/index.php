@@ -166,9 +166,36 @@ try {
                 if (isset($_SESSION['us_id'])) {
                     $input['us_id'] = $_SESSION['us_id'];
                 }
-                // Crear reservación - El input debe traer esp_id, fecha_uso, hora_ent, hora_sal, etc.
-                $response = $controller->create($input);
-                $status_code = $response['success'] ? 201 : 400;
+                
+                // Si viene un arreglo de fechas para reservaciones múltiples
+                if (isset($input['fechas_uso']) && is_array($input['fechas_uso'])) {
+                    $results = [];
+                    $has_error = false;
+                    $error_msg = "";
+                    foreach ($input['fechas_uso'] as $fecha) {
+                        $single_input = $input;
+                        $single_input['fecha_uso'] = $fecha;
+                        unset($single_input['fechas_uso']);
+                        $res = $controller->create($single_input);
+                        if (!$res['success']) {
+                            $has_error = true;
+                            $error_msg = "Error en la fecha " . $fecha . ": " . ($res['error'] ?? 'Conflicto de horario.');
+                            break;
+                        }
+                        $results[] = $res['id'];
+                    }
+                    if ($has_error) {
+                        $response = ["success" => false, "error" => $error_msg];
+                        $status_code = 400;
+                    } else {
+                        $response = ["success" => true, "ids" => $results];
+                        $status_code = 201;
+                    }
+                } else {
+                    // Crear reservación - El input debe traer esp_id, fecha_uso, hora_ent, hora_sal, etc.
+                    $response = $controller->create($input);
+                    $status_code = $response['success'] ? 201 : 400;
+                }
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['esp_id'])) {
                 // Consultar disponibilidad
                 $response = $controller->getAvailability($_GET['esp_id'], $_GET['date']);
@@ -216,7 +243,34 @@ try {
             }
             break;
 
+        case 'calendar':
+            require_once '../controllers/CalendarController.php';
+            $controller = new \Controllers\CalendarController();
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $edificio = $_GET['edificio'] ?? null;
+                $esp_id = $_GET['esp_id'] ?? null;
+                $tipo = $_GET['tipo'] ?? null;
+                $fecha_inicio = $_GET['fecha_inicio'] ?? null;
+                $fecha_fin = $_GET['fecha_fin'] ?? null;
+                $us_id = $_GET['us_id'] ?? null;
+                $status = $_GET['status'] ?? null;
+                
+                $response = $controller->getEventsFiltered($edificio, $esp_id, $tipo, $fecha_inicio, $fecha_fin, $us_id, $status);
+                $status_code = 200;
+            }
+            break;
+
+        case 'spaces':
+            require_once '../controllers/SpaceController.php';
+            $controller = new \Controllers\SpaceController();
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $response = $controller->getAll();
+                $status_code = 200;
+            }
+            break;
+
         case 'notifications':
+
             require_once '../controllers/NotificationController.php';
             $controller = new \Controllers\NotificationController();
             

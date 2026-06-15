@@ -595,7 +595,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             <a href="index.php" class="nav-item <?php echo $currentPage == 'index.php' ? 'active' : ''; ?>">
                 <i class="bi bi-grid-1x2-fill"></i> Dashboard
             </a>
-            <a href="#" class="nav-item <?php echo $currentPage == 'calendario.php' ? 'active' : ''; ?>">
+            <a href="calendario.php" class="nav-item <?php echo $currentPage == 'calendario.php' ? 'active' : ''; ?>">
                 <i class="bi bi-calendar3"></i> Calendario
             </a>
             
