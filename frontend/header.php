@@ -49,7 +49,7 @@ $protected_pages = [
     'enrolamiento.php', 
     'auditoria.php', 
     'config.php', 
-    'test_rfid.php',
+    'rfid.php',
     'aprobacion_reservas.php'
 ];
 
@@ -664,9 +664,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     </script>
     <aside class="sidebar">
         <div class="sidebar-top">
-            <a href="login.php" class="sidebar-back-btn" title="Volver">
-                <i class="bi bi-arrow-left" style="font-size: 18px;"></i>
-            </a>
             <button id="sidebarToggle" class="sidebar-toggle-btn" title="Minimizar menú">
                 <i class="bi bi-chevron-left" style="font-size: 18px; transition: transform 0.3s ease;"></i>
             </button>
@@ -719,6 +716,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </a>
             <?php endif; ?>
 
+            <a href="rfid.php" class="nav-item <?php echo $currentPage == 'rfid.php' ? 'active' : ''; ?>">
+                <i class="bi bi-broadcast"></i> Monitor RFID
+            </a>
 
         </nav>
 
