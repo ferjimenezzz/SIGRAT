@@ -1196,3 +1196,767 @@ Cuerpo:
 Cuerpo: 
 2026-06-15 18:29:49 - GET /creaciones%20antigravity/Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
+2026-06-15 20:55:43 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:55:44 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:55:47 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:55:48 - GET /SIGRAT/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-15 20:55:50 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:56:06 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:56:07 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:56:12 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:56:13 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:56:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:56:57 - GET /SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-15 20:56:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:57:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:57:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:58:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:58:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 20:59:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 20:59:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:00:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:00:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:01:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:01:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:02:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:02:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:03:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:03:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:04:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:04:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:05:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:05:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:06:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:06:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:07:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:07:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:08:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:08:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:09:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:09:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:10:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:10:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:11:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:11:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:12:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:12:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:13:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:13:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:14:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:14:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:15:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:15:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:16:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:16:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:17:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:17:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:18:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:18:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:19:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:19:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:20:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:20:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:21:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:21:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:22:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:22:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:23:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:23:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:24:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:24:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:25:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:25:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:26:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:26:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:27:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:27:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:28:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:28:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:29:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:29:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:30:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:30:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:31:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:31:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:32:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:32:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:33:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:33:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:34:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:34:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:35:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:35:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:36:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:36:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:37:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:37:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:38:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:38:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:39:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:39:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:40:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:40:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:41:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:41:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:42:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:42:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:43:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:43:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:44:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:44:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:45:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:45:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:46:57 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:46:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:47:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:48:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:48:59 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:49:00 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:50:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:50:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:51:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:51:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:52:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:52:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:54:08 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:54:11 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:54:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:54:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:55:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:56:09 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:56:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:56:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:57:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:57:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:58:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 21:59:00 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 21:59:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:00:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:00:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:00:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:01:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:01:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:02:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:02:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:03:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:03:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:04:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:04:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:05:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:05:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:06:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:06:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:07:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:07:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:08:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:08:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:09:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:09:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:10:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:10:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:11:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:11:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:12:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:12:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:13:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:13:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:14:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:14:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:15:57 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:15:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:16:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:17:00 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:17:59 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:18:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:19:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:19:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:20:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:20:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:21:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:21:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:22:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:24:11 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:24:12 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:24:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:25:14 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:25:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:25:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:26:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:26:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:27:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:27:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:28:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:28:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:29:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:29:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:30:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:30:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:31:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:31:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:32:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:32:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:33:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:33:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:34:57 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:34:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:35:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:35:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:36:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:36:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:37:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:37:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:38:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:38:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:39:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:39:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:40:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:40:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:41:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:41:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:42:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:42:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:43:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:43:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:44:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:44:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:45:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:45:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:46:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:46:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:47:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:47:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:48:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:48:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:49:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:49:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:50:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:50:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:51:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:51:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:52:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:52:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:53:56 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:53:57 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:54:57 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:54:58 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:55:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:55:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:56:59 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:57:00 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:58:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:58:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 22:58:55 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 22:58:56 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:00:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:00:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:00:48 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:01:04 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:01:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:01:27 - GET /SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-15 23:01:27 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:02:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:02:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:03:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:03:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:04:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:04:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:05:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:05:27 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:06:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:06:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:07:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:07:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:08:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:08:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:09:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:09:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:10:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:10:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:11:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:11:29 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:12:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:12:29 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:13:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:13:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:14:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:14:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:15:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:15:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:16:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:16:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:17:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:17:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:18:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:18:29 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:19:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:19:29 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:20:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:20:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:21:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:21:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:22:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:22:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:23:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:23:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:24:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:24:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:25:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:25:29 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:26:28 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:26:31 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:27:29 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:27:31 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:28:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:28:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:29:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:29:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:30:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:30:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:31:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:31:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:32:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:32:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:33:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:33:28 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:34:27 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:40:34 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:40:37 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:41:28 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:41:42 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-15 23:42:28 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-15 23:42:29 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:22:58 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:22:59 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:23:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:23:03 - GET /SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-16 17:23:04 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:24:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:24:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:25:03 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:25:04 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:26:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:26:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:27:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:27:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:28:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:28:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:29:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:29:04 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:30:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:30:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:31:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:31:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:32:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:32:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:33:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:33:03 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:34:03 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:34:04 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:35:02 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:35:03 - GET /SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-16 17:35:04 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:35:23 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:35:24 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:35:31 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:35:32 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:35:37 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:35:38 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:35:45 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:35:47 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:35:52 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:35:54 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:36:08 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:36:09 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:36:26 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:36:27 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:36:31 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:36:32 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:36:37 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:36:38 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:37:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:37:01 - GET /SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-16 17:37:02 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-16 17:38:00 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 17:38:01 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
