@@ -717,7 +717,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             <?php endif; ?>
 
             <a href="rfid.php" class="nav-item <?php echo $currentPage == 'rfid.php' ? 'active' : ''; ?>">
-                <i class="bi bi-broadcast"></i> Monitor RFID
+                <i class="bi bi-broadcast"></i> <span>Monitor RFID</span>
             </a>
 
         </nav>

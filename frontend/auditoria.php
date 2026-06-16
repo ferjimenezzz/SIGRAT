@@ -312,6 +312,42 @@ include 'header.php';
         text-transform: uppercase;
         display: inline-block;
     }
+
+    /* Media queries para responsividad */
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        .report-section {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 20px;
+        }
+        .report-include {
+            max-width: 100%;
+        }
+        .header-section {
+            flex-direction: column;
+            gap: 15px;
+        }
+        .filters-grid[style] {
+            grid-template-columns: 1fr !important;
+        }
+        .filters-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+        .btn-clear, .btn-apply {
+            justify-content: center;
+            width: 100%;
+        }
+    }
 </style>
 
 <div class="audit-container">
