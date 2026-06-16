@@ -49,7 +49,7 @@ $protected_pages = [
     'enrolamiento.php', 
     'auditoria.php', 
     'config.php', 
-    'test_rfid.php',
+    'rfid.php',
     'aprobacion_reservas.php'
 ];
 
@@ -719,6 +719,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </a>
             <?php endif; ?>
 
+            <a href="rfid.php" class="nav-item <?php echo $currentPage == 'rfid.php' ? 'active' : ''; ?>">
+                <i class="bi bi-broadcast"></i> Monitor RFID
+            </a>
 
         </nav>
 
