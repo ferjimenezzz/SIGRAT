@@ -145,6 +145,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            transition: width 0.3s ease, min-width 0.3s ease;
         }
 
         .sidebar-top {
@@ -170,6 +171,30 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         .sidebar-back-btn:hover {
             background: var(--sidebar-hover);
             color: white;
+        }
+
+        .sidebar-toggle-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: transparent;
+            margin-left: auto;
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: var(--sidebar-hover);
+            color: white;
+        }
+        
+        body.sidebar-collapsed .sidebar-toggle-btn i {
+            transform: rotate(180deg);
         }
 
         .sidebar-header {
@@ -313,6 +338,58 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             color: #f87171;
         }
 
+        /* ==================== COLLAPSED SIDEBAR ==================== */
+        body.sidebar-collapsed .sidebar {
+            width: 80px;
+            min-width: 80px;
+        }
+
+        body.sidebar-collapsed .main-container {
+            margin-left: 80px;
+        }
+
+        body.sidebar-collapsed .sidebar-brand,
+        body.sidebar-collapsed .nav-item span,
+        body.sidebar-collapsed .sidebar-user-info,
+        body.sidebar-collapsed .sidebar-logout span {
+            display: none;
+        }
+
+        body.sidebar-collapsed .sidebar-header {
+            padding: 8px 0 20px 0;
+            justify-content: center;
+        }
+
+        body.sidebar-collapsed .sidebar-logo {
+            margin: 0;
+        }
+
+        body.sidebar-collapsed .nav-item {
+            justify-content: center;
+            padding: 11px 0;
+        }
+
+        body.sidebar-collapsed .nav-item i {
+            margin: 0;
+            font-size: 20px;
+            width: auto;
+        }
+
+        body.sidebar-collapsed .sidebar-user {
+            justify-content: center;
+            padding: 16px 0;
+            margin: 8px 12px 12px 12px;
+        }
+
+        body.sidebar-collapsed .sidebar-logout {
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        body.sidebar-collapsed .sidebar-logout i {
+            margin: 0;
+        }
+
         /* ==================== MAIN CONTAINER ==================== */
         .main-container {
             flex: 1;
@@ -320,6 +397,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         /* ==================== TOP BAR ==================== */
@@ -579,11 +657,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     </style>
 </head>
 <body>
+    <script>
+        if (localStorage.getItem('sigrat_sidebar_collapsed') === 'true') {
+            document.body.classList.add('sidebar-collapsed');
+        }
+    </script>
     <aside class="sidebar">
         <div class="sidebar-top">
             <a href="login.php" class="sidebar-back-btn" title="Volver">
                 <i class="bi bi-arrow-left" style="font-size: 18px;"></i>
             </a>
+            <button id="sidebarToggle" class="sidebar-toggle-btn" title="Minimizar menú">
+                <i class="bi bi-chevron-left" style="font-size: 18px; transition: transform 0.3s ease;"></i>
+            </button>
         </div>
 
         <div class="sidebar-header">
@@ -596,40 +682,40 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         <nav class="nav-menu">
             <a href="index.php" class="nav-item <?php echo $currentPage == 'index.php' ? 'active' : ''; ?>">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                <i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span>
             </a>
             <a href="calendario.php" class="nav-item <?php echo $currentPage == 'calendario.php' ? 'active' : ''; ?>">
-                <i class="bi bi-calendar3"></i> Calendario
+                <i class="bi bi-calendar3"></i> <span>Calendario</span>
             </a>
             
             <?php if (hasPermission('Usuarios')): ?>
             <a href="usuarios.php" class="nav-item <?php echo $currentPage == 'usuarios.php' ? 'active' : ''; ?>">
-                <i class="bi bi-person"></i> Usuario
+                <i class="bi bi-person"></i> <span>Usuario</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('Espacios')): ?>
             <a href="espacios.php" class="nav-item <?php echo $currentPage == 'espacios.php' ? 'active' : ''; ?>">
-                <i class="bi bi-geo-alt"></i> Espacios
+                <i class="bi bi-geo-alt"></i> <span>Espacios</span>
             </a>
             <a href="aprobacion_reservas.php" class="nav-item <?php echo $currentPage == 'aprobacion_reservas.php' ? 'active' : ''; ?>">
-                <i class="bi bi-check2-square"></i> Aprobaciones
+                <i class="bi bi-check2-square"></i> <span>Aprobaciones</span>
             </a>
             <?php endif; ?>
 
             <a href="prestamos.php" class="nav-item <?php echo $currentPage == 'prestamos.php' ? 'active' : ''; ?>">
-                <i class="bi bi-arrow-left-right"></i> Préstamos
+                <i class="bi bi-arrow-left-right"></i> <span>Préstamos</span>
             </a>
 
             <?php if (hasPermission('Inventario')): ?>
             <a href="inventario.php" class="nav-item <?php echo $currentPage == 'inventario.php' ? 'active' : ''; ?>">
-                <i class="bi bi-box-seam"></i> Inventario
+                <i class="bi bi-box-seam"></i> <span>Inventario</span>
             </a>
             <?php endif; ?>
 
             <?php if (hasPermission('Auditorias')): ?>
             <a href="auditoria.php" class="nav-item <?php echo $currentPage == 'auditoria.php' ? 'active' : ''; ?>">
-                <i class="bi bi-heart-pulse"></i> Auditoría
+                <i class="bi bi-heart-pulse"></i> <span>Auditoría</span>
             </a>
             <?php endif; ?>
 
@@ -645,7 +731,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </div>
         </a>
         <a href="logout.php" class="sidebar-logout">
-            <i class="bi bi-box-arrow-left"></i> Cerrar sesión
+            <i class="bi bi-box-arrow-left"></i> <span>Cerrar sesión</span>
         </a>
     </aside>
 
@@ -685,6 +771,18 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         <script>
         localStorage.removeItem('sigrat_dark');
         document.body.classList.remove('dark-mode');
+
+        // Sidebar Toggle Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-collapsed');
+                    const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+                    localStorage.setItem('sigrat_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+                });
+            }
+        });
         </script>
         
         <script>
