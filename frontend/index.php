@@ -36,10 +36,11 @@ if (isset($_SESSION['us_id'])) {
         $visitStats = $dashController->getVisitsStats();
 
         // Nuevos datos para el dashboard rediseñado
+        $rango = $_GET['rango'] ?? 'semana';
         $classroomUsage = $dashController->getClassroomUsagePercent();
         $rfidAccess = $dashController->getRFIDAccessToday();
         $activeLoans = $dashController->getActiveLoanCount();
-        $spaceUsageByName = $dashController->getSpaceUsageByName();
+        $spaceUsageByName = $dashController->getSpaceUsageByName($rango);
         $inventoryStatus = $dashController->getInventoryStatus();
         $todayReservations = $dashController->getTodayReservations();
     } catch (Exception $e) {
@@ -70,18 +71,18 @@ if (isset($_SESSION['us_id'])) {
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 16px;
-            padding: 22px 20px;
+            border-radius: 12px;
+            padding: 16px 16px;
             border: 1px solid #e2e8f0;
             display: flex;
             align-items: flex-start;
-            gap: 16px;
+            gap: 12px;
             transition: all 0.2s ease;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
@@ -175,8 +176,8 @@ if (isset($_SESSION['us_id'])) {
 
         .chart-card {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 16px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
@@ -185,7 +186,7 @@ if (isset($_SESSION['us_id'])) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .chart-title {
@@ -260,10 +261,24 @@ if (isset($_SESSION['us_id'])) {
         /* ==================== RESERVATIONS LIST ==================== */
         .reservations-card {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 16px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Ocultar barra de scroll interna en webkit para que se vea limpio pero siga siendo scrolleable */
+        .reservations-card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .reservations-card::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .reservations-card::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
         }
 
         .reservations-header {
@@ -371,6 +386,63 @@ if (isset($_SESSION['us_id'])) {
         .res-menu-btn:hover {
             background: #f1f5f9;
             color: #64748b;
+        }
+
+        .res-menu-container {
+            position: relative;
+        }
+
+        .res-dropdown-menu {
+            position: absolute;
+            right: 34px; /* Aparece justo a la izquierda del botón */
+            top: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-50%) translateX(10px);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: row; /* Horizontal */
+            padding: 4px 6px;
+            gap: 2px;
+        }
+
+        .res-menu-container:hover .res-dropdown-menu,
+        .res-menu-container:focus-within .res-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .res-dropdown-item {
+            padding: 6px 10px;
+            font-size: 13px;
+            color: #475569;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .res-dropdown-item:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .res-dropdown-item.danger {
+            color: #ef4444;
+        }
+
+        .res-dropdown-item.danger:hover {
+            background: #fef2f2;
+            color: #dc2626;
         }
 
         .empty-state {
@@ -494,109 +566,127 @@ if (isset($_SESSION['us_id'])) {
         </div>
     </div>
 
-    <!-- ==================== CHARTS ROW ==================== -->
-    <div class="charts-grid">
-        <!-- Bar Chart: Espacios más utilizados -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">Espacios más utilizados</h3>
-                <select class="chart-dropdown">
-                    <option>Esta semana</option>
-                    <option>Este mes</option>
-                    <option>Este año</option>
-                </select>
+    <!-- ==================== MAIN DASHBOARD LAYOUT ==================== -->
+    <div class="dashboard-bottom-grid" style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; margin-bottom: 24px;">
+        
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="dashboard-col-left" style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Bar Chart: Espacios más utilizados -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Espacios más utilizados</h3>
+                    <select class="chart-dropdown" onchange="window.location.href='index.php?rango='+this.value">
+                        <option value="semana" <?php echo $rango === 'semana' ? 'selected' : ''; ?>>Esta semana</option>
+                        <option value="mes" <?php echo $rango === 'mes' ? 'selected' : ''; ?>>Este mes</option>
+                        <option value="ano" <?php echo $rango === 'ano' ? 'selected' : ''; ?>>Este año</option>
+                    </select>
+                </div>
+                <canvas id="spacesBarChart" height="130"></canvas>
             </div>
-            <canvas id="spacesBarChart" height="180"></canvas>
+
+            <!-- Reservaciones de hoy -->
+            <div class="reservations-card" style="margin-top: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                <div class="reservations-header">
+                    <h3 class="reservations-title">Reservaciones de hoy</h3>
+                    <a href="calendario.php" class="reservations-link">Ver todas</a>
+                </div>
+
+                <?php if (empty($todayReservations)): ?>
+                    <div class="empty-state">
+                        <i class="bi bi-calendar-x"></i>
+                        <p>No hay reservaciones programadas para hoy</p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($todayReservations as $res): ?>
+                        <?php
+                            $iconClass = 'default';
+                            $iconName = 'bi-building';
+                            $tipoEsp = strtolower($res['tipo_espacio'] ?? '');
+                            if (strpos($tipoEsp, 'aula') !== false) { $iconClass = 'aula'; $iconName = 'bi-mortarboard-fill'; }
+                            elseif (strpos($tipoEsp, 'lab') !== false) { $iconClass = 'lab'; $iconName = 'bi-pc-display'; }
+                            elseif (strpos($tipoEsp, 'audit') !== false) { $iconClass = 'auditorio'; $iconName = 'bi-display'; }
+                            elseif (strpos($tipoEsp, 'sala') !== false) { $iconClass = 'sala'; $iconName = 'bi-people-fill'; }
+
+                            $estatus = strtolower($res['estatus'] ?? 'pendiente');
+                            $badgeClass = 'pending';
+                            $badgeText = 'Pendiente';
+                            if (strpos($estatus, 'aprob') !== false || strpos($estatus, 'confirm') !== false) { 
+                                $badgeClass = 'confirmed'; $badgeText = 'Confirmada'; 
+                            } elseif (strpos($estatus, 'rechaz') !== false) { 
+                                $badgeClass = 'rejected'; $badgeText = 'Rechazada'; 
+                            }
+
+                            $horaEnt = substr($res['hora_ent'], 0, 5);
+                            $horaSal = substr($res['hora_sal'], 0, 5);
+                        ?>
+                        <div class="reservation-item">
+                            <div class="res-icon <?php echo $iconClass; ?>">
+                                <i class="bi <?php echo $iconName; ?>"></i>
+                            </div>
+                            <div class="res-time"><?php echo $horaEnt; ?> - <?php echo $horaSal; ?></div>
+                            <div class="res-info">
+                                <div class="res-space-name"><?php echo htmlspecialchars($res['nombre_numero']); ?></div>
+                                <div class="res-description"><?php echo htmlspecialchars($res['solicitante']); ?></div>
+                            </div>
+                            <span class="res-badge <?php echo $badgeClass; ?>"><?php echo $badgeText; ?></span>
+                            <div class="res-menu-container">
+                                <button class="res-menu-btn" title="Opciones">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <div class="res-dropdown-menu">
+                                    <a href="calendario.php" class="res-dropdown-item">
+                                        <i class="bi bi-eye"></i> Ver detalles
+                                    </a>
+                                    <a href="calendario.php" class="res-dropdown-item">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a href="calendario.php" class="res-dropdown-item danger">
+                                        <i class="bi bi-x-circle"></i> Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </div>
 
-        <!-- Donut Chart: Estado de inventario -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">Estado de inventario</h3>
-            </div>
-            <div class="donut-container">
-                <div class="donut-wrapper" style="width: 180px; height: 180px;">
-                    <canvas id="inventoryDonut"></canvas>
-                    <div class="donut-center-text">
-                        <div class="donut-value"><?php echo number_format($inventoryTotal, 0, '.', ','); ?></div>
-                    </div>
+        <!-- COLUMNA DERECHA -->
+        <div class="dashboard-col-right" style="display: flex; flex-direction: column;">
+            <!-- Donut Chart: Estado de inventario -->
+            <div class="chart-card donut-card" style="display: flex; flex-direction: column;">
+                <div class="chart-header">
+                    <h3 class="chart-title">Estado de inventario</h3>
                 </div>
-                <div class="donut-legend">
-                    <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #ef4444;"></div>
-                        Disponibles
+                <div class="donut-container" style="display: flex; align-items: center; justify-content: center; padding: 20px 0;">
+                    <div class="donut-wrapper" style="width: 170px; height: 170px;">
+                        <canvas id="inventoryDonut"></canvas>
+                        <div class="donut-center-text">
+                            <div class="donut-value"><?php echo number_format($inventoryTotal, 0, '.', ','); ?></div>
+                        </div>
                     </div>
-                    <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #f59e0b;"></div>
-                        En préstamo
-                    </div>
-                    <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #2563eb;"></div>
-                        En mantenimiento
-                    </div>
-                    <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #10b981;"></div>
-                        Extraviados
+                    <div class="donut-legend">
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-dot" style="background: #ef4444;"></div>
+                            Disponibles
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-dot" style="background: #f59e0b;"></div>
+                            En préstamo
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-dot" style="background: #2563eb;"></div>
+                            En mantenimiento
+                        </div>
+                        <div class="donut-legend-item">
+                            <div class="donut-legend-dot" style="background: #10b981;"></div>
+                            Extraviados
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ==================== RESERVATIONS TODAY ==================== -->
-    <div class="reservations-card">
-        <div class="reservations-header">
-            <h3 class="reservations-title">Reservaciones de hoy</h3>
-            <a href="espacios.php" class="reservations-link">Ver todas</a>
-        </div>
-
-        <?php if (empty($todayReservations)): ?>
-            <div class="empty-state">
-                <i class="bi bi-calendar-x"></i>
-                <p>No hay reservaciones programadas para hoy</p>
-            </div>
-        <?php else: ?>
-            <?php foreach ($todayReservations as $res): ?>
-                <?php
-                    // Determinar ícono según tipo de espacio
-                    $iconClass = 'default';
-                    $iconName = 'bi-building';
-                    $tipoEsp = strtolower($res['tipo_espacio'] ?? '');
-                    if (strpos($tipoEsp, 'aula') !== false) { $iconClass = 'aula'; $iconName = 'bi-mortarboard-fill'; }
-                    elseif (strpos($tipoEsp, 'lab') !== false) { $iconClass = 'lab'; $iconName = 'bi-pc-display'; }
-                    elseif (strpos($tipoEsp, 'audit') !== false) { $iconClass = 'auditorio'; $iconName = 'bi-display'; }
-                    elseif (strpos($tipoEsp, 'sala') !== false) { $iconClass = 'sala'; $iconName = 'bi-people-fill'; }
-
-                    // Determinar badge
-                    $estatus = strtolower($res['estatus'] ?? 'pendiente');
-                    $badgeClass = 'pending';
-                    $badgeText = 'Pendiente';
-                    if (strpos($estatus, 'aprob') !== false || strpos($estatus, 'confirm') !== false) { 
-                        $badgeClass = 'confirmed'; $badgeText = 'Confirmada'; 
-                    } elseif (strpos($estatus, 'rechaz') !== false) { 
-                        $badgeClass = 'rejected'; $badgeText = 'Rechazada'; 
-                    }
-
-                    // Formatear horas
-                    $horaEnt = substr($res['hora_ent'], 0, 5);
-                    $horaSal = substr($res['hora_sal'], 0, 5);
-                ?>
-                <div class="reservation-item">
-                    <div class="res-icon <?php echo $iconClass; ?>">
-                        <i class="bi <?php echo $iconName; ?>"></i>
-                    </div>
-                    <div class="res-time"><?php echo $horaEnt; ?> - <?php echo $horaSal; ?></div>
-                    <div class="res-info">
-                        <div class="res-space-name"><?php echo htmlspecialchars($res['nombre_numero']); ?></div>
-                        <div class="res-description"><?php echo htmlspecialchars($res['solicitante']); ?></div>
-                    </div>
-                    <span class="res-badge <?php echo $badgeClass; ?>"><?php echo $badgeText; ?></span>
-                    <button class="res-menu-btn" title="Opciones">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
     </div>
 
     <script>

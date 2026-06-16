@@ -134,13 +134,21 @@ class DashboardController {
 
     /**
      * Obtiene el uso de cada espacio individual (para gráfica de barras).
+     * @param string $rango Puede ser 'semana', 'mes' o 'ano'.
      * @return array Lista de espacios con su conteo de reservas.
      */
-    public function getSpaceUsageByName() {
+    public function getSpaceUsageByName($rango = 'semana') {
+        $interval = "INTERVAL '7 days'";
+        if ($rango === 'mes') {
+            $interval = "INTERVAL '1 month'";
+        } elseif ($rango === 'ano') {
+            $interval = "INTERVAL '1 year'";
+        }
+
         $query = "
             SELECT e.nombre_numero, e.tipo, COUNT(r.re_id) as total_reservas
             FROM ESPACIO e
-            LEFT JOIN RESERVA r ON e.esp_id = r.esp_id AND r.fecha_uso >= CURRENT_DATE - INTERVAL '7 days'
+            LEFT JOIN RESERVA r ON e.esp_id = r.esp_id AND r.fecha_uso >= CURRENT_DATE - $interval
             GROUP BY e.esp_id, e.nombre_numero, e.tipo
             ORDER BY total_reservas DESC
             LIMIT 8
