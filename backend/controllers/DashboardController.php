@@ -140,7 +140,7 @@ class DashboardController {
         $query = "
             SELECT e.nombre_numero, e.tipo, COUNT(r.re_id) as total_reservas
             FROM ESPACIO e
-            LEFT JOIN RESERVA r ON e.esp_id = r.esp_id AND r.fecha_uso >= CURRENT_DATE - INTERVAL 7 DAY
+            LEFT JOIN RESERVA r ON e.esp_id = r.esp_id AND r.fecha_uso >= CURRENT_DATE - INTERVAL '7 days'
             GROUP BY e.esp_id, e.nombre_numero, e.tipo
             ORDER BY total_reservas DESC
             LIMIT 8

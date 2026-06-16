@@ -602,7 +602,11 @@ if (isset($_SESSION['us_id'])) {
     <script>
     // ==================== BAR CHART: Espacios más utilizados ====================
     const spaceDataRaw = <?php echo json_encode($spaceUsageByName); ?>;
-    const spaceLabels = spaceDataRaw.map(d => d.nombre_numero);
+    const spaceLabels = spaceDataRaw.map(d => {
+        let name = d.nombre_numero;
+        if(name.includes('(')) name = name.split('(')[0].trim();
+        return name.length > 18 ? name.substring(0, 15) + '...' : name;
+    });
     const spaceValues = spaceDataRaw.map(d => parseInt(d.total_reservas));
 
     // Colores alternando azul claro y azul fuerte
