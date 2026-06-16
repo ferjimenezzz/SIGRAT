@@ -82,8 +82,7 @@ class CalendarController {
         }
         if ($status) {
             // Estatus puede ser Aprobada, Pendiente, Rechazada
-            $query .= " AND (r.status = ? OR r.estatus = ?)";
-            $params[] = $status;
+            $query .= " AND r.estatus = ?";
             $params[] = $status;
         }
         

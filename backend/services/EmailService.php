@@ -26,19 +26,24 @@ class EmailService {
         $this->mail = new PHPMailer(true);
 
         try {
-            // Configuración del servidor (Obtenida del entorno)
-            // Se asume que las variables de entorno ya fueron cargadas por config/Database.php u otro bootstrapper.
+            // Cargar archivo .env manualmente
+            $env_file = dirname(__DIR__) . '/.env';
+            $env = [];
+            if (file_exists($env_file)) {
+                $env = parse_ini_file($env_file);
+            }
+
             $this->mail->isSMTP();
-            $this->mail->Host       = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
+            $this->mail->Host       = $env['SMTP_HOST'] ?? 'smtp.gmail.com';
             $this->mail->SMTPAuth   = true;
-            $this->mail->Username   = getenv('SMTP_USER');
-            $this->mail->Password   = getenv('SMTP_PASS');
-            $this->mail->SMTPSecure = getenv('SMTP_SECURE') ?: PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mail->Port       = getenv('SMTP_PORT') ?: 587;
+            $this->mail->Username   = $env['SMTP_USER'] ?? '';
+            $this->mail->Password   = $env['SMTP_PASS'] ?? '';
+            $this->mail->SMTPSecure = $env['SMTP_SECURE'] ?? PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mail->Port       = $env['SMTP_PORT'] ?? 587;
 
             // Remitente
-            $fromEmail = getenv('SMTP_FROM_EMAIL') ?: getenv('SMTP_USER');
-            $fromName = getenv('SMTP_FROM_NAME') ?: 'Sistema de Reservas SIGRAT';
+            $fromEmail = $env['SMTP_FROM_EMAIL'] ?? $this->mail->Username;
+            $fromName = $env['SMTP_FROM_NAME'] ?? 'Sistema de Reservas SIGRAT';
             
             // Solo configurar From si hay credenciales (evita errores en init sin .env configurado)
             if ($fromEmail) {
@@ -141,6 +146,45 @@ class EmailService {
             $motivoHtml
             <br>
             <p>Saludos cordiales,<br>Equipo SIGRAT</p>
+        ";
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    /**
+     * @summary Envía un correo con el enlace para restablecer la contraseña.
+     * 
+     * @param string $to Correo del usuario.
+     * @param string $token Token de recuperación seguro.
+     */
+    public function sendPasswordRecovery($to, $token) {
+        $subject = "Recuperación de Contraseña - SIGRAT";
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+        $host = $_SERVER['HTTP_HOST'];
+        
+        // Detectar automáticamente la carpeta base del proyecto (ej: /creaciones antigravity/Estadias)
+        $scriptPath = $_SERVER['SCRIPT_NAME'];
+        $basePos = strpos($scriptPath, '/backend/');
+        $basePath = ($basePos !== false) ? substr($scriptPath, 0, $basePos) : '/Estadias';
+        
+        $resetLink = $protocol . "://" . $host . $basePath . "/frontend/recuperar_password.php?token=" . $token;
+        $resetLink = str_replace(' ', '%20', $resetLink); // Codificar espacios en la URL
+        
+        $body = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                <h2 style='color: #1E335F;'>Recuperación de Contraseña</h2>
+                <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en el sistema SIGRAT.</p>
+                <p>Para crear una nueva contraseña, haz clic en el siguiente enlace:</p>
+                <div style='text-align: center; margin: 30px 0;'>
+                    <a href='$resetLink' style='background-color: #1E335F; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold;'>Restablecer Contraseña</a>
+                </div>
+                <p style='color: #6c757d; font-size: 14px;'>Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:</p>
+                <p style='color: #6c757d; font-size: 13px; word-break: break-all;'><a href='$resetLink'>$resetLink</a></p>
+                <br>
+                <p style='color: #ef4444; font-size: 14px;'><strong>Atención:</strong> Este enlace expirará en 1 hora.</p>
+                <p style='font-size: 14px;'>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+                <br>
+                <p style='font-size: 14px;'>Saludos cordiales,<br>Equipo SIGRAT</p>
+            </div>
         ";
         return $this->sendEmail($to, $subject, $body);
     }

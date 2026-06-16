@@ -1,188 +1,299 @@
+<?php
+/**
+ * @file recuperar_password.php
+ * @summary Interfaz gráfica unificada para la recuperación y restablecimiento de contraseñas.
+ */
+session_start();
+$token = $_GET['token'] ?? null;
+?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGRAT | Recuperar Contraseña</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1E335F;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        .login-card {
+            width: 420px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
 
-<title>Recuperar Contraseña - SIGRAT</title>
+        .logo {
+            text-align: center;
+            margin-bottom: 15px;
+        }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        .logo img {
+            width: 110px;
+        }
 
-<style>
+        .titulo {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1E335F;
+        }
 
-body{
-    background-color:#1E335F;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-family:'Segoe UI',sans-serif;
-}
+        .subtitulo {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
 
-.recovery-card{
-    width:450px;
-    background:white;
-    border-radius:15px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
+        .btn-sigrat {
+            background: #1E335F;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+        }
 
-.logo{
-    text-align:center;
-    margin-bottom:15px;
-}
+        .btn-sigrat:hover {
+            background: #17284b;
+            color: white;
+        }
 
-.logo img{
-    width:120px;
-}
+        .form-control {
+            border-radius: 10px;
+        }
 
-.titulo{
-    text-align:center;
-    color:#1E335F;
-    font-weight:bold;
-    font-size:22px;
-}
+        .input-group-text {
+            cursor: pointer;
+            background: white;
+        }
 
-.subtitulo{
-    text-align:center;
-    color:#6c757d;
-    margin-bottom:20px;
-}
+        .volver {
+            text-align: center;
+            margin-top: 15px;
+        }
 
-.btn-sigrat{
-    background:#1E335F;
-    color:white;
-    border:none;
-    border-radius:15px;
-    font-weight:600;
-}
+        .volver a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
-.btn-sigrat:hover{
-    background:#17284b;
-    color:white;
-}
+        .volver a:hover {
+            text-decoration: underline;
+        }
 
-.volver-link{
-    color:#6c757d;
-    text-decoration:none;
-    font-size:14px;
-}
-
-.volver-link:hover{
-    text-decoration:underline;
-}
-
-</style>
-
+        /* Utilidad para ocultar sin Display:none */
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="recovery-card">
-
+<div class="login-card">
     <div class="logo">
         <img src="assets/images/sigrat_logo.png" alt="SIGRAT">
     </div>
 
-    <div class="titulo">
-        RECUPERAR CONTRASEÑA
-    </div>
+    <?php if (!$token): ?>
+    <!-- MODO 1: SOLICITAR ENLACE -->
+    <div class="titulo">RECUPERAR CONTRASEÑA</div>
+    <div class="subtitulo">Ingresa tu correo institucional para recibir un enlace de recuperación.</div>
 
-    <div class="subtitulo">
-        Ingresa tu correo institucional para recuperar el acceso.
-    </div>
+    <form id="formRequestReset">
+        <div class="mb-3">
+            <label class="form-label" style="font-weight: 600;">Correo Electrónico</label>
+            <input type="email" id="correo" class="form-control" placeholder="ejemplo@uteq.edu.mx" required>
+        </div>
 
-    <form id="formRecuperar">
+        <div id="msgRequest" class="alert d-none"></div>
+
+        <div class="d-grid mt-4">
+            <button type="submit" id="btnRequest" class="btn btn-sigrat">
+                ENVIAR ENLACE
+            </button>
+        </div>
+    </form>
+    <?php else: ?>
+    <!-- MODO 2: RESTABLECER CONTRASEÑA -->
+    <div class="titulo">NUEVA CONTRASEÑA</div>
+    <div class="subtitulo">Ingresa una nueva contraseña para tu cuenta.</div>
+
+    <form id="formResetPassword">
+        <input type="hidden" id="token" value="<?php echo htmlspecialchars($token); ?>">
+        
+        <div class="mb-3">
+            <label class="form-label" style="font-weight: 600;">Nueva Contraseña</label>
+            <div class="input-group">
+                <input type="password" id="newPassword" class="form-control" placeholder="Contraseña" required>
+                <span class="input-group-text" onclick="togglePassword('newPassword', this)">
+                    <i class="bi bi-eye"></i>
+                </span>
+            </div>
+            <small class="text-muted" style="font-size: 12px;">Mínimo 8 caracteres, mayúscula, número y especial.</small>
+        </div>
 
         <div class="mb-3">
-
-            <label class="form-label">
-                Correo Institucional
-            </label>
-
-            <input
-                type="email"
-                class="form-control"
-                id="correo"
-                placeholder="ejemplo@uteq.edu.mx"
-                required>
-
+            <label class="form-label" style="font-weight: 600;">Confirmar Contraseña</label>
+            <div class="input-group">
+                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirmar" required>
+                <span class="input-group-text" onclick="togglePassword('confirmPassword', this)">
+                    <i class="bi bi-eye"></i>
+                </span>
+            </div>
         </div>
 
-        <div
-            id="mensajeError"
-            class="alert alert-danger d-none">
-        </div>
+        <div id="msgReset" class="alert d-none"></div>
 
-        <div
-            id="mensajeExito"
-            class="alert alert-success d-none">
-        </div>
-
-        <div class="d-grid">
-
-            <button
-                type="submit"
-                class="btn btn-sigrat">
-
-                ENVIAR ENLACE
-
+        <div class="d-grid mt-4">
+            <button type="submit" id="btnReset" class="btn btn-sigrat">
+                GUARDAR CONTRASEÑA
             </button>
-
         </div>
-
     </form>
+    <?php endif; ?>
 
-    <div class="text-center mt-3">
-
-        <a href="iniciar_sesion.php" class="volver-link">
-            Volver al inicio de sesión
-        </a>
-
+    <div class="volver">
+        <a href="iniciar_sesion.php"><i class="bi bi-arrow-left"></i> Volver al inicio de sesión</a>
     </div>
-
 </div>
 
 <script>
-
-document
-.getElementById("formRecuperar")
-.addEventListener("submit", function(e){
-
-    e.preventDefault();
-
-    const correo =
-    document.getElementById("correo").value;
-
-    const error =
-    document.getElementById("mensajeError");
-
-    const exito =
-    document.getElementById("mensajeExito");
-
-    error.classList.add("d-none");
-    exito.classList.add("d-none");
-
-    if(!correo.endsWith("@uteq.edu.mx")){
-
-        error.innerHTML =
-        "Debes ingresar un correo institucional @uteq.edu.mx";
-
-        error.classList.remove("d-none");
-
-        return;
+// Función para mostrar/ocultar contraseñas
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector("i");
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
     }
+}
 
-    exito.innerHTML =
-    "Si el correo existe en el sistema, recibirás instrucciones para restablecer tu contraseña.";
+// Lógica para Solicitar Enlace
+const formRequest = document.getElementById('formRequestReset');
+if (formRequest) {
+    formRequest.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const correo = document.getElementById('correo').value;
+        const btn = document.getElementById('btnRequest');
+        const msg = document.getElementById('msgRequest');
 
-    exito.classList.remove("d-none");
+        // Validar correo institucional
+        if (!correo.endsWith('@uteq.edu.mx')) {
+            msg.className = "alert alert-danger";
+            msg.innerHTML = "Debes ingresar un correo institucional @uteq.edu.mx";
+            return;
+        }
 
-});
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
+        msg.className = "alert d-none";
 
+        fetch('../backend/api/index.php/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo: correo })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = 'ENVIAR ENLACE';
+            msg.classList.remove('d-none');
+            
+            if (data.success || data.message.includes('recibirás un enlace')) {
+                msg.className = "alert alert-success";
+                msg.innerHTML = "<i class='bi bi-check-circle'></i> " + data.message;
+                document.getElementById('correo').value = '';
+            } else {
+                msg.className = "alert alert-danger";
+                msg.innerHTML = "<i class='bi bi-exclamation-triangle'></i> " + (data.message || 'Error desconocido.');
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = 'ENVIAR ENLACE';
+            msg.className = "alert alert-danger";
+            msg.innerHTML = "Error de conexión. Intente más tarde.";
+        });
+    });
+}
+
+// Lógica para Restablecer Contraseña
+const formReset = document.getElementById('formResetPassword');
+if (formReset) {
+    formReset.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const token = document.getElementById('token').value;
+        const pass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        const btn = document.getElementById('btnReset');
+        const msg = document.getElementById('msgReset');
+
+        msg.className = "alert d-none";
+
+        const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}$/;
+        if(!regex.test(pass)){
+            msg.className = "alert alert-warning";
+            msg.innerHTML = "La contraseña debe tener mínimo 8 caracteres, una mayúscula, un número y un carácter especial.";
+            return;
+        }
+
+        if (pass !== confirmPass) {
+            msg.className = "alert alert-warning";
+            msg.innerHTML = "Las contraseñas no coinciden.";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+
+        fetch('../backend/api/index.php/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token, password: pass })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                msg.className = "alert alert-success";
+                msg.innerHTML = "<i class='bi bi-check-circle'></i> " + data.message;
+                btn.style.display = 'none';
+                setTimeout(() => {
+                    window.location.href = 'iniciar_sesion.php';
+                }, 3000);
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = 'GUARDAR CONTRASEÑA';
+                msg.className = "alert alert-danger";
+                msg.innerHTML = "<i class='bi bi-exclamation-triangle'></i> " + (data.message || 'Error desconocido.');
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = 'GUARDAR CONTRASEÑA';
+            msg.className = "alert alert-danger";
+            msg.innerHTML = "Error de conexión. Intente más tarde.";
+        });
+    });
+}
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

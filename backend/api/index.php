@@ -101,8 +101,8 @@ if ($resource === 'hardware') {
     $is_public = true;
 }
 
-// 4. Registro de usuario es público (POST /auth/register)
-if ($resource === 'auth' && $_SERVER['REQUEST_METHOD'] === 'POST' && end($uri) === 'register') {
+// 4. Endpoints de autenticación públicos (Registro y Recuperación de Contraseña)
+if ($resource === 'auth' && $_SERVER['REQUEST_METHOD'] === 'POST' && in_array(end($uri), ['register', 'forgot-password', 'reset-password'])) {
     $is_public = true;
 }
 
@@ -139,15 +139,24 @@ try {
             break;
 
         case 'auth':
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'register') {
-                $response = $auth->register(
-                    $input['nombre'] ?? '', 
-                    $input['correo'] ?? '', 
-                    $input['telefono'] ?? '', 
-                    $input['carrera'] ?? '', 
-                    $input['password'] ?? ''
-                );
-                $status_code = $response['success'] ? 201 : 400;
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $action = end($uri);
+                if ($action === 'register') {
+                    $response = $auth->register(
+                        $input['nombre'] ?? '', 
+                        $input['correo'] ?? '', 
+                        $input['telefono'] ?? '', 
+                        $input['carrera'] ?? '', 
+                        $input['password'] ?? ''
+                    );
+                    $status_code = $response['success'] ? 201 : 400;
+                } elseif ($action === 'forgot-password') {
+                    $response = $auth->requestPasswordReset($input['correo'] ?? '');
+                    $status_code = $response['success'] ? 200 : 400;
+                } elseif ($action === 'reset-password') {
+                    $response = $auth->resetPassword($input['token'] ?? '', $input['password'] ?? '');
+                    $status_code = $response['success'] ? 200 : 400;
+                }
             }
             break;
 

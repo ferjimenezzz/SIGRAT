@@ -8,8 +8,10 @@
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 use Config\Database;
+use Services\EmailService;
 use PDO;
 
 class AuthController {
@@ -152,5 +154,54 @@ class AuthController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         session_unset();
         session_destroy();
+    }
+
+    /**
+     * @summary Solicita restablecer la contraseña (genera token y envía correo).
+     */
+    public function requestPasswordReset($correo) {
+        $stmt = $this->db->prepare("SELECT us_id FROM usuario WHERE correo = ? AND estatus = 'Activo'");
+        $stmt->execute([$correo]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            // Por seguridad no revelamos si el correo existe o no, pero retornamos success.
+            return ["success" => true, "message" => "Si el correo está registrado, recibirás un enlace de recuperación."];
+        }
+
+        $token = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', time() + 3600); // 1 hora de vigencia
+
+        $update = $this->db->prepare("UPDATE usuario SET reset_token = ?, reset_expires = ? WHERE us_id = ?");
+        $update->execute([$token, $expires, $user['us_id']]);
+
+        $emailService = new EmailService();
+        $sent = $emailService->sendPasswordRecovery($correo, $token);
+
+        if ($sent) {
+            return ["success" => true, "message" => "Si el correo está registrado, recibirás un enlace de recuperación."];
+        } else {
+            return ["success" => false, "message" => "Ocurrió un error al intentar enviar el correo. Por favor contacta al administrador."];
+        }
+    }
+
+    /**
+     * @summary Restablece la contraseña si el token es válido.
+     */
+    public function resetPassword($token, $newPassword) {
+        $stmt = $this->db->prepare("SELECT us_id FROM usuario WHERE reset_token = ? AND reset_expires > NOW()");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            return ["success" => false, "message" => "El enlace de recuperación es inválido o ha expirado."];
+        }
+
+        $hash = self::hashPassword($newPassword);
+        
+        $update = $this->db->prepare("UPDATE usuario SET contrasena = ?, reset_token = NULL, reset_expires = NULL WHERE us_id = ?");
+        $update->execute([$hash, $user['us_id']]);
+
+        return ["success" => true, "message" => "Tu contraseña ha sido restablecida exitosamente. Ya puedes iniciar sesión."];
     }
 }

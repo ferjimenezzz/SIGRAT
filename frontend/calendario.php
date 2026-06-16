@@ -2452,8 +2452,11 @@ include 'header.php';
     function fetchEvents() {
         let url = '../backend/api/index.php/calendar/events';
         
-        fetch(url)
-            .then(res => res.json())
+        fetch(url, { credentials: 'same-origin' })
+            .then(res => {
+                if(!res.ok) throw new Error("Error en la petición: " + res.statusText);
+                return res.json();
+            })
             .then(data => {
                 state.events = Array.isArray(data) ? data : [];
                 renderActiveCalendar();
@@ -3137,6 +3140,7 @@ include 'header.php';
             hora_ent: `${horaEnt}:00`,
             hora_sal: `${horaSal}:00`,
             num_alumnos: numAlumnos,
+            motivo: motivo,
             vis_id: null
         };
 
@@ -3200,6 +3204,7 @@ include 'header.php';
 
         fetch('../backend/api/index.php/reservations', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
             },

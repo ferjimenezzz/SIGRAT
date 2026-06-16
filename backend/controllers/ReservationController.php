@@ -54,8 +54,8 @@ class ReservationController {
                 $estatus_inicial = 'Pendiente'; // Requiere revisión del admin
             }
 
-            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial]);
+            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, motivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial, $data['motivo'] ?? null]);
             
             $new_res_id = $this->db->lastInsertId();
             $this->db->commit();
