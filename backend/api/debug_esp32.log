@@ -2494,3 +2494,7 @@ Cuerpo:
 Cuerpo: 
 2026-06-16 20:45:07 - GET /SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
+2026-06-16 20:46:05 - POST /SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-16 20:46:06 - GET /SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 

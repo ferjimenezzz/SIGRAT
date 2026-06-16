@@ -1209,6 +1209,96 @@ include 'header.php';
         color: var(--active-blue);
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
+    /* CUSTOM MONTH/YEAR PICKER DROPDOWN */
+    .month-picker-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        padding: 16px;
+        width: 280px;
+        margin-top: 8px;
+        animation: slideDownFade 0.2s ease-out;
+    }
+    
+    @keyframes slideDownFade {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -10px);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+
+    .picker-month-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        padding: 8px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .picker-month-btn:hover {
+        background: var(--active-blue-light);
+        color: var(--active-blue);
+    }
+
+    .picker-month-btn.active {
+        background: var(--active-blue);
+        color: white;
+        font-weight: 700;
+    }
+
+    .btn-picker-year-nav {
+        background: #f1f5f9;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+
+    .btn-picker-year-nav:hover {
+        background: #e2e8f0;
+        color: var(--active-blue);
+    }
+
+    /* TOOLTIP Y DETALLES */
+    .res-tooltip {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.96);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        font-size: 12px;
+        max-width: 280px;
+        pointer-events: none;
+        line-height: 1.4;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
 </style>
 
 <div class="calendar-wrapper">
@@ -1242,28 +1332,50 @@ include 'header.php';
         
         <!-- MES Y AÑO SELECCIÓN DESPLEGABLE -->
         <div class="calendar-current-label">
-            <div style="position: relative; display: flex; align-items: center;">
-                <select id="selectMonthNav" style="background: transparent; border: none; font-size: 18px; font-weight: 800; color: var(--text-primary); outline: none; cursor: pointer; -webkit-appearance: none; padding-right: 18px;">
-                    <option value="0">Enero</option>
-                    <option value="1">Febrero</option>
-                    <option value="2">Marzo</option>
-                    <option value="3">Abril</option>
-                    <option value="4">Mayo</option>
-                    <option value="5">Junio</option>
-                    <option value="6">Julio</option>
-                    <option value="7">Agosto</option>
-                    <option value="8">Septiembre</option>
-                    <option value="9">Octubre</option>
-                    <option value="10">Noviembre</option>
-                    <option value="11">Diciembre</option>
-                </select>
-                <i class="bi bi-chevron-down" style="font-size: 12px; position: absolute; right: 0; pointer-events: none; color: var(--text-secondary);"></i>
-            </div>
-            <div style="position: relative; display: flex; align-items: center; margin-left: 10px;">
-                <select id="selectYearNav" style="background: transparent; border: none; font-size: 18px; font-weight: 800; color: var(--text-primary); outline: none; cursor: pointer; -webkit-appearance: none; padding-right: 18px;">
-                    <!-- Rellenado dinámicamente en JS -->
-                </select>
-                <i class="bi bi-chevron-down" style="font-size: 12px; position: absolute; right: 0; pointer-events: none; color: var(--text-secondary);"></i>
+            <select id="selectMonthNav" style="display: none;">
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+            </select>
+            <select id="selectYearNav" style="display: none;"></select>
+
+            <!-- Custom trigger & dropdown menu -->
+            <div style="position: relative; display: inline-block;">
+                <div id="monthPickerTrigger" style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                    <span id="currentMonthYearLabel" style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Cargando...</span>
+                    <i class="bi bi-chevron-down" id="monthPickerChevron" style="font-size: 14px; color: var(--text-secondary); transition: transform 0.2s;"></i>
+                </div>
+                
+                <div class="month-picker-dropdown" id="monthPickerDropdown">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                        <button type="button" id="prevYearBtn" class="btn-picker-year-nav"><i class="bi bi-chevron-left"></i></button>
+                        <span id="pickerYearLabel" style="font-weight: 800; font-size: 16px; color: var(--text-primary);">2026</span>
+                        <button type="button" id="nextYearBtn" class="btn-picker-year-nav"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                    <div class="months-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                        <button type="button" class="picker-month-btn" data-month="0">Ene</button>
+                        <button type="button" class="picker-month-btn" data-month="1">Feb</button>
+                        <button type="button" class="picker-month-btn" data-month="2">Mar</button>
+                        <button type="button" class="picker-month-btn" data-month="3">Abr</button>
+                        <button type="button" class="picker-month-btn" data-month="4">May</button>
+                        <button type="button" class="picker-month-btn" data-month="5">Jun</button>
+                        <button type="button" class="picker-month-btn" data-month="6">Jul</button>
+                        <button type="button" class="picker-month-btn" data-month="7">Ago</button>
+                        <button type="button" class="picker-month-btn" data-month="8">Sep</button>
+                        <button type="button" class="picker-month-btn" data-month="9">Oct</button>
+                        <button type="button" class="picker-month-btn" data-month="10">Nov</button>
+                        <button type="button" class="picker-month-btn" data-month="11">Dic</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1355,7 +1467,6 @@ include 'header.php';
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
                     <span>Próximas reservaciones</span>
-                    <a href="espacios.php?tab=aprobaciones">Ver todas</a>
                 </div>
                 <div class="upcoming-res-list" id="upcomingReservationsList">
                     <!-- Dinámico -->
@@ -1752,6 +1863,73 @@ include 'header.php';
     </div>
 </div>
 
+<!-- ==================== MODAL DE DETALLES DE RESERVACIÓN ==================== -->
+<div class="res-modal-overlay" id="resDetailsModal" style="display: none;">
+    <div class="res-modal-card" style="max-width: 450px;">
+        <div class="res-modal-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+            <h2>Detalles de la Reserva</h2>
+            <button id="btnExitDetailsModal" type="button" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="res-modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Info de estado y espacio -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h3 id="detEspacioNombre" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">Laboratorio 101</h3>
+                    <p id="detEdificioTipo" style="font-size: 13px; color: var(--text-secondary); margin: 4px 0 0 0;">CIC · Laboratorio</p>
+                </div>
+                <span id="detEstatusBadge" class="status-badge" style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;">Aprobada</span>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0;">
+            
+            <!-- Información detallada -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: var(--active-blue);"><i class="bi bi-calendar-event"></i></div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">FECHA</div>
+                        <div id="detFecha" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Martes, 16 de Junio, 2026</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: var(--active-blue);"><i class="bi bi-clock"></i></div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">HORARIO</div>
+                        <div id="detHorario" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">08:00 AM - 10:00 AM</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #f0fdf4; display: flex; align-items: center; justify-content: center; color: var(--green-accent);"><i class="bi bi-person"></i></div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">SOLICITANTE</div>
+                        <div id="detSolicitante" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Juan Pérez</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #f0fdf4; display: flex; align-items: center; justify-content: center; color: var(--green-accent);"><i class="bi bi-envelope"></i></div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">CORREO</div>
+                        <div id="detCorreo" style="font-size: 13px; font-weight: 700; color: var(--text-primary); word-break: break-all;">juan.perez@correo.com</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #fef3c7; display: flex; align-items: center; justify-content: center; color: var(--orange-accent);"><i class="bi bi-people"></i></div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">ASISTENTES ESTIMADOS</div>
+                        <div id="detAsistentes" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">15 alumnos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="res-modal-footer" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+            <button type="button" class="btn-action-outline" style="flex:1; justify-content:center;" id="btnCloseDetailsModal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor del Tooltip -->
+<div class="res-tooltip" id="calendarTooltip"></div>
+
 <!-- JAVASCRIPT CONTROLLER LOGIC -->
 <script>
     // DATOS ESTÁTICOS COMPARTIDOS DESDE PHP
@@ -2057,10 +2235,12 @@ include 'header.php';
             btnResModeSingle.click();
 
             reservationModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeResModal() {
             reservationModal.style.display = 'none';
+            document.body.style.overflow = '';
         }
 
         if(btnNewReservation) btnNewReservation.addEventListener('click', () => openResModal());
@@ -2109,6 +2289,134 @@ include 'header.php';
             resForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 submitReservation();
+            });
+        }
+
+        // ----------------------------------------------------
+        // LOGICA DE SELECTOR DE FECHA PERSONALIZADO
+        // ----------------------------------------------------
+        const monthPickerTrigger = document.getElementById('monthPickerTrigger');
+        const monthPickerDropdown = document.getElementById('monthPickerDropdown');
+        const monthPickerChevron = document.getElementById('monthPickerChevron');
+        const currentMonthYearLabel = document.getElementById('currentMonthYearLabel');
+        const pickerYearLabel = document.getElementById('pickerYearLabel');
+        const prevYearBtn = document.getElementById('prevYearBtn');
+        const nextYearBtn = document.getElementById('nextYearBtn');
+        
+        let pickerCurrentYear = state.currentDate.getFullYear();
+        
+        window.updateCustomPickerUI = function() {
+            const currentMonth = state.currentDate.getMonth();
+            const currentYear = state.currentDate.getFullYear();
+            
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            if (currentMonthYearLabel) {
+                currentMonthYearLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            }
+            
+            if (pickerYearLabel) {
+                pickerYearLabel.textContent = pickerCurrentYear;
+            }
+            
+            document.querySelectorAll('.picker-month-btn').forEach(btn => {
+                const btnMonth = parseInt(btn.dataset.month);
+                if (btnMonth === currentMonth && pickerCurrentYear === currentYear) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        };
+        
+        if (monthPickerTrigger) {
+            monthPickerTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = monthPickerDropdown.style.display === 'block';
+                if (isOpen) {
+                    closeCustomPicker();
+                } else {
+                    openCustomPicker();
+                }
+            });
+        }
+        
+        function openCustomPicker() {
+            if (monthPickerDropdown) monthPickerDropdown.style.display = 'block';
+            if (monthPickerChevron) monthPickerChevron.style.transform = 'rotate(180deg)';
+            pickerCurrentYear = state.currentDate.getFullYear();
+            window.updateCustomPickerUI();
+        }
+        
+        function closeCustomPicker() {
+            if (monthPickerDropdown) monthPickerDropdown.style.display = 'none';
+            if (monthPickerChevron) monthPickerChevron.style.transform = 'rotate(0deg)';
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (monthPickerDropdown && !monthPickerDropdown.contains(e.target) && e.target !== monthPickerTrigger) {
+                closeCustomPicker();
+            }
+        });
+        
+        if (prevYearBtn) {
+            prevYearBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                pickerCurrentYear--;
+                window.updateCustomPickerUI();
+            });
+        }
+        
+        if (nextYearBtn) {
+            nextYearBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                pickerCurrentYear++;
+                window.updateCustomPickerUI();
+            });
+        }
+        
+        document.querySelectorAll('.picker-month-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const selectedMonth = parseInt(btn.dataset.month);
+                
+                monthSelect.value = selectedMonth;
+                
+                let yearOptionExists = false;
+                for (let i = 0; i < yearSelect.options.length; i++) {
+                    if (parseInt(yearSelect.options[i].value) === pickerCurrentYear) {
+                        yearOptionExists = true;
+                        break;
+                    }
+                }
+                
+                if (!yearOptionExists) {
+                    const opt = document.createElement('option');
+                    opt.value = pickerCurrentYear;
+                    opt.textContent = pickerCurrentYear;
+                    yearSelect.appendChild(opt);
+                }
+                
+                yearSelect.value = pickerCurrentYear;
+                monthSelect.dispatchEvent(new Event('change'));
+                closeCustomPicker();
+            });
+        });
+
+        // ----------------------------------------------------
+        // LOGICA DE MODAL DE DETALLES
+        // ----------------------------------------------------
+        const resDetailsModal = document.getElementById('resDetailsModal');
+        const btnExitDetailsModal = document.getElementById('btnExitDetailsModal');
+        const btnCloseDetailsModal = document.getElementById('btnCloseDetailsModal');
+        
+        if (btnExitDetailsModal) btnExitDetailsModal.addEventListener('click', () => { resDetailsModal.style.display = 'none'; document.body.style.overflow = ''; });
+        if (btnCloseDetailsModal) btnCloseDetailsModal.addEventListener('click', () => { resDetailsModal.style.display = 'none'; document.body.style.overflow = ''; });
+        if (resDetailsModal) {
+            resDetailsModal.addEventListener('click', (e) => {
+                if (e.target === resDetailsModal) {
+                    resDetailsModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
             });
         }
     }
@@ -2160,6 +2468,11 @@ include 'header.php';
         // Actualizar dropdowns de mes/año nav
         document.getElementById('selectMonthNav').value = state.currentDate.getMonth();
         document.getElementById('selectYearNav').value = state.currentDate.getFullYear();
+        
+        // Sincronizar UI del seleccionador de fecha personalizado
+        if (typeof window.updateCustomPickerUI === 'function') {
+            window.updateCustomPickerUI();
+        }
         
         // Renderizar filtros tags
         renderActiveFiltersTags();
@@ -2536,8 +2849,20 @@ include 'header.php';
                 if (est === 'Rechazada' || est === 'rejected') statClass = 'status-rejected';
 
                 evEl.className = `event-capsule ${statClass}`;
-                evEl.title = `${ev.hora_ent.substring(0,5)} - ${ev.hora_sal.substring(0,5)} | ${ev.nombre_numero}\nSolicitante: ${ev.usuario_nombre || 'Visita'}`;
                 evEl.textContent = `${ev.hora_ent.substring(0,5)} ${ev.nombre_numero}`;
+                
+                // Tooltip events
+                evEl.addEventListener('mouseenter', (e) => showResTooltip(e, ev));
+                evEl.addEventListener('mousemove', (e) => positionResTooltip(e));
+                evEl.addEventListener('mouseleave', () => hideResTooltip());
+                
+                // Click details modal event
+                evEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    hideResTooltip();
+                    openDetailsModal(ev);
+                });
+
                 eventsCont.appendChild(evEl);
             });
 
@@ -2645,9 +2970,15 @@ include 'header.php';
                         <div class="week-event-time">${ev.hora_ent.substring(0,5)} - ${ev.hora_sal.substring(0,5)}</div>
                     `;
                     
+                    // Tooltip events
+                    evCard.addEventListener('mouseenter', (e) => showResTooltip(e, ev));
+                    evCard.addEventListener('mousemove', (e) => positionResTooltip(e));
+                    evCard.addEventListener('mouseleave', () => hideResTooltip());
+                    
                     evCard.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        alert(`Reserva de: ${userName}\nHorario: ${ev.hora_ent} a ${ev.hora_sal}\nEspacio: ${sp.edificio} - ${sp.nombre_numero}\nEstado: ${ev.estatus || ev.status}`);
+                        hideResTooltip();
+                        openDetailsModal(ev);
                     });
 
                     cellContainer.appendChild(evCard);
@@ -2895,6 +3226,106 @@ include 'header.php';
             btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
         });
     }
+
+    // ----------------------------------------------------
+    // DETALLES Y TOOLTIP DE RESERVACIONES (DIT)
+    // ----------------------------------------------------
+    window.openDetailsModal = function(ev) {
+        document.getElementById('detEspacioNombre').textContent = ev.nombre_numero;
+        document.getElementById('detEdificioTipo').textContent = `${ev.edificio} · ${ev.espacio_tipo || 'Espacio'}`;
+        
+        const est = ev.estatus || ev.status || 'Pendiente';
+        const badge = document.getElementById('detEstatusBadge');
+        badge.textContent = est;
+        badge.className = 'status-badge';
+        
+        if (est === 'Aprobada' || est === 'approved' || est === 'Aprobado') {
+            badge.style.background = '#dcfce7';
+            badge.style.color = '#15803d';
+        } else if (est === 'Pendiente' || est === 'pending') {
+            badge.style.background = '#fef3c7';
+            badge.style.color = '#b45309';
+        } else {
+            badge.style.background = '#fee2e2';
+            badge.style.color = '#b91c1c';
+        }
+        
+        // Formatear fecha
+        try {
+            const dateParts = ev.fecha_uso.split('-');
+            const dateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = dateObj.toLocaleDateString('es-ES', options);
+            document.getElementById('detFecha').textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+        } catch (err) {
+            document.getElementById('detFecha').textContent = ev.fecha_uso;
+        }
+        
+        // Formatear horario
+        const horaEnt = ev.hora_ent ? ev.hora_ent.substring(0, 5) : '00:00';
+        const horaSal = ev.hora_sal ? ev.hora_sal.substring(0, 5) : '00:00';
+        document.getElementById('detHorario').textContent = `${horaEnt} - ${horaSal}`;
+        
+        // Solicitante
+        document.getElementById('detSolicitante').textContent = ev.usuario_nombre || 'Visita / Externo';
+        document.getElementById('detCorreo').textContent = ev.usuario_correo || 'No disponible';
+        document.getElementById('detAsistentes').textContent = `${ev.num_alumnos || 0} alumnos`;
+        
+        document.getElementById('resDetailsModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.showResTooltip = function(e, ev) {
+        const tooltip = document.getElementById('calendarTooltip');
+        if (!tooltip) return;
+        
+        const est = ev.estatus || ev.status || 'Pendiente';
+        let statusColor = '#10b981';
+        if (est === 'Pendiente' || est === 'pending') statusColor = '#f59e0b';
+        if (est === 'Rechazada' || est === 'rejected') statusColor = '#ef4444';
+        
+        const horaEnt = ev.hora_ent ? ev.hora_ent.substring(0, 5) : '00:00';
+        const horaSal = ev.hora_sal ? ev.hora_sal.substring(0, 5) : '00:00';
+        
+        tooltip.innerHTML = `
+            <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span>${ev.nombre_numero} (${ev.edificio})</span>
+                <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: ${statusColor}; color: white; text-transform: uppercase;">${est}</span>
+            </div>
+            <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-clock" style="margin-right: 6px;"></i><strong>Horario:</strong> ${horaEnt} - ${horaSal}</div>
+            <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-person" style="margin-right: 6px;"></i><strong>Solicitante:</strong> ${ev.usuario_nombre || 'Visita'}</div>
+            <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-envelope" style="margin-right: 6px;"></i><strong>Correo:</strong> ${ev.usuario_correo || 'N/A'}</div>
+            <div style="color: #cbd5e1;"><i class="bi bi-people" style="margin-right: 6px;"></i><strong>Asistentes:</strong> ${ev.num_alumnos || 0}</div>
+        `;
+        tooltip.style.display = 'block';
+        window.positionResTooltip(e);
+    };
+
+    window.positionResTooltip = function(e) {
+        const tooltip = document.getElementById('calendarTooltip');
+        if (!tooltip || tooltip.style.display === 'none') return;
+        
+        const tooltipWidth = tooltip.offsetWidth;
+        const tooltipHeight = tooltip.offsetHeight;
+        
+        let x = e.clientX + 15;
+        let y = e.clientY + 15;
+        
+        if (x + tooltipWidth > window.innerWidth) {
+            x = e.clientX - tooltipWidth - 15;
+        }
+        if (y + tooltipHeight > window.innerHeight) {
+            y = e.clientY - tooltipHeight - 15;
+        }
+        
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    };
+
+    window.hideResTooltip = function() {
+        const tooltip = document.getElementById('calendarTooltip');
+        if (tooltip) tooltip.style.display = 'none';
+    };
 </script>
 
 <?php
