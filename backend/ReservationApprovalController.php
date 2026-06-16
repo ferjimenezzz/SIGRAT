@@ -11,10 +11,13 @@ namespace Backend;
 use PDO;
 use Exception;
 
+require_once __DIR__ . '/services/EmailService.php';
+
 class ReservationApprovalController
 {
     /** @var PDO $pdo Database connection */
     private PDO $pdo;
+    private $emailService;
 
     /**
      * Constructor.
@@ -24,6 +27,7 @@ class ReservationApprovalController
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->emailService = new \Services\EmailService();
     }
 
     /**
@@ -100,11 +104,17 @@ class ReservationApprovalController
             try {
                 require_once __DIR__ . '/controllers/NotificationController.php';
                 $notifCtrl = new \Controllers\NotificationController();
-                $stmtUser = $this->pdo->prepare("SELECT us_id FROM reserva WHERE re_id = :id");
+                $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
                 $stmtUser->execute([':id' => $reservationId]);
-                $resUsId = $stmtUser->fetchColumn();
-                if ($resUsId) {
+                $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+                if ($usuario) {
+                    $resUsId = $usuario['us_id'];
+                    $correo = $usuario['correo'];
                     $notifCtrl->createNotification($resUsId, 'Reserva', 'Tu reserva #' . $reservationId . ' ha sido aprobada.', 'espacios.php');
+                    
+                    if ($correo) {
+                        $this->emailService->sendReservationApproved($correo, $reservationId);
+                    }
                 }
             } catch (Exception $e) {
                 error_log("Error notificando aprobación (ApprovalController): " . $e->getMessage());
@@ -173,13 +183,19 @@ class ReservationApprovalController
         try {
             require_once __DIR__ . '/controllers/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
-            $stmtUser = $this->pdo->prepare("SELECT us_id FROM reserva WHERE re_id = :id");
+            $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
             $stmtUser->execute([':id' => $reservationId]);
-            $resUsId = $stmtUser->fetchColumn();
-            if ($resUsId) {
+            $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            if ($usuario) {
+                $resUsId = $usuario['us_id'];
+                $correo = $usuario['correo'];
                 $msg = 'Tu reserva #' . $reservationId . ' ha sido rechazada.';
                 if ($reason) $msg .= ' Motivo: ' . $reason;
                 $notifCtrl->createNotification($resUsId, 'Reserva', $msg, 'espacios.php');
+                
+                if ($correo) {
+                    $this->emailService->sendReservationRejected($correo, $reservationId, $reason);
+                }
             }
         } catch (Exception $e) {
             error_log("Error notificando rechazo (ApprovalController): " . $e->getMessage());

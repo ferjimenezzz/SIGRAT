@@ -10,19 +10,23 @@ namespace Controllers;
 require_once __DIR__ . '/../config/Database.php';
 require_once 'AuditController.php';
 require_once 'NotificationController.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 use Config\Database;
 use Controllers\AuditController;
 use Controllers\NotificationController;
+use Services\EmailService;
 use PDO;
 
 class ReservationController {
     private $db;
     private $audit;
+    private $emailService;
 
     public function __construct() {
         $this->db = Database::getConnection();
         $this->audit = new AuditController();
+        $this->emailService = new EmailService();
     }
 
     /**
@@ -72,6 +76,20 @@ class ReservationController {
                     error_log("Error notificando reserva pendiente: " . $e->getMessage());
                 }
             }
+            
+            // Notificar al usuario por correo de la nueva reserva
+            try {
+                if ($us_id) {
+                    $stmtCorreo = $this->db->prepare("SELECT correo FROM USUARIO WHERE us_id = ?");
+                    $stmtCorreo->execute([$us_id]);
+                    $correo = $stmtCorreo->fetchColumn();
+                    if ($correo) {
+                        $this->emailService->sendReservationCreated($correo, $new_res_id, $estatus_inicial);
+                    }
+                }
+            } catch (\Exception $e) {
+                error_log("Error enviando correo de confirmación: " . $e->getMessage());
+            }
 
             return ["success" => true, "id" => $new_res_id];
         } catch (\Exception $e) {
@@ -91,14 +109,20 @@ class ReservationController {
             // Auditoría
             $this->audit->log($admin_id, "Aprobada reservación ID: $id", "RESERVAS");
 
-            // Notificar al usuario
+            // Notificar al usuario (Push / Correo)
             try {
                 $notifCtrl = new NotificationController();
-                $stmtUs = $this->db->prepare("SELECT us_id FROM RESERVA WHERE re_id = ?");
+                $stmtUs = $this->db->prepare("SELECT r.us_id, u.correo FROM RESERVA r JOIN USUARIO u ON r.us_id = u.us_id WHERE r.re_id = ?");
                 $stmtUs->execute([$id]);
-                $us_id = $stmtUs->fetchColumn();
-                if ($us_id) {
+                $usuario = $stmtUs->fetch();
+                if ($usuario) {
+                    $us_id = $usuario['us_id'];
+                    $correo = $usuario['correo'];
                     $notifCtrl->createNotification($us_id, 'Reserva', "Tu reserva (ID: $id) ha sido aprobada.", 'espacios.php');
+                    
+                    if ($correo) {
+                        $this->emailService->sendReservationApproved($correo, $id);
+                    }
                 }
             } catch (\Exception $e) {
                 error_log("Error notificando aprobación de reserva: " . $e->getMessage());
