@@ -3191,10 +3191,15 @@ include 'header.php';
             let curr = new Date(startDate);
             while (curr <= endDate) {
                 if (checkedWeekdays.includes(curr.getDay())) {
-                    fechas.push(curr.toISOString().split('T')[0]);
+                    const y = curr.getFullYear();
+                    const m = String(curr.getMonth() + 1).padStart(2, '0');
+                    const d = String(curr.getDate()).padStart(2, '0');
+                    fechas.push(`${y}-${m}-${d}`);
                 }
                 curr.setDate(curr.getDate() + 1);
             }
+            
+            console.log("Multi-day array generated:", fechas);
 
             if (fechas.length === 0) {
                 alert("No hay días hábiles que coincidan en el rango seleccionado.");
