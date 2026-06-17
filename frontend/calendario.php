@@ -71,6 +71,7 @@ include 'header.php';
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .search-input-wrapper {
@@ -569,6 +570,26 @@ include 'header.php';
         display: flex;
         flex-direction: column;
         gap: 10px;
+        max-height: 220px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    .available-spaces-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .available-spaces-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .available-spaces-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .available-spaces-list::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
     }
 
     .space-status-item {
@@ -1320,6 +1341,13 @@ include 'header.php';
                 <i class="bi bi-search"></i>
                 <input type="text" id="searchInput" placeholder="Buscar espacio, sala...">
             </div>
+            <div class="btn-action-outline" style="cursor: default; display: flex; align-items: center; gap: 10px; user-select: none;">
+                <span style="font-weight: 700; color: var(--text-primary);">Mis reservas</span>
+                <label class="toggle-switch" style="margin-bottom: 0;">
+                    <input type="checkbox" id="quickFilterSoloMisReservas">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
             <button class="btn-action-outline" id="btnToggleFilters">
                 <i class="bi bi-funnel"></i> Filtros avanz.
             </button>
@@ -1431,13 +1459,6 @@ include 'header.php';
             </select>
         </div>
 
-        <div class="quick-filter-group">
-            <span>Mis reservas:</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="quickFilterSoloMisReservas">
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
     </div>
 
     <!-- BARRA DE FILTROS ACTIVOS -->
@@ -1470,26 +1491,6 @@ include 'header.php';
 
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
-            <!-- Próximas Reservaciones -->
-            <div class="sidebar-section-card">
-                <div class="sidebar-section-title">
-                    <span>Próximas reservaciones</span>
-                </div>
-                <div class="upcoming-res-list" id="upcomingReservationsList">
-                    <!-- Dinámico -->
-                </div>
-            </div>
-
-            <!-- Espacios Disponibles -->
-            <div class="sidebar-section-card">
-                <div class="sidebar-section-title">
-                    <span>Espacios disponibles</span>
-                </div>
-                <div class="available-spaces-list" id="availableSpacesList">
-                    <!-- Dinámico -->
-                </div>
-            </div>
-
             <!-- Resumen del Día -->
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
@@ -1508,6 +1509,26 @@ include 'header.php';
                         <div class="resumen-card-num" id="statPendientes">0</div>
                         <div class="resumen-card-label">Por aprobar</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Próximas Reservaciones -->
+            <div class="sidebar-section-card">
+                <div class="sidebar-section-title">
+                    <span>Próximas reservaciones</span>
+                </div>
+                <div class="upcoming-res-list" id="upcomingReservationsList">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <!-- Espacios Disponibles -->
+            <div class="sidebar-section-card">
+                <div class="sidebar-section-title">
+                    <span>Espacios disponibles</span>
+                </div>
+                <div class="available-spaces-list" id="availableSpacesList">
+                    <!-- Dinámico -->
                 </div>
             </div>
         </div>
