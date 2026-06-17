@@ -347,7 +347,7 @@ include 'header.php';
 
     .month-days-header {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         background: #f8fafc;
         border-bottom: 1px solid var(--border-color);
         text-align: center;
@@ -364,7 +364,7 @@ include 'header.php';
 
     .month-days-grid {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         grid-auto-rows: minmax(110px, 1fr);
     }
 
@@ -663,7 +663,8 @@ include 'header.php';
     .week-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 800px;
+        min-width: 1000px;
+        table-layout: fixed;
     }
 
     .week-table th {
@@ -701,12 +702,18 @@ include 'header.php';
         font-size: 13px;
         font-weight: 800;
         color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .week-space-subtitle {
         font-size: 11px;
         color: var(--text-secondary);
         margin-top: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .week-cell-slots-container {
