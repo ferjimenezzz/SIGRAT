@@ -40,6 +40,8 @@ class EmailService {
             $this->mail->Password   = $env['SMTP_PASS'] ?? '';
             $this->mail->SMTPSecure = $env['SMTP_SECURE'] ?? PHPMailer::ENCRYPTION_STARTTLS;
             $this->mail->Port       = $env['SMTP_PORT'] ?? 587;
+            $this->mail->Timeout    = 3; // Timeout corto para no bloquear la app
+
 
             // Remitente
             $fromEmail = $env['SMTP_FROM_EMAIL'] ?? $this->mail->Username;
@@ -106,6 +108,37 @@ class EmailService {
             <p>Tu solicitud de reserva con el número de folio <strong>#$re_id</strong> ha sido registrada en el sistema.</p>
             <p>El estatus actual de tu solicitud es: <strong>$estatus</strong>.</p>
             <p>Si el estatus es Pendiente, un administrador revisará tu solicitud y te notificará por este mismo medio una vez que sea autorizada o rechazada.</p>
+            <br>
+            <p>Saludos cordiales,<br>Equipo SIGRAT</p>
+        ";
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    /**
+     * @summary Envía correo de confirmación para reservas múltiples.
+     * 
+     * @param string $to Correo del usuario.
+     * @param array $re_ids Array de IDs de reservas.
+     * @param array $fechas Array de fechas correspondientes.
+     * @param string $estatus Estatus inicial.
+     */
+    public function sendBulkReservationCreated($to, $re_ids, $fechas, $estatus) {
+        $subject = "Confirmación de solicitudes de reserva múltiples";
+        
+        $listaReservas = "";
+        for ($i = 0; $i < count($re_ids); $i++) {
+            $fechaStr = isset($fechas[$i]) ? $fechas[$i] : '';
+            $listaReservas .= "<li>Reserva <strong>#" . $re_ids[$i] . "</strong> para el día <strong>" . $fechaStr . "</strong></li>";
+        }
+
+        $body = "
+            <h2>Notificación del Sistema de Reservas</h2>
+            <p>Tus solicitudes de reserva han sido registradas en el sistema exitosamente:</p>
+            <ul>
+                $listaReservas
+            </ul>
+            <p>El estatus actual de estas solicitudes es: <strong>$estatus</strong>.</p>
+            <p>Si el estatus es Pendiente, un administrador revisará tus solicitudes y te notificará una vez que sean autorizadas o rechazadas.</p>
             <br>
             <p>Saludos cordiales,<br>Equipo SIGRAT</p>
         ";

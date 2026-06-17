@@ -5,7 +5,9 @@
  * @description Centraliza las peticiones, gestiona CORS, decodifica JSON y despacha a los controladores correspondientes.
  */
 session_start();
-
+ob_start();
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 // Configuración de encabezados para API REST y CORS
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -185,7 +187,7 @@ try {
                         $single_input = $input;
                         $single_input['fecha_uso'] = $fecha;
                         unset($single_input['fechas_uso']);
-                        $res = $controller->create($single_input);
+                        $res = $controller->create($single_input, true); // true = skip individual email
                         if (!$res['success']) {
                             $has_error = true;
                             $error_msg = "Error en la fecha " . $fecha . ": " . ($res['error'] ?? 'Conflicto de horario.');
@@ -197,6 +199,12 @@ try {
                         $response = ["success" => false, "error" => $error_msg];
                         $status_code = 400;
                     } else {
+                        // SEND BULK EMAIL
+                        $us_id = $_SESSION['us_id'] ?? ($input['us_id'] ?? null);
+                        if ($us_id) {
+                            $controller->sendBulkEmail($us_id, $results, $input['fechas_uso'], $input['esp_id']);
+                        }
+
                         $response = ["success" => true, "ids" => $results];
                         $status_code = 201;
                     }
@@ -310,6 +318,11 @@ try {
 } catch (\Exception $e) {
     $response = ["error" => $e->getMessage()];
     $status_code = 500;
+}
+
+// Limpiar el buffer de salida para evitar que Warnings/Notices rompan el JSON
+if (ob_get_length()) {
+    ob_clean();
 }
 
 http_response_code($status_code);

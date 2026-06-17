@@ -2266,14 +2266,14 @@ include 'header.php';
             document.body.style.overflow = 'hidden';
         }
 
-        function closeResModal() {
+        window.closeResModal = function() {
             reservationModal.style.display = 'none';
             document.body.style.overflow = '';
         }
 
         if(btnNewReservation) btnNewReservation.addEventListener('click', () => openResModal());
-        if(btnExitResModal) btnExitResModal.addEventListener('click', closeResModal);
-        if(btnCancelReserva) btnCancelReserva.addEventListener('click', closeResModal);
+        if(btnExitResModal) btnExitResModal.addEventListener('click', window.closeResModal);
+        if(btnCancelReserva) btnCancelReserva.addEventListener('click', window.closeResModal);
 
         // Al cambiar edificio en la reserva
         if(resEdificio) {
@@ -2477,7 +2477,7 @@ include 'header.php';
     // ----------------------------------------------------
     // OBTENER RESERVACIONES DESDE LA API
     // ----------------------------------------------------
-    function fetchEvents() {
+    window.fetchEvents = function() {
         let url = '../backend/api/index.php/calendar/events';
         
         fetch(url, { credentials: 'same-origin' })
@@ -3138,8 +3138,6 @@ include 'header.php';
             });
         }
     }
-
-    // ----------------------------------------------------
     // ENVIAR SOLICITUD DE RESERVACIÓN (DÍA ÚNICO O RECURRENTE)
     // ----------------------------------------------------
     function submitReservation() {
@@ -3247,17 +3245,17 @@ include 'header.php';
         .then(data => {
             if (data.success || data.id || data.ids) {
                 alert("¡Reservación programada con éxito!");
-                closeResModal();
+                window.closeResModal();
                 
                 // Recargar eventos y actualizar vista
-                fetchEvents();
+                window.fetchEvents();
             } else {
                 alert(`Error al agendar reserva: ${data.error || 'Conflicto de horario o espacio no disponible.'}`);
             }
         })
         .catch(err => {
             console.error("Error submitting reservation:", err);
-            alert("Ocurrió un error al procesar la reservación. Intente de nuevo.");
+            alert("Ocurrió un error al procesar la reservación: " + err.message);
         })
         .finally(() => {
             btnConfirm.disabled = false;
