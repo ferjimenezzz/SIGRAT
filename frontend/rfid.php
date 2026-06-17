@@ -370,6 +370,50 @@ include 'header.php';
             alert('Error en la conexión con el API');
         }
     }
+
+    // Funcionalidad de Monitoreo en Vivo (Polling)
+    async function fetchMonitorData() {
+        // Solo hacer la petición si estamos en la pestaña de monitor
+        if (document.getElementById('section-monitor').style.display !== 'none') {
+            try {
+                const response = await fetch('../backend/api/index.php/hardware/recent-scans', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const tbody = document.getElementById('monitor-tbody');
+                    if (result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-weight: 600;">Aún no hay escaneos en la Base de Datos...</td></tr>';
+                    } else {
+                        let html = '';
+                        result.data.forEach(scan => {
+                            const color = scan.tipo_mov === 'ENTRADA' ? '#10b981' : '#f59e0b';
+                            const ubi = scan.ubicacion ? scan.ubicacion : 'Desconocida';
+                            html += `<tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 16px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #334155;">${scan.tag_id}</td>
+                                <td style="padding: 16px 24px;"><span style="background: ${color}22; color: ${color}; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900;">${scan.tipo_mov}</span></td>
+                                <td style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #64748b;">${ubi}</td>
+                                <td style="padding: 16px 24px; font-size: 13px; color: #94a3b8;">${scan.fecha_hora}</td>
+                            </tr>`;
+                        });
+                        tbody.innerHTML = html;
+                    }
+                    
+                    const now = new Date();
+                    document.getElementById('monitor-time').innerText = `(Actualizado: ${now.toLocaleTimeString()})`;
+                }
+            } catch (e) {
+                console.error('Error al actualizar el monitor:', e);
+            }
+        }
+    }
+
+    // Consultar nuevos datos cada 2 segundos
+    setInterval(fetchMonitorData, 2000);
+
 </script>
 
 <?php include 'footer.php'; ?>
