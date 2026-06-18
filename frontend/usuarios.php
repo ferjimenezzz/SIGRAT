@@ -793,9 +793,11 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('us_rfc').value = '';
         document.getElementById('user-modal-title').innerText = 'Nuevo Usuario';
         document.getElementById('modal-usuario').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
     function closeUserModal() {
         document.getElementById('modal-usuario').style.display = 'none';
+        document.body.style.overflow = '';
     }
     function editUser(u) {
         document.getElementById('us_id').value = u.us_id;
@@ -806,6 +808,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('us_rfc').value = u.rfc_matricula || u.empresa || '';
         document.getElementById('user-modal-title').innerText = 'Editar Usuario';
         document.getElementById('modal-usuario').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     // Modal Rol
@@ -814,9 +817,11 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('rol_id').value = '';
         document.getElementById('role-modal-title').innerText = 'Configurar Nuevo Rol';
         document.getElementById('modal-rol').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
     function closeRoleModal() {
         document.getElementById('modal-rol').style.display = 'none';
+        document.body.style.overflow = '';
     }
     function editRole(rol) {
         document.getElementById('rol_id').value = rol.rol_id;
@@ -838,6 +843,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
             }
         }
         document.getElementById('modal-rol').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 </script>
 
