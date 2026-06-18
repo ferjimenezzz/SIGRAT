@@ -32,7 +32,7 @@ class ReservationController {
     /**
      * Crea una reservación (Inicia en estado 'Pendiente').
      */
-    public function create($data) {
+    public function create($data, $skip_email = false) {
         $this->db->beginTransaction();
         try {
             $vis_id = $data['vis_id'] ?? null;
@@ -78,17 +78,19 @@ class ReservationController {
             }
             
             // Notificar al usuario por correo de la nueva reserva
-            try {
-                if ($us_id) {
-                    $stmtCorreo = $this->db->prepare("SELECT correo FROM USUARIO WHERE us_id = ?");
-                    $stmtCorreo->execute([$us_id]);
-                    $correo = $stmtCorreo->fetchColumn();
-                    if ($correo) {
-                        $this->emailService->sendReservationCreated($correo, $new_res_id, $estatus_inicial);
+            if (!$skip_email) {
+                try {
+                    if ($us_id) {
+                        $stmtCorreo = $this->db->prepare("SELECT correo FROM USUARIO WHERE us_id = ?");
+                        $stmtCorreo->execute([$us_id]);
+                        $correo = $stmtCorreo->fetchColumn();
+                        if ($correo) {
+                            $this->emailService->sendReservationCreated($correo, $new_res_id, $estatus_inicial);
+                        }
                     }
+                } catch (\Exception $e) {
+                    error_log("Error enviando correo de confirmación: " . $e->getMessage());
                 }
-            } catch (\Exception $e) {
-                error_log("Error enviando correo de confirmación: " . $e->getMessage());
             }
 
             return ["success" => true, "id" => $new_res_id];
@@ -136,8 +138,50 @@ class ReservationController {
     }
 
     public function getAvailability($esp_id, $date) {
-        $stmt = $this->db->prepare("SELECT hora_ent, hora_sal, estatus FROM RESERVA WHERE esp_id = ? AND fecha_uso = ? AND estatus != 'Rechazada'");
-        $stmt->execute([$esp_id, $date]);
-        return $stmt->fetchAll();
+        try {
+            $query = "SELECT re_id, hora_ent, hora_sal, estatus 
+                      FROM RESERVA 
+                      WHERE esp_id = ? AND fecha_uso = ? AND estatus != 'Rechazada'";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$esp_id, $date]);
+            return $stmt->fetchAll();
+        } catch (\Exception $e) {
+            error_log("Error check availability: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * @summary Envía un solo correo confirmando múltiples reservaciones creadas a la vez.
+     * 
+     * @param int $us_id
+     * @param array $re_ids Array de IDs de reservas creadas
+     * @param array $fechas Array de fechas
+     * @param int $esp_id
+     */
+    public function sendBulkEmail($us_id, $re_ids, $fechas, $esp_id) {
+        try {
+            if (!$us_id || empty($re_ids) || empty($fechas)) return false;
+            
+            // Determinar estatus inicial
+            $estatus_inicial = 'Aprobada';
+            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio->execute([$esp_id]);
+            $espacio = $stmtEspacio->fetch();
+            if ($espacio && $espacio['acceso_tipo'] === 'Restringido') {
+                $estatus_inicial = 'Pendiente';
+            }
+
+            $stmtCorreo = $this->db->prepare("SELECT correo FROM USUARIO WHERE us_id = ?");
+            $stmtCorreo->execute([$us_id]);
+            $correo = $stmtCorreo->fetchColumn();
+            
+            if ($correo) {
+                return $this->emailService->sendBulkReservationCreated($correo, $re_ids, $fechas, $estatus_inicial);
+            }
+        } catch (\Exception $e) {
+            error_log("Error enviando correo masivo de confirmación: " . $e->getMessage());
+        }
+        return false;
     }
 }
