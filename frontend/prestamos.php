@@ -406,8 +406,14 @@ foreach ($loans as $l) {
         });
     });
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function openModal(id) { 
+        document.getElementById(id).classList.add('active'); 
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('active'); 
+        document.body.style.overflow = '';
+    }
 
     // Rellenar Modal de Ver
     function openViewModal(data) {

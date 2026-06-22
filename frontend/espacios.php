@@ -519,16 +519,20 @@ $tab = $_GET['tab'] ?? 'espacios';
 
     function openNewSpaceModal() {
         document.getElementById('modal-nuevo-espacio').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
     function closeNewSpaceModal() {
         document.getElementById('modal-nuevo-espacio').style.display = 'none';
+        document.body.style.overflow = '';
     }
 
     function openResModal() {
         document.getElementById('modal-reserva').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
     function closeResModal() {
         document.getElementById('modal-reserva').style.display = 'none';
+        document.body.style.overflow = '';
     }
 
     function toggleDivisionSelect(context) {
@@ -555,9 +559,11 @@ $tab = $_GET['tab'] ?? 'espacios';
         document.getElementById('edit_division_restringida').value = sp.division_restringida || '';
         toggleDivisionSelect('edit');
         document.getElementById('modal-edit-espacio').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
     function closeEditSpace() {
         document.getElementById('modal-edit-espacio').style.display = 'none';
+        document.body.style.overflow = '';
     }
 
     function filterInventory() {

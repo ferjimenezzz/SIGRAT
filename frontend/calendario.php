@@ -71,6 +71,7 @@ include 'header.php';
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .search-input-wrapper {
@@ -569,6 +570,26 @@ include 'header.php';
         display: flex;
         flex-direction: column;
         gap: 10px;
+        max-height: 220px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    .available-spaces-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .available-spaces-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .available-spaces-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .available-spaces-list::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
     }
 
     .space-status-item {
@@ -1320,6 +1341,13 @@ include 'header.php';
                 <i class="bi bi-search"></i>
                 <input type="text" id="searchInput" placeholder="Buscar espacio, sala...">
             </div>
+            <div class="btn-action-outline" style="cursor: default; display: flex; align-items: center; gap: 10px; user-select: none;">
+                <span style="font-weight: 700; color: var(--text-primary);">Mis reservas</span>
+                <label class="toggle-switch" style="margin-bottom: 0;">
+                    <input type="checkbox" id="quickFilterSoloMisReservas">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
             <button class="btn-action-outline" id="btnToggleFilters">
                 <i class="bi bi-funnel"></i> Filtros avanz.
             </button>
@@ -1431,13 +1459,6 @@ include 'header.php';
             </select>
         </div>
 
-        <div class="quick-filter-group">
-            <span>Mis reservas:</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="quickFilterSoloMisReservas">
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
     </div>
 
     <!-- BARRA DE FILTROS ACTIVOS -->
@@ -1470,26 +1491,6 @@ include 'header.php';
 
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
-            <!-- Próximas Reservaciones -->
-            <div class="sidebar-section-card">
-                <div class="sidebar-section-title">
-                    <span>Próximas reservaciones</span>
-                </div>
-                <div class="upcoming-res-list" id="upcomingReservationsList">
-                    <!-- Dinámico -->
-                </div>
-            </div>
-
-            <!-- Espacios Disponibles -->
-            <div class="sidebar-section-card">
-                <div class="sidebar-section-title">
-                    <span>Espacios disponibles</span>
-                </div>
-                <div class="available-spaces-list" id="availableSpacesList">
-                    <!-- Dinámico -->
-                </div>
-            </div>
-
             <!-- Resumen del Día -->
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
@@ -1508,6 +1509,26 @@ include 'header.php';
                         <div class="resumen-card-num" id="statPendientes">0</div>
                         <div class="resumen-card-label">Por aprobar</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Próximas Reservaciones -->
+            <div class="sidebar-section-card">
+                <div class="sidebar-section-title">
+                    <span>Próximas reservaciones</span>
+                </div>
+                <div class="upcoming-res-list" id="upcomingReservationsList">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <!-- Espacios Disponibles -->
+            <div class="sidebar-section-card">
+                <div class="sidebar-section-title">
+                    <span>Espacios disponibles</span>
+                </div>
+                <div class="available-spaces-list" id="availableSpacesList">
+                    <!-- Dinámico -->
                 </div>
             </div>
         </div>
@@ -2245,14 +2266,14 @@ include 'header.php';
             document.body.style.overflow = 'hidden';
         }
 
-        function closeResModal() {
+        window.closeResModal = function() {
             reservationModal.style.display = 'none';
             document.body.style.overflow = '';
         }
 
         if(btnNewReservation) btnNewReservation.addEventListener('click', () => openResModal());
-        if(btnExitResModal) btnExitResModal.addEventListener('click', closeResModal);
-        if(btnCancelReserva) btnCancelReserva.addEventListener('click', closeResModal);
+        if(btnExitResModal) btnExitResModal.addEventListener('click', window.closeResModal);
+        if(btnCancelReserva) btnCancelReserva.addEventListener('click', window.closeResModal);
 
         // Al cambiar edificio en la reserva
         if(resEdificio) {
@@ -2456,7 +2477,7 @@ include 'header.php';
     // ----------------------------------------------------
     // OBTENER RESERVACIONES DESDE LA API
     // ----------------------------------------------------
-    function fetchEvents() {
+    window.fetchEvents = function() {
         let url = '../backend/api/index.php/calendar/events';
         
         fetch(url, { credentials: 'same-origin' })
@@ -3117,8 +3138,6 @@ include 'header.php';
             });
         }
     }
-
-    // ----------------------------------------------------
     // ENVIAR SOLICITUD DE RESERVACIÓN (DÍA ÚNICO O RECURRENTE)
     // ----------------------------------------------------
     function submitReservation() {
@@ -3191,10 +3210,15 @@ include 'header.php';
             let curr = new Date(startDate);
             while (curr <= endDate) {
                 if (checkedWeekdays.includes(curr.getDay())) {
-                    fechas.push(curr.toISOString().split('T')[0]);
+                    const y = curr.getFullYear();
+                    const m = String(curr.getMonth() + 1).padStart(2, '0');
+                    const d = String(curr.getDate()).padStart(2, '0');
+                    fechas.push(`${y}-${m}-${d}`);
                 }
                 curr.setDate(curr.getDate() + 1);
             }
+            
+            console.log("Multi-day array generated:", fechas);
 
             if (fechas.length === 0) {
                 alert("No hay días hábiles que coincidan en el rango seleccionado.");
@@ -3221,17 +3245,17 @@ include 'header.php';
         .then(data => {
             if (data.success || data.id || data.ids) {
                 alert("¡Reservación programada con éxito!");
-                closeResModal();
+                window.closeResModal();
                 
                 // Recargar eventos y actualizar vista
-                fetchEvents();
+                window.fetchEvents();
             } else {
                 alert(`Error al agendar reserva: ${data.error || 'Conflicto de horario o espacio no disponible.'}`);
             }
         })
         .catch(err => {
             console.error("Error submitting reservation:", err);
-            alert("Ocurrió un error al procesar la reservación. Intente de nuevo.");
+            alert("Ocurrió un error al procesar la reservación: " + err.message);
         })
         .finally(() => {
             btnConfirm.disabled = false;

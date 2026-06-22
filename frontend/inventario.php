@@ -164,7 +164,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active">INVENTARIO</button>
         <button onclick="switchAssetTab('mantenimiento')" id="tab-mantenimiento" class="btn-tab">MANTENIMIENTO</button>
     </div>
-    <button class="btn-primary" onclick="document.getElementById('newAssetModal').style.display='flex'">
+    <button class="btn-primary" type="button" onclick="document.getElementById('newAssetModal').style.display='flex'; document.body.style.overflow='hidden';">
         <i class="bi bi-plus-lg"></i>
         Nuevo activo
     </button>
@@ -1415,6 +1415,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     if (urlParams.get('filtro') === 'alerta') activeTab = 'inventario'; // Opcional: forzar pestaña
     switchAssetTab(activeTab);
 
+
+
     // Funciones del Modal de Edición
     function openEditModal(asset) {
         document.getElementById('edit_act_id').value = asset.act_id;
@@ -1427,10 +1429,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.getElementById('edit_esp_asignado').value = asset.esp_asignado || '';
         
         document.getElementById('editModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     function closeEditModal() {
         document.getElementById('editModal').style.display = 'none';
+        document.body.style.overflow = '';
     }
     
     // Search inventory & Filters Logic
@@ -1770,7 +1774,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     <div class="custom-modal-content">
         <div class="modal-header">
             <h3>Nuevo activo</h3>
-            <button onclick="document.getElementById('newAssetModal').style.display='none'">✕</button>
+            <button type="button" onclick="document.getElementById('newAssetModal').style.display='none'; document.body.style.overflow='';">✕</button>
         </div>
 
         <form method="POST">
@@ -1869,7 +1873,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             </div>
 
             <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('newAssetModal').style.display='none'">Cancelar</button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('newAssetModal').style.display='none'; document.body.style.overflow='';">Cancelar</button>
                 <button type="submit" class="btn-primary">
                     <i class="bi bi-box-seam"></i> Registrar activo
                 </button>
