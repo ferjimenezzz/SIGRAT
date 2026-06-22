@@ -205,7 +205,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </select>
             </div>
             <div class="filters-right">
-                <button class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()">
+                <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()">
                     <i class="bi bi-funnel"></i>
                     Filtros
                 </button>
@@ -287,7 +287,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                             </span>
                         </td>
                         <td style="white-space: nowrap;">
-                            <button class="btn-primary" onclick='openEditModal(<?php echo json_encode($asset); ?>)' style="padding: 6px 12px; font-size: 12.5px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-right: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                            <button class="btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($asset), ENT_QUOTES, 'UTF-8'); ?>)" style="padding: 6px 12px; font-size: 12.5px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-right: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
                                 <i class="bi bi-pencil-square"></i> Editar
                             </button>
                             <a href="?delete_id=<?php echo $asset['act_id']; ?>" onclick="return confirm('¿Eliminar activo?')" style="padding: 6px 12px; font-size: 12.5px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
@@ -1507,23 +1507,44 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         }
     });
 
+    let _filtersPanelOpen = false;
     function toggleFiltersPanel() {
         const stats = document.getElementById("statsSidebar");
         const filters = document.getElementById("filtersSidebar");
         const btn = document.getElementById("filtersBtn");
         
-        if (filters.style.display === 'none' || filters.style.display === '') {
+        console.log("ToggleFiltersPanel ejecutado. Estado actual:", _filtersPanelOpen);
+        
+        if (!filters || !stats) {
+            console.error("Paneles de filtros o stats no encontrados en el DOM.");
+            return;
+        }
+
+        _filtersPanelOpen = !_filtersPanelOpen;
+        
+        if (_filtersPanelOpen) {
             // Mostrar filtros, ocultar stats
             stats.style.display = 'none';
             filters.style.display = 'flex';
-            btn.classList.add('filters-active');
+            if (btn) btn.classList.add('filters-active');
         } else {
             // Ocultar filtros, mostrar stats
             filters.style.display = 'none';
             stats.style.display = 'flex';
-            btn.classList.remove('filters-active');
+            if (btn) btn.classList.remove('filters-active');
         }
     }
+    
+    // Asegurar el enlace del evento por si falla el atributo onclick
+    document.addEventListener("DOMContentLoaded", () => {
+        const fBtn = document.getElementById("filtersBtn");
+        if(fBtn) {
+            fBtn.onclick = function(e) {
+                e.preventDefault();
+                toggleFiltersPanel();
+            };
+        }
+    });
 
     function clearDrawerFilters() {
         document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = false);
@@ -1611,7 +1632,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.body.appendChild(printFrame);
         const doc = printFrame.contentWindow.document;
         doc.open();
-        doc.write(\`
+        doc.write(`
             <!DOCTYPE html>
             <html lang="es">
             <head>
@@ -1731,7 +1752,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </div>
             </body>
             </html>
-        \`);
+        `);
         doc.close();
         // Pequeño delay para que el iframe cargue el contenido antes de imprimir
         setTimeout(() => {
