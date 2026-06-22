@@ -88,8 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         header("Location: usuarios.php?tab=roles&success=1");
         exit();
     } elseif ($_POST['action'] === 'generate_code') {
-        $inviteController->create($_POST['nombre_visita'], $_POST['correo_visita'], $_SESSION['us_id']);
-        header("Location: usuarios.php?tab=invitaciones&success=1");
+        header('Content-Type: application/json');
+        try {
+            $res = $inviteController->generate($_POST['nombre_visita'], $_POST['correo_visita'], $_SESSION['us_id']);
+            echo json_encode($res);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
         exit();
     }
 }
@@ -98,13 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 if (isset($_GET['delete_user'])) {
     $stmt = $db->prepare("UPDATE usuario SET estatus = 'Inactivo' WHERE us_id = ?");
     $stmt->execute([$_GET['delete_user']]);
-    header("Location: usuarios.php?tab=usuarios");
+    header("Location: usuarios.php?tab=usuarios&deleted=1");
     exit();
 }
 if (isset($_GET['delete_rol'])) {
     $stmt = $db->prepare("DELETE FROM ROLES WHERE rol_id = ?");
     $stmt->execute([$_GET['delete_rol']]);
-    header("Location: usuarios.php?tab=roles");
+    header("Location: usuarios.php?tab=roles&deleted=1");
     exit();
 }
 
@@ -114,7 +119,8 @@ $stats = $db->query("
         COUNT(*) as total_usuarios,
         SUM(CASE WHEN estatus = 'Activo' THEN 1 ELSE 0 END) as activos,
         SUM(CASE WHEN estatus = 'Inactivo' THEN 1 ELSE 0 END) as inactivos,
-        SUM(CASE WHEN r.nombre = 'Administrador' OR r.nombre = 'Super Administrador' THEN 1 ELSE 0 END) as administradores
+        SUM(CASE WHEN r.nombre = 'Administrador' OR r.nombre = 'Super Administrador' THEN 1 ELSE 0 END) as administradores,
+        SUM(CASE WHEN EXTRACT(MONTH FROM u.fecha_creacion) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM u.fecha_creacion) = EXTRACT(YEAR FROM CURRENT_DATE) THEN 1 ELSE 0 END) as nuevos_mes
     FROM usuario u
     LEFT JOIN roles r ON u.rol_id = r.rol_id
 ")->fetch();
@@ -123,6 +129,7 @@ $total_usuarios = $stats['total_usuarios'] ?? 0;
 $activos = $stats['activos'] ?? 0;
 $inactivos = $stats['inactivos'] ?? 0;
 $admins = $stats['administradores'] ?? 0;
+$nuevos_mes = $stats['nuevos_mes'] ?? 0;
 $activos_percent = $total_usuarios > 0 ? round(($activos / $total_usuarios) * 100, 1) : 0;
 $admins_percent = $total_usuarios > 0 ? round(($admins / $total_usuarios) * 100, 1) : 0;
 
@@ -196,20 +203,20 @@ $tab = $_GET['tab'] ?? 'usuarios';
             
             <div style="display: flex; gap: 12px; margin-left: 20px;">
                 <select id="roleFilter" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; outline: none; cursor: pointer;">
-                    <option value="">🟢 Todos los roles</option>
+                    <option value="">Todos los roles</option>
                     <?php foreach ($roles as $r): ?>
                         <option value="<?php echo htmlspecialchars($r['nombre']); ?>"><?php echo htmlspecialchars($r['nombre']); ?></option>
                     <?php endforeach; ?>
                 </select>
                 <select id="statusFilter" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; outline: none; cursor: pointer;">
-                    <option value="">🟢 Estado</option>
+                    <option value="">Estado</option>
                     <option value="Activo">Activo</option>
                     <option value="Inactivo">Inactivo</option>
                 </select>
             </div>
             
-            <button style="display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; cursor: pointer;">
-                <i data-lucide="filter" style="width: 14px;"></i> Filtros
+            <button id="btnClearFilters" style="display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; cursor: pointer;">
+                <i data-lucide="filter" style="width: 14px;"></i> Limpiar Filtros
             </button>
         </div>
         
@@ -225,7 +232,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
         <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Total usuarios</h4>
             <div style="font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px;"><?php echo $total_usuarios; ?></div>
-            <div style="display: inline-block; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">+12 este mes</div>
+            <div style="display: inline-block; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">+<?php echo $nuevos_mes; ?> este mes</div>
         </div>
         <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Activos Ahora</h4>
@@ -320,9 +327,9 @@ $tab = $_GET['tab'] ?? 'usuarios';
                         <button onclick='editUser(<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES, "UTF-8"); ?>)' style="background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #475569; cursor: pointer; transition: all 0.2s; margin-right: 8px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
                             <i data-lucide="edit-2" style="width: 16px; height: 16px;"></i>
                         </button>
-                        <a href="?delete_user=<?php echo $u['us_id']; ?>" onclick="return confirm('¿Baja de este usuario?')" style="display: inline-block; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">
+                        <button onclick="confirmDelete(event, '?delete_user=<?php echo $u['us_id']; ?>', '¿Dar de baja a este usuario?')" style="display: inline-block; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">
                             <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -338,7 +345,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
             <div style="padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;">
                 <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 8px;">
                     <button onclick='editRole(<?php echo json_encode($rol); ?>)' style="background: #f1f5f9; border: none; border-radius: 6px; padding: 6px; color: #475569; cursor: pointer;"><i data-lucide="edit-2" style="width: 14px; height: 14px;"></i></button>
-                    <a href="?delete_rol=<?php echo $rol['rol_id']; ?>" onclick="return confirm('¿Eliminar este rol?')" style="background: #fef2f2; border: none; border-radius: 6px; padding: 6px; color: #ef4444; cursor: pointer; display: inline-block;"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></a>
+                    <button onclick="confirmDelete(event, '?delete_rol=<?php echo $rol['rol_id']; ?>', '¿Eliminar este rol definitivamente?')" style="background: #fef2f2; border: none; border-radius: 6px; padding: 6px; color: #ef4444; cursor: pointer; display: inline-block;"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
                 </div>
                 
                 <h4 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 6px 0;"><?php echo htmlspecialchars($rol['nombre']); ?></h4>
@@ -388,16 +395,15 @@ $tab = $_GET['tab'] ?? 'usuarios';
         
         <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 24px; align-self: start;">
             <h3 style="font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 24px;">Generar Invitación</h3>
-            <form method="POST">
-                <input type="hidden" name="action" value="generate_code">
+            <form id="form-invitacion">
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre completo</label>
-                        <input type="text" name="nombre_visita" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre/Empresa del Invitado</label>
+                        <input type="text" name="nombre_visita" id="nombre_visita" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Correo electrónico</label>
-                        <input type="email" name="correo_visita" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Correo del Invitado</label>
+                        <input type="email" name="correo_visita" id="correo_visita" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
                     </div>
                     <button type="submit" style="background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 8px;">Generar Código</button>
                 </div>
@@ -845,6 +851,104 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('modal-rol').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
+
+    // Botón Limpiar Filtros
+    document.getElementById('btnClearFilters').addEventListener('click', () => {
+        searchInput.value = '';
+        roleFilter.value = '';
+        statusFilter.value = '';
+        filterTable();
+    });
+
+    // Formulario Generar Invitación (AJAX con SweetAlert)
+    const formInvitacion = document.getElementById('form-invitacion');
+    if (formInvitacion) {
+        formInvitacion.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(formInvitacion);
+            formData.append('action', 'generate_code');
+            
+            try {
+                const res = await fetch('', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Invitación Generada!',
+                        html: `El código de acceso es:<br><br><b style="font-size:24px; letter-spacing:4px; color:#2563eb;">${data.codigo}</b><br><br>Por favor, compártelo con el invitado.`,
+                        confirmButtonColor: '#2563eb',
+                        confirmButtonText: 'Entendido'
+                    }).then(() => {
+                        window.location.href = 'usuarios.php?tab=invitaciones';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo generar la invitación: ' + (data.error || 'Error desconocido'),
+                        confirmButtonColor: '#2563eb'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: 'Ocurrió un error al procesar la solicitud.',
+                    confirmButtonColor: '#2563eb'
+                });
+            }
+        });
+    }
+
+    // Notificaciones de URL
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Operación Exitosa!',
+                text: 'Los cambios se han guardado correctamente.',
+                timer: 2500,
+                showConfirmButton: false
+            });
+            // Limpiar URL
+            window.history.replaceState({}, document.title, window.location.pathname + '?tab=' + (urlParams.get('tab') || 'usuarios'));
+        }
+        if (urlParams.has('deleted')) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Registro Eliminado',
+                text: 'El registro ha sido dado de baja o eliminado exitosamente.',
+                timer: 2500,
+                showConfirmButton: false
+            });
+            window.history.replaceState({}, document.title, window.location.pathname + '?tab=' + (urlParams.get('tab') || 'usuarios'));
+        }
+    });
+
+    // Función global para confirmaciones con SweetAlert2
+    function confirmDelete(e, url, message) {
+        e.preventDefault();
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
 </script>
 
 <?php include 'footer.php'; ?>

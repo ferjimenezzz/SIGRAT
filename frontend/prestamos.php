@@ -16,32 +16,39 @@ if (isset($_SESSION['rol']) && strpos(strtoupper(trim($_SESSION['rol'])), 'ADMIN
 }
 $us_id_sesion = $_SESSION['us_id'] ?? null;
 
+$currentUser = null;
+if (!$isAdmin) {
+    $db = \Config\Database::getConnection();
+    $stmtUser = $db->prepare("SELECT nombre, apellido, correo, carrera FROM USUARIO WHERE us_id = ?");
+    $stmtUser->execute([$us_id_sesion]);
+    $currentUser = $stmtUser->fetch();
+}
+
 // Manejar POST (Nuevo, Editar, Eliminar)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if (!$isAdmin) {
-        echo "<script>alert('Acción no permitida.'); window.location.href='prestamos.php';</script>";
-        exit;
-    }
     if ($_POST['action'] === 'new_loan_dynamic') {
         $fecha_ent = empty($_POST['fecha_ent']) ? null : $_POST['fecha_ent'];
+        $estatus = isset($_POST['estatus']) ? $_POST['estatus'] : 'Activo';
         $res = $loanController->createDynamicLoan(
-            $_POST['equipo'], $_POST['categoria'], $_POST['serie'], 
+            $_POST['equipo'], '', $_POST['serie'] ?? '', 
             $_POST['nombre'], $_POST['correo'], $_POST['area'], 
-            $_POST['fecha_pres'], $fecha_ent, $_POST['estatus'], $_POST['observaciones']
+            $_POST['fecha_pres'], $fecha_ent, $estatus, $_POST['observaciones']
         );
-        if ($res['success']) echo "<script>alert('Préstamo registrado correctamente.'); window.location.href='prestamos.php';</script>";
-        else echo "<script>alert('Error al registrar: " . addslashes($res['error']) . "');</script>";
+        if ($res['success']) { header("Location: prestamos.php?success=created"); exit(); }
+        else { header("Location: prestamos.php?error=" . urlencode($res['error'])); exit(); }
     } 
     elseif ($_POST['action'] === 'edit_loan') {
+        if (!$isAdmin) { header("Location: prestamos.php?error=unauthorized"); exit(); }
         $fecha_ent = empty($_POST['fecha_ent']) ? null : $_POST['fecha_ent'];
         $res = $loanController->updateLoan($_POST['pres_id'], $_POST['estatus'], $_POST['fecha_pres'], $fecha_ent);
-        if ($res['success']) echo "<script>alert('Préstamo actualizado.'); window.location.href='prestamos.php';</script>";
-        else echo "<script>alert('Error al actualizar: " . addslashes($res['error']) . "');</script>";
+        if ($res['success']) { header("Location: prestamos.php?success=edited"); exit(); }
+        else { header("Location: prestamos.php?error=" . urlencode($res['error'])); exit(); }
     }
     elseif ($_POST['action'] === 'delete_loan') {
+        if (!$isAdmin) { header("Location: prestamos.php?error=unauthorized"); exit(); }
         $res = $loanController->deleteLoan($_POST['pres_id']);
-        if ($res['success']) echo "<script>alert('Préstamo eliminado exitosamente.'); window.location.href='prestamos.php';</script>";
-        else echo "<script>alert('Error al eliminar: " . addslashes($res['error']) . "');</script>";
+        if ($res['success']) { header("Location: prestamos.php?success=deleted"); exit(); }
+        else { header("Location: prestamos.php?error=" . urlencode($res['error'])); exit(); }
     }
 }
 
@@ -74,6 +81,13 @@ foreach ($loans as $l) {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- jsPDF y AutoTable para PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     /* ... Estilos anteriores simplificados por espacio ... */
@@ -139,11 +153,9 @@ foreach ($loans as $l) {
             <i class="bi bi-search" style="color: var(--text-muted);"></i>
             <input type="text" id="searchInput" placeholder="Buscar equipo o serie..." onkeyup="filterTable()" style="border: none; outline: none; font-size: 13px;">
         </div>
-        <?php if ($isAdmin): ?>
         <button class="btn-primary" onclick="openModal('newLoanModal')">
             <i class="bi bi-plus-lg"></i> Nuevo préstamo
         </button>
-        <?php endif; ?>
     </div>
 </div>
 
@@ -156,8 +168,7 @@ foreach ($loans as $l) {
         <button class="filter-btn" onclick="setFilter('Finalizado', this)"><i class="bi bi-check-circle"></i> Devueltos (<?php echo $countDevueltos; ?>)</button>
     </div>
     <div style="display: flex; gap: 8px; align-items: center;">
-        <span style="font-size: 13px; color: var(--text-muted); font-weight: 500; margin-right: 12px;" id="countText">Mostrando todos</span>
-        <button class="btn-secondary" onclick="exportToCSV()"><i class="bi bi-download"></i> Exportar</button>
+        <button class="btn-secondary" onclick="exportToPDF()"><i class="bi bi-download"></i> Exportar a PDF</button>
     </div>
 </div>
 
@@ -218,11 +229,11 @@ foreach ($loans as $l) {
                             <button class="btn-icon" title="Ver detalles" onclick="openViewModal(<?php echo $loanData; ?>)"><i class="bi bi-eye"></i></button>
                             <?php if ($isAdmin): ?>
                             <button class="btn-icon" title="Editar préstamo" onclick="openEditModal(<?php echo $loanData; ?>)"><i class="bi bi-pencil-square"></i></button>
-                            <form method="POST" style="display:inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este préstamo? El equipo quedará libre.');">
+                            <form id="delete-form-<?php echo $loan['pres_id']; ?>" method="POST" style="display:none;">
                                 <input type="hidden" name="action" value="delete_loan">
                                 <input type="hidden" name="pres_id" value="<?php echo $loan['pres_id']; ?>">
-                                <button type="submit" class="btn-icon delete" title="Eliminar préstamo"><i class="bi bi-trash"></i></button>
                             </form>
+                            <button type="button" class="btn-icon delete" title="Eliminar préstamo" onclick="confirmDeleteLoan(<?php echo $loan['pres_id']; ?>)"><i class="bi bi-trash"></i></button>
                             <?php endif; ?>
                         </div>
                     </td>
@@ -245,7 +256,7 @@ foreach ($loans as $l) {
                 <!-- Información del préstamo -->
                 <div class="form-section">
                     <div class="form-section-title"><i class="bi bi-file-earmark-text-fill" style="color: #2563eb;"></i> Información del préstamo</div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="form-grid" style="grid-template-columns: <?php echo $isAdmin ? '1fr 1fr' : '1fr'; ?>;">
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Equipo</label>
                             <select name="equipo" class="form-control searchable-select" style="width: 100%;" required>
@@ -257,19 +268,12 @@ foreach ($loans as $l) {
                                 <option value="Mobiliario">Mobiliario</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Categoría</label>
-                            <select name="categoria" class="form-control" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" required>
-                                <option value="">Selecciona categoría</option>
-                                <option value="Computo">Cómputo</option>
-                                <option value="Redes">Redes</option>
-                                <option value="Accesorios">Accesorios</option>
-                            </select>
-                        </div>
+                        <?php if ($isAdmin): ?>
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Serie / Inventario</label>
                             <input type="text" name="serie" class="form-control" placeholder="Ingresa la serie (opcional)" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;">
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -279,45 +283,46 @@ foreach ($loans as $l) {
                     <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Nombre del solicitante</label>
-                            <input type="text" name="nombre" class="form-control" placeholder="Ingresa el nombre completo" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" required>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ingresa el nombre completo" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" 
+                            value="<?php echo !$isAdmin && $currentUser ? htmlspecialchars($currentUser['nombre'] . ' ' . $currentUser['apellido']) : ''; ?>" 
+                            <?php echo !$isAdmin ? 'readonly' : ''; ?> required>
                         </div>
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Correo institucional</label>
-                            <input type="email" name="correo" class="form-control" placeholder="ejemplo@sistema.com.mx" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" required>
+                            <input type="email" name="correo" class="form-control" placeholder="ejemplo@sistema.com.mx" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" 
+                            value="<?php echo !$isAdmin && $currentUser ? htmlspecialchars($currentUser['correo']) : ''; ?>" 
+                            <?php echo !$isAdmin ? 'readonly' : ''; ?> required>
                         </div>
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Área / Departamento</label>
-                            <select name="area" class="form-control" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" required>
-                                <option value="">Selecciona el área</option>
-                                <option value="Sistemas">Sistemas</option>
-                                <option value="Administración">Administración</option>
-                                <option value="Docencia">Docencia</option>
-                                <option value="Alumnado">Alumnado</option>
-                            </select>
+                            <?php if (!$isAdmin): ?>
+                                <input type="text" name="area" class="form-control" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" 
+                                value="<?php echo htmlspecialchars($currentUser['carrera'] ?? 'Sin área'); ?>" readonly required>
+                            <?php else: ?>
+                                <select name="area" class="form-control" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" required>
+                                    <option value="">Selecciona el área</option>
+                                    <option value="Sistemas">Sistemas</option>
+                                    <option value="Administración">Administración</option>
+                                    <option value="Docencia">Docencia</option>
+                                    <option value="Alumnado">Alumnado</option>
+                                </select>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
                 <!-- Fechas y estado -->
                 <div class="form-section">
-                    <div class="form-section-title"><i class="bi bi-calendar-event-fill" style="color: #6366f1;"></i> Fechas y estado</div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="form-section-title"><i class="bi bi-calendar-event-fill" style="color: #6366f1;"></i> Fechas</div>
+                    <input type="hidden" name="estatus" value="Activo">
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Fecha de inicio</label>
                             <input type="date" name="fecha_pres" class="form-control" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
                         <div class="form-group">
-                            <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Fecha de devolución</label>
+                            <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Fecha de devolución (Opcional)</label>
                             <input type="date" name="fecha_ent" class="form-control" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;">
-                        </div>
-                        <div class="form-group">
-                            <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Estado Inicial</label>
-                            <div style="position: relative; display: flex; align-items: center; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;">
-                                <div style="width:10px; height:10px; border-radius:50%; background:#22c55e; margin-right:8px;"></div>
-                                <select name="estatus" style="border:none; background:transparent; width:100%; outline:none; font-weight:600; color:#16a34a;">
-                                    <option value="Activo">Activo</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -462,22 +467,76 @@ foreach ($loans as $l) {
         document.getElementById('countText').innerText = `Mostrando ${visibleCount} préstamos`;
     }
 
-    function exportToCSV() {
-        let csvContent = "";
-        document.querySelectorAll("table tr").forEach(row => {
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.text("Reporte de Préstamos", 14, 15);
+        
+        let bodyData = [];
+        document.querySelectorAll("#loansTable tbody tr").forEach(row => {
             if (row.style.display !== 'none') {
-                let rowData = [];
-                const cols = row.querySelectorAll("td, th");
-                cols.forEach((col, index) => {
-                    if (index < cols.length - 1) rowData.push('"' + col.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim() + '"');
-                });
-                csvContent += rowData.join(",") + "\r\n";
+                const cols = row.querySelectorAll("td");
+                bodyData.push([
+                    cols[0].innerText.trim(),
+                    cols[1].innerText.trim(),
+                    cols[2].innerText.trim(),
+                    cols[3].innerText.trim(),
+                    cols[4].innerText.trim()
+                ]);
             }
         });
-        const blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
-        link.download = "reporte_prestamos.csv"; link.click();
+
+        doc.autoTable({
+            head: [['Equipo', 'Solicitante', 'Fecha Préstamo', 'Fecha Devolución', 'Estado']],
+            body: bodyData,
+            startY: 20,
+            styles: { fontSize: 9 }
+        });
+        
+        doc.save('reporte_prestamos.pdf');
     }
+
+    // Funciones SweetAlert2
+    function confirmDeleteLoan(id) {
+        Swal.fire({
+            title: '¿Eliminar préstamo?',
+            text: 'Esta acción devolverá el equipo y eliminará el registro permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+
+    // Alertas por URL
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            const action = urlParams.get('success');
+            let msg = 'Operación realizada correctamente.';
+            let title = '¡Éxito!';
+            let icon = 'success';
+            
+            if (action === 'created') msg = 'El préstamo se ha registrado correctamente.';
+            if (action === 'edited') msg = 'El préstamo ha sido actualizado con éxito.';
+            if (action === 'deleted') { title = 'Eliminado'; msg = 'El registro de préstamo fue dado de baja.'; icon = 'info'; }
+            
+            Swal.fire({ icon: icon, title: title, text: msg, timer: 3000, showConfirmButton: false });
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        if (urlParams.has('error')) {
+            let msg = urlParams.get('error') === 'unauthorized' ? 'Acción no permitida.' : 'Error: ' + urlParams.get('error');
+            Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
 </script>
 
 <?php include 'footer.php'; ?>

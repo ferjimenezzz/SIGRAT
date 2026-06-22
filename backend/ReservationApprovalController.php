@@ -31,9 +31,9 @@ class ReservationApprovalController
     }
 
     /**
-     * Get all pending reservations.
+     * Get all reservations for the approval module.
      *
-     * @return array List of pending reservations.
+     * @return array List of reservations.
      */
     public function getPending(): array
     {
@@ -44,8 +44,8 @@ class ReservationApprovalController
             FROM reserva r
             LEFT JOIN usuario u ON r.us_id = u.us_id
             LEFT JOIN espacio e ON r.esp_id = e.esp_id
-            WHERE r.status = 'pending'
-            ORDER BY r.fecha_uso ASC, r.hora_ent ASC
+            ORDER BY r.fecha_uso DESC, r.hora_ent DESC
+            LIMIT 100
         ");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

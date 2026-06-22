@@ -45,7 +45,7 @@ class ReservationController {
             if ($stmt->fetch()) throw new \Exception("Conflicto de horario.");
 
             // Revisar el tipo de acceso del espacio para determinar estatus inicial
-            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
             $stmtEspacio->execute([$data['esp_id']]);
             $espacio = $stmtEspacio->fetch();
             
@@ -85,7 +85,8 @@ class ReservationController {
                         $stmtCorreo->execute([$us_id]);
                         $correo = $stmtCorreo->fetchColumn();
                         if ($correo) {
-                            $this->emailService->sendReservationCreated($correo, $new_res_id, $estatus_inicial);
+                            $espacio_nombre = $espacio ? "{$espacio['edificio']} - {$espacio['nombre_numero']}" : "Espacio";
+                            $this->emailService->sendReservationCreated($correo, $new_res_id, $estatus_inicial, $espacio_nombre, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']);
                         }
                     }
                 } catch (\Exception $e) {
@@ -114,7 +115,13 @@ class ReservationController {
             // Notificar al usuario (Push / Correo)
             try {
                 $notifCtrl = new NotificationController();
-                $stmtUs = $this->db->prepare("SELECT r.us_id, u.correo FROM RESERVA r JOIN USUARIO u ON r.us_id = u.us_id WHERE r.re_id = ?");
+                $stmtUs = $this->db->prepare("
+                    SELECT r.us_id, u.correo, r.fecha_uso, r.hora_ent, r.hora_sal, e.edificio, e.nombre_numero 
+                    FROM RESERVA r 
+                    JOIN USUARIO u ON r.us_id = u.us_id 
+                    JOIN ESPACIO e ON r.esp_id = e.esp_id
+                    WHERE r.re_id = ?
+                ");
                 $stmtUs->execute([$id]);
                 $usuario = $stmtUs->fetch();
                 if ($usuario) {
@@ -123,7 +130,8 @@ class ReservationController {
                     $notifCtrl->createNotification($us_id, 'Reserva', "Tu reserva (ID: $id) ha sido aprobada.", 'espacios.php');
                     
                     if ($correo) {
-                        $this->emailService->sendReservationApproved($correo, $id);
+                        $esp_nombre = $usuario['edificio'] . ' - ' . $usuario['nombre_numero'];
+                        $this->emailService->sendReservationApproved($correo, $id, $esp_nombre, $usuario['fecha_uso'], $usuario['hora_ent'], $usuario['hora_sal']);
                     }
                 }
             } catch (\Exception $e) {
@@ -165,7 +173,7 @@ class ReservationController {
             
             // Determinar estatus inicial
             $estatus_inicial = 'Aprobada';
-            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
             $stmtEspacio->execute([$esp_id]);
             $espacio = $stmtEspacio->fetch();
             if ($espacio && $espacio['acceso_tipo'] === 'Restringido') {
@@ -177,7 +185,20 @@ class ReservationController {
             $correo = $stmtCorreo->fetchColumn();
             
             if ($correo) {
-                return $this->emailService->sendBulkReservationCreated($correo, $re_ids, $fechas, $estatus_inicial);
+                $espacio_nombre = $espacio ? "{$espacio['edificio']} - {$espacio['nombre_numero']}" : "Espacio";
+                // Get the first reservation to get times
+                $hora_ent = ''; $hora_sal = '';
+                if (!empty($re_ids)) {
+                    $stmtTime = $this->db->prepare("SELECT hora_ent, hora_sal FROM RESERVA WHERE re_id = ?");
+                    $stmtTime->execute([$re_ids[0]]);
+                    $timeData = $stmtTime->fetch();
+                    if ($timeData) {
+                        $hora_ent = $timeData['hora_ent'];
+                        $hora_sal = $timeData['hora_sal'];
+                    }
+                }
+                
+                return $this->emailService->sendBulkReservationCreated($correo, $re_ids, $fechas, $estatus_inicial, $espacio_nombre, $hora_ent, $hora_sal);
             }
         } catch (\Exception $e) {
             error_log("Error enviando correo masivo de confirmación: " . $e->getMessage());

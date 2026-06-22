@@ -16,6 +16,7 @@ $fecha_inicio = $_GET['fecha_inicio'] ?? null;
 $fecha_fin = $_GET['fecha_fin'] ?? null;
 $us_id = $_GET['us_id'] ?? null;
 $modulo = $_GET['modulo'] ?? null;
+$tipo_reporte = $_GET['tipo_reporte'] ?? 'auditoria'; // 'auditoria' o 'uso_espacios'
 
 // Capturar filtros extra
 $extra_filters = [
@@ -26,8 +27,14 @@ $extra_filters = [
     'incluir_transferencias' => $_GET['incluir_transferencias'] ?? null,
 ];
 
-$logs = $auditController->getFiltered($fecha_inicio, $fecha_fin, $us_id, $modulo, $extra_filters);
-$stats = $auditController->getAuditStats();
+if ($tipo_reporte === 'uso_espacios') {
+    $espacios_logs = $auditController->getSpaceUsageReport($fecha_inicio, $fecha_fin, $extra_filters['edificio'] ?? null);
+    $espacios_stats = $auditController->getSpaceUsageStats($fecha_inicio, $fecha_fin, $extra_filters['edificio'] ?? null);
+} else {
+    $logs = $auditController->getFiltered($fecha_inicio, $fecha_fin, $us_id, $modulo, $extra_filters);
+    $stats = $auditController->getAuditStats();
+}
+
 $usuarios = $db->query("SELECT us_id, nombre FROM USUARIO ORDER BY nombre")->fetchAll();
 
 include 'header.php';
@@ -54,9 +61,8 @@ include 'header.php';
         flex-direction: column;
         gap: 24px;
         color: var(--text-main);
-        max-width: 1200px;
-        margin: 0 auto;
-        padding-bottom: 40px;
+        width: 100%;
+        padding: 0 24px 40px 24px;
     }
 
     .header-section {
@@ -226,8 +232,9 @@ include 'header.php';
 
     .report-section {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: flex-end;
+        gap: 20px;
     }
 
     .report-include {
@@ -273,11 +280,15 @@ include 'header.php';
         display: flex;
         align-items: center;
         gap: 10px;
+        height: max-content;
     }
 
     .table-card {
         padding: 0;
         overflow-x: auto;
+        overflow-y: auto;
+        max-height: 450px;
+        position: relative;
     }
 
     .table-card table {
@@ -293,6 +304,10 @@ include 'header.php';
         color: var(--text-muted);
         background: var(--bg-main);
         border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 1px 0 var(--border);
     }
 
     .table-card td {
@@ -366,7 +381,14 @@ include 'header.php';
         
         <form method="GET" action="auditoria.php">
             <!-- Main Filters Row -->
-            <div class="filters-grid" style="grid-template-columns: 1fr 1fr auto;">
+            <div class="filters-grid" style="grid-template-columns: 1fr 1fr 1fr auto;">
+                <div class="filter-group">
+                    <label>Tipo de Reporte</label>
+                    <select name="tipo_reporte" id="tipoReporteSelect">
+                        <option value="auditoria" <?php echo $tipo_reporte === 'auditoria' ? 'selected' : ''; ?>>Auditoría del Sistema</option>
+                        <option value="uso_espacios" <?php echo $tipo_reporte === 'uso_espacios' ? 'selected' : ''; ?>>Asistencias y Uso de Espacios</option>
+                    </select>
+                </div>
                 <div class="filter-group">
                     <label>Edificio</label>
                     <select name="edificio">
@@ -448,6 +470,37 @@ include 'header.php';
     </div>
 
     <!-- KPIs -->
+    <?php if ($tipo_reporte === 'uso_espacios'): ?>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i data-lucide="check-square"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Total Reservas Confirmadas</h4>
+                <p><strong><?php echo number_format($espacios_stats['total_reservas']); ?></strong> reservas</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Total Asistencia</h4>
+                <p><strong><?php echo number_format($espacios_stats['total_asistencia']); ?></strong> alumnos/personas</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i data-lucide="award"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Espacio más utilizado</h4>
+                <p><strong><?php echo htmlspecialchars($espacios_stats['espacio_top']); ?></strong></p>
+            </div>
+        </div>
+    </div>
+    <?php else: ?>
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon blue">
@@ -486,12 +539,118 @@ include 'header.php';
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
-    <!-- Reporte Exportar y Tabla -->
-    
-    <div class="report-section">
-        <div class="report-include">
+    <!-- Main Content Layout (Table left, Info right) -->
+    <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+        
+        <!-- Tabla (Left Column) -->
+        <div class="card table-card" style="flex: 1; min-width: 0; padding: 0;">
+            <!-- Header for Table Card with Button -->
+            <div style="padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: white; border-radius: var(--radius) var(--radius) 0 0; position: sticky; top: 0; z-index: 20;">
+                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main);">Resultados del Reporte</h3>
+                <a href="../backend/reports/audit_pdf.php?<?php echo $_SERVER['QUERY_STRING']; ?>" target="_blank" class="btn-download" style="padding: 10px 16px; font-size: 13px; height: max-content;">
+                    <i data-lucide="download"></i> Descargar Reporte
+                </a>
+            </div>
+            
+            <div style="overflow-x: auto; overflow-y: auto; max-height: 450px;">
+                <table>
+                    <?php if ($tipo_reporte === 'uso_espacios'): ?>
+                    <thead>
+                        <tr>
+                            <th style="top: 0;">ESPACIO</th>
+                            <th style="top: 0;">EDIFICIO / TIPO</th>
+                            <th style="top: 0;">TOTAL RESERVAS</th>
+                            <th style="top: 0;">ASISTENCIA CALCULADA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($espacios_logs)): ?>
+                            <tr>
+                                <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600;">
+                                    No se encontraron registros de uso con los filtros seleccionados.
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($espacios_logs as $log): ?>
+                            <tr>
+                                <td style="font-weight: 700;">
+                                    <?php echo htmlspecialchars($log['nombre_numero']); ?>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: #f1f5f9; color: #475569;">
+                                        <?php echo htmlspecialchars($log['edificio']); ?>
+                                    </span>
+                                    <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">
+                                        <?php echo htmlspecialchars($log['tipo']); ?>
+                                    </span>
+                                </td>
+                                <td style="font-weight: 700; color: var(--primary);">
+                                    <?php echo number_format($log['total_reservas']); ?>
+                                </td>
+                                <td style="color: #0f172a; font-weight: 600;">
+                                    <?php echo number_format($log['total_asistencia']); ?> <span style="font-weight:400; color: var(--text-muted);">personas</span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                    <?php else: ?>
+                    <thead>
+                        <tr>
+                            <th style="top: 0;">FECHA Y HORA</th>
+                            <th style="top: 0;">USUARIO</th>
+                            <th style="top: 0;">MÓDULO</th>
+                            <th style="top: 0;">ACCIÓN REALIZADA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($logs)): ?>
+                            <tr>
+                                <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600;">
+                                    No se encontraron registros con los filtros seleccionados.
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($logs as $log): ?>
+                            <tr>
+                                <td style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
+                                    <?php echo date('d/m/Y H:i', strtotime($log['fecha_hora'])); ?>
+                                </td>
+                                <td style="font-weight: 700;">
+                                    <?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?>
+                                </td>
+                                <td>
+                                    <span class="badge">
+                                        <?php echo htmlspecialchars($log['modulo_afectado']); ?>
+                                    </span>
+                                </td>
+                                <td style="color: #475569;">
+                                    <?php echo htmlspecialchars($log['accion']); ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                    <?php endif; ?>
+                </table>
+            </div>
+        </div>
+
+        <!-- Info Sidebar (Right Column) -->
+        <div class="report-include" style="width: 320px; min-width: 320px; position: sticky; top: 24px;">
             <h3>Qué incluye este reporte?</h3>
+            <?php if ($tipo_reporte === 'uso_espacios'): ?>
+            <ul>
+                <li><i data-lucide="check-circle-2"></i> Asistencias totales calculadas por espacio</li>
+                <li><i data-lucide="check-circle-2"></i> Volumen de reservas confirmadas</li>
+                <li><i data-lucide="check-circle-2"></i> Clasificación de aulas más utilizadas</li>
+                <li style="margin-top: 12px; background: #eff6ff; padding: 10px; border-radius: 6px; color: #1e40af;">
+                    <i data-lucide="info" style="color:#1e40af;"></i> El reporte se generará en formato PDF y podrá descargarse o imprimirse.
+                </li>
+            </ul>
+            <?php else: ?>
             <ul>
                 <li><i data-lucide="check-circle-2"></i> Resumen de movimientos en el periodo seleccionado</li>
                 <li><i data-lucide="check-circle-2"></i> Detalles de operaciones por usuario</li>
@@ -500,55 +659,9 @@ include 'header.php';
                     <i data-lucide="info" style="color:#1e40af;"></i> El reporte se generará en formato PDF y podrá descargarse o imprimirse.
                 </li>
             </ul>
+            <?php endif; ?>
         </div>
-        
-        <div>
-            <a href="../backend/reports/audit_pdf.php?<?php echo $_SERVER['QUERY_STRING']; ?>" target="_blank" class="btn-download">
-                <i data-lucide="download"></i> Descargar Reporte
-            </a>
-        </div>
-    </div>
 
-    <!-- Tabla -->
-    <div class="card table-card">
-        <table>
-            <thead>
-                <tr>
-                    <th>FECHA Y HORA</th>
-                    <th>USUARIO</th>
-                    <th>MÓDULO</th>
-                    <th>ACCIÓN REALIZADA</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($logs)): ?>
-                    <tr>
-                        <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600;">
-                            No se encontraron registros con los filtros seleccionados.
-                        </td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($logs as $log): ?>
-                    <tr>
-                        <td style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
-                            <?php echo date('d/m/Y H:i', strtotime($log['fecha_hora'])); ?>
-                        </td>
-                        <td style="font-weight: 700;">
-                            <?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?>
-                        </td>
-                        <td>
-                            <span class="badge">
-                                <?php echo htmlspecialchars($log['modulo_afectado']); ?>
-                            </span>
-                        </td>
-                        <td style="color: #475569;">
-                            <?php echo htmlspecialchars($log['accion']); ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
     </div>
 
 </div>

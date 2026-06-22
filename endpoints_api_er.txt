@@ -1,140 +1,257 @@
 ================================================================================
-          DOCUMENTACIÓN DE ENDPOINTS - SISTEMA SIGRAT (BASADO EN ER)
+          DOCUMENTACIÓN DE ENDPOINTS - SISTEMA SIGRAT (SUPABASE / POSTGRESQL)
 ================================================================================
-Módulo: Arquitectura Base
-Descripción: Mapeo completo de las rutas de la API RESTful para el sistema
-SIGRAT, derivado directamente del modelo Entidad-Relación proporcionado.
+Módulo: Arquitectura Base RESTful
+Descripción: Mapeo completo de las rutas de la API para el sistema SIGRAT.
+Los payloads JSON y la estructura están diseñados estrictamente para coincidir 
+con la base de datos alojada en Supabase (PostgreSQL).
+
+-> URL BASE LOCAL: http://localhost/Estadias/backend/api
+   (Nota: Si tu alias en XAMPP es diferente, ej. /creaciones%20antigravity/Estadias, ajusta la base).
+-> HEADERS GLOBALES REQUERIDOS:
+   Content-Type: application/json
+   Authorization: Bearer <TU_TOKEN_JWT> (Para endpoints protegidos)
 ================================================================================
 
-1. MÓDULO DE USUARIOS Y ROLES
 --------------------------------------------------------------------------------
--- Roles (roles)
-GET    /api/roles                 -> Obtener lista de todos los roles
-GET    /api/roles/{id}            -> Obtener detalles de un rol específico
-POST   /api/roles                 -> Crear un nuevo rol
-PUT    /api/roles/{id}            -> Actualizar un rol
-DELETE /api/roles/{id}            -> Eliminar un rol
+1. MÓDULO DE USUARIOS Y ROLES (Supabase Tables: roles, usuario)
+--------------------------------------------------------------------------------
 
--- Usuarios (usuario)
-GET    /api/usuarios              -> Obtener todos los usuarios
-GET    /api/usuarios/{id}         -> Obtener detalles de un usuario
-POST   /api/usuarios              -> Registrar un nuevo usuario
-PUT    /api/usuarios/{id}         -> Actualizar datos de usuario
-DELETE /api/usuarios/{id}         -> Eliminar o dar de baja un usuario (soft delete recomendado)
-GET    /api/usuarios/{id}/reservas-> Obtener historial de reservas del usuario
+[1.1] ROLES (roles)
+
+GET    /roles
+URL: http://localhost/Estadias/backend/api/roles
+Descripción: Obtener lista de todos los roles.
+
+POST   /roles
+URL: http://localhost/Estadias/backend/api/roles
+JSON Body:
+{
+  "nombre": "Soporte Técnico",
+  "descripcion": "Gestión de mantenimiento de equipos",
+  "permisos": "{\"mantenimiento\":\"all\", \"activos\":\"read\"}"
+}
+
+PUT    /roles/{id}
+URL: http://localhost/Estadias/backend/api/roles/1
+JSON Body:
+{
+  "nombre": "Administrador General",
+  "descripcion": "Control total del sistema (Actualizado)"
+}
+
+DELETE /roles/{id}
+URL: http://localhost/Estadias/backend/api/roles/3
 
 
+[1.2] USUARIOS (usuario)
+
+GET    /usuarios
+URL: http://localhost/Estadias/backend/api/usuarios
+
+POST   /usuarios
+URL: http://localhost/Estadias/backend/api/usuarios
+JSON Body (Nota: Mapea al UsuarioController con PostgreSQL):
+{
+  "nombre": "Juan Perez",
+  "correo": "juan.perez@sigrat.edu",
+  "contrasena": "Password123!",
+  "rol_id": 2,
+  "tag_id": "E200001"
+}
+
+PUT    /usuarios/{id}
+URL: http://localhost/Estadias/backend/api/usuarios/1
+JSON Body:
+{
+  "nombre": "Juan Perez Editado",
+  "estatus": "Inactivo",
+  "rol_id": 2
+}
+
+DELETE /usuarios/{id}
+URL: http://localhost/Estadias/backend/api/usuarios/1
+Descripción: Baja lógica del usuario (soft delete, actualiza estatus='Inactivo').
+
+
+--------------------------------------------------------------------------------
 2. MÓDULO DE INFRAESTRUCTURA Y ESPACIOS
 --------------------------------------------------------------------------------
--- Espacios (espacio)
-GET    /api/espacios              -> Listar todos los espacios (aulas, labs, etc.)
-GET    /api/espacios/{id}         -> Detalles de un espacio específico
-POST   /api/espacios              -> Registrar nuevo espacio
-PUT    /api/espacios/{id}         -> Modificar datos del espacio
-DELETE /api/espacios/{id}         -> Dar de baja un espacio (soft delete)
-GET    /api/espacios/{id}/activos -> Listar inventario/activos vinculados a este espacio
 
--- Antenas RFID (antena)
-GET    /api/antenas               -> Listar antenas instaladas
-GET    /api/antenas/{id}          -> Detalles de una antena
-POST   /api/antenas               -> Registrar nueva antena
-PUT    /api/antenas/{id}          -> Actualizar datos de antena
-DELETE /api/antenas/{id}          -> Eliminar antena
+[2.1] ESPACIOS (espacio)
 
--- Lectores RFID (lector)
-GET    /api/lectores              -> Listar lectores registrados
-GET    /api/lectores/{id}         -> Detalle de un lector
-POST   /api/lectores              -> Registrar lector
-PUT    /api/lectores/{id}         -> Actualizar lector
-DELETE /api/lectores/{id}         -> Eliminar lector
+GET    /spaces
+URL: http://localhost/Estadias/backend/api/spaces
+
+POST   /spaces
+URL: http://localhost/Estadias/backend/api/spaces
+JSON Body:
+{
+  "edificio": "CIC",
+  "nombre_numero": "Laboratorio Redes",
+  "tipo": "Laboratorio",
+  "capacidad": 30,
+  "estatus": "Disponible"
+}
+
+PUT    /spaces/{id}
+URL: http://localhost/Estadias/backend/api/spaces/1
+JSON Body:
+{
+  "capacidad": 35,
+  "estatus": "Mantenimiento"
+}
 
 
+--------------------------------------------------------------------------------
 3. MÓDULO DE INVENTARIO Y ACTIVOS
 --------------------------------------------------------------------------------
--- Activos (activo)
-GET    /api/activos               -> Listar todos los activos (equipos)
-GET    /api/activos/{id}          -> Detalles de un activo
-POST   /api/activos               -> Registrar nuevo activo
-PUT    /api/activos/{id}          -> Modificar activo
-DELETE /api/activos/{id}          -> Dar de baja activo
 
--- Mobiliario (mobiliario)
-GET    /api/mobiliario            -> Listar mobiliario
-GET    /api/mobiliario/{id}       -> Detalles de mobiliario
-POST   /api/mobiliario            -> Registrar mobiliario
-PUT    /api/mobiliario/{id}       -> Actualizar mobiliario
-DELETE /api/mobiliario/{id}       -> Dar de baja mobiliario
+[3.1] ACTIVOS TECNOLÓGICOS (activo)
 
--- Llaves (llave)
-GET    /api/llaves                -> Listar llaves de espacios
-GET    /api/llaves/{id}           -> Detalle de una llave
-POST   /api/llaves                -> Registrar nueva llave
-PUT    /api/llaves/{id}           -> Actualizar llave
-DELETE /api/llaves/{id}           -> Eliminar llave
+GET    /assets
+URL: http://localhost/Estadias/backend/api/assets
 
--- Mantenimiento (mantenimiento)
-GET    /api/mantenimientos        -> Listar registros de mantenimiento
-GET    /api/mantenimientos/{id}   -> Detalle de un mantenimiento
-POST   /api/mantenimientos        -> Registrar mantenimiento a un activo
-PUT    /api/mantenimientos/{id}   -> Actualizar estatus de mantenimiento
-DELETE /api/mantenimientos/{id}   -> Eliminar registro de mantenimiento
+POST   /assets/bulk
+URL: http://localhost/Estadias/backend/api/assets/bulk
+Descripción: Endpoint optimizado para registro masivo.
+JSON Body:
+{
+  "common_category": "Laptops",
+  "assets": [
+    {
+      "tipo": "Laptop",
+      "marca": "Lenovo",
+      "modelo": "ThinkPad T14",
+      "num_serie": "PF2XYZ789",
+      "num_inv": "INV-LNV-001",
+      "tag_id": "A100001",
+      "esp_asignado": 1
+    }
+  ]
+}
+
+[3.2] MANTENIMIENTO 
+
+POST   /maintenance
+URL: http://localhost/Estadias/backend/api/maintenance
+JSON Body:
+{
+  "act_id": 1,
+  "descripcion": "Cambio de disco duro por falla",
+  "responsable": "Técnico Soporte"
+}
 
 
+--------------------------------------------------------------------------------
 4. MÓDULO DE RESERVAS Y PRESTAMOS
 --------------------------------------------------------------------------------
--- Reservas (reserva)
-GET    /api/reservas              -> Listar todas las reservas
-GET    /api/reservas/{id}         -> Detalle de reserva
-POST   /api/reservas              -> Crear solicitud de reserva
-PUT    /api/reservas/{id}         -> Modificar reserva
-DELETE /api/reservas/{id}         -> Cancelar reserva
 
--- Aprobaciones (aprobacion)
-GET    /api/aprobaciones          -> Listar aprobaciones (pendientes/realizadas)
-POST   /api/aprobaciones          -> Aprobar o rechazar una reserva
-GET    /api/aprobaciones/{id}     -> Detalle de una aprobación
+[4.1] RESERVAS (reserva)
 
--- Préstamos (prestamo)
-GET    /api/prestamos             -> Listar préstamos de activos/equipos
-GET    /api/prestamos/{id}        -> Detalle de préstamo
-POST   /api/prestamos             -> Registrar nuevo préstamo
-PUT    /api/prestamos/{id}        -> Actualizar préstamo (ej. marcar como devuelto)
+GET    /reservations
+URL: http://localhost/Estadias/backend/api/reservations?esp_id=1&date=2024-12-25
+Descripción: Consulta disponibilidad pública.
+
+POST   /reservations
+URL: http://localhost/Estadias/backend/api/reservations
+JSON Body:
+{
+  "esp_id": 1,
+  "fecha_uso": "2024-12-25",
+  "hora_ent": "10:00:00",
+  "hora_sal": "12:00:00",
+  "motivo": "Clase de Redes Avanzadas"
+}
+
+POST   /reservations/bulk
+URL: http://localhost/Estadias/backend/api/reservations
+JSON Body (Soporta múltiples fechas):
+{
+  "esp_id": 1,
+  "fechas_uso": ["2024-12-25", "2024-12-26"],
+  "hora_ent": "10:00:00",
+  "hora_sal": "12:00:00",
+  "motivo": "Congreso"
+}
+
+POST   /reservations/{id}/approve
+URL: http://localhost/Estadias/backend/api/reservations/1/approve
+Descripción: Aprobación de reserva (Requiere token de Administrador).
+
+POST   /reservations/{id}/reject
+URL: http://localhost/Estadias/backend/api/reservations/1/reject
+JSON Body:
+{
+  "reason": "Mantenimiento del aula."
+}
 
 
-5. MÓDULO DE SEGUIMIENTO RFID (ACTIVOS, LLAVES Y MOBILIARIO)
+[4.2] PRÉSTAMOS (Equipos/Llaves)
+
+POST   /loans
+URL: http://localhost/Estadias/backend/api/loans
+JSON Body:
+{
+  "act_id": 1,
+  "us_id": 2
+}
+
+PUT    /loans
+URL: http://localhost/Estadias/backend/api/loans
+JSON Body:
+{
+  "pres_id": 1,
+  "condicion_dev": "Buen estado",
+  "notas": "Devuelto a tiempo"
+}
+
+
 --------------------------------------------------------------------------------
--- Tags RFID (tag_rfid)
-GET    /api/tags                  -> Listar tags registrados (exclusivo para inventario)
-GET    /api/tags/{id}             -> Detalle de un tag
-POST   /api/tags                  -> Registrar nuevo tag (Solo asignable a Activo, Llave o Mobiliario)
-PUT    /api/tags/{id}             -> Actualizar estado del tag
-DELETE /api/tags/{id}             -> Dar de baja tag
-
--- Movimientos RFID (movimiento_rfid)
-GET    /api/movimientos           -> Listar todos los movimientos detectados
-POST   /api/movimientos           -> Registrar movimiento (normalmente por hardware/IoT)
-GET    /api/movimientos/{id}      -> Detalle de movimiento específico
-
--- Visitas (visita)
-GET    /api/visitas               -> Listar visitantes registrados
-GET    /api/visitas/{id}          -> Detalle de visita
-POST   /api/visitas               -> Registrar nueva visita (y generar código de acceso)
-PUT    /api/visitas/{id}          -> Actualizar estatus de visita
-
-
-6. MÓDULO DE AUDITORÍA Y REPORTES
+5. MÓDULO DE SEGUIMIENTO RFID (ESP32)
 --------------------------------------------------------------------------------
--- Bitácora (bitacora)
-GET    /api/bitacora              -> Listar registros de auditoría (logs del sistema)
-POST   /api/bitacora              -> Registrar acción en sistema (uso interno del backend)
 
--- Reportes (reporte)
-GET    /api/reportes              -> Listar reportes generados
-GET    /api/reportes/{id}         -> Detalle de metadatos de un reporte
-POST   /api/reportes              -> Generar nuevo reporte analítico
+[5.1] TAGS RFID
 
--- Archivos (archivo)
-GET    /api/archivos              -> Listar metadatos de archivos generados por el sistema (ej. Reportes PDF)
-GET    /api/archivos/{id}/dl      -> Descargar archivo físico generado
-# Nota de Arquitectura: No existe endpoint POST público para subida manual. 
-# Los archivos son creados y guardados automáticamente por el backend al generar reportes.
+GET    /hardware/recent-scans
+URL: http://localhost/Estadias/backend/api/hardware/recent-scans
+Método: POST (Configurado así en el router para obtener scaneos recientes).
+
+[5.2] PROCESAR LECTURA ESP32
+
+POST   /hardware/rfid-scan
+URL: http://localhost/Estadias/backend/api/hardware/rfid-scan
+JSON Body:
+{
+  "tag_id": "E200001",
+  "lec_id": 1
+}
+
+
+--------------------------------------------------------------------------------
+6. MÓDULO DE NOTIFICACIONES Y AUDITORÍA
+--------------------------------------------------------------------------------
+
+[6.1] NOTIFICACIONES
+
+GET    /notifications/unread
+URL: http://localhost/Estadias/backend/api/notifications/unread
+
+POST   /notifications/read
+URL: http://localhost/Estadias/backend/api/notifications/read
+JSON Body:
+{
+  "not_id": 1
+}
+
+[6.2] INVITACIONES
+
+POST   /invites/generate
+URL: http://localhost/Estadias/backend/api/invites/generate
+JSON Body:
+{
+  "hours_valid": 24
+}
+
+GET    /invites/validate/{codigo}
+URL: http://localhost/Estadias/backend/api/invites/validate/ABCD-1234

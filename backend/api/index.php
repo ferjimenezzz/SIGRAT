@@ -30,20 +30,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Autoload manual (Simulando PSR-4 para simplicidad en XAMPP sin Composer)
 require_once '../config/Database.php';
 require_once '../controllers/AuthController.php';
+require_once '../controllers/UsuarioController.php';
+require_once '../controllers/SpaceController.php';
+require_once '../controllers/TagController.php';
 require_once '../controllers/InviteController.php';
 require_once '../controllers/ReservationController.php';
 require_once '../controllers/RFIDController.php';
 require_once '../controllers/AssetController.php';
 require_once '../controllers/LoanController.php';
 require_once '../controllers/MaintenanceController.php';
+require_once '../controllers/DashboardController.php';
 
 use Controllers\AuthController;
+use Controllers\UsuarioController;
+use Controllers\SpaceController;
+use Controllers\TagController;
 use Controllers\InviteController;
 use Controllers\ReservationController;
 use Controllers\RFIDController;
 use Controllers\AssetController;
 use Controllers\LoanController;
 use Controllers\MaintenanceController;
+use Controllers\DashboardController;
 
 // --- CONTROL DE ACCESO MEDIANTE TOKENS (JWT) ---
 $auth = new AuthController();
@@ -125,6 +133,49 @@ $status_code = 404;
 
 try {
     switch ($resource) {
+        case 'dashboard':
+            $controller = new DashboardController();
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $rango = $_GET['rango'] ?? 'semana';
+                $response = $controller->getSpaceUsageByName($rango);
+                $status_code = 200;
+            }
+            break;
+
+        case 'usuarios':
+            $controller = new UsuarioController();
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $response = $controller->getAllUsers();
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $response = $controller->createUser($input['nombre'] ?? '', $input['correo'] ?? '', $input['contrasena'] ?? '', $input['rol_id'] ?? 2);
+                $status_code = isset($response['success']) && $response['success'] ? 201 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                $id = end($uri);
+                $response = $controller->softDeleteUser($id);
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
+            }
+            break;
+
+        case 'tags':
+            $controller = new TagController();
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $response = $controller->getAll();
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $response = $controller->create($input);
+                $status_code = isset($response['success']) && $response['success'] ? 201 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+                $id = end($uri);
+                $response = $controller->updateStatus($id, $input['estatus'] ?? 'Inactivo');
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                $id = end($uri);
+                $response = $controller->delete($id);
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
+            }
+            break;
+
         case 'invites':
             $controller = new InviteController();
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'generate') {
@@ -199,6 +250,19 @@ try {
                         $response = ["success" => false, "error" => $error_msg];
                         $status_code = 400;
                     } else {
+                        // CREAR PRESTAMOS DE EQUIPAMIENTO SI EXISTEN
+                        if (!empty($input['equipamiento_ids']) && is_array($input['equipamiento_ids'])) {
+                            $loanController = new LoanController();
+                            $us_id = $_SESSION['us_id'] ?? ($input['us_id'] ?? null);
+                            foreach ($input['fechas_uso'] as $fecha) {
+                                $fecha_pres = $fecha . ' ' . $input['hora_ent'];
+                                $fecha_ent = $fecha . ' ' . $input['hora_sal'];
+                                foreach ($input['equipamiento_ids'] as $act_id) {
+                                    $loanController->createScheduledLoan($act_id, $us_id, $fecha_pres, $fecha_ent);
+                                }
+                            }
+                        }
+
                         // SEND BULK EMAIL
                         $us_id = $_SESSION['us_id'] ?? ($input['us_id'] ?? null);
                         if ($us_id) {
@@ -211,6 +275,18 @@ try {
                 } else {
                     // Crear reservación - El input debe traer esp_id, fecha_uso, hora_ent, hora_sal, etc.
                     $response = $controller->create($input);
+                    if ($response['success']) {
+                        // CREAR PRESTAMOS DE EQUIPAMIENTO SI EXISTEN
+                        if (!empty($input['equipamiento_ids']) && is_array($input['equipamiento_ids'])) {
+                            $loanController = new LoanController();
+                            $us_id = $_SESSION['us_id'] ?? ($input['us_id'] ?? null);
+                            $fecha_pres = $input['fecha_uso'] . ' ' . $input['hora_ent'];
+                            $fecha_ent = $input['fecha_uso'] . ' ' . $input['hora_sal'];
+                            foreach ($input['equipamiento_ids'] as $act_id) {
+                                $loanController->createScheduledLoan($act_id, $us_id, $fecha_pres, $fecha_ent);
+                            }
+                        }
+                    }
                     $status_code = $response['success'] ? 201 : 400;
                 }
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['esp_id'])) {
@@ -228,27 +304,59 @@ try {
                 $status_code = (isset($response['success']) && $response['success']) ? 200 : 403;
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'recent-scans') {
                 $controller = new RFIDController();
-                $response = $controller->getRecentScans();
+                $ant_id = isset($input['ant_id']) && $input['ant_id'] !== 'all' ? $input['ant_id'] : null;
+                $response = $controller->getRecentScans($ant_id);
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $uri[count($uri)-1] === 'antennas-status') {
+                $controller = new RFIDController();
+                $response = $controller->getAntennasStatus();
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'ping') {
+                $controller = new RFIDController();
+                $ant_id = $input['ant_id'] ?? null;
+                $response = $controller->updateAntennaPing($ant_id);
                 $status_code = 200;
             }
             break;
 
         case 'assets':
+            $controller = new AssetController();
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $uri[count($uri)-1] === 'bulk') {
-                $controller = new AssetController();
                 $response = $controller->bulkSave($input['assets'], $input['common_category']);
                 $status_code = 201;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $response = $controller->getAll();
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $response = $controller->create($input);
+                $status_code = isset($response['success']) && $response['success'] ? 201 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+                $id = end($uri);
+                $response = $controller->update($id, $input);
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                $id = end($uri);
+                $response = $controller->delete($id);
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
             }
             break;
 
         case 'loans':
             $controller = new LoanController();
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $response = $controller->getAllLoans();
+                $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = $controller->create($input['act_id'], $input['us_id']);
                 $status_code = 201;
             } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-                $response = $controller->returnAsset($input['pres_id']);
-                $status_code = 200;
+                $id = end($uri);
+                if (is_numeric($id)) {
+                    $response = $controller->returnAsset($id);
+                } else {
+                    $response = $controller->returnAsset($input['pres_id']);
+                }
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
             }
             break;
 
@@ -278,11 +386,21 @@ try {
             break;
 
         case 'spaces':
-            require_once '../controllers/SpaceController.php';
-            $controller = new \Controllers\SpaceController();
+            $controller = new SpaceController();
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $response = $controller->getAll();
                 $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $response = $controller->create($input);
+                $status_code = isset($response['success']) && $response['success'] ? 201 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+                $id = end($uri);
+                $response = $controller->update($id, $input);
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                $id = end($uri);
+                $response = $controller->delete($id);
+                $status_code = isset($response['success']) && $response['success'] ? 200 : 400;
             }
             break;
 

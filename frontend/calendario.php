@@ -34,6 +34,7 @@ include 'header.php';
 ?>
 
 <!-- Hojas de estilo y Fuentes adicionales -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
     /* VARIABLES DE DISEÑO PREMIUM */
     :root {
@@ -462,6 +463,14 @@ include 'header.php';
         border-left-color: #db2777;
     }
 
+    .event-capsule.event-color-blue { background: #eff6ff; color: var(--active-blue); border-left-color: var(--active-blue); }
+    .event-capsule.event-color-purple { background: #f5f3ff; color: var(--purple-accent); border-left-color: var(--purple-accent); }
+    .event-capsule.event-color-orange { background: #fffbeb; color: var(--orange-accent); border-left-color: var(--orange-accent); }
+    .event-capsule.event-color-pink { background: #fdf2f8; color: var(--pink-accent); border-left-color: var(--pink-accent); }
+    .event-capsule.event-color-green { background: #ecfdf5; color: var(--green-accent); border-left-color: var(--green-accent); }
+    .event-capsule.event-color-teal { background: #f0fdfa; color: #0d9488; border-left-color: #0d9488; }
+    .event-capsule.event-color-red { background: #fef2f2; color: #e11d48; border-left-color: #e11d48; }
+
     /* DETALLES LATERALES DERECHOS */
     .calendar-sidebar-details {
         display: flex;
@@ -781,6 +790,18 @@ include 'header.php';
         background: #fdf2f8;
         color: #9d174d;
         border-left-color: var(--pink-accent);
+    }
+
+    .week-event-card.event-color-teal {
+        background: #f0fdfa;
+        color: #0d9488;
+        border-left-color: #0d9488;
+    }
+
+    .week-event-card.event-color-red {
+        background: #fef2f2;
+        color: #e11d48;
+        border-left-color: #e11d48;
     }
 
     .week-event-time {
@@ -1838,12 +1859,26 @@ include 'header.php';
                     </div>
 
                     <div class="modal-form-group">
-                        <label>Equipamiento disponible</label>
-                        <input type="text" class="modal-input" id="resEquipamiento" disabled placeholder="Sin equipamiento asignado">
+                        <label>Equipamiento disponible (Seleccionar para préstamo)</label>
+                        <div id="resEquipamientoContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px; max-height: 120px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: #f8fafc;">
+                            <div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: INFORMACIÓN DEL SOLICITANTE -->
+                <!-- SECCIÓN 2: MOTIVO DE LA RESERVA -->
+                <div>
+                    <div class="res-modal-section-title">
+                        <i class="bi bi-chat-left-text"></i> Motivo de la reserva
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Motivo / Actividad</label>
+                        <textarea class="modal-textarea" id="resMotivo" maxlength="250" placeholder="Describe el propósito de la reserva..."></textarea>
+                        <div class="char-counter"><span id="charCount">0</span> / 250</div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: INFORMACIÓN DEL SOLICITANTE -->
                 <div>
                     <div class="res-modal-section-title">
                         <i class="bi bi-person"></i> Información del solicitante
@@ -1865,18 +1900,6 @@ include 'header.php';
                             <label>Teléfono (Opcional)</label>
                             <input type="text" class="modal-input" id="resTelefonoSolicitante" placeholder="+52 ..." value="<?php echo htmlspecialchars($currentUser['telefono']); ?>">
                         </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 3: MOTIVO DE LA RESERVA -->
-                <div>
-                    <div class="res-modal-section-title">
-                        <i class="bi bi-chat-left-text"></i> Motivo de la reserva
-                    </div>
-                    <div class="modal-form-group">
-                        <label>Motivo / Actividad</label>
-                        <textarea class="modal-textarea" id="resMotivo" maxlength="250" placeholder="Describe el propósito de la reserva..."></textarea>
-                        <div class="char-counter"><span id="charCount">0</span> / 250</div>
                     </div>
                 </div>
             </div>
@@ -1965,6 +1988,21 @@ include 'header.php';
     const allAssets = <?php echo json_encode($assets); ?>;
     const sessionUserId = <?php echo json_encode($us_id_sesion); ?>;
     const isUserAdmin = <?php echo json_encode($isAdmin); ?>;
+
+    // SISTEMA DE COLORES POR ESPACIO
+    function getColorForSpace(esp_id) {
+        const colors = [
+            'event-color-blue', 'event-color-purple', 'event-color-orange', 
+            'event-color-pink', 'event-color-green', 'event-color-teal', 'event-color-red'
+        ];
+        let hash = 0;
+        const str = String(esp_id);
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % colors.length;
+        return colors[index];
+    }
 
     // ESTADO DE LA APLICACIÓN DE CALENDARIO
     const state = {
@@ -2255,7 +2293,8 @@ include 'header.php';
             document.getElementById('resEdificio').value = "";
             document.getElementById('resEspacio').innerHTML = '<option value="">Seleccione espacio...</option>';
             document.getElementById('resCapacidadLabel').value = "0 personas";
-            document.getElementById('resEquipamiento').value = "Selecciona un espacio...";
+            const eqCont = document.getElementById('resEquipamientoContainer');
+            if (eqCont) eqCont.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
             document.getElementById('resMotivo').value = "";
             document.getElementById('charCount').textContent = "0";
 
@@ -2287,7 +2326,8 @@ include 'header.php';
                 });
                 resEspacio.innerHTML = opts;
                 document.getElementById('resCapacidadLabel').value = "0 personas";
-                document.getElementById('resEquipamiento').value = "Selecciona un espacio...";
+                const eqCont2 = document.getElementById('resEquipamientoContainer');
+                if (eqCont2) eqCont2.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
             });
         }
 
@@ -2296,19 +2336,77 @@ include 'header.php';
             resEspacio.addEventListener('change', (e) => {
                 const espId = parseInt(e.target.value);
                 const spObj = allSpaces.find(sp => sp.esp_id === espId);
+                const eqContainer = document.getElementById('resEquipamientoContainer');
                 if (spObj) {
                     document.getElementById('resCapacidadLabel').value = `${spObj.capacidad} personas`;
                     
                     // Buscar equipamiento asignado a este espacio o edificio
                     const spAssets = allAssets.filter(as => as.esp_asignado == espId || (as.edificio === spObj.edificio && !as.esp_asignado));
                     if(spAssets.length > 0) {
-                        const assetsNames = spAssets.map(as => `${as.tipo} ${as.modelo}`).join(', ');
-                        document.getElementById('resEquipamiento').value = assetsNames;
+                        let html = '';
+                        spAssets.forEach(as => {
+                            html += `<label style='display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); cursor: pointer;'>
+                                <input type='checkbox' class='equipamiento-checkbox' value='${as.act_id}'>
+                                ${as.tipo} ${as.marca} ${as.modelo || ''}
+                            </label>`;
+                        });
+                        eqContainer.innerHTML = html;
                     } else {
-                        document.getElementById('resEquipamiento').value = "Sin equipamiento específico disponible.";
+                        eqContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Sin equipamiento específico disponible.</div>';
                     }
+                } else {
+                    eqContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
                 }
+                checkAvailability();
             });
+        }
+
+        const resFecha = document.getElementById('resFecha');
+        if (resFecha) {
+            resFecha.addEventListener('change', checkAvailability);
+        }
+
+        function checkAvailability() {
+            if (state.resMode !== 'single') return; // En multi-día es más complejo, lo dejamos al backend
+            const espId = resEspacio.value;
+            const fecha = document.getElementById('resFecha').value;
+            if (!espId || !fecha) return;
+            
+            // Habilitar todos primero
+            Array.from(document.getElementById('resHoraEnt').options).forEach(opt => {
+                opt.disabled = false;
+                const h = parseInt(opt.value);
+                opt.text = opt.value + (h < 12 ? ' AM' : ' PM');
+            });
+            
+            fetch(`../backend/api/index.php/reservations?esp_id=${espId}&date=${fecha}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const selectHora = document.getElementById('resHoraEnt');
+                        Array.from(selectHora.options).forEach(opt => {
+                            const optHour = parseInt(opt.value);
+                            data.forEach(res => {
+                                const startH = parseInt(res.hora_ent);
+                                const endH = parseInt(res.hora_sal);
+                                if (optHour >= startH && optHour < endH) {
+                                    opt.disabled = true;
+                                    opt.text = opt.value + ' (Ocupado)';
+                                }
+                            });
+                        });
+                        // Si la seleccionada está ocupada, cambiar
+                        if (selectHora.options[selectHora.selectedIndex].disabled) {
+                            for (let i=0; i<selectHora.options.length; i++) {
+                                if (!selectHora.options[i].disabled) {
+                                    selectHora.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error("Error check availability", err));
         }
 
         // Envío del formulario de reserva
@@ -2873,11 +2971,8 @@ include 'header.php';
             dayEvents.forEach(ev => {
                 const evEl = document.createElement('div');
                 
-                // Formatear estatus
-                let statClass = 'status-approved';
-                const est = ev.estatus || ev.status;
-                if (est === 'Pendiente' || est === 'pending') statClass = 'status-pending';
-                if (est === 'Rechazada' || est === 'rejected') statClass = 'status-rejected';
+                // Formatear color dinámico por espacio
+                let statClass = getColorForSpace(ev.esp_id);
 
                 evEl.className = `event-capsule ${statClass}`;
                 evEl.textContent = `${ev.hora_ent.substring(0,5)} ${ev.nombre_numero}`;
@@ -2983,15 +3078,8 @@ include 'header.php';
                 resEvents.forEach(ev => {
                     const evCard = document.createElement('div');
                     
-                    // Elegir color según tipo de espacio o estatus
-                    let colorClass = 'event-color-blue';
-                    if (sp.tipo === 'Aula') colorClass = 'event-color-purple';
-                    if (sp.tipo === 'Auditorio') colorClass = 'event-color-orange';
-                    if (sp.tipo === 'Sala de juntas') colorClass = 'event-color-pink';
-                    
-                    const est = ev.estatus || ev.status;
-                    if (est === 'Pendiente' || est === 'pending') colorClass = 'event-color-orange';
-                    if (est === 'Rechazada' || est === 'rejected') colorClass = 'event-color-pink';
+                    // Elegir color dinámico según espacio
+                    let colorClass = getColorForSpace(sp.esp_id);
 
                     evCard.className = `week-event-card ${colorClass}`;
                     
@@ -3148,7 +3236,7 @@ include 'header.php';
         const motivo = document.getElementById('resMotivo').value;
 
         if (!espId || !horaEnt) {
-            alert("Por favor, complete todos los campos obligatorios.");
+            Swal.fire('Atención', 'Por favor, complete todos los campos obligatorios.', 'warning');
             return;
         }
 
@@ -3174,7 +3262,7 @@ include 'header.php';
         if (state.resMode === 'single') {
             const fecha = document.getElementById('resFecha').value;
             if(!fecha) {
-                alert("Por favor, selecciona una fecha.");
+                Swal.fire('Atención', 'Por favor, selecciona una fecha.', 'warning');
                 return;
             }
             requestData.fecha_uso = fecha;
@@ -3183,14 +3271,14 @@ include 'header.php';
             const startStr = document.getElementById('resFechaInicio').value;
             const endStr = document.getElementById('resFechaFin').value;
             if(!startStr || !endStr) {
-                alert("Por favor, selecciona el rango de fechas.");
+                Swal.fire('Atención', 'Por favor, selecciona el rango de fechas.', 'warning');
                 return;
             }
 
             const startDate = new Date(startStr + 'T00:00:00');
             const endDate = new Date(endStr + 'T00:00:00');
             if (endDate < startDate) {
-                alert("La fecha de fin no puede ser menor que la de inicio.");
+                Swal.fire('Atención', 'La fecha de fin no puede ser menor que la de inicio.', 'warning');
                 return;
             }
 
@@ -3201,7 +3289,7 @@ include 'header.php';
             });
 
             if (checkedWeekdays.length === 0) {
-                alert("Por favor, selecciona al menos un día de la semana.");
+                Swal.fire('Atención', 'Por favor, selecciona al menos un día de la semana.', 'warning');
                 return;
             }
 
@@ -3229,6 +3317,12 @@ include 'header.php';
             requestData.fechas_uso = fechas;
         }
 
+        // Obtener equipamientos seleccionados
+        const eqCheckboxes = document.querySelectorAll('.equipamiento-checkbox:checked');
+        if (eqCheckboxes.length > 0) {
+            requestData.equipamiento_ids = Array.from(eqCheckboxes).map(cb => parseInt(cb.value));
+        }
+
         const btnConfirm = document.getElementById('btnConfirmReserva');
         btnConfirm.disabled = true;
         btnConfirm.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
@@ -3244,18 +3338,33 @@ include 'header.php';
         .then(res => res.json())
         .then(data => {
             if (data.success || data.id || data.ids) {
-                alert("¡Reservación programada con éxito!");
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Reservación Solicitada!',
+                    text: 'Tu reservación ha sido programada con éxito. Revisa tu correo para más detalles.',
+                    confirmButtonColor: '#10b981'
+                });
                 window.closeResModal();
                 
                 // Recargar eventos y actualizar vista
                 window.fetchEvents();
             } else {
-                alert(`Error al agendar reserva: ${data.error || 'Conflicto de horario o espacio no disponible.'}`);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al agendar reserva',
+                    text: data.error || 'Conflicto de horario o espacio no disponible.',
+                    confirmButtonColor: '#ef4444'
+                });
             }
         })
         .catch(err => {
             console.error("Error submitting reservation:", err);
-            alert("Ocurrió un error al procesar la reservación: " + err.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'Ocurrió un error al procesar la reservación: ' + err.message,
+                confirmButtonColor: '#ef4444'
+            });
         })
         .finally(() => {
             btnConfirm.disabled = false;

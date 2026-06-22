@@ -17,18 +17,18 @@ $us_id_sesion = $_SESSION['us_id'] ?? null;
 $spaceController = new Controllers\SpaceController();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'new_space') {
     $spaceController->create($_POST);
-    header("Location: espacios.php?tab=espacios");
+    header("Location: espacios.php?tab=espacios&success=created");
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_space') {
     $spaceController->update($_POST['esp_id'], $_POST);
-    header("Location: espacios.php?tab=espacios");
+    header("Location: espacios.php?tab=espacios&success=edited");
     exit();
 }
 if (isset($_GET['delete_id'])) {
     $stmt = $db->prepare("UPDATE ESPACIO SET estatus = 'Inactivo' WHERE esp_id = ?");
     $stmt->execute([$_GET['delete_id']]);
-    header("Location: espacios.php?tab=espacios");
+    header("Location: espacios.php?tab=espacios&success=deleted");
     exit();
 }
 $spaces = $db->query("SELECT * FROM ESPACIO WHERE estatus != 'Inactivo' ORDER BY edificio, nombre_numero")->fetchAll();
@@ -122,10 +122,19 @@ $tab = $_GET['tab'] ?? 'espacios';
             
             <div style="display: flex; gap: 12px; margin-left: 20px;">
                 <select id="edificioFilter" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; outline: none; cursor: pointer;">
-                    <option value="">🏢 Todos los edificios</option>
+                    <option value="">Todos los edificios</option>
                     <option value="CIC">CIC</option>
                     <option value="PIDET">PIDET</option>
                 </select>
+                <select id="tipoFilter" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; outline: none; cursor: pointer;">
+                    <option value="">Todos los tipos</option>
+                    <?php foreach ($spaceController->getTiposPermitidos() as $tipoEnum): ?>
+                    <option value="<?php echo htmlspecialchars($tipoEnum); ?>"><?php echo htmlspecialchars($tipoEnum); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <button id="btnClearFilters" style="display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; cursor: pointer;">
+                    <i data-lucide="filter" style="width: 14px;"></i> Limpiar Filtros
+                </button>
             </div>
         </div>
         
@@ -183,7 +192,7 @@ $tab = $_GET['tab'] ?? 'espacios';
                             <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;"><?php echo htmlspecialchars($space['acceso_tipo']); ?></p>
                         </div>
                     </td>
-                    <td style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #475569;">
+                    <td class="space-tipo" style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #475569;">
                         <?php echo htmlspecialchars($space['tipo']); ?>
                     </td>
                     <td style="padding: 16px 24px;">
@@ -199,9 +208,9 @@ $tab = $_GET['tab'] ?? 'espacios';
                         </button>
                         <?php endif; ?>
                         <?php if (hasPermission('Espacios', 'delete')): ?>
-                        <a href="?delete_id=<?php echo $space['esp_id']; ?>" onclick="return confirm('¿Eliminar este espacio?')" style="display: inline-block; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">
+                        <button onclick="confirmDeleteSpace(event, '?delete_id=<?php echo $space['esp_id']; ?>')" style="display: inline-block; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">
                             <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
-                        </a>
+                        </button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -489,24 +498,27 @@ $tab = $_GET['tab'] ?? 'espacios';
 
     const inventarioFull = <?php echo json_encode($inventario); ?>;
 
-    // Filters for spaces
     const searchInput = document.getElementById('searchInput');
     const edificioFilter = document.getElementById('edificioFilter');
+    const tipoFilter = document.getElementById('tipoFilter');
     const rows = document.querySelectorAll('.space-row');
 
     function filterTable() {
         if(!searchInput) return;
         const query = searchInput.value.toLowerCase();
-        const edificio = edificioFilter.value;
+        const edificio = edificioFilter ? edificioFilter.value : '';
+        const tipo = tipoFilter ? tipoFilter.value : '';
 
         rows.forEach(row => {
             const name = row.querySelector('.space-name').innerText.toLowerCase();
             const rowEdificio = row.getAttribute('data-edificio');
+            const rowTipo = row.querySelector('.space-tipo').innerText;
 
             const matchSearch = name.includes(query);
             const matchEdificio = edificio === "" || rowEdificio === edificio;
+            const matchTipo = tipo === "" || rowTipo === tipo;
 
-            if (matchSearch && matchEdificio) {
+            if (matchSearch && matchEdificio && matchTipo) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
@@ -516,6 +528,62 @@ $tab = $_GET['tab'] ?? 'espacios';
 
     if(searchInput) searchInput.addEventListener('input', filterTable);
     if(edificioFilter) edificioFilter.addEventListener('change', filterTable);
+    if(tipoFilter) tipoFilter.addEventListener('change', filterTable);
+
+    // Botón Limpiar Filtros
+    const btnClearFilters = document.getElementById('btnClearFilters');
+    if (btnClearFilters) {
+        btnClearFilters.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            if (edificioFilter) edificioFilter.value = '';
+            if (tipoFilter) tipoFilter.value = '';
+            filterTable();
+        });
+    }
+
+    // Funciones SweetAlert2
+    function confirmDeleteSpace(e, url) {
+        e.preventDefault();
+        Swal.fire({
+            title: '¿Eliminar Espacio?',
+            text: 'Esta acción inhabilitará el espacio y no aparecerá más en los listados.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    // Alertas por URL
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            const action = urlParams.get('success');
+            let msg = 'Operación realizada correctamente.';
+            let title = '¡Éxito!';
+            let icon = 'success';
+            
+            if (action === 'created') msg = 'El nuevo espacio se ha creado y está disponible.';
+            if (action === 'edited') msg = 'Los cambios del espacio se han guardado exitosamente.';
+            if (action === 'deleted') { title = 'Espacio Eliminado'; msg = 'El espacio ha sido dado de baja.'; icon = 'info'; }
+            if (action === '1') { msg = 'La reserva se ha programado.'; } // Por si es de la reserva
+            
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: msg,
+                timer: 3000,
+                showConfirmButton: false
+            });
+            window.history.replaceState({}, document.title, window.location.pathname + '?tab=' + (urlParams.get('tab') || 'espacios'));
+        }
+    });
 
     function openNewSpaceModal() {
         document.getElementById('modal-nuevo-espacio').style.display = 'flex';

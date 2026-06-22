@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$res['success']) {
         header("Location: inventario.php?tab=inventario&error=" . urlencode($res['error']));
     } else {
-        header("Location: inventario.php?tab=inventario");
+        header("Location: inventario.php?tab=inventario&success=edited");
     }
     exit();
 }
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$res['success']) {
         header("Location: inventario.php?tab=inventario&error=" . urlencode($res['error']));
     } else {
-        header("Location: enrolamiento.php?tab=inventario");
+        header("Location: inventario.php?tab=inventario&success=created");
     }
     exit();
 }
@@ -124,11 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Manejar eliminación
 if (isset($_GET['delete_id'])) {
     $assetController->delete($_GET['delete_id']);
-    header("Location: inventario.php?tab=inventario");
+    header("Location: inventario.php?tab=inventario&success=deleted");
     exit();
 }
 
 include 'header.php';
+// Add SweetAlert2
+echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
 ?>
 
 <?php
@@ -151,7 +153,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <p>Gestiona y controla los activos y mobiliario institucional</p>
     </div>
     <div class="premium-header-right">
-        <button class="bell-btn" onclick="alert('No hay notificaciones nuevas')">
+        <button class="bell-btn" onclick="Swal.fire({icon: 'info', title: 'Notificaciones', text: 'No hay notificaciones nuevas por el momento.', showConfirmButton: false, timer: 2500})">
             <i class="bi bi-bell"></i>
             <span class="bell-badge">3</span>
         </button>
@@ -290,9 +292,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                             <button class="btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($asset), ENT_QUOTES, 'UTF-8'); ?>)" style="padding: 6px 12px; font-size: 12.5px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-right: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
                                 <i class="bi bi-pencil-square"></i> Editar
                             </button>
-                            <a href="?delete_id=<?php echo $asset['act_id']; ?>" onclick="return confirm('¿Eliminar activo?')" style="padding: 6px 12px; font-size: 12.5px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                            <button onclick="confirmDeleteAsset(<?php echo $asset['act_id']; ?>)" style="padding: 6px 12px; font-size: 12.5px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
                                 <i class="bi bi-trash"></i> Eliminar
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -592,26 +594,46 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
 <!-- Modal de Edición -->
 <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div style="background: white; padding: 32px; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+    <div style="background: white; padding: 32px; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
         <h3 style="margin-top: 0; color: #1e293b; font-weight: 800; font-size: 20px; margin-bottom: 24px;">Editar Activo</h3>
         <form method="POST">
             <input type="hidden" name="action" value="edit_asset">
             <input type="hidden" name="act_id" id="edit_act_id">
             
-            <div style="display: grid; gap: 16px;">
+            <div style="display: grid; gap: 16px; grid-template-columns: 1fr 1fr;">
                 <div>
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Tipo de Equipo</label>
-                    <input type="text" name="tipo" id="edit_tipo" class="form-control" required>
+                    <select name="tipo" id="edit_tipo" class="form-control" required>
+                        <option value="">-- Seleccionar --</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Monitor">Monitor</option>
+                        <option value="Impresora">Impresora</option>
+                        <option value="Proyector">Proyector</option>
+                        <option value="Bocina">Bocina</option>
+                        <option value="Computadora">Computadora</option>
+                        <option value="Silla">Silla</option>
+                        <option value="Mesa">Mesa</option>
+                        <option value="Pizarrón">Pizarrón</option>
+                        <option value="Escritorio">Escritorio</option>
+                        <option value="Otro">Otro / Herramienta</option>
+                    </select>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div>
-                        <label style="font-size: 11px; font-weight: 800; color: #64748b;">Marca</label>
-                        <input type="text" name="marca" id="edit_marca" class="form-control" required>
-                    </div>
-                    <div>
-                        <label style="font-size: 11px; font-weight: 800; color: #64748b;">Modelo</label>
-                        <input type="text" name="modelo" id="edit_modelo" class="form-control" required>
-                    </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Estado</label>
+                    <select name="estatus" id="edit_estatus" class="form-control" required>
+                        <option value="Disponible">Disponible</option>
+                        <option value="Prestado">En préstamo</option>
+                        <option value="Mantenimiento">En mantenimiento</option>
+                        <option value="Extraviado">Extraviado</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Marca</label>
+                    <input type="text" name="marca" id="edit_marca" class="form-control" required>
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Modelo</label>
+                    <input type="text" name="modelo" id="edit_modelo" class="form-control" required>
                 </div>
                 <div>
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Número de Serie</label>
@@ -621,17 +643,25 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Número de Inventario (Opcional)</label>
                     <input type="text" name="num_inv" id="edit_num_inv" class="form-control">
                 </div>
-                <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; position: relative;">
+                <div style="grid-column: span 2; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; position: relative;">
                     <label style="font-size: 11px; font-weight: 800; color: #3b82f6;">UID TAG (RFID) - Dejar vacío para desvincular</label>
                     <input type="text" name="tag_id" id="edit_tag_id" autocomplete="off" placeholder="Busca o Escanea el TAG..." class="form-control" style="font-family: 'JetBrains Mono', monospace; color: var(--active-blue); margin-top: 8px; width: 100%; box-sizing: border-box;">
                     <div id="edit_tag_dropdown" class="custom-dropdown" style="top: 75px;"></div>
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Edificio</label>
+                    <select id="edit_edificio" class="form-control">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="CIC">CIC</option>
+                        <option value="PIDET">PIDET</option>
+                    </select>
                 </div>
                 <div>
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Espacio Asignado (Opcional)</label>
                     <select name="esp_asignado" id="edit_esp_asignado" class="form-control">
                         <option value="">-- Sin Asignar --</option>
                         <?php foreach($allSpaces as $esp): ?>
-                        <option value="<?php echo $esp['esp_id']; ?>"><?php echo htmlspecialchars($esp['nombre_numero'] . ' - ' . $esp['edificio']); ?></option>
+                        <option value="<?php echo $esp['esp_id']; ?>" data-edificio="<?php echo htmlspecialchars($esp['edificio']); ?>"><?php echo htmlspecialchars($esp['nombre_numero']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -769,8 +799,17 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         display: flex;
         align-items: center;
         gap: 8px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         flex-grow: 1;
+        overflow-x: auto;
+        padding-bottom: 4px; /* for scrollbar */
+    }
+    .filters-left::-webkit-scrollbar {
+        height: 4px;
+    }
+    .filters-left::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
     }
     .search-input-wrapper {
         display: flex;
@@ -1387,10 +1426,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        setupAutocomplete('new_tag_id', 'new_tag_dropdown');
-        setupAutocomplete('edit_tag_id', 'edit_tag_dropdown');
-    });
+
 
     function toggleEnrollMode() {
         const mode = document.getElementById('enroll_mode').value;
@@ -1426,6 +1462,15 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.getElementById('edit_num_serie').value = asset.num_serie;
         document.getElementById('edit_num_inv').value = asset.num_inv;
         document.getElementById('edit_tag_id').value = asset.tag_id || '';
+        document.getElementById('edit_estatus').value = asset.estatus || 'Disponible';
+        document.getElementById('edit_edificio').value = asset.edificio || '';
+
+        // Disparar change en el edificio para poblar los espacios correctamente
+        const edSelect = document.getElementById('edit_edificio');
+        const spSelect = document.getElementById('edit_esp_asignado');
+        const event = new Event('change');
+        edSelect.dispatchEvent(event);
+
         document.getElementById('edit_esp_asignado').value = asset.esp_asignado || '';
         
         document.getElementById('editModal').style.display = 'flex';
@@ -1436,6 +1481,56 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.getElementById('editModal').style.display = 'none';
         document.body.style.overflow = '';
     }
+
+    // Funciones SweetAlert2
+    function confirmDeleteAsset(id) {
+        Swal.fire({
+            title: '¿Eliminar activo?',
+            text: 'Esta acción dará de baja el equipo o mobiliario permanentemente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `inventario.php?delete_id=${id}`;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupAutocomplete('new_tag_id', 'new_tag_dropdown');
+        setupAutocomplete('edit_tag_id', 'edit_tag_dropdown');
+
+        // SweetAlert2 URL Handler
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            const action = urlParams.get('success');
+            let msg = 'Operación realizada correctamente.';
+            let title = '¡Éxito!';
+            let icon = 'success';
+            
+            if (action === 'created') msg = 'El activo se ha registrado correctamente en el inventario.';
+            if (action === 'edited') msg = 'El activo ha sido actualizado con éxito.';
+            if (action === 'deleted') { title = 'Eliminado'; msg = 'El activo fue dado de baja.'; icon = 'info'; }
+            
+            Swal.fire({ icon: icon, title: title, text: msg, timer: 3000, showConfirmButton: false });
+            
+            // Limpiar la URL de los parámetros de éxito para no repetir la alerta
+            const url = new URL(window.location);
+            url.searchParams.delete('success');
+            window.history.replaceState({}, document.title, url);
+        }
+        if (urlParams.has('error')) {
+            let msg = 'Error: ' + urlParams.get('error');
+            Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
+            const url = new URL(window.location);
+            url.searchParams.delete('error');
+            window.history.replaceState({}, document.title, url);
+        }
+    });
     
     // Search inventory & Filters Logic
     const searchInventory = document.getElementById("searchInventory");

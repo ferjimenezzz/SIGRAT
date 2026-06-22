@@ -253,4 +253,26 @@ class LoanController {
             return ["success" => false, "error" => $e->getMessage()];
         }
     }
+
+    /**
+     * @summary Crea un préstamo programado (a partir de una reservación).
+     * @param int $act_id
+     * @param int $us_id
+     * @param string $fecha_pres Fecha y hora de inicio del préstamo (Y-m-d H:i:s).
+     * @param string $fecha_ent Fecha y hora de entrega del préstamo (Y-m-d H:i:s).
+     */
+    public function createScheduledLoan($act_id, $us_id, $fecha_pres, $fecha_ent) {
+        try {
+            $query = "INSERT INTO PRESTAMO (act_id, us_id, fecha_pres, fecha_ent, estatus) VALUES (?, ?, ?, ?, 'Activo')";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$act_id, $us_id, $fecha_pres, $fecha_ent]);
+            
+            $new_pres_id = $this->db->lastInsertId();
+
+            return ["success" => true, "id" => $new_pres_id];
+        } catch (\Exception $e) {
+            error_log("Error creando préstamo programado: " . $e->getMessage());
+            return ["success" => false, "error" => $e->getMessage()];
+        }
+    }
 }

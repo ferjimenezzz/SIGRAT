@@ -23,12 +23,23 @@ class DashboardController {
     }
 
     /**
+     * Calcula el porcentaje de crecimiento entre dos valores.
+     */
+    private function calculateGrowth($current, $previous) {
+        if ($previous == 0) {
+            return $current > 0 ? 100 : 0;
+        }
+        return round((($current - $previous) / $previous) * 100);
+    }
+
+    /**
      * Obtiene el resumen de estadísticas para los contadores superiores.
      * @return array Conjunto de conteos para el dashboard.
      */
     public function getStats() {
-        // 1. Reservas programadas para la fecha actual
+        // 1. Reservas programadas para la fecha actual y ayer
         $resToday = $this->db->query("SELECT COUNT(*) FROM RESERVA WHERE fecha_uso = CURRENT_DATE")->fetchColumn();
+        $resYesterday = $this->db->query("SELECT COUNT(*) FROM RESERVA WHERE fecha_uso = CURRENT_DATE - INTERVAL '1 day'")->fetchColumn();
 
         // 2. Activos cuyo estatus indica que no están disponibles (en uso, préstamo, etc.)
         $actInUse = $this->db->query("SELECT COUNT(*) FROM ACTIVO WHERE estatus != 'Disponible'")->fetchColumn();
@@ -41,6 +52,7 @@ class DashboardController {
 
         return [
             'reservas_hoy' => (int)$resToday,
+            'reservas_growth' => $this->calculateGrowth($resToday, $resYesterday),
             'activos_uso' => (int)$actInUse,
             'alertas_stock' => (int)$stockAlerts,
             'incidentes' => (int)$incidents
@@ -94,41 +106,63 @@ class DashboardController {
     }
 
     /**
-     * Calcula el porcentaje de aulas utilizadas hoy.
-     * @return int Porcentaje de uso (0-100).
+     * Calcula las estadísticas de uso de aulas (semana actual vs pasada).
+     * @return array Arreglo con uso actual y crecimiento.
      */
-    public function getClassroomUsagePercent() {
+    public function getClassroomUsageStats() {
         try {
             $totalSpaces = $this->db->query("SELECT COUNT(*) FROM ESPACIO")->fetchColumn();
-            $usedToday = $this->db->query("SELECT COUNT(DISTINCT esp_id) FROM RESERVA WHERE fecha_uso = CURRENT_DATE")->fetchColumn();
-            if ($totalSpaces == 0) return 0;
-            return (int) round(($usedToday / $totalSpaces) * 100);
+            if ($totalSpaces == 0) return ['current' => 0, 'growth' => 0];
+
+            $usedThisWeek = $this->db->query("SELECT COUNT(DISTINCT esp_id) FROM RESERVA WHERE fecha_uso >= CURRENT_DATE - INTERVAL '7 days'")->fetchColumn();
+            $usedLastWeek = $this->db->query("SELECT COUNT(DISTINCT esp_id) FROM RESERVA WHERE fecha_uso >= CURRENT_DATE - INTERVAL '14 days' AND fecha_uso < CURRENT_DATE - INTERVAL '7 days'")->fetchColumn();
+
+            $pctThisWeek = (int) round(($usedThisWeek / $totalSpaces) * 100);
+            $pctLastWeek = (int) round(($usedLastWeek / $totalSpaces) * 100);
+
+            return [
+                'current' => $pctThisWeek,
+                'growth' => $pctThisWeek - $pctLastWeek
+            ];
         } catch (\Exception $e) {
-            return 0;
+            return ['current' => 0, 'growth' => 0];
         }
     }
 
     /**
-     * Obtiene el total de accesos RFID registrados hoy.
-     * @return int Número de lecturas RFID del día.
+     * Obtiene estadísticas de accesos RFID de hoy vs ayer.
+     * @return array
      */
-    public function getRFIDAccessToday() {
+    public function getRFIDAccessStats() {
         try {
-            return (int) $this->db->query("SELECT COUNT(*) FROM LECTOR WHERE fecha = CURRENT_DATE")->fetchColumn();
+            $today = (int) $this->db->query("SELECT COUNT(*) FROM LECTOR WHERE fecha = CURRENT_DATE")->fetchColumn();
+            $yesterday = (int) $this->db->query("SELECT COUNT(*) FROM LECTOR WHERE fecha = CURRENT_DATE - INTERVAL '1 day'")->fetchColumn();
+            
+            return [
+                'current' => $today,
+                'growth' => $this->calculateGrowth($today, $yesterday)
+            ];
         } catch (\Exception $e) {
-            return 0;
+            return ['current' => 0, 'growth' => 0];
         }
     }
 
     /**
-     * Obtiene el total de préstamos activos actualmente.
-     * @return int Número de préstamos con estatus 'Activo'.
+     * Obtiene estadísticas de préstamos.
+     * @return array
      */
-    public function getActiveLoanCount() {
+    public function getLoanStats() {
         try {
-            return (int) $this->db->query("SELECT COUNT(*) FROM PRESTAMO WHERE estatus = 'Activo'")->fetchColumn();
+            $active = (int) $this->db->query("SELECT COUNT(*) FROM PRESTAMO WHERE estatus = 'Activo'")->fetchColumn();
+            $createdToday = (int) $this->db->query("SELECT COUNT(*) FROM PRESTAMO WHERE CAST(fecha_prestamo AS DATE) = CURRENT_DATE")->fetchColumn();
+            $createdYesterday = (int) $this->db->query("SELECT COUNT(*) FROM PRESTAMO WHERE CAST(fecha_prestamo AS DATE) = CURRENT_DATE - INTERVAL '1 day'")->fetchColumn();
+            
+            return [
+                'current' => $active,
+                'growth' => $this->calculateGrowth($createdToday, $createdYesterday)
+            ];
         } catch (\Exception $e) {
-            return 0;
+            return ['current' => 0, 'growth' => 0];
         }
     }
 

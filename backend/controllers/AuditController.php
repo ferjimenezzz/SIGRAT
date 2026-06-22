@@ -127,4 +127,63 @@ class AuditController {
 
         return $stats;
     }
+    /**
+     * Obtiene estadísticas de uso y asistencia de espacios basadas en reservas aprobadas.
+     */
+    public function getSpaceUsageReport($fecha_inicio = null, $fecha_fin = null, $edificio = null) {
+        $query = "SELECT e.esp_id, e.nombre_numero, e.edificio, e.tipo, 
+                         COUNT(r.re_id) as total_reservas, 
+                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
+                  FROM ESPACIO e
+                  JOIN RESERVA r ON e.esp_id = r.esp_id
+                  WHERE r.estatus = 'Aprobada'";
+        
+        $params = [];
+
+        if ($fecha_inicio) {
+            $query .= " AND r.fecha_uso >= ?";
+            $params[] = $fecha_inicio;
+        }
+        if ($fecha_fin) {
+            $query .= " AND r.fecha_uso <= ?";
+            $params[] = $fecha_fin;
+        }
+        if ($edificio && $edificio !== 'Todos') {
+            $query .= " AND e.edificio = ?";
+            $params[] = $edificio;
+        }
+
+        $query .= " GROUP BY e.esp_id, e.nombre_numero, e.edificio, e.tipo
+                    ORDER BY total_reservas DESC, total_asistencia DESC";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtiene estadísticas agregadas de uso de espacios.
+     */
+    public function getSpaceUsageStats($fecha_inicio = null, $fecha_fin = null, $edificio = null) {
+        $stats = [
+            'total_reservas' => 0,
+            'total_asistencia' => 0,
+            'espacio_top' => 'N/A'
+        ];
+
+        try {
+            $report = $this->getSpaceUsageReport($fecha_inicio, $fecha_fin, $edificio);
+            foreach ($report as $row) {
+                $stats['total_reservas'] += $row['total_reservas'];
+                $stats['total_asistencia'] += $row['total_asistencia'];
+            }
+            if (count($report) > 0) {
+                $stats['espacio_top'] = $report[0]['nombre_numero'] . ' (' . $report[0]['edificio'] . ')';
+            }
+        } catch (\Exception $e) {
+            error_log("Error Space Usage Stats: " . $e->getMessage());
+        }
+
+        return $stats;
+    }
 }

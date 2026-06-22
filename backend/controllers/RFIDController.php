@@ -94,22 +94,65 @@ class RFIDController {
 
     /**
      * Obtiene los escaneos más recientes para el monitor en tiempo real.
+     * @param int|null $ant_id ID de la antena para filtrar
      * @return array Lista de logs recientes con detalles del lector.
      */
-    public function getRecentScans() {
+    public function getRecentScans($ant_id = null) {
         try {
-            // Adaptado para usar MOVIMIENTO_RFID en lugar de la tabla anterior
             $query = "SELECT m.*, l.ant_id, a.ubicacion 
                       FROM MOVIMIENTO_RFID m
                       JOIN LECTOR l ON m.lec_id = l.lec_id
-                      LEFT JOIN ANTENA a ON l.ant_id = a.ant_id
-                      ORDER BY m.fecha_hora DESC LIMIT 15";
+                      LEFT JOIN ANTENA a ON l.ant_id = a.ant_id";
+            
+            $params = [];
+            if ($ant_id !== null) {
+                $query .= " WHERE a.ant_id = :ant_id";
+                $params[':ant_id'] = $ant_id;
+            }
+            
+            $query .= " ORDER BY m.fecha_hora DESC LIMIT 15";
+            
             $stmt = $this->db->prepare($query);
-            $stmt->execute();
+            $stmt->execute($params);
             return ["success" => true, "data" => $stmt->fetchAll()];
         } catch (PDOException $e) {
             error_log("Error en getRecentScans: " . $e->getMessage());
             return ["success" => false, "error" => "Error al obtener historial de escaneos."];
+        }
+    }
+
+    /**
+     * Obtiene el estado de conexión de todas las antenas.
+     */
+    public function getAntennasStatus() {
+        try {
+            // Si last_ping es menos de 2 minutos atrás (120 segundos), la consideramos conectada
+            $query = "SELECT ant_id, ubicacion, estatus, last_ping,
+                             CASE 
+                                WHEN last_ping IS NOT NULL AND TIMESTAMPDIFF(SECOND, last_ping, NOW()) <= 120 THEN 1 
+                                ELSE 0 
+                             END as is_connected
+                      FROM ANTENA";
+            $stmt = $this->db->query($query);
+            return ["success" => true, "data" => $stmt->fetchAll()];
+        } catch (PDOException $e) {
+            error_log("Error en getAntennasStatus: " . $e->getMessage());
+            return ["success" => false, "error" => "Error al obtener estado de antenas."];
+        }
+    }
+
+    /**
+     * Actualiza el last_ping de una antena (Heartbeat de hardware)
+     */
+    public function updateAntennaPing($ant_id) {
+        if (!$ant_id) return ["success" => false, "error" => "Falta ID de antena"];
+        try {
+            $stmt = $this->db->prepare("UPDATE ANTENA SET last_ping = CURRENT_TIMESTAMP WHERE ant_id = :ant_id");
+            $stmt->execute([':ant_id' => $ant_id]);
+            return ["success" => true];
+        } catch (PDOException $e) {
+            error_log("Error en updateAntennaPing: " . $e->getMessage());
+            return ["success" => false, "error" => "Error interno"];
         }
     }
 }

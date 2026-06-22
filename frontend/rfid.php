@@ -146,7 +146,7 @@ include 'header.php';
     </div>
 
     <!-- Sección: Simulador -->
-    <div id="section-simulador" style="display: none; flex-direction: column; gap: 32px; max-width: 800px; margin: 0 auto; width: 100%;">
+    <div id="section-simulador" style="display: none; flex-direction: column; gap: 32px; width: 100%;">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <h3 style="font-weight: 800; color: #1e293b; margin: 0;">Lector Físico y Simulador (HW)</h3>
@@ -167,8 +167,11 @@ include 'header.php';
                 <div>
                     <label style="display: block; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Ubicación (Lector/Antena)</label>
                     <select id="sim-lec" class="form-control">
-                        <option value="1">Antena 1 - Entrada CIC</option>
-                        <option value="2">Antena 2 - Entrada PIDET</option>
+                        <?php
+                        $antenas = $db->query("SELECT ant_id, ubicacion FROM ANTENA")->fetchAll();
+                        foreach($antenas as $ant): ?>
+                            <option value="<?php echo $ant['ant_id']; ?>"><?php echo htmlspecialchars($ant['ubicacion']); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
@@ -192,16 +195,37 @@ include 'header.php';
     </div>
 
     <!-- Sección: Monitor en Vivo -->
-    <div id="section-monitor" style="display: none; flex-direction: column; gap: 32px; max-width: 800px; margin: 0 auto; width: 100%;">
+    <div id="section-monitor" style="display: none; flex-direction: column; gap: 32px; width: 100%;">
+        
+        <!-- Estado de Antenas -->
+        <div>
+            <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 16px;">Estado de Antenas (Conectividad)</h3>
+            <div id="antennas-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+                <!-- Cargado via JS -->
+                <div style="padding: 24px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; color: #94a3b8; font-size: 13px; text-align: center;">Cargando estado...</div>
+            </div>
+        </div>
+
+        <!-- Escaneos Recientes -->
         <div class="card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                 <div>
                     <h3 style="font-weight: 800; color: #1e293b; margin: 0;">Escaneos Recientes</h3>
                     <p style="font-size: 12px; color: #94a3b8; margin: 4px 0 0 0;">Actualización automática en tiempo real <span id="monitor-time" style="font-weight: bold; color: #3b82f6;"></span></p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 900; color: #10b981; background: #dcfce3; padding: 6px 12px; border-radius: 20px;">
-                    <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
-                    ONLINE
+                
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <select id="filter-antena" onchange="fetchMonitorData()" class="form-control" style="width: auto; padding: 8px 16px; font-size: 13px; font-weight: 700;">
+                        <option value="all">Todas las Antenas</option>
+                        <?php foreach($antenas as $ant): ?>
+                            <option value="<?php echo $ant['ant_id']; ?>"><?php echo htmlspecialchars($ant['ubicacion']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 900; color: #10b981; background: #dcfce3; padding: 8px 16px; border-radius: 20px;">
+                        <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                        ONLINE
+                    </div>
                 </div>
             </div>
             <table style="width: 100%; border-collapse: collapse; text-align: left;">
@@ -214,36 +238,7 @@ include 'header.php';
                     </tr>
                 </thead>
                 <tbody id="monitor-tbody">
-                    <?php
-                    try {
-                        require_once __DIR__ . '/../backend/config/Database.php';
-                        $dbObj = \Config\Database::getConnection();
-                        $stmt = $dbObj->query("
-                            SELECT m.*, l.ant_id, a.ubicacion 
-                            FROM MOVIMIENTO_RFID m
-                            JOIN LECTOR l ON m.lec_id = l.lec_id
-                            LEFT JOIN ANTENA a ON l.ant_id = a.ant_id
-                            ORDER BY m.fecha_hora DESC LIMIT 15
-                        ");
-                        $rows = $stmt->fetchAll();
-                        if(count($rows) > 0) {
-                            foreach($rows as $scan) {
-                                $color = $scan['tipo_mov'] === 'ENTRADA' ? '#10b981' : '#f59e0b';
-                                $ubi = $scan['ubicacion'] ?: 'Desconocida';
-                                echo '<tr style="border-bottom: 1px solid #f1f5f9;">';
-                                echo '<td style="padding: 16px 24px; font-family: \'JetBrains Mono\', monospace; font-size: 13px; font-weight: 700; color: #334155;">' . htmlspecialchars($scan['tag_id']) . '</td>';
-                                echo '<td style="padding: 16px 24px;"><span style="background: '.$color.'22; color: '.$color.'; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900;">' . htmlspecialchars($scan['tipo_mov']) . '</span></td>';
-                                echo '<td style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #64748b;">' . htmlspecialchars($ubi) . '</td>';
-                                echo '<td style="padding: 16px 24px; font-size: 13px; color: #94a3b8;">' . htmlspecialchars($scan['fecha_hora']) . '</td>';
-                                echo '</tr>';
-                            }
-                        } else {
-                            echo '<tr><td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-weight: 600;">Aún no hay escaneos en la Base de Datos...</td></tr>';
-                        }
-                    } catch (Exception $e) {
-                        echo '<tr><td colspan="4">Error conectando a DB desde PHP: '.$e->getMessage().'</td></tr>';
-                    }
-                    ?>
+                    <!-- Cargado inicialmente via PHP o JS -->
                 </tbody>
             </table>
         </div>
@@ -372,24 +367,37 @@ include 'header.php';
     }
 
     // Funcionalidad de Monitoreo en Vivo (Polling)
+    // Funcionalidad de Monitoreo en Vivo (Polling)
     async function fetchMonitorData() {
         // Solo hacer la petición si estamos en la pestaña de monitor
         if (document.getElementById('section-monitor').style.display !== 'none') {
+            const filterAntId = document.getElementById('filter-antena').value;
+
             try {
-                const response = await fetch('../backend/api/index.php/hardware/recent-scans', {
+                // Fetch Recent Scans
+                const reqScans = fetch('../backend/api/index.php/hardware/recent-scans', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
+                    body: JSON.stringify({ ant_id: filterAntId })
                 });
-                
-                const result = await response.json();
-                if (result.success && result.data) {
+
+                // Fetch Antennas Status
+                const reqStatus = fetch('../backend/api/index.php/hardware/antennas-status', {
+                    method: 'GET'
+                });
+
+                const [resScans, resStatus] = await Promise.all([reqScans, reqStatus]);
+                const resultScans = await resScans.json();
+                const resultStatus = await resStatus.json();
+
+                // Renderizar Scans
+                if (resultScans.success && resultScans.data) {
                     const tbody = document.getElementById('monitor-tbody');
-                    if (result.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-weight: 600;">Aún no hay escaneos en la Base de Datos...</td></tr>';
+                    if (resultScans.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="padding: 40px; text-align: center; color: #94a3b8; font-weight: 600;">Aún no hay escaneos con estos filtros...</td></tr>';
                     } else {
                         let html = '';
-                        result.data.forEach(scan => {
+                        resultScans.data.forEach(scan => {
                             const color = scan.tipo_mov === 'ENTRADA' ? '#10b981' : '#f59e0b';
                             const ubi = scan.ubicacion ? scan.ubicacion : 'Desconocida';
                             html += `<tr style="border-bottom: 1px solid #f1f5f9;">
@@ -401,10 +409,38 @@ include 'header.php';
                         });
                         tbody.innerHTML = html;
                     }
-                    
-                    const now = new Date();
-                    document.getElementById('monitor-time').innerText = `(Actualizado: ${now.toLocaleTimeString()})`;
                 }
+
+                // Renderizar Estado Antenas
+                if (resultStatus.success && resultStatus.data) {
+                    const grid = document.getElementById('antennas-grid');
+                    let html = '';
+                    resultStatus.data.forEach(ant => {
+                        const isConnected = ant.is_connected == 1;
+                        const iconColor = isConnected ? '#10b981' : '#94a3b8';
+                        const bgColor = isConnected ? '#dcfce3' : '#f1f5f9';
+                        const statusText = isConnected ? 'Conectada (Online)' : 'Fuera de Línea';
+                        const adminStatus = ant.estatus; // Operativa, Mantenimiento...
+
+                        html += `<div style="padding: 16px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h4 style="margin: 0 0 4px 0; font-size: 13px; color: #1e293b;">${ant.ubicacion}</h4>
+                                <p style="margin: 0; font-size: 11px; color: #64748b;">Mantenimiento: ${adminStatus}</p>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; color: ${iconColor}; background: ${bgColor}; padding: 4px 8px; border-radius: 12px;">
+                                    <div style="width: 6px; height: 6px; background: ${iconColor}; border-radius: 50%; ${isConnected ? 'animation: pulse 1.5s infinite;' : ''}"></div>
+                                    ${statusText}
+                                </div>
+                                <span style="font-size: 9px; color: #94a3b8;">Ping: ${ant.last_ping ? ant.last_ping : 'Nunca'}</span>
+                            </div>
+                        </div>`;
+                    });
+                    grid.innerHTML = html;
+                }
+
+                const now = new Date();
+                document.getElementById('monitor-time').innerText = `(Actualizado: ${now.toLocaleTimeString()})`;
             } catch (e) {
                 console.error('Error al actualizar el monitor:', e);
             }
@@ -413,6 +449,8 @@ include 'header.php';
 
     // Consultar nuevos datos cada 2 segundos
     setInterval(fetchMonitorData, 2000);
+    // Fetch inicial rápido si entra al tab
+    document.getElementById('tab-monitor').addEventListener('click', () => { setTimeout(fetchMonitorData, 200); });
 
 </script>
 

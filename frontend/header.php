@@ -207,12 +207,13 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .sidebar-logo {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
-            background: white;
-            padding: 4px;
+            background-color: var(--accent-blue);
+            padding: 6px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
 
         .sidebar-brand h2 {
@@ -670,7 +671,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         </div>
 
         <div class="sidebar-header">
-            <img src="assets/images/sigrat_logo.png" alt="SIGRAT" class="sidebar-logo">
+            <img src="assets/images/sigrat_sidebar_logo.png" alt="SIGRAT" class="sidebar-logo">
             <div class="sidebar-brand">
                 <h2>SIGRAT</h2>
                 <p>Control Integral</p>

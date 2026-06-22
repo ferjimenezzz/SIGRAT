@@ -100,12 +100,31 @@ class EmailService {
      * @param string $to Correo del usuario.
      * @param int $re_id ID de la reserva.
      * @param string $estatus Estatus inicial (Pendiente/Aprobada).
+     * @param string $espacio_nombre Nombre del espacio (opcional).
+     * @param string $fecha_uso Fecha de uso (opcional).
+     * @param string $hora_ent Hora de entrada (opcional).
+     * @param string $hora_sal Hora de salida (opcional).
      */
-    public function sendReservationCreated($to, $re_id, $estatus) {
+    public function sendReservationCreated($to, $re_id, $estatus, $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
         $subject = "Confirmación de solicitud de reserva #$re_id";
+        
+        $detallesHtml = "";
+        if ($espacio_nombre) {
+            $detallesHtml = "
+            <br>
+            <h3>Detalles de la Reserva:</h3>
+            <ul>
+                <li><strong>Lugar:</strong> $espacio_nombre</li>
+                <li><strong>Fecha:</strong> $fecha_uso</li>
+                <li><strong>Horario:</strong> $hora_ent - $hora_sal</li>
+            </ul>
+            <br>";
+        }
+
         $body = "
             <h2>Notificación del Sistema de Reservas</h2>
             <p>Tu solicitud de reserva con el número de folio <strong>#$re_id</strong> ha sido registrada en el sistema.</p>
+            $detallesHtml
             <p>El estatus actual de tu solicitud es: <strong>$estatus</strong>.</p>
             <p>Si el estatus es Pendiente, un administrador revisará tu solicitud y te notificará por este mismo medio una vez que sea autorizada o rechazada.</p>
             <br>
@@ -121,8 +140,11 @@ class EmailService {
      * @param array $re_ids Array de IDs de reservas.
      * @param array $fechas Array de fechas correspondientes.
      * @param string $estatus Estatus inicial.
+     * @param string $espacio_nombre Nombre del espacio (opcional).
+     * @param string $hora_ent Hora de entrada (opcional).
+     * @param string $hora_sal Hora de salida (opcional).
      */
-    public function sendBulkReservationCreated($to, $re_ids, $fechas, $estatus) {
+    public function sendBulkReservationCreated($to, $re_ids, $fechas, $estatus, $espacio_nombre = '', $hora_ent = '', $hora_sal = '') {
         $subject = "Confirmación de solicitudes de reserva múltiples";
         
         $listaReservas = "";
@@ -131,12 +153,25 @@ class EmailService {
             $listaReservas .= "<li>Reserva <strong>#" . $re_ids[$i] . "</strong> para el día <strong>" . $fechaStr . "</strong></li>";
         }
 
+        $detallesHtml = "";
+        if ($espacio_nombre) {
+            $detallesHtml = "
+            <br>
+            <h3>Detalles Compartidos:</h3>
+            <ul>
+                <li><strong>Lugar:</strong> $espacio_nombre</li>
+                <li><strong>Horario:</strong> $hora_ent - $hora_sal</li>
+            </ul>
+            <br>";
+        }
+
         $body = "
             <h2>Notificación del Sistema de Reservas</h2>
             <p>Tus solicitudes de reserva han sido registradas en el sistema exitosamente:</p>
             <ul>
                 $listaReservas
             </ul>
+            $detallesHtml
             <p>El estatus actual de estas solicitudes es: <strong>$estatus</strong>.</p>
             <p>Si el estatus es Pendiente, un administrador revisará tus solicitudes y te notificará una vez que sean autorizadas o rechazadas.</p>
             <br>
@@ -151,11 +186,26 @@ class EmailService {
      * @param string $to Correo del usuario.
      * @param int $re_id ID de la reserva.
      */
-    public function sendReservationApproved($to, $re_id) {
+    public function sendReservationApproved($to, $re_id, $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
         $subject = "Reserva Aprobada #$re_id";
+        
+        $detallesHtml = "";
+        if ($espacio_nombre) {
+            $detallesHtml = "
+            <br>
+            <h3>Detalles de la Reserva:</h3>
+            <ul>
+                <li><strong>Lugar:</strong> $espacio_nombre</li>
+                <li><strong>Fecha:</strong> $fecha_uso</li>
+                <li><strong>Horario:</strong> $hora_ent - $hora_sal</li>
+            </ul>
+            <br>";
+        }
+
         $body = "
             <h2>¡Tu reserva ha sido aprobada!</h2>
             <p>Nos complace informarte que tu solicitud de reserva con el número de folio <strong>#$re_id</strong> ha sido <strong>autorizada</strong>.</p>
+            $detallesHtml
             <p>Por favor, asegúrate de cumplir con los lineamientos de uso del espacio asignado.</p>
             <br>
             <p>Saludos cordiales,<br>Equipo SIGRAT</p>
