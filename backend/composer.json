@@ -1,5 +1,19 @@
 {
+    "name": "ferjimenezzz/sigrat",
+    "description": "Project dependencies generated from composer.lock",
     "require": {
-        "phpmailer/phpmailer": "^7.1"
+        "php": ">=5.5.0",
+        "phpmailer/phpmailer": "v7.1.1",
+        "ext-ctype": "*",
+        "ext-filter": "*",
+        "ext-hash": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPMailer\\PHPMailer\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
     }
 }

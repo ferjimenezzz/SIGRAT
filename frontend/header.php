@@ -198,7 +198,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .sidebar-header {
-            padding: 8px 18px 20px 18px;
+            padding: 8px 18px 20px 26px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -207,13 +207,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .sidebar-logo {
-            width: 42px;
-            height: 42px;
+            width: 60px;
+            height: 60px;
             object-fit: contain;
-            background-color: var(--accent-blue);
-            padding: 6px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
 
         .sidebar-brand h2 {
