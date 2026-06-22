@@ -667,7 +667,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         </div>
 
         <div class="sidebar-header">
-            <img src="assets/images/sigrat_sidebar_logo.png" alt="SIGRAT" class="sidebar-logo">
+            <img src="assets/images/sigrat_logo.png" alt="SIGRAT" class="sidebar-logo" style="filter: brightness(0) invert(1); drop-shadow(0 0 2px rgba(0,0,0,0.5));">
             <div class="sidebar-brand">
                 <h2>SIGRAT</h2>
                 <p>Control Integral</p>
