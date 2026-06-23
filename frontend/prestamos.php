@@ -267,7 +267,6 @@ foreach ($loans as $l) {
                                 <option value="Proyector">Proyector</option>
                                 <option value="Router">Router</option>
                                 <option value="Cable">Cable</option>
-                                <option value="Mobiliario">Mobiliario</option>
                             </select>
                         </div>
                         <?php if ($isAdmin): ?>
@@ -408,7 +407,7 @@ foreach ($loans as $l) {
     $(document).ready(function() {
         $('.searchable-select').select2({
             placeholder: "Escribe para buscar...",
-            allowClear: true,
+            allowClear: false,
             width: '100%'
         });
     });
