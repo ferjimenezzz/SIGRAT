@@ -29,7 +29,7 @@ if (isset($_SESSION['us_id'])) {
     include 'header.php';
     
     try {
-        $recentLogs = $auditController->getFiltered(null, null, null); 
+        $recentLogs = $auditController->getGeneralActivity([]); 
         $stats = $dashController->getStats();
         $usage = $dashController->getSpaceUsage();
         $resByDay = $dashController->getReservationsByDay();
