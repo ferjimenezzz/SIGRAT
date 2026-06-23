@@ -5,7 +5,6 @@
  * @description Módulo administrativo para listar, buscar, filtrar y registrar préstamos de equipo.
  */
 require_once 'seguridad.php';
-require_once 'header.php';
 require_once '../backend/controllers/LoanController.php';
 
 $loanController = new \Controllers\LoanController();
@@ -51,6 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         else { header("Location: prestamos.php?error=" . urlencode($res['error'])); exit(); }
     }
 }
+
+// Cargar la vista (ahora sí, se permite output HTML)
+require_once 'header.php';
 
 $loans = $loanController->getAllLoans($us_id_sesion, $isAdmin);
 $availableAssets = $loanController->getAvailableAssets();
