@@ -186,7 +186,7 @@ function ReservationApprovalApp() {
     sx: {
       color: '#3b82f6'
     }
-  })) : /*#__PURE__*/React.createElement(TableContainer, null, /*#__PURE__*/React.createElement(Table, null, /*#__PURE__*/React.createElement(TableHead, {
+  })) : /*#__PURE__*/React.createElement(TableContainer, { sx: { maxHeight: 450 } }, /*#__PURE__*/React.createElement(Table, { stickyHeader: true }, /*#__PURE__*/React.createElement(TableHead, {
     sx: {
       bgcolor: "#f8fafc"
     }
