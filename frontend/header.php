@@ -131,8 +131,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-main);
             color: var(--text-primary);
+            display: flex;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
         /* ==================== SIDEBAR ==================== */
@@ -390,6 +390,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         /* ==================== MAIN CONTAINER ==================== */
         .main-container {
+            flex: 1;
             margin-left: 240px;
             display: flex;
             flex-direction: column;
@@ -651,65 +652,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         .form-control:focus { outline: none; border-color: var(--accent-blue); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         
         label { display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
-
-        /* ==================== RESPONSIVE QUERIES ==================== */
-        .mobile-menu-btn {
-            display: none;
-            background: transparent;
-            border: none;
-            font-size: 26px;
-            color: var(--text-primary);
-            cursor: pointer;
-            margin-right: 16px;
-            padding: 4px;
-        }
-
-        .topbar-left-wrapper {
-            display: flex;
-            align-items: center;
-        }
-
-        @media (max-width: 992px) {
-            .main-container { margin-left: 80px; }
-            .sidebar { width: 80px; min-width: 80px; }
-            .sidebar-brand, .nav-item span, .sidebar-user-info, .sidebar-logout span { display: none; }
-            .sidebar-header { padding: 8px 0 20px 0; justify-content: center; }
-            .sidebar-logo { margin: 0; }
-            .nav-item { justify-content: center; padding: 11px 0; }
-            .nav-item i { margin: 0; font-size: 20px; width: auto; }
-            .sidebar-user { justify-content: center; padding: 16px 0; margin: 8px 12px 12px 12px; }
-            .sidebar-logout { justify-content: center; padding: 10px 0; }
-            .sidebar-logout i { margin: 0; }
-            .sidebar-toggle-btn { display: none; }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-menu-btn { display: block; }
-            .sidebar {
-                transform: translateX(-100%);
-                width: 260px;
-                min-width: 260px;
-                transition: transform 0.3s ease;
-                box-shadow: 4px 0 24px rgba(0,0,0,0.2);
-            }
-            body.sidebar-mobile-open .sidebar { transform: translateX(0); }
-            
-            /* Restore sidebar content when open on mobile */
-            .sidebar-brand, .nav-item span, .sidebar-user-info, .sidebar-logout span { display: block; }
-            .sidebar-header { padding: 8px 18px 20px 26px; justify-content: flex-start; }
-            .nav-item { justify-content: flex-start; padding: 11px 14px; }
-            .nav-item i { margin-right: 12px; width: 20px; font-size: 18px; }
-            .sidebar-user { justify-content: flex-start; padding: 16px 14px; margin: 8px 12px 12px 12px; }
-            .sidebar-logout { justify-content: flex-start; padding: 10px 14px; margin: 0 12px 16px 12px; }
-            
-            .main-container { margin-left: 0; }
-            body.sidebar-collapsed .main-container { margin-left: 0; }
-            
-            .topbar-date, .search-box { display: none; }
-            .topbar-left h1 { font-size: 16px; }
-            .topbar-left p { display: none; }
-            .content-padding { padding: 16px; }
-        }
     </style>
 </head>
 <body>
@@ -794,18 +736,13 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
     <div class="main-container">
         <header class="top-bar">
-            <div class="topbar-left-wrapper">
-                <button id="mobileMenuBtn" class="mobile-menu-btn">
-                    <i class="bi bi-list"></i>
-                </button>
-                <div class="topbar-left">
-                    <?php 
-                    $generoUsuario = $_SESSION['genero'] ?? 'Masculino';
-                    $saludoTexto = ($generoUsuario === 'Femenino') ? '¡Bienvenida' : '¡Bienvenido';
-                    ?>
-                    <h1><?php echo $saludoTexto; ?>, <?php echo explode(' ', $nombreUsuario)[0]; ?>!</h1>
-                    <p>Resumen general del sistema</p>
-                </div>
+            <div class="topbar-left">
+                <?php 
+                $generoUsuario = $_SESSION['genero'] ?? 'Masculino';
+                $saludoTexto = ($generoUsuario === 'Femenino') ? '¡Bienvenida' : '¡Bienvenido';
+                ?>
+                <h1><?php echo $saludoTexto; ?>, <?php echo explode(' ', $nombreUsuario)[0]; ?>!</h1>
+                <p>Resumen general del sistema</p>
             </div>
             <div class="topbar-right">
                 <div class="topbar-icon-btn" id="notifBtn">
@@ -848,23 +785,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     localStorage.setItem('sigrat_sidebar_collapsed', isCollapsed ? 'true' : 'false');
                 });
             }
-
-            // Mobile Sidebar Toggle Logic
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    document.body.classList.toggle('sidebar-mobile-open');
-                });
-            }
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function(e) {
-                const sidebar = document.querySelector('.sidebar');
-                if (document.body.classList.contains('sidebar-mobile-open') && sidebar && !sidebar.contains(e.target) && (!mobileMenuBtn || !mobileMenuBtn.contains(e.target))) {
-                    document.body.classList.remove('sidebar-mobile-open');
-                }
-            });
         });
         </script>
         

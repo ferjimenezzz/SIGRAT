@@ -461,60 +461,6 @@ if (isset($_SESSION['us_id'])) {
             font-size: 14px;
             font-weight: 600;
         }
-
-        /* ==================== RESPONSIVE QUERIES ==================== */
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 992px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            .donut-container {
-                flex-direction: column;
-            }
-            .donut-legend {
-                margin-left: 0;
-                margin-top: 20px;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 16px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .chart-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .donut-wrapper {
-                width: 200px !important;
-                height: 200px !important;
-            }
-            .reservations-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .reservation-item {
-                flex-wrap: wrap;
-            }
-            .res-time {
-                width: 100%;
-                margin-bottom: 4px;
-            }
-            .res-badge {
-                margin-left: auto;
-            }
-        }
     </style>
 
     <!-- ==================== STAT CARDS ==================== -->
@@ -623,7 +569,7 @@ if (isset($_SESSION['us_id'])) {
     <!-- ==================== MAIN DASHBOARD LAYOUT ==================== -->
     
     <!-- ROW 1: CHARTS -->
-    <div class="charts-grid" style="margin-bottom: 24px; align-items: stretch;">
+    <div class="charts-grid" style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 24px; align-items: stretch;">
         <!-- Bar Chart: Espacios más utilizados -->
         <div class="chart-card" style="display: flex; flex-direction: column; min-height: 350px;">
             <div class="chart-header">
