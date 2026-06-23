@@ -277,9 +277,9 @@ $tab = $_GET['tab'] ?? 'usuarios';
     </div>
 
     <!-- Pestaña Usuarios -->
-    <div id="tab-usuarios" class="card" style="display: <?php echo $tab === 'usuarios' ? 'block' : 'none'; ?>; padding: 0; overflow: hidden; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: white;">
+    <div id="tab-usuarios" class="card" style="display: <?php echo $tab === 'usuarios' ? 'block' : 'none'; ?>; padding: 0; overflow-y: auto; max-height: 450px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: white;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;" id="usersTable">
-            <thead style="border-bottom: 1px solid #e2e8f0;">
+            <thead style="border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; background: #f8fafc;">
                 <tr>
                     <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Usuario</th>
                     <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Rol</th>
