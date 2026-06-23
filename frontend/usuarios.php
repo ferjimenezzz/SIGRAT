@@ -59,17 +59,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $empresa = $_POST['empresa'] ?? '';
         $rfc = $_POST['rfc_matricula'] ?? '';
         $rol_id = $_POST['rol_id'];
+        $genero = $_POST['genero'] ?? 'Masculino';
         $us_id = $_POST['us_id'] ?? null;
 
         if ($us_id) {
-            $stmt = $db->prepare("UPDATE usuario SET nombre=?, apellido=?, correo=?, empresa=?, rfc_matricula=?, rol_id=? WHERE us_id=?");
-            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $us_id]);
+            $stmt = $db->prepare("UPDATE usuario SET nombre=?, apellido=?, correo=?, empresa=?, rfc_matricula=?, rol_id=?, genero=? WHERE us_id=?");
+            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $genero, $us_id]);
         } else {
             $pass = AuthController::hashPassword('123456');
-            $stmt = $db->prepare("INSERT INTO usuario (nombre, apellido, correo, empresa, rfc_matricula, rol_id, contrasena, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, 'Activo')");
-            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $pass]);
+            $stmt = $db->prepare("INSERT INTO usuario (nombre, apellido, correo, empresa, rfc_matricula, rol_id, genero, contrasena, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Activo')");
+            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $genero, $pass]);
         }
-        header("Location: usuarios.php?tab=usuarios&success=1");
         header("Location: usuarios.php?tab=usuarios&success=1");
         exit();
     } elseif ($_POST['action'] === 'save_role') {
@@ -440,13 +440,20 @@ $tab = $_GET['tab'] ?? 'usuarios';
                 <input type="email" name="correo" id="us_correo" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 32px;">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Rol Asignado</label>
                     <select name="rol_id" id="us_rol" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
                         <?php foreach ($roles as $r): ?>
                             <option value="<?php echo $r['rol_id']; ?>"><?php echo htmlspecialchars($r['nombre']); ?></option>
                         <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Género</label>
+                    <select name="genero" id="us_genero" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
                     </select>
                 </div>
                 <div>
@@ -811,6 +818,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('us_apellido').value = u.apellido || '';
         document.getElementById('us_correo').value = u.correo || '';
         document.getElementById('us_rol').value = u.rol_id;
+        document.getElementById('us_genero').value = u.genero || 'Masculino';
         document.getElementById('us_rfc').value = u.rfc_matricula || u.empresa || '';
         document.getElementById('user-modal-title').innerText = 'Editar Usuario';
         document.getElementById('modal-usuario').style.display = 'flex';

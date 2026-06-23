@@ -26,6 +26,7 @@ if (isset($_COOKIE['auth_token'])) {
         $_SESSION['nombre'] = $payload['nombre'];
         $_SESSION['rol'] = $payload['rol'];
         $_SESSION['permisos'] = $payload['permisos'];
+        $_SESSION['genero'] = $payload['genero'] ?? 'Masculino';
         $jwt_valid = true;
         
         // Sliding Expiration: Renovar la cookie por otros 8 horas para mantener la sesión activa
@@ -735,7 +736,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     <div class="main-container">
         <header class="top-bar">
             <div class="topbar-left">
-                <h1>¡Bienvenido, <?php echo explode(' ', $nombreUsuario)[0]; ?>!</h1>
+                <?php 
+                $generoUsuario = $_SESSION['genero'] ?? 'Masculino';
+                $saludoTexto = ($generoUsuario === 'Femenino') ? '¡Bienvenida' : '¡Bienvenido';
+                ?>
+                <h1><?php echo $saludoTexto; ?>, <?php echo explode(' ', $nombreUsuario)[0]; ?>!</h1>
                 <p>Resumen general del sistema</p>
             </div>
             <div class="topbar-right">

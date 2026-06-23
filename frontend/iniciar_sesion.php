@@ -31,6 +31,7 @@ if (isset($_POST['login'])) {
             'nombre' => $user['nombre'],
             'rol' => $user['rol_nombre'],
             'carrera' => $user['carrera'],
+            'genero' => $user['genero'],
             'permisos' => json_decode($user['permisos'], true)
         ];
 
@@ -43,6 +44,7 @@ if (isset($_POST['login'])) {
         $_SESSION['us_id'] = $user['us_id'];
         $_SESSION['nombre'] = $user['nombre'];
         $_SESSION['rol'] = $user['rol_nombre'];
+        $_SESSION['genero'] = $user['genero'];
         $_SESSION['permisos'] = json_decode($user['permisos'], true);
         $_SESSION['division'] = $user['carrera'];
         

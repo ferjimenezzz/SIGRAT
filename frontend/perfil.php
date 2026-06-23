@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $nuevoTelefono  = trim($_POST['telefono'] ?? '');
     $nuevoCorreo    = trim($_POST['correo'] ?? '');
     $nuevaArea      = trim($_POST['carrera'] ?? '');
+    $nuevoGenero    = trim($_POST['genero'] ?? 'Masculino');
 
     $errores = [];
     if (empty($nuevoNombre))   $errores[] = "El nombre no puede estar vacío.";
@@ -42,12 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     if (empty($errores)) {
         try {
-            $updateStmt = $db->prepare("UPDATE USUARIO SET nombre = ?, telefono = ?, correo = ?, carrera = ? WHERE us_id = ?");
-            $updateStmt->execute([$nuevoNombre, $nuevoTelefono, $nuevoCorreo, $nuevaArea, $us_id]);
+            $updateStmt = $db->prepare("UPDATE USUARIO SET nombre = ?, telefono = ?, correo = ?, carrera = ?, genero = ? WHERE us_id = ?");
+            $updateStmt->execute([$nuevoNombre, $nuevoTelefono, $nuevoCorreo, $nuevaArea, $nuevoGenero, $us_id]);
 
             // Actualizar sesión
             $_SESSION['nombre']   = $nuevoNombre;
             $_SESSION['division'] = $nuevaArea;
+            $_SESSION['genero']   = $nuevoGenero;
 
             // Regenerar JWT con todos los campos actualizados
             $auth = new \Controllers\AuthController();
@@ -56,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'nombre'   => $nuevoNombre,
                 'rol'      => $_SESSION['rol'],
                 'carrera'  => $nuevaArea,
+                'genero'   => $nuevoGenero,
                 'permisos' => json_decode($usuarioInfo['permisos'], true)
             ];
             $newToken = $auth->generateJWT($newPayload);
@@ -143,6 +146,16 @@ include 'header.php';
                     <label style="display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: none;">Correo institucional</label>
                     <input type="email" name="correo" value="<?php echo htmlspecialchars($usuarioInfo['correo']); ?>" class="form-control" style="background: white;" required>
                     <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">Puedes modificar tu correo</div>
+                </div>
+
+                <!-- Género -->
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: none;">Género</label>
+                    <select name="genero" class="form-control" style="background: white; padding: 10px 16px;">
+                        <option value="Masculino" <?php echo (($usuarioInfo['genero'] ?? 'Masculino') === 'Masculino') ? 'selected' : ''; ?>>Masculino</option>
+                        <option value="Femenino" <?php echo (($usuarioInfo['genero'] ?? '') === 'Femenino') ? 'selected' : ''; ?>>Femenino</option>
+                    </select>
+                    <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">Para tu saludo personalizado</div>
                 </div>
 
                 <!-- Teléfono -->
@@ -235,6 +248,7 @@ include 'header.php';
         <ul style="font-size: 12px; color: #1e293b; font-weight: 600; padding-left: 18px; margin-bottom: 20px; line-height: 2;">
             <li>Nombre completo</li>
             <li>Correo institucional</li>
+            <li>Género</li>
             <li>Número telefónico</li>
             <li>Organización / Área</li>
         </ul>
