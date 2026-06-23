@@ -1,8 +1,8 @@
 <?php
 /**
  * @file auditoria.php
- * @summary Módulo de Auditoría y Trazabilidad con Filtros y Exportación.
- * @description Permite visualizar y filtrar los movimientos del sistema, con opción de reporte.
+ * @summary Módulo de Auditoría y Reportes dinámicos.
+ * @description Interfaz adaptativa según el reporte seleccionado.
  */
 require_once 'seguridad.php';
 require_once '../backend/controllers/AuditController.php';
@@ -11,37 +11,58 @@ require_once '../backend/config/Database.php';
 $auditController = new Controllers\AuditController();
 $db = Config\Database::getConnection();
 
-// Capturar filtros básicos
-$fecha_inicio = $_GET['fecha_inicio'] ?? null;
-$fecha_fin = $_GET['fecha_fin'] ?? null;
-$us_id = $_GET['us_id'] ?? null;
-$modulo = $_GET['modulo'] ?? null;
-$tipo_reporte = $_GET['tipo_reporte'] ?? 'auditoria'; // 'auditoria' o 'uso_espacios'
-
-// Capturar filtros extra
-$extra_filters = [
-    'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
+// Capturar parámetros
+$tipo_reporte = $_GET['tipo_reporte'] ?? 'actividad';
+$filtros = [
+    'fecha_inicio' => $_GET['fecha_inicio'] ?? null,
+    'fecha_fin' => $_GET['fecha_fin'] ?? null,
     'edificio' => $_GET['edificio'] ?? null,
+    'modulo' => $_GET['modulo'] ?? null,
     'estado' => $_GET['estado'] ?? null,
-    'incluir_prestamos' => $_GET['incluir_prestamos'] ?? null,
-    'incluir_transferencias' => $_GET['incluir_transferencias'] ?? null,
+    'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
+    'buscar_activo' => $_GET['buscar_activo'] ?? null,
+    'metrica' => $_GET['metrica'] ?? 'reservas',
+    'limit' => $_GET['limit'] ?? 10
 ];
 
-if ($tipo_reporte === 'uso_espacios') {
-    $espacios_logs = $auditController->getSpaceUsageReport($fecha_inicio, $fecha_fin, $extra_filters['edificio'] ?? null);
-    $espacios_stats = $auditController->getSpaceUsageStats($fecha_inicio, $fecha_fin, $extra_filters['edificio'] ?? null);
-} else {
-    $logs = $auditController->getFiltered($fecha_inicio, $fecha_fin, $us_id, $modulo, $extra_filters);
-    $stats = $auditController->getAuditStats();
+$logs = [];
+$stats = $auditController->getAuditStats();
+
+// Procesar según reporte
+switch ($tipo_reporte) {
+    case 'asistencia':
+        $logs = $auditController->getAttendanceReport($filtros);
+        break;
+    case 'aulas_top':
+        $logs = $auditController->getTopSpaces($filtros);
+        break;
+    case 'uso_edificio':
+        $logs = $auditController->getUsageByBuilding($filtros);
+        break;
+    case 'asistencia_usuario':
+        $logs = $auditController->getAttendanceByUser($filtros);
+        break;
+    case 'prestamos':
+        $logs = $auditController->getAssetLoans($filtros);
+        break;
+    case 'inventario':
+        $logs = $auditController->getInventoryMovements($filtros);
+        break;
+    case 'incidencias':
+        $logs = $auditController->getIncidents($filtros);
+        break;
+    case 'actividad':
+    default:
+        $logs = $auditController->getGeneralActivity($filtros);
+        break;
 }
 
-$usuarios = $db->query("SELECT us_id, nombre FROM USUARIO ORDER BY nombre")->fetchAll();
+$usuarios = $db->query("SELECT us_id, nombre FROM usuario ORDER BY nombre")->fetchAll();
 
 include 'header.php';
 ?>
 
 <style>
-    /* Diseño Sistema (Tailwind-like variables) */
     :root {
         --primary: #2563eb;
         --primary-dark: #1e3a8a;
@@ -52,640 +73,314 @@ include 'header.php';
         --bg-main: #f8fafc;
         --radius: 12px;
         --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --font-sans: 'Inter', system-ui, sans-serif;
     }
+    .audit-container { padding: 0 24px 40px 24px; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; gap: 24px; }
+    .card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; border: 1px solid var(--border); }
+    .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end; }
+    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+    .filter-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .filter-group input, .filter-group select { padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; }
+    .filter-group input:focus, .filter-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; text-decoration: none; border: none; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary { background: var(--secondary); color: var(--text-muted); }
+    .btn-outline { border: 1px solid var(--border); background: white; color: var(--text-main); }
+    
+    /* Preset Dates */
+    .preset-dates { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .preset-chip { padding: 6px 12px; font-size: 11px; font-weight: 600; background: #f1f5f9; color: #475569; border-radius: 16px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+    .preset-chip:hover, .preset-chip.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+    
+    /* Table */
+    .table-container { overflow-x: auto; max-height: 500px; border: 1px solid var(--border); border-radius: var(--radius); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 16px 20px; font-size: 12px; font-weight: 700; color: var(--text-muted); background: var(--bg-main); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+    td { padding: 14px 20px; font-size: 13px; border-bottom: 1px solid var(--secondary); color: var(--text-main); }
 
-    .audit-container {
-        font-family: var(--font-sans);
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-        color: var(--text-main);
-        width: 100%;
-        padding: 0 24px 40px 24px;
-    }
-
-    .header-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-    }
-
-    .header-section h1 {
-        font-size: 28px;
-        font-weight: 800;
-        margin: 0 0 8px 0;
-        letter-spacing: -0.5px;
-    }
-
-    .header-section p {
-        color: var(--text-muted);
-        font-size: 14px;
-        margin: 0;
-    }
-
-
-
-    .card {
-        background: white;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 24px;
-        border: 1px solid var(--border);
-    }
-
-    .filters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        align-items: end;
-    }
-
-    .filter-group label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-main);
-        margin-bottom: 8px;
-    }
-
-    .filter-group input, .filter-group select {
-        width: 100%;
-        padding: 10px 14px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 14px;
-        color: var(--text-main);
-        background: #fff;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    .filter-group input:focus, .filter-group select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    .btn-more-filters {
-        background: var(--primary-dark);
-        color: white;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 8px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        width: max-content;
-    }
-
-    .more-filters-section {
-        display: none;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-    }
-
-    .more-filters-section.active {
-        display: block;
-    }
-
-    .filters-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 16px;
-        margin-top: 24px;
-    }
-
-    .btn-clear {
-        padding: 10px 20px;
-        background: var(--secondary);
-        color: var(--text-muted);
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-    }
-
-    .btn-apply {
-        padding: 10px 24px;
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 20px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-
-    .stat-icon.blue { background: #eff6ff; color: #3b82f6; }
-    .stat-icon.green { background: #f0fdf4; color: #22c55e; }
-    .stat-icon.orange { background: #fff7ed; color: #f97316; }
-    .stat-icon.purple { background: #faf5ff; color: #a855f7; }
-
-    .stat-info h4 {
-        margin: 0;
-        font-size: 13px;
-        color: var(--text-main);
-        font-weight: 700;
-    }
-
-    .stat-info p {
-        margin: 4px 0 0 0;
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-
-    .report-section {
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-end;
-        gap: 20px;
-    }
-
-    .report-include {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 20px;
-        max-width: 400px;
-    }
-
-    .report-include h3 {
-        margin: 0 0 16px 0;
-        font-size: 16px;
-    }
-
-    .report-include ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        font-size: 13px;
-        color: var(--text-muted);
-    }
-
-    .report-include li {
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .report-include li i {
-        color: var(--primary);
-        width: 16px;
-    }
-
-    .btn-download {
-        background: var(--primary-dark);
-        color: white;
-        padding: 14px 28px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        height: max-content;
-    }
-
-    .table-card {
-        padding: 0;
-        overflow-x: auto;
-        overflow-y: auto;
-        max-height: 450px;
-        position: relative;
-    }
-
-    .table-card table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-
-    .table-card th {
-        padding: 16px 24px;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-muted);
-        background: var(--bg-main);
-        border-bottom: 1px solid var(--border);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        box-shadow: 0 1px 0 var(--border);
-    }
-
-    .table-card td {
-        padding: 16px 24px;
-        font-size: 14px;
-        border-bottom: 1px solid var(--secondary);
-        color: var(--text-main);
-    }
-
-    .badge {
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        background: #eff6ff;
-        color: #2563eb;
-        text-transform: uppercase;
-        display: inline-block;
-    }
-
-    /* Media queries para responsividad */
-    @media (max-width: 1024px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
+    /* Print Styles */
+    @media print {
+        /* Ocultar elementos no deseados */
+        .sidebar, .top-bar, form#filterForm, .btn-primary, .btn-secondary, .btn-outline, .preset-dates, .audit-container > div:first-child {
+            display: none !important;
         }
-    }
-
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
+        
+        /* Ajustar contenedor principal */
+        body, .main-container {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
         }
-        .report-section {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 20px;
+        .audit-container {
+            padding: 0 !important;
         }
-        .report-include {
-            max-width: 100%;
+        
+        /* Ajustar la tarjeta de la tabla */
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
         }
-        .header-section {
-            flex-direction: column;
-            gap: 15px;
+        
+        /* Quitar scroll y expandir tabla completa */
+        .table-container {
+            overflow: visible !important;
+            max-height: none !important;
+            border: none !important;
         }
-        .filters-grid[style] {
-            grid-template-columns: 1fr !important;
+        th {
+            position: static !important;
+            background: #f8fafc !important;
+            color: black !important;
+            border-bottom: 2px solid black !important;
         }
-        .filters-actions {
-            flex-direction: column;
-            width: 100%;
-        }
-        .btn-clear, .btn-apply {
-            justify-content: center;
-            width: 100%;
+        td {
+            border-bottom: 1px solid #ccc !important;
         }
     }
 </style>
 
 <div class="audit-container">
-
-    <!-- Header -->
-    <div class="header-section">
-        <div>
-            <h1>Bitácora de Auditoría</h1>
-            <p>Trazabilidad completa de acciones y movimientos del sistema.</p>
-        </div>
+    <div>
+        <h1 style="font-size: 24px; margin:0 0 4px 0;">Módulo de Auditoría y Reportes</h1>
+        <p style="color: #64748b; margin:0; font-size: 14px;">Centro de análisis y trazabilidad del sistema.</p>
     </div>
 
-    <!-- Filtros -->
     <div class="card">
-        <h3 style="margin-top:0; margin-bottom:20px; font-size:18px;">Filtros del Reporte</h3>
-        
-        <form method="GET" action="auditoria.php">
-            <!-- Main Filters Row -->
-            <div class="filters-grid" style="grid-template-columns: 1fr 1fr 1fr auto;">
+        <form method="GET" action="auditoria.php" id="filterForm">
+            <!-- Selector Principal -->
+            <div class="filter-group" style="margin-bottom: 24px; max-width: 400px;">
+                <label>Selecciona el tipo de reporte</label>
+                <select name="tipo_reporte" id="tipoReporte" style="font-size: 15px; font-weight: 600; padding: 12px;">
+                    <option value="actividad" <?php echo $tipo_reporte == 'actividad' ? 'selected' : ''; ?>>Actividad general del sistema</option>
+                    <option value="asistencia" <?php echo $tipo_reporte == 'asistencia' ? 'selected' : ''; ?>>Reporte de asistencia a aulas</option>
+                    <option value="aulas_top" <?php echo $tipo_reporte == 'aulas_top' ? 'selected' : ''; ?>>Reporte de aulas más utilizadas</option>
+                    <option value="uso_edificio" <?php echo $tipo_reporte == 'uso_edificio' ? 'selected' : ''; ?>>Reporte de uso por edificio</option>
+                    <option value="asistencia_usuario" <?php echo $tipo_reporte == 'asistencia_usuario' ? 'selected' : ''; ?>>Reporte de asistencia por usuario</option>
+                    <option value="prestamos" <?php echo $tipo_reporte == 'prestamos' ? 'selected' : ''; ?>>Reporte de préstamos de activos</option>
+                    <option value="inventario" <?php echo $tipo_reporte == 'inventario' ? 'selected' : ''; ?>>Reporte de movimientos de inventario</option>
+                    <option value="incidencias" <?php echo $tipo_reporte == 'incidencias' ? 'selected' : ''; ?>>Reporte de incidencias y mantenimientos</option>
+                </select>
+            </div>
+
+            <!-- Rango de Fechas (Siempre visible) -->
+            <div class="filters-grid" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;">
                 <div class="filter-group">
-                    <label>Tipo de Reporte</label>
-                    <select name="tipo_reporte" id="tipoReporteSelect">
-                        <option value="auditoria" <?php echo $tipo_reporte === 'auditoria' ? 'selected' : ''; ?>>Auditoría del Sistema</option>
-                        <option value="uso_espacios" <?php echo $tipo_reporte === 'uso_espacios' ? 'selected' : ''; ?>>Asistencias y Uso de Espacios</option>
-                    </select>
+                    <label>Desde Fecha</label>
+                    <input type="date" name="fecha_inicio" id="fecha_inicio" value="<?php echo $filtros['fecha_inicio']; ?>">
                 </div>
                 <div class="filter-group">
+                    <label>Hasta Fecha</label>
+                    <input type="date" name="fecha_fin" id="fecha_fin" value="<?php echo $filtros['fecha_fin']; ?>">
+                </div>
+                <div style="grid-column: 1 / -1;" class="preset-dates">
+                    <span class="preset-chip" onclick="setPreset('hoy')">Hoy</span>
+                    <span class="preset-chip" onclick="setPreset('semana')">Esta semana</span>
+                    <span class="preset-chip" onclick="setPreset('mes')">Este mes</span>
+                    <span class="preset-chip" onclick="setPreset('30dias')">Últimos 30 días</span>
+                    <span class="preset-chip" onclick="setPreset('custom')">Limpiar fechas</span>
+                </div>
+            </div>
+
+            <!-- Filtros Dinámicos -->
+            <div class="filters-grid" id="dynamicFilters">
+                
+                <div class="filter-group fg-edificio" style="display:none;">
                     <label>Edificio</label>
                     <select name="edificio">
-                        <option value="Todos">Todos</option>
-                        <option value="CIC" <?php echo ($extra_filters['edificio'] ?? '') === 'CIC' ? 'selected' : ''; ?>>CIC</option>
-                        <option value="Edificio 1" <?php echo ($extra_filters['edificio'] ?? '') === 'Edificio 1' ? 'selected' : ''; ?>>Edificio Principal</option>
+                        <option value="Todos">Todos los edificios</option>
+                        <option value="CIC" <?php echo $filtros['edificio'] == 'CIC' ? 'selected' : ''; ?>>CIC</option>
+                        <option value="Edificio 1" <?php echo $filtros['edificio'] == 'Edificio 1' ? 'selected' : ''; ?>>Edificio 1</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <label>Módulo</label>
+
+                <div class="filter-group fg-usuario" style="display:none;">
+                    <label>Buscar Usuario</label>
+                    <input type="text" name="buscar_usuario" placeholder="Nombre de profesor o alumno..." value="<?php echo htmlspecialchars($filtros['buscar_usuario'] ?? ''); ?>">
+                </div>
+
+                <div class="filter-group fg-modulo" style="display:none;">
+                    <label>Módulo del Sistema</label>
                     <select name="modulo">
-                        <option value="">Todos los movimientos</option>
-                        <option value="USUARIOS" <?php echo $modulo == 'USUARIOS' ? 'selected' : ''; ?>>Usuarios</option>
-                        <option value="RESERVAS" <?php echo $modulo == 'RESERVAS' ? 'selected' : ''; ?>>Reservas</option>
-                        <option value="ACTIVOS" <?php echo $modulo == 'ACTIVOS' ? 'selected' : ''; ?>>Activos</option>
-                        <option value="SEGURIDAD" <?php echo $modulo == 'SEGURIDAD' ? 'selected' : ''; ?>>Seguridad</option>
-                        <option value="PRESTAMOS" <?php echo $modulo == 'PRESTAMOS' ? 'selected' : ''; ?>>Préstamos</option>
+                        <option value="">Todos los módulos</option>
+                        <option value="USUARIOS" <?php echo $filtros['modulo'] == 'USUARIOS' ? 'selected' : ''; ?>>Usuarios</option>
+                        <option value="RESERVAS" <?php echo $filtros['modulo'] == 'RESERVAS' ? 'selected' : ''; ?>>Reservas</option>
+                        <option value="ACTIVOS" <?php echo $filtros['modulo'] == 'ACTIVOS' ? 'selected' : ''; ?>>Activos</option>
+                        <option value="PRESTAMOS" <?php echo $filtros['modulo'] == 'PRESTAMOS' ? 'selected' : ''; ?>>Préstamos</option>
                     </select>
                 </div>
-                <?php $isFiltersActive = array_filter($extra_filters) || $fecha_inicio || $fecha_fin; ?>
-                <div class="filter-group">
-                    <button type="button" class="btn-more-filters" id="toggleFiltersBtn">
-                        <i data-lucide="settings"></i> Más filtros <i data-lucide="<?php echo $isFiltersActive ? 'chevron-up' : 'chevron-down'; ?>" id="toggleIcon"></i>
-                    </button>
+
+                <div class="filter-group fg-estado" style="display:none;">
+                    <label>Estado de la Acción</label>
+                    <select name="estado">
+                        <option value="Todos">Cualquier estado</option>
+                        <option value="Exitoso" <?php echo $filtros['estado'] == 'Exitoso' ? 'selected' : ''; ?>>Exitoso</option>
+                        <option value="Error" <?php echo $filtros['estado'] == 'Error' ? 'selected' : ''; ?>>Error / Falla</option>
+                    </select>
+                </div>
+
+                <div class="filter-group fg-metrica" style="display:none;">
+                    <label>Métrica de Ordenamiento</label>
+                    <select name="metrica">
+                        <option value="reservas" <?php echo $filtros['metrica'] == 'reservas' ? 'selected' : ''; ?>>Cantidad de Reservas</option>
+                        <option value="asistencia" <?php echo $filtros['metrica'] == 'asistencia' ? 'selected' : ''; ?>>Volumen de Asistencia</option>
+                    </select>
+                </div>
+
+                <div class="filter-group fg-limit" style="display:none;">
+                    <label>Cantidad de Resultados</label>
+                    <input type="number" name="limit" value="<?php echo $filtros['limit'] ?: 10; ?>" min="1" max="100">
+                </div>
+
+                <div class="filter-group fg-activo" style="display:none;">
+                    <label>Buscar Activo</label>
+                    <input type="text" name="buscar_activo" placeholder="Num inv o tipo..." value="<?php echo htmlspecialchars($filtros['buscar_activo'] ?? ''); ?>">
                 </div>
             </div>
 
-            <!-- More Filters (Collapsible) -->
-            <div class="more-filters-section <?php echo $isFiltersActive ? 'active' : ''; ?>" id="moreFiltersSection">
-                <div class="filters-grid" style="margin-bottom: 20px;">
-                    <div class="filter-group">
-                        <label>Desde Fecha</label>
-                        <input type="date" name="fecha_inicio" value="<?php echo $fecha_inicio; ?>">
-                    </div>
-                    <div class="filter-group">
-                        <label>Hasta Fecha</label>
-                        <input type="date" name="fecha_fin" value="<?php echo $fecha_fin; ?>">
-                    </div>
-                    <div class="filter-group">
-                        <label>Buscar Usuario</label>
-                        <input type="text" name="buscar_usuario" placeholder="Nombre de usuario..." value="<?php echo htmlspecialchars($extra_filters['buscar_usuario'] ?? ''); ?>">
-                    </div>
-                    <div class="filter-group">
-                        <label>Estado Acción</label>
-                        <select name="estado">
-                            <option value="Todos">Todos</option>
-                            <option value="Aprobado" <?php echo ($extra_filters['estado'] ?? '') === 'Aprobado' ? 'selected' : ''; ?>>Exitoso / Aprobado</option>
-                            <option value="Rechazado" <?php echo ($extra_filters['estado'] ?? '') === 'Rechazado' ? 'selected' : ''; ?>>Rechazado / Error</option>
-                        </select>
-                    </div>
+            <!-- Botones de Acción -->
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 24px;">
+                <div style="display: flex; gap: 12px;">
+                    <a href="auditoria.php" class="btn btn-secondary"><i data-lucide="refresh-cw"></i> Restaurar</a>
+                    <button type="submit" class="btn btn-primary"><i data-lucide="filter"></i> Generar Reporte</button>
                 </div>
-
-                <div class="filters-grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="filter-group">
-                        <label>Incluir préstamos</label>
-                        <select name="incluir_prestamos">
-                            <option value="Todos">Todos</option>
-                            <option value="Si" <?php echo ($extra_filters['incluir_prestamos'] ?? '') === 'Si' ? 'selected' : ''; ?>>Sí</option>
-                            <option value="No" <?php echo ($extra_filters['incluir_prestamos'] ?? '') === 'No' ? 'selected' : ''; ?>>No</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Incluir transferencias internas</label>
-                        <select name="incluir_transferencias">
-                            <option value="Todos">Todos</option>
-                            <option value="Si" <?php echo ($extra_filters['incluir_transferencias'] ?? '') === 'Si' ? 'selected' : ''; ?>>Sí</option>
-                            <option value="No" <?php echo ($extra_filters['incluir_transferencias'] ?? '') === 'No' ? 'selected' : ''; ?>>No</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Acciones -->
-            <div class="filters-actions">
-                <a href="auditoria.php" class="btn-clear"><i data-lucide="refresh-cw"></i> Limpiar filtros</a>
-                <button type="submit" class="btn-apply"><i data-lucide="filter"></i> Aplicar filtros</button>
             </div>
         </form>
     </div>
 
-    <!-- KPIs -->
-    <?php if ($tipo_reporte === 'uso_espacios'): ?>
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon blue">
-                <i data-lucide="check-square"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Total Reservas Confirmadas</h4>
-                <p><strong><?php echo number_format($espacios_stats['total_reservas']); ?></strong> reservas</p>
-            </div>
+    <!-- Resultados -->
+    <div class="card" style="padding: 0;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Resultados (<?php echo count($logs); ?>)</h3>
+            <button class="btn btn-outline" onclick="window.print()"><i data-lucide="printer"></i> Imprimir</button>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon green">
-                <i data-lucide="users"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Total Asistencia</h4>
-                <p><strong><?php echo number_format($espacios_stats['total_asistencia']); ?></strong> alumnos/personas</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon orange">
-                <i data-lucide="award"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Espacio más utilizado</h4>
-                <p><strong><?php echo htmlspecialchars($espacios_stats['espacio_top']); ?></strong></p>
-            </div>
-        </div>
-    </div>
-    <?php else: ?>
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon blue">
-                <i data-lucide="users"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Total de registros</h4>
-                <p>Histórico: <strong><?php echo number_format($stats['total']); ?></strong></p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon green">
-                <i data-lucide="log-in"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Módulo más activo</h4>
-                <p><strong><?php echo htmlspecialchars($stats['modulo_activo']); ?></strong></p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon orange">
-                <i data-lucide="log-out"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Usuarios Activos</h4>
-                <p><strong><?php echo number_format($stats['usuarios_activos']); ?></strong> usuarios únicos</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple">
-                <i data-lucide="file-text"></i>
-            </div>
-            <div class="stat-info">
-                <h4>Movimientos Hoy</h4>
-                <p><strong><?php echo number_format($stats['hoy']); ?></strong> acciones</p>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- Main Content Layout (Table left, Info right) -->
-    <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
         
-        <!-- Tabla (Left Column) -->
-        <div class="card table-card" style="flex: 1; min-width: 0; padding: 0;">
-            <!-- Header for Table Card with Button -->
-            <div style="padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: white; border-radius: var(--radius) var(--radius) 0 0; position: sticky; top: 0; z-index: 20;">
-                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main);">Resultados del Reporte</h3>
-                <a href="../backend/reports/audit_pdf.php?<?php echo $_SERVER['QUERY_STRING']; ?>" target="_blank" class="btn-download" style="padding: 10px 16px; font-size: 13px; height: max-content;">
-                    <i data-lucide="download"></i> Descargar Reporte
-                </a>
-            </div>
-            
-            <div style="overflow-x: auto; overflow-y: auto; max-height: 450px;">
-                <table>
-                    <?php if ($tipo_reporte === 'uso_espacios'): ?>
-                    <thead>
-                        <tr>
-                            <th style="top: 0;">ESPACIO</th>
-                            <th style="top: 0;">EDIFICIO / TIPO</th>
-                            <th style="top: 0;">TOTAL RESERVAS</th>
-                            <th style="top: 0;">ASISTENCIA CALCULADA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($espacios_logs)): ?>
-                            <tr>
-                                <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600;">
-                                    No se encontraron registros de uso con los filtros seleccionados.
-                                </td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($espacios_logs as $log): ?>
-                            <tr>
-                                <td style="font-weight: 700;">
-                                    <?php echo htmlspecialchars($log['nombre_numero']); ?>
-                                </td>
-                                <td>
-                                    <span class="badge" style="background: #f1f5f9; color: #475569;">
-                                        <?php echo htmlspecialchars($log['edificio']); ?>
-                                    </span>
-                                    <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">
-                                        <?php echo htmlspecialchars($log['tipo']); ?>
-                                    </span>
-                                </td>
-                                <td style="font-weight: 700; color: var(--primary);">
-                                    <?php echo number_format($log['total_reservas']); ?>
-                                </td>
-                                <td style="color: #0f172a; font-weight: 600;">
-                                    <?php echo number_format($log['total_asistencia']); ?> <span style="font-weight:400; color: var(--text-muted);">personas</span>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                    <?php else: ?>
-                    <thead>
-                        <tr>
-                            <th style="top: 0;">FECHA Y HORA</th>
-                            <th style="top: 0;">USUARIO</th>
-                            <th style="top: 0;">MÓDULO</th>
-                            <th style="top: 0;">ACCIÓN REALIZADA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($logs)): ?>
-                            <tr>
-                                <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600;">
-                                    No se encontraron registros con los filtros seleccionados.
-                                </td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($logs as $log): ?>
-                            <tr>
-                                <td style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
-                                    <?php echo date('d/m/Y H:i', strtotime($log['fecha_hora'])); ?>
-                                </td>
-                                <td style="font-weight: 700;">
-                                    <?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?>
-                                </td>
-                                <td>
-                                    <span class="badge">
-                                        <?php echo htmlspecialchars($log['modulo_afectado']); ?>
-                                    </span>
-                                </td>
-                                <td style="color: #475569;">
-                                    <?php echo htmlspecialchars($log['accion']); ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
+                        <tr><th>FECHA Y HORA</th><th>USUARIO</th><th>MÓDULO</th><th>ACCIÓN REALIZADA</th></tr>
+                    <?php elseif ($tipo_reporte == 'asistencia'): ?>
+                        <tr><th>FECHA</th><th>HORARIO</th><th>ESPACIO</th><th>RESPONSABLE</th><th>ASISTENCIA</th></tr>
+                    <?php elseif ($tipo_reporte == 'aulas_top'): ?>
+                        <tr><th>ESPACIO</th><th>EDIFICIO</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+                    <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
+                        <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+                    <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
+                        <tr><th>USUARIO</th><th>ROL</th><th>TOTAL RESERVAS</th><th>ASISTENCIA SUMADA</th></tr>
+                    <?php elseif ($tipo_reporte == 'prestamos'): ?>
+                        <tr><th>FECHA PRESTAMO</th><th>USUARIO</th><th>ACTIVO / INVENTARIO</th><th>ESTATUS</th></tr>
                     <?php endif; ?>
-                </table>
-            </div>
+                </thead>
+                <tbody>
+                    <?php if (empty($logs)): ?>
+                        <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No hay registros para este periodo.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($logs as $log): ?>
+                            <tr>
+                            <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
+                                <td><?php echo date('d/m/Y H:i', strtotime($log['fecha_hora'])); ?></td>
+                                <td><b><?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?></b></td>
+                                <td><span style="background: #eff6ff; color: #2563eb; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;"><?php echo htmlspecialchars($log['modulo_afectado']); ?></span></td>
+                                <td style="color: #475569;"><?php echo htmlspecialchars($log['accion']); ?></td>
+                            <?php elseif ($tipo_reporte == 'asistencia'): ?>
+                                <td><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></td>
+                                <td><?php echo htmlspecialchars($log['hora_ent'] . ' a ' . $log['hora_sal']); ?></td>
+                                <td><b><?php echo htmlspecialchars($log['espacio']); ?></b> <br><small><?php echo htmlspecialchars($log['edificio']); ?></small></td>
+                                <td><?php echo htmlspecialchars($log['responsable']); ?></td>
+                                <td><b style="color: var(--primary);"><?php echo (int)$log['num_alumnos']; ?></b> alumnos</td>
+                            <?php elseif ($tipo_reporte == 'aulas_top'): ?>
+                                <td><b><?php echo htmlspecialchars($log['nombre_numero']); ?></b><br><small><?php echo htmlspecialchars($log['tipo']); ?></small></td>
+                                <td><?php echo htmlspecialchars($log['edificio']); ?></td>
+                                <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                                <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                            <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
+                                <td><b><?php echo htmlspecialchars($log['edificio'] ?: 'Sin Edificio'); ?></b></td>
+                                <td><?php echo (int)$log['total_espacios']; ?></td>
+                                <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                                <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                            <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
+                                <td><b><?php echo htmlspecialchars($log['nombre']); ?></b></td>
+                                <td><?php echo htmlspecialchars($log['rol']); ?></td>
+                                <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                                <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                            <?php elseif ($tipo_reporte == 'prestamos'): ?>
+                                <td><?php echo date('d/m/Y H:i', strtotime($log['fecha_pres'])); ?></td>
+                                <td><b><?php echo htmlspecialchars($log['usuario_nombre']); ?></b></td>
+                                <td><?php echo htmlspecialchars($log['activo_tipo'] . ' - ' . $log['activo_marca']); ?><br><small><?php echo htmlspecialchars($log['activo_inv']); ?></small></td>
+                                <td>
+                                    <?php if ($log['estatus'] == 'Activo'): ?>
+                                        <span style="color: #ea580c; background: #ffedd5; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">En Curso</span>
+                                    <?php else: ?>
+                                        <span style="color: #16a34a; background: #dcfce3; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Finalizado</span>
+                                    <?php endif; ?>
+                                </td>
+                            <?php endif; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
-
-        <!-- Info Sidebar (Right Column) -->
-        <div class="report-include" style="width: 320px; min-width: 320px; position: sticky; top: 24px;">
-            <h3>Qué incluye este reporte?</h3>
-            <?php if ($tipo_reporte === 'uso_espacios'): ?>
-            <ul>
-                <li><i data-lucide="check-circle-2"></i> Asistencias totales calculadas por espacio</li>
-                <li><i data-lucide="check-circle-2"></i> Volumen de reservas confirmadas</li>
-                <li><i data-lucide="check-circle-2"></i> Clasificación de aulas más utilizadas</li>
-                <li style="margin-top: 12px; background: #eff6ff; padding: 10px; border-radius: 6px; color: #1e40af;">
-                    <i data-lucide="info" style="color:#1e40af;"></i> El reporte se generará en formato PDF y podrá descargarse o imprimirse.
-                </li>
-            </ul>
-            <?php else: ?>
-            <ul>
-                <li><i data-lucide="check-circle-2"></i> Resumen de movimientos en el periodo seleccionado</li>
-                <li><i data-lucide="check-circle-2"></i> Detalles de operaciones por usuario</li>
-                <li><i data-lucide="check-circle-2"></i> Estadísticas por módulo afectado</li>
-                <li style="margin-top: 12px; background: #eff6ff; padding: 10px; border-radius: 6px; color: #1e40af;">
-                    <i data-lucide="info" style="color:#1e40af;"></i> El reporte se generará en formato PDF y podrá descargarse o imprimirse.
-                </li>
-            </ul>
-            <?php endif; ?>
-        </div>
-
     </div>
-
 </div>
 
 <script>
-    // Lógica para colapsar / expandir filtros
-    document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('toggleFiltersBtn');
-        const section = document.getElementById('moreFiltersSection');
-        const icon = document.getElementById('toggleIcon');
+// Dynamic Filters Engine
+document.addEventListener('DOMContentLoaded', () => {
+    const reportType = document.getElementById('tipoReporte');
+    const updateFilters = () => {
+        // Hide all dynamically
+        document.querySelectorAll('.filter-group[class*="fg-"]').forEach(el => el.style.display = 'none');
         
-        btn.addEventListener('click', function() {
-            section.classList.toggle('active');
-            if (section.classList.contains('active')) {
-                icon.setAttribute('data-lucide', 'chevron-up');
-            } else {
-                icon.setAttribute('data-lucide', 'chevron-down');
-            }
-            // re-render lucide icons
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        });
-    });
+        const val = reportType.value;
+        if(val === 'actividad') {
+            document.querySelector('.fg-usuario').style.display = 'flex';
+            document.querySelector('.fg-modulo').style.display = 'flex';
+            document.querySelector('.fg-estado').style.display = 'flex';
+        } else if(val === 'asistencia') {
+            document.querySelector('.fg-edificio').style.display = 'flex';
+        } else if(val === 'aulas_top') {
+            document.querySelector('.fg-edificio').style.display = 'flex';
+            document.querySelector('.fg-metrica').style.display = 'flex';
+            document.querySelector('.fg-limit').style.display = 'flex';
+        } else if(val === 'asistencia_usuario') {
+            document.querySelector('.fg-usuario').style.display = 'flex';
+        } else if(val === 'prestamos') {
+            document.querySelector('.fg-usuario').style.display = 'flex';
+            document.querySelector('.fg-activo').style.display = 'flex';
+        }
+    };
+    reportType.addEventListener('change', updateFilters);
+    updateFilters(); // Run on load
+});
+
+// Preset Dates
+function setPreset(preset) {
+    const dIni = document.getElementById('fecha_inicio');
+    const dFin = document.getElementById('fecha_fin');
+    const today = new Date();
+    
+    let start = new Date();
+    let end = new Date();
+
+    if(preset === 'hoy') {
+        // do nothing, start and end are today
+    } else if (preset === 'semana') {
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day == 0 ? -6:1);
+        start.setDate(diff);
+    } else if (preset === 'mes') {
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+    } else if (preset === '30dias') {
+        start.setDate(today.getDate() - 30);
+    } else if (preset === 'custom') {
+        dIni.value = ''; dFin.value = ''; return;
+    }
+
+    dIni.value = start.toISOString().split('T')[0];
+    dFin.value = end.toISOString().split('T')[0];
+}
 </script>
 
 <?php include 'footer.php'; ?>

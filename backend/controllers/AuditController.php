@@ -1,8 +1,7 @@
 <?php
 /**
  * @file AuditController.php
- * @summary Controlador de Auditoría y Trazabilidad.
- * @description Ajustado para PostgreSQL (Supabase) con sintaxis de casteo de fechas ::DATE.
+ * @summary Controlador de Auditoría y Trazabilidad ampliado para nuevos reportes.
  */
 
 namespace Controllers;
@@ -24,7 +23,6 @@ class AuditController {
      */
     public function log($us_id, $accion, $modulo) {
         try {
-            // Usamos minúsculas para PostgreSQL
             $query = "INSERT INTO bitacora (us_id, accion, modulo_afectado) VALUES (?, ?, ?)";
             $stmt = $this->db->prepare($query);
             return $stmt->execute([$us_id, $accion, $modulo]);
@@ -35,70 +33,234 @@ class AuditController {
     }
 
     /**
-     * Obtiene registros filtrados para la bitácora.
+     * Reporte: Actividad general del sistema (Bitácora raw)
      */
-    public function getFiltered($fecha_inicio = null, $fecha_fin = null, $us_id = null, $modulo = null, $extra_filters = []) {
+    public function getGeneralActivity($filters) {
         $query = "SELECT b.*, u.nombre as usuario_nombre 
                   FROM bitacora b 
                   LEFT JOIN usuario u ON b.us_id = u.us_id 
                   WHERE 1=1";
         $params = [];
 
-        if ($fecha_inicio) {
-            // En PostgreSQL usamos ::DATE para extraer la fecha del timestamp
-            $query .= " AND b.fecha_hora::DATE >= ?";
-            $params[] = $fecha_inicio;
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND DATE(b.fecha_hora) >= ?";
+            $params[] = $filters['fecha_inicio'];
         }
-        if ($fecha_fin) {
-            $query .= " AND b.fecha_hora::DATE <= ?";
-            $params[] = $fecha_fin;
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND DATE(b.fecha_hora) <= ?";
+            $params[] = $filters['fecha_fin'];
         }
-        if ($us_id) {
-            $query .= " AND b.us_id = ?";
-            $params[] = $us_id;
-        }
-        if ($modulo) {
+        if (!empty($filters['modulo'])) {
             $query .= " AND b.modulo_afectado = ?";
-            $params[] = $modulo;
+            $params[] = $filters['modulo'];
         }
-
-        // Nuevos filtros avanzados (Mockup)
-        if (!empty($extra_filters['buscar_usuario'])) {
-            $query .= " AND u.nombre ILIKE ?";
-            $params[] = "%" . $extra_filters['buscar_usuario'] . "%";
+        if (!empty($filters['buscar_usuario'])) {
+            $query .= " AND u.nombre LIKE ?";
+            $params[] = "%" . $filters['buscar_usuario'] . "%";
         }
-        if (!empty($extra_filters['edificio']) && $extra_filters['edificio'] !== 'Todos') {
-            $query .= " AND b.accion ILIKE ?";
-            $params[] = "%" . $extra_filters['edificio'] . "%";
-        }
-        if (!empty($extra_filters['estado']) && $extra_filters['estado'] !== 'Todos') {
-            $query .= " AND b.accion ILIKE ?";
-            $params[] = "%" . $extra_filters['estado'] . "%";
-        }
-        if (!empty($extra_filters['incluir_prestamos']) && $extra_filters['incluir_prestamos'] !== 'Todos') {
-            if ($extra_filters['incluir_prestamos'] === 'Si') {
-                $query .= " AND b.modulo_afectado = 'PRESTAMOS'";
-            } elseif ($extra_filters['incluir_prestamos'] === 'No') {
-                $query .= " AND b.modulo_afectado != 'PRESTAMOS'";
-            }
-        }
-        if (!empty($extra_filters['incluir_transferencias']) && $extra_filters['incluir_transferencias'] !== 'Todos') {
-            if ($extra_filters['incluir_transferencias'] === 'Si') {
-                $query .= " AND b.accion ILIKE '%transferencia%'";
-            } elseif ($extra_filters['incluir_transferencias'] === 'No') {
-                $query .= " AND b.accion NOT ILIKE '%transferencia%'";
+        if (!empty($filters['estado']) && $filters['estado'] !== 'Todos') {
+            if ($filters['estado'] === 'Exitoso') {
+                $query .= " AND b.accion NOT LIKE '%error%' AND b.accion NOT LIKE '%falla%'";
+            } else {
+                $query .= " AND (b.accion LIKE '%error%' OR b.accion LIKE '%falla%')";
             }
         }
 
         $query .= " ORDER BY b.fecha_hora DESC";
         $stmt = $this->db->prepare($query);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Obtiene estadísticas de la bitácora para las tarjetas de KPIs.
-     * @return array
+     * Reporte: Asistencia a Aulas
+     */
+    public function getAttendanceReport($filters) {
+        $query = "SELECT r.re_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.num_alumnos,
+                         e.nombre_numero as espacio, e.edificio,
+                         u.nombre as responsable
+                  FROM reserva r
+                  JOIN espacio e ON r.esp_id = e.esp_id
+                  JOIN usuario u ON r.us_id = u.us_id
+                  WHERE r.estatus = 'Aprobada'";
+        $params = [];
+
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND r.fecha_uso >= ?";
+            $params[] = $filters['fecha_inicio'];
+        }
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND r.fecha_uso <= ?";
+            $params[] = $filters['fecha_fin'];
+        }
+        if (!empty($filters['edificio']) && $filters['edificio'] !== 'Todos') {
+            $query .= " AND e.edificio = ?";
+            $params[] = $filters['edificio'];
+        }
+
+        $query .= " ORDER BY r.fecha_uso DESC, r.hora_ent DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Reporte: Aulas más utilizadas
+     */
+    public function getTopSpaces($filters) {
+        $query = "SELECT e.esp_id, e.nombre_numero, e.edificio, e.tipo, 
+                         COUNT(r.re_id) as total_reservas, 
+                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
+                  FROM espacio e
+                  LEFT JOIN reserva r ON e.esp_id = r.esp_id AND r.estatus = 'Aprobada'";
+        
+        $params = [];
+
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND r.fecha_uso >= ?";
+            $params[] = $filters['fecha_inicio'];
+        }
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND r.fecha_uso <= ?";
+            $params[] = $filters['fecha_fin'];
+        }
+        if (!empty($filters['edificio']) && $filters['edificio'] !== 'Todos') {
+            $query .= " AND e.edificio = ?";
+            $params[] = $filters['edificio'];
+        }
+
+        $query .= " GROUP BY e.esp_id, e.nombre_numero, e.edificio, e.tipo";
+        
+        if (!empty($filters['metrica']) && $filters['metrica'] === 'asistencia') {
+            $query .= " ORDER BY total_asistencia DESC, total_reservas DESC";
+        } else {
+            $query .= " ORDER BY total_reservas DESC, total_asistencia DESC";
+        }
+
+        if (!empty($filters['limit'])) {
+            $query .= " LIMIT " . (int)$filters['limit'];
+        }
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Reporte: Uso por edificio
+     */
+    public function getUsageByBuilding($filters) {
+        $query = "SELECT e.edificio,
+                         COUNT(DISTINCT e.esp_id) as total_espacios,
+                         COUNT(r.re_id) as total_reservas, 
+                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
+                  FROM espacio e
+                  LEFT JOIN reserva r ON e.esp_id = r.esp_id AND r.estatus = 'Aprobada'";
+        
+        $params = [];
+
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND r.fecha_uso >= ?";
+            $params[] = $filters['fecha_inicio'];
+        }
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND r.fecha_uso <= ?";
+            $params[] = $filters['fecha_fin'];
+        }
+
+        $query .= " GROUP BY e.edificio ORDER BY total_reservas DESC";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Reporte: Asistencia por usuario (profesores)
+     */
+    public function getAttendanceByUser($filters) {
+        $query = "SELECT u.us_id, u.nombre, u.rol,
+                         COUNT(r.re_id) as total_reservas, 
+                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
+                  FROM usuario u
+                  JOIN reserva r ON u.us_id = r.us_id AND r.estatus = 'Aprobada'";
+        $params = [];
+
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND r.fecha_uso >= ?";
+            $params[] = $filters['fecha_inicio'];
+        }
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND r.fecha_uso <= ?";
+            $params[] = $filters['fecha_fin'];
+        }
+        if (!empty($filters['buscar_usuario'])) {
+            $query .= " AND u.nombre LIKE ?";
+            $params[] = "%" . $filters['buscar_usuario'] . "%";
+        }
+
+        $query .= " GROUP BY u.us_id, u.nombre, u.rol ORDER BY total_asistencia DESC";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Reporte: Préstamos de activos
+     */
+    public function getAssetLoans($filters) {
+        $query = "SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus,
+                         a.tipo as activo_tipo, a.marca as activo_marca, a.num_inv as activo_inv,
+                         u.nombre as usuario_nombre
+                  FROM prestamo p
+                  JOIN activo a ON p.act_id = a.act_id
+                  JOIN usuario u ON p.us_id = u.us_id
+                  WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND DATE(p.fecha_pres) >= ?";
+            $params[] = $filters['fecha_inicio'];
+        }
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND DATE(p.fecha_pres) <= ?";
+            $params[] = $filters['fecha_fin'];
+        }
+        if (!empty($filters['buscar_usuario'])) {
+            $query .= " AND u.nombre LIKE ?";
+            $params[] = "%" . $filters['buscar_usuario'] . "%";
+        }
+        if (!empty($filters['buscar_activo'])) {
+            $query .= " AND (a.tipo LIKE ? OR a.num_inv LIKE ?)";
+            $params[] = "%" . $filters['buscar_activo'] . "%";
+            $params[] = "%" . $filters['buscar_activo'] . "%";
+        }
+
+        $query .= " ORDER BY p.fecha_pres DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Reporte: Movimientos de inventario
+     */
+    public function getInventoryMovements($filters) {
+        $filters['modulo'] = 'ACTIVOS';
+        return $this->getGeneralActivity($filters);
+    }
+
+    /**
+     * Reporte: Incidencias, alertas y mantenimientos
+     */
+    public function getIncidents($filters) {
+        $filters['modulo'] = 'MANTENIMIENTO'; // O buscar por LIKE %incidencia%
+        return $this->getGeneralActivity($filters);
+    }
+
+    /**
+     * Estadísticas generales (KPIs base)
      */
     public function getAuditStats() {
         $stats = [
@@ -109,79 +271,13 @@ class AuditController {
         ];
 
         try {
-            $stmt = $this->db->query("SELECT COUNT(*) FROM bitacora");
-            $stats['total'] = $stmt->fetchColumn() ?: 0;
-
-            $stmt = $this->db->query("SELECT COUNT(*) FROM bitacora WHERE fecha_hora::DATE = CURRENT_DATE");
-            $stats['hoy'] = $stmt->fetchColumn() ?: 0;
-
-            $stmt = $this->db->query("SELECT modulo_afectado FROM bitacora GROUP BY modulo_afectado ORDER BY COUNT(*) DESC LIMIT 1");
-            $mod = $stmt->fetchColumn();
+            $stats['total'] = $this->db->query("SELECT COUNT(*) FROM bitacora")->fetchColumn() ?: 0;
+            $stats['hoy'] = $this->db->query("SELECT COUNT(*) FROM bitacora WHERE DATE(fecha_hora) = CURRENT_DATE")->fetchColumn() ?: 0;
+            $mod = $this->db->query("SELECT modulo_afectado FROM bitacora GROUP BY modulo_afectado ORDER BY COUNT(*) DESC LIMIT 1")->fetchColumn();
             if ($mod) $stats['modulo_activo'] = $mod;
-
-            $stmt = $this->db->query("SELECT COUNT(DISTINCT us_id) FROM bitacora");
-            $stats['usuarios_activos'] = $stmt->fetchColumn() ?: 0;
+            $stats['usuarios_activos'] = $this->db->query("SELECT COUNT(DISTINCT us_id) FROM bitacora")->fetchColumn() ?: 0;
         } catch (\Exception $e) {
             error_log("Error Audit Stats: " . $e->getMessage());
-        }
-
-        return $stats;
-    }
-    /**
-     * Obtiene estadísticas de uso y asistencia de espacios basadas en reservas aprobadas.
-     */
-    public function getSpaceUsageReport($fecha_inicio = null, $fecha_fin = null, $edificio = null) {
-        $query = "SELECT e.esp_id, e.nombre_numero, e.edificio, e.tipo, 
-                         COUNT(r.re_id) as total_reservas, 
-                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
-                  FROM ESPACIO e
-                  JOIN RESERVA r ON e.esp_id = r.esp_id
-                  WHERE r.estatus = 'Aprobada'";
-        
-        $params = [];
-
-        if ($fecha_inicio) {
-            $query .= " AND r.fecha_uso >= ?";
-            $params[] = $fecha_inicio;
-        }
-        if ($fecha_fin) {
-            $query .= " AND r.fecha_uso <= ?";
-            $params[] = $fecha_fin;
-        }
-        if ($edificio && $edificio !== 'Todos') {
-            $query .= " AND e.edificio = ?";
-            $params[] = $edificio;
-        }
-
-        $query .= " GROUP BY e.esp_id, e.nombre_numero, e.edificio, e.tipo
-                    ORDER BY total_reservas DESC, total_asistencia DESC";
-        
-        $stmt = $this->db->prepare($query);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Obtiene estadísticas agregadas de uso de espacios.
-     */
-    public function getSpaceUsageStats($fecha_inicio = null, $fecha_fin = null, $edificio = null) {
-        $stats = [
-            'total_reservas' => 0,
-            'total_asistencia' => 0,
-            'espacio_top' => 'N/A'
-        ];
-
-        try {
-            $report = $this->getSpaceUsageReport($fecha_inicio, $fecha_fin, $edificio);
-            foreach ($report as $row) {
-                $stats['total_reservas'] += $row['total_reservas'];
-                $stats['total_asistencia'] += $row['total_asistencia'];
-            }
-            if (count($report) > 0) {
-                $stats['espacio_top'] = $report[0]['nombre_numero'] . ' (' . $report[0]['edificio'] . ')';
-            }
-        } catch (\Exception $e) {
-            error_log("Error Space Usage Stats: " . $e->getMessage());
         }
 
         return $stats;
