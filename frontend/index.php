@@ -599,7 +599,7 @@ if (isset($_SESSION['us_id'])) {
                 </div>
                 <div class="donut-legend">
                     <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #ef4444;"></div>
+                        <div class="donut-legend-dot" style="background: #10b981;"></div>
                         Disponibles
                     </div>
                     <div class="donut-legend-item">
@@ -607,11 +607,11 @@ if (isset($_SESSION['us_id'])) {
                         En préstamo
                     </div>
                     <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #2563eb;"></div>
+                        <div class="donut-legend-dot" style="background: #3b82f6;"></div>
                         En mantenimiento
                     </div>
                     <div class="donut-legend-item">
-                        <div class="donut-legend-dot" style="background: #10b981;"></div>
+                        <div class="donut-legend-dot" style="background: #ef4444;"></div>
                         Extraviados
                     </div>
                 </div>
@@ -759,13 +759,13 @@ if (isset($_SESSION['us_id'])) {
 
     // Color mapping for statuses
     const statusColorMap = {
-        'Disponible': '#ef4444',
+        'Disponible': '#10b981',
         'En préstamo': '#f59e0b',
         'Préstamo': '#f59e0b',
-        'Activo': '#f59e0b',
-        'Mantenimiento': '#2563eb',
-        'En mantenimiento': '#2563eb',
-        'Extraviado': '#10b981',
+        'Activo': '#10b981',
+        'Mantenimiento': '#3b82f6',
+        'En mantenimiento': '#3b82f6',
+        'Extraviado': '#ef4444',
         'Dañado': '#8b5cf6'
     };
 
