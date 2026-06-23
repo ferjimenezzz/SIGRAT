@@ -271,4 +271,45 @@ class EmailService {
         ";
         return $this->sendEmail($to, $subject, $body);
     }
+
+    /**
+     * @summary Envía correo de confirmación de un préstamo (ya sea dinámico o estándar).
+     * 
+     * @param string $to Correo del usuario.
+     * @param int $pres_id ID del préstamo.
+     * @param string $equipo Nombre o tipo de equipo.
+     * @param string $serie Número de serie del equipo.
+     * @param string $fecha_pres Fecha de inicio del préstamo.
+     * @param string $fecha_ent Fecha de entrega esperada (opcional).
+     */
+    public function sendLoanCreated($to, $pres_id, $equipo, $serie, $fecha_pres, $fecha_ent = '') {
+        $subject = "Confirmación de Préstamo de Equipo #$pres_id";
+        
+        $detallesHtml = "
+        <br>
+        <h3>Detalles del Préstamo:</h3>
+        <ul>
+            <li><strong>Equipo/Activo:</strong> $equipo</li>
+            <li><strong>No. Serie:</strong> $serie</li>
+            <li><strong>Fecha de Salida:</strong> $fecha_pres</li>
+        ";
+        
+        if (!empty($fecha_ent)) {
+            $detallesHtml .= "<li><strong>Fecha de Devolución Esperada:</strong> $fecha_ent</li>";
+        }
+        
+        $detallesHtml .= "</ul><br>";
+
+        $body = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                <h2 style='color: #1E335F;'>Notificación de Préstamo</h2>
+                <p>Se ha registrado exitosamente un préstamo de equipo a tu nombre bajo el folio <strong>#$pres_id</strong>.</p>
+                $detallesHtml
+                <p>Por favor, recuerda devolver el equipo en las mismas condiciones en las que fue entregado.</p>
+                <br>
+                <p>Saludos cordiales,<br>Equipo SIGRAT</p>
+            </div>
+        ";
+        return $this->sendEmail($to, $subject, $body);
+    }
 }

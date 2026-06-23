@@ -9,9 +9,11 @@ namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/NotificationController.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 use Config\Database;
 use Controllers\NotificationController;
+use Services\EmailService;
 use PDO;
 
 class LoanController {
@@ -45,6 +47,18 @@ class LoanController {
                 }
             } catch (\Exception $e) {
                 error_log("Error al enviar notificación de préstamo: " . $e->getMessage());
+            }
+            // Notificar al solicitante por correo
+            try {
+                $stmtDet = $this->db->prepare("SELECT u.correo, a.tipo, a.num_serie FROM USUARIO u, ACTIVO a WHERE u.us_id = ? AND a.act_id = ?");
+                $stmtDet->execute([$us_id, $act_id]);
+                $det = $stmtDet->fetch();
+                if ($det && !empty($det['correo'])) {
+                    $emailService = new EmailService();
+                    $emailService->sendLoanCreated($det['correo'], $new_pres_id, $det['tipo'], $det['num_serie'], date('Y-m-d H:i:s'));
+                }
+            } catch (\Exception $e) {
+                error_log("Error al enviar correo de préstamo al usuario: " . $e->getMessage());
             }
 
             return ["success" => true, "id" => $new_pres_id];
@@ -117,6 +131,14 @@ class LoanController {
                 }
             } catch (\Exception $e) {
                 error_log("Error al enviar notificación de préstamo dinámico: " . $e->getMessage());
+            }
+
+            // Notificar al solicitante por correo
+            try {
+                $emailService = new EmailService();
+                $emailService->sendLoanCreated($correo, $new_pres_id, $equipo, $serie, $fecha_pres, $fecha_ent_val);
+            } catch (\Exception $e) {
+                error_log("Error al enviar correo de préstamo al usuario: " . $e->getMessage());
             }
 
             $this->db->commit();
