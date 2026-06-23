@@ -140,6 +140,7 @@ CREATE TABLE `reserva` (
   `fecha_uso` date NOT NULL,
   `hora_ent` time NOT NULL,
   `hora_sal` time NOT NULL,
+  `status` varchar(20) DEFAULT 'pending',
   `estatus` varchar(20) DEFAULT 'Aprobado',
   `vis_id` int(11) DEFAULT NULL,
   `motivo` varchar(255) DEFAULT NULL,

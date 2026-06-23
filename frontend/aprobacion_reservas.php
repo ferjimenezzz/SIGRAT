@@ -23,6 +23,8 @@ include 'header.php';
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
 <script src="https://unpkg.com/@mui/material@5/umd/material-ui.production.min.js" crossorigin></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Script React original adaptado -->
 <script>
@@ -93,11 +95,15 @@ function ReservationApprovalApp() {
     try {
       const response = await fetch(`../backend/api/index.php/reservations/${id}/approve`, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      if (!response.ok) throw new Error("Error al aprobar");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Error al aprobar");
+      }
       await Swal.fire({
         icon: 'success',
         title: '¡Aprobada!',
@@ -127,6 +133,7 @@ function ReservationApprovalApp() {
     try {
       const response = await fetch(`../backend/api/index.php/reservations/${selectedReservation.re_id}/reject`, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -134,7 +141,10 @@ function ReservationApprovalApp() {
           reason: rejectReason
         })
       });
-      if (!response.ok) throw new Error("Error al rechazar");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Error al rechazar");
+      }
       await Swal.fire({
         icon: 'success',
         title: 'Rechazada',
