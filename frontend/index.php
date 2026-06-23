@@ -762,6 +762,7 @@ if (isset($_SESSION['us_id'])) {
         'Disponible': '#10b981',
         'En préstamo': '#f59e0b',
         'Préstamo': '#f59e0b',
+        'Prestado': '#f59e0b',
         'Activo': '#10b981',
         'Mantenimiento': '#3b82f6',
         'En mantenimiento': '#3b82f6',
