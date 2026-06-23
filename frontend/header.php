@@ -149,31 +149,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             transition: width 0.3s ease, min-width 0.3s ease;
         }
 
-        .sidebar-top {
-            padding: 20px 18px 12px 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .sidebar-back-btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .sidebar-back-btn:hover {
-            background: var(--sidebar-hover);
-            color: white;
-        }
-
         .sidebar-toggle-btn {
             width: 32px;
             height: 32px;
@@ -193,23 +168,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             background: var(--sidebar-hover);
             color: white;
         }
-        
-        body.sidebar-collapsed .sidebar-toggle-btn i {
-            transform: rotate(180deg);
-        }
 
         .sidebar-header {
-            padding: 8px 18px 20px 26px;
+            padding: 24px 16px 20px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
             margin-bottom: 8px;
         }
 
         .sidebar-logo {
-            width: 60px;
-            height: 60px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
         }
 
@@ -354,12 +325,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         body.sidebar-collapsed .sidebar-header {
-            padding: 8px 0 20px 0;
-            justify-content: center;
+            padding: 20px 0 16px 0;
+            flex-direction: column;
+            gap: 16px;
         }
 
         body.sidebar-collapsed .sidebar-logo {
             margin: 0;
+            width: 36px;
+            height: 36px;
+        }
+
+        body.sidebar-collapsed .sidebar-toggle-btn {
+            margin-left: 0;
         }
 
         body.sidebar-collapsed .nav-item {
@@ -661,18 +639,15 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
     </script>
     <aside class="sidebar">
-        <div class="sidebar-top">
-            <button id="sidebarToggle" class="sidebar-toggle-btn" title="Minimizar menú">
-                <i class="bi bi-chevron-left" style="font-size: 18px; transition: transform 0.3s ease;"></i>
-            </button>
-        </div>
-
         <div class="sidebar-header">
             <img src="assets/images/sigrat_logo.png" alt="SIGRAT" class="sidebar-logo" style="filter: brightness(0) invert(1); drop-shadow(0 0 2px rgba(0,0,0,0.5));">
             <div class="sidebar-brand">
                 <h2>SIGRAT</h2>
                 <p>Control Integral</p>
             </div>
+            <button id="sidebarToggle" class="sidebar-toggle-btn" title="Minimizar/Desplegar menú">
+                <i class="bi bi-list" style="font-size: 22px;"></i>
+            </button>
         </div>
 
         <nav class="nav-menu">
