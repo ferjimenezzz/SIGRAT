@@ -1,4 +1,5 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) session_start();
 /**
  * @file usuarios.php
  * @summary Gestión Integral de Usuarios, Invitaciones y Roles del Sistema.
@@ -367,9 +368,9 @@ $tab = $_GET['tab'] ?? 'usuarios';
 
     <!-- Pestaña Invitaciones -->
     <div id="tab-invitaciones" style="display: <?php echo $tab === 'invitaciones' ? 'grid' : 'none'; ?>; grid-template-columns: 2fr 1fr; gap: 32px;">
-        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden;">
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); max-height: 350px; overflow-y: auto; align-self: start;">
             <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
                     <tr>
                         <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Invitado</th>
                         <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Código</th>
@@ -884,14 +885,35 @@ $tab = $_GET['tab'] ?? 'usuarios';
                 const data = await res.json();
                 
                 if (data.success) {
+                    // Update DOM instantly without waiting for SweetAlert confirmation
+                    const tableBody = document.querySelector('#tab-invitaciones table tbody');
+                    const guestName = document.getElementById('nombre_visita').value;
+                    const guestEmail = document.getElementById('correo_visita').value;
+                    const hostName = "<?php echo addslashes($_SESSION['nombre'] ?? 'Anfitrión Actual'); ?>";
+                    
+                    const newRow = document.createElement('tr');
+                    newRow.style.borderBottom = '1px solid #f1f5f9';
+                    newRow.innerHTML = `
+                        <td style="padding: 16px 24px;">
+                            <p style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;">${guestName.replace(/</g, "&lt;")}</p>
+                            <p style="font-size: 12px; color: #64748b; margin: 0;">${guestEmail.replace(/</g, "&lt;")}</p>
+                        </td>
+                        <td style="padding: 16px 24px;">
+                            <code style="background: #f1f5f9; padding: 6px 12px; border-radius: 8px; font-weight: 800; color: #1e293b; font-size: 13px;">${data.codigo}</code>
+                        </td>
+                        <td style="padding: 16px 24px; font-size: 13px; font-weight: 700; color: #64748b;">${hostName}</td>
+                    `;
+                    
+                    tableBody.prepend(newRow); // Add to top of the table
+                    document.getElementById('form-invitacion').reset(); // Clear the form
+
+                    // Show success message
                     Swal.fire({
                         icon: 'success',
                         title: '¡Invitación Generada!',
                         html: `El código de acceso es:<br><br><b style="font-size:24px; letter-spacing:4px; color:#2563eb;">${data.codigo}</b><br><br>Por favor, compártelo con el invitado.`,
                         confirmButtonColor: '#2563eb',
                         confirmButtonText: 'Entendido'
-                    }).then(() => {
-                        window.location.href = 'usuarios.php?tab=invitaciones';
                     });
                 } else {
                     Swal.fire({
