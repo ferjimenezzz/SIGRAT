@@ -5,6 +5,13 @@
  * @description Permite el enrolamiento manual de tags y la simulación de hardware.
  */
 require_once 'seguridad.php';
+
+// Validar que el rol no sea USUARIO
+if (isset($_SESSION['rol']) && strtoupper(trim($_SESSION['rol'])) === 'USUARIO') {
+    header("Location: index.php");
+    exit();
+}
+
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/TagController.php';
 

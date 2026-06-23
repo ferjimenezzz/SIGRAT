@@ -713,10 +713,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <i class="bi bi-heart-pulse"></i> <span>Auditoría</span>
             </a>
             <?php endif; ?>
-
+            <?php if (isset($_SESSION['rol']) && strtoupper(trim($_SESSION['rol'])) !== 'USUARIO'): ?>
             <a href="rfid.php" class="nav-item <?php echo $currentPage == 'rfid.php' ? 'active' : ''; ?>">
                 <i class="bi bi-broadcast"></i> <span>Monitor RFID</span>
             </a>
+            <?php endif; ?>
 
         </nav>
 
