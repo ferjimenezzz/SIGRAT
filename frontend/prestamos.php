@@ -102,9 +102,9 @@ foreach ($loans as $l) {
     .filter-btn { background: white; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
     .filter-btn.active { background: #f1f5f9; color: var(--text-primary); border-color: #cbd5e1; }
     
-    .table-container { background: white; border-radius: 12px; border: 2px solid var(--accent-blue); overflow: hidden; margin-bottom: 24px; }
+    .table-container { background: white; border-radius: 12px; border: 2px solid var(--accent-blue); max-height: 450px; overflow-y: auto; margin-bottom: 24px; }
     .table-custom { width: 100%; border-collapse: collapse; }
-    .table-custom th { background: #1e293b; color: white; padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 600; }
+    .table-custom th { background: #1e293b; color: white; padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; }
     .table-custom td { padding: 16px 24px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
     
     .item-cell, .user-cell, .date-cell { display: flex; align-items: center; gap: 10px; }
