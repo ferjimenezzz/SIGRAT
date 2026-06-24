@@ -133,6 +133,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             color: var(--text-primary);
             display: flex;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* ==================== SIDEBAR ==================== */
@@ -373,6 +374,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-width: 0;
+            overflow-x: hidden;
             transition: margin-left 0.3s ease;
         }
 
@@ -630,6 +633,189 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         .form-control:focus { outline: none; border-color: var(--accent-blue); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         
         label { display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+
+        /* ==================== MOBILE MENU BUTTON ==================== */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 4px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .topbar-left-wrapper {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+
+        /* ==================== SIDEBAR OVERLAY (mobile) ==================== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 99;
+        }
+
+        body.sidebar-mobile-open .sidebar-overlay {
+            display: block;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablet: colapsar sidebar a solo íconos */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 72px;
+                min-width: 72px;
+            }
+            .main-container {
+                margin-left: 72px;
+            }
+            .sidebar-brand,
+            .nav-item span,
+            .sidebar-user-info,
+            .sidebar-logout span {
+                display: none;
+            }
+            .sidebar-header {
+                padding: 20px 0 16px 0;
+                flex-direction: column;
+                gap: 12px;
+                justify-content: center;
+            }
+            .sidebar-logo {
+                margin: 0;
+                width: 34px;
+                height: 34px;
+            }
+            .sidebar-toggle-btn {
+                margin-left: 0;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 11px 0;
+            }
+            .nav-item i {
+                margin: 0;
+                font-size: 20px;
+                width: auto;
+            }
+            .sidebar-user {
+                justify-content: center;
+                padding: 16px 0;
+                margin: 8px 8px 8px 8px;
+            }
+            .sidebar-logout {
+                justify-content: center;
+                padding: 10px 0;
+            }
+            .sidebar-logout i {
+                margin: 0;
+            }
+            /* Ocultar el toggle de escritorio en tablet */
+            .sidebar-toggle-btn {
+                display: none;
+            }
+            /* Ocultar elementos sobrantes del topbar */
+            .search-box {
+                display: none;
+            }
+        }
+
+        /* Móvil: ocultar sidebar por completo, mostrar hamburguesa */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+            }
+            .sidebar {
+                width: 260px;
+                min-width: 260px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+            }
+            /* Restaurar sidebar completa cuando está abierta */
+            body.sidebar-mobile-open .sidebar {
+                transform: translateX(0);
+            }
+            body.sidebar-mobile-open .sidebar-brand,
+            body.sidebar-mobile-open .nav-item span,
+            body.sidebar-mobile-open .sidebar-user-info,
+            body.sidebar-mobile-open .sidebar-logout span {
+                display: block;
+            }
+            body.sidebar-mobile-open .sidebar-header {
+                padding: 24px 16px 20px 20px;
+                flex-direction: row;
+                gap: 10px;
+            }
+            body.sidebar-mobile-open .sidebar-logo {
+                width: 42px;
+                height: 42px;
+            }
+            body.sidebar-mobile-open .nav-item {
+                justify-content: flex-start;
+                padding: 11px 14px;
+            }
+            body.sidebar-mobile-open .nav-item i {
+                width: 20px;
+                font-size: 18px;
+            }
+            body.sidebar-mobile-open .sidebar-user {
+                justify-content: flex-start;
+                padding: 16px 14px;
+                margin: 8px 12px 12px 12px;
+            }
+            body.sidebar-mobile-open .sidebar-logout {
+                justify-content: flex-start;
+                padding: 10px 14px;
+                margin: 0 12px 16px 12px;
+            }
+
+            .main-container {
+                margin-left: 0;
+            }
+            body.sidebar-collapsed .main-container {
+                margin-left: 0;
+            }
+
+            .topbar-date {
+                display: none;
+            }
+            .top-bar {
+                padding: 0 16px;
+            }
+            .topbar-left h1 {
+                font-size: 15px;
+            }
+            .topbar-left p {
+                display: none;
+            }
+            .content-padding {
+                padding: 16px;
+            }
+        }
+
+        /* Móvil pequeño */
+        @media (max-width: 480px) {
+            .topbar-right .topbar-icon-btn:not(#notifBtn) {
+                display: none;
+            }
+            .top-bar {
+                padding: 0 12px;
+                height: 56px;
+            }
+            .content-padding {
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -709,15 +895,23 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         </a>
     </aside>
 
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="main-container">
         <header class="top-bar">
-            <div class="topbar-left">
-                <?php 
-                $generoUsuario = $_SESSION['genero'] ?? 'Masculino';
-                $saludoTexto = ($generoUsuario === 'Femenino') ? '¡Bienvenida' : '¡Bienvenido';
-                ?>
-                <h1><?php echo $saludoTexto; ?>, <?php echo explode(' ', $nombreUsuario)[0]; ?>!</h1>
-                <p>Resumen general del sistema</p>
+            <div class="topbar-left-wrapper">
+                <button id="mobileMenuBtn" class="mobile-menu-btn">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="topbar-left">
+                    <?php 
+                    $generoUsuario = $_SESSION['genero'] ?? 'Masculino';
+                    $saludoTexto = ($generoUsuario === 'Femenino') ? '¡Bienvenida' : '¡Bienvenido';
+                    ?>
+                    <h1><?php echo $saludoTexto; ?>, <?php echo explode(' ', $nombreUsuario)[0]; ?>!</h1>
+                    <p>Resumen general del sistema</p>
+                </div>
             </div>
             <div class="topbar-right">
                 <div class="topbar-icon-btn" id="notifBtn">
@@ -760,6 +954,30 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     localStorage.setItem('sigrat_sidebar_collapsed', isCollapsed ? 'true' : 'false');
                 });
             }
+
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            function closeMobileSidebar() {
+                document.body.classList.remove('sidebar-mobile-open');
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.body.classList.toggle('sidebar-mobile-open');
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeMobileSidebar);
+            }
+
+            // Cerrar sidebar móvil al hacer click en un link del nav
+            document.querySelectorAll('.sidebar .nav-item').forEach(function(link) {
+                link.addEventListener('click', closeMobileSidebar);
+            });
         });
         </script>
         

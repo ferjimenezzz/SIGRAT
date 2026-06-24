@@ -461,6 +461,63 @@ if (isset($_SESSION['us_id'])) {
             font-size: 14px;
             font-weight: 600;
         }
+
+        /* ==================== RESPONSIVE DASHBOARD ==================== */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .charts-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .donut-container {
+                flex-direction: column;
+            }
+            .donut-legend {
+                margin-left: 0;
+                margin-top: 16px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .donut-wrapper {
+                width: 200px !important;
+                height: 200px !important;
+            }
+            .donut-center-text .donut-value {
+                font-size: 22px;
+            }
+            .reservations-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .reservation-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .res-time {
+                min-width: auto;
+            }
+        }
     </style>
 
     <!-- ==================== STAT CARDS ==================== -->
@@ -878,6 +935,12 @@ if (isset($_SESSION['us_id'])) {
 
     // Iniciar contador en paralelo
     animateCenterCounter(inventoryFinalTotal, DONUT_DURATION);
+
+    // Redibujar la dona al cambiar tamaño de ventana (responsividad)
+    window.addEventListener('resize', function() {
+        resizeDonutCanvas();
+        drawDonutFrame(1);
+    });
     </script>
 
     </div>
