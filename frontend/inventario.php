@@ -153,9 +153,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <p>Gestiona y controla los activos y mobiliario institucional</p>
     </div>
     <div class="premium-header-right">
-        <button class="bell-btn" onclick="const n = document.getElementById('notifBtn'); if(n) n.click();">
+        <button class="bell-btn" id="invCustomBellBtn">
             <i class="bi bi-bell"></i>
-            <!-- <span class="bell-badge">3</span> -->
         </button>
     </div>
 </div>
@@ -1647,6 +1646,35 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 e.preventDefault();
                 toggleFiltersPanel();
             };
+        }
+    });
+
+    // Mover el panel de notificaciones del header oculto al bell-btn personalizado
+    document.addEventListener("DOMContentLoaded", () => {
+        const mainNotifPanel = document.getElementById("notifPanel");
+        const invBellBtn = document.getElementById("invCustomBellBtn");
+        const mainBadge = document.getElementById("notifBadge");
+        
+        if (mainNotifPanel && invBellBtn) {
+            // Reposicionar estilos del panel
+            mainNotifPanel.style.top = '45px';
+            mainNotifPanel.style.right = '0';
+            invBellBtn.appendChild(mainNotifPanel);
+            
+            invBellBtn.addEventListener('click', function(e) {
+                if(e.target.closest('.notif-list')) return; 
+                mainNotifPanel.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!invBellBtn.contains(e.target)) {
+                    mainNotifPanel.classList.remove('show');
+                }
+            });
+        }
+        
+        if (mainBadge && invBellBtn) {
+            invBellBtn.appendChild(mainBadge);
         }
     });
 
