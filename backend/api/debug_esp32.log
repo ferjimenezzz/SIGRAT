@@ -5882,3 +5882,15 @@ Cuerpo:
 Cuerpo: 
 2026-06-24 22:51:22 - GET /Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
+2026-06-24 22:52:02 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-24 22:52:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-24 22:52:08 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-24 22:52:09 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-24 22:52:11 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-24 22:52:11 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 

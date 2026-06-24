@@ -1662,6 +1662,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             invBellBtn.appendChild(mainNotifPanel);
             
             invBellBtn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevenir que el listener global de header.php lo cierre inmediatamente
                 if(e.target.closest('.notif-list')) return; 
                 mainNotifPanel.classList.toggle('show');
             });
