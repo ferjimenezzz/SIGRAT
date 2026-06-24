@@ -380,6 +380,12 @@ try {
                 $us_id = $_GET['us_id'] ?? null;
                 $status = $_GET['status'] ?? null;
                 
+                // REGLA DE NEGOCIO: Si no es administrador, solo puede ver sus propias reservaciones.
+                $isAdmin = isset($_SESSION['rol']) && strpos(strtoupper(trim($_SESSION['rol'])), 'ADMIN') !== false;
+                if (!$isAdmin) {
+                    $us_id = $_SESSION['us_id'] ?? null;
+                }
+                
                 $response = $controller->getEventsFiltered($edificio, $esp_id, $tipo, $fecha_inicio, $fecha_fin, $us_id, $status);
                 $status_code = 200;
             }

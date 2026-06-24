@@ -75,6 +75,17 @@ class ReservationController {
                 $status_inicial = 'pending';
             }
 
+            // REGLA DE NEGOCIO: Si dura más de 2 horas, forzar a Pendiente (solicitado por usuario)
+            $hora_ent_ts = strtotime($data['hora_ent']);
+            $hora_sal_ts = strtotime($data['hora_sal']);
+            if ($hora_ent_ts !== false && $hora_sal_ts !== false) {
+                $duracion_horas = ($hora_sal_ts - $hora_ent_ts) / 3600;
+                if ($duracion_horas > 2) {
+                    $estatus_inicial = 'Pendiente';
+                    $status_inicial = 'pending';
+                }
+            }
+
             $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, status, motivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial, $status_inicial, $data['motivo'] ?? null]);
             

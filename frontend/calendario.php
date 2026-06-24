@@ -1517,7 +1517,7 @@ include 'header.php';
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
             <!-- Resumen del Día -->
-            <?php if (hasPermission('Calendario', 'ver_resumen')): ?>
+            <?php if ($isAdmin): ?>
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
                     <span>Resumen del día</span>
@@ -1850,6 +1850,7 @@ include 'header.php';
                                 <option value="4">4 horas</option>
                                 <option value="5">5 horas</option>
                             </select>
+                            <small id="resWarningLong" style="color: #ef4444; font-size: 10px; display: none; font-weight: 700; margin-top: 4px;">Reservas > 2 horas requieren aprobación del admin.</small>
                         </div>
                     </div>
 
@@ -2113,6 +2114,7 @@ include 'header.php';
 
         function openFilters() {
             filtersOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
             setTimeout(() => {
                 filtersOverlay.style.opacity = '1';
                 filtersSidebar.classList.add('show');
@@ -2124,6 +2126,7 @@ include 'header.php';
             filtersOverlay.style.opacity = '0';
             setTimeout(() => {
                 filtersOverlay.style.display = 'none';
+                document.body.style.overflow = '';
             }, 300);
         }
 
@@ -2303,6 +2306,8 @@ include 'header.php';
             if (eqCont) eqCont.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
             document.getElementById('resMotivo').value = "";
             document.getElementById('charCount').textContent = "0";
+            document.getElementById('resWarningLong').style.display = 'none';
+            document.getElementById('resDuracion').value = "2";
 
             // Forzar volver a Día Único al abrir
             btnResModeSingle.click();
@@ -2370,6 +2375,19 @@ include 'header.php';
         const resFecha = document.getElementById('resFecha');
         if (resFecha) {
             resFecha.addEventListener('change', checkAvailability);
+        }
+
+        const resDuracionSelect = document.getElementById('resDuracion');
+        const resWarningLong = document.getElementById('resWarningLong');
+        if (resDuracionSelect && resWarningLong) {
+            resDuracionSelect.addEventListener('change', (e) => {
+                if (parseInt(e.target.value) > 2) {
+                    resWarningLong.style.display = 'block';
+                } else {
+                    resWarningLong.style.display = 'none';
+                }
+                checkAvailability();
+            });
         }
 
         function checkAvailability() {
