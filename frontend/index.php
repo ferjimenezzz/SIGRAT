@@ -594,7 +594,7 @@ if (isset($_SESSION['us_id'])) {
                 <div class="donut-wrapper" style="width: 250px; height: 250px;">
                     <canvas id="inventoryDonut"></canvas>
                     <div class="donut-center-text">
-                        <div class="donut-value"><?php echo number_format($inventoryTotal, 0, '.', ','); ?></div>
+                        <div class="donut-value" id="donutCenterValue">0</div>
                     </div>
                 </div>
                 <div class="donut-legend">
@@ -756,6 +756,7 @@ if (isset($_SESSION['us_id'])) {
     const invDataRaw = <?php echo json_encode($inventoryStatus); ?>;
     const invLabels = invDataRaw.map(d => d.estatus);
     const invValues = invDataRaw.map(d => parseInt(d.total));
+    const inventoryFinalTotal = <?php echo (int)$inventoryTotal; ?>;
 
     // Color mapping for statuses
     const statusColorMap = {
@@ -772,27 +773,111 @@ if (isset($_SESSION['us_id'])) {
 
     const invColors = invLabels.map(label => statusColorMap[label] || '#cbd5e1');
 
-    const ctxDonut = document.getElementById('inventoryDonut').getContext('2d');
-    new Chart(ctxDonut, {
-        type: 'doughnut',
-        data: {
-            labels: invLabels.length ? invLabels : ['Sin datos'],
-            datasets: [{
-                data: invValues.length ? invValues : [1],
-                backgroundColor: invColors.length ? invColors : ['#e2e8f0'],
-                borderWidth: 0,
-                spacing: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '72%',
-            plugins: {
-                legend: { display: false }
+    // Build segments (filter out zeros)
+    let donutSegments = invLabels
+        .map((label, i) => ({ value: invValues[i], color: invColors[i] }))
+        .filter(s => s.value > 0);
+
+    if (donutSegments.length === 0) {
+        donutSegments = [{ value: 1, color: '#e2e8f0' }];
+    }
+
+    const donutCanvas  = document.getElementById('inventoryDonut');
+    const donutCtx     = donutCanvas.getContext('2d');
+    const DONUT_DURATION = 1200; // ms — 1 a 1.5 segundos
+    const CUTOUT_RATIO   = 0.72; // 72% cutout igual que antes
+    const GAP_RAD        = donutSegments.length > 1 ? 0.025 : 0; // espacio entre segmentos
+
+    // Ease-out cúbico: arranca rápido, frena suavemente
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    // Ajustar el canvas al tamaño real del contenedor
+    function resizeDonutCanvas() {
+        const wrapper = donutCanvas.parentElement;
+        donutCanvas.width  = wrapper.offsetWidth;
+        donutCanvas.height = wrapper.offsetHeight;
+    }
+    resizeDonutCanvas();
+
+    /**
+     * Dibuja la dona al nivel de progreso indicado (0 → 1).
+     * progress=0  → dona vacía
+     * progress=1  → dona completa
+     * Los segmentos se trazan de forma secuencial, clockwise, desde las 12 en punto.
+     */
+    function drawDonutFrame(progress) {
+        const w  = donutCanvas.width;
+        const h  = donutCanvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+        const outerR = Math.min(w, h) / 2 - 2;
+        const innerR = outerR * CUTOUT_RATIO;
+
+        donutCtx.clearRect(0, 0, w, h);
+
+        const total    = donutSegments.reduce((s, seg) => s + seg.value, 0);
+        const maxAngle = 2 * Math.PI * progress; // arco total a revelar en este frame
+        const START    = -Math.PI / 2;            // 12 en punto
+
+        let cumulative = 0; // radianes ya asignados
+
+        for (let i = 0; i < donutSegments.length; i++) {
+            const seg        = donutSegments[i];
+            const segTotal   = (seg.value / total) * 2 * Math.PI; // arco completo del segmento
+            const segVisible = segTotal - GAP_RAD;                  // arco visible (sin gap)
+
+            const segStart = cumulative;             // donde empieza este segmento
+            const segEnd   = cumulative + segVisible; // donde termina la parte visible
+
+            // ¿Hasta dónde dibujamos este segmento en este frame?
+            const drawEnd = Math.min(segEnd, maxAngle);
+
+            if (drawEnd > segStart && segVisible > 0) {
+                const arcFrom = START + segStart;
+                const arcTo   = START + drawEnd;
+
+                donutCtx.beginPath();
+                donutCtx.arc(cx, cy, outerR, arcFrom, arcTo, false); // arco exterior
+                donutCtx.arc(cx, cy, innerR, arcTo, arcFrom, true);  // arco interior (inverso)
+                donutCtx.closePath();
+                donutCtx.fillStyle = seg.color;
+                donutCtx.fill();
             }
+
+            cumulative += segTotal; // avanza incluyendo el gap
+            if (cumulative >= maxAngle) break;
         }
-    });
+    }
+
+    // Contador central animado sincronizado con la dona
+    const centerValueEl = document.getElementById('donutCenterValue');
+    function animateCenterCounter(finalVal, duration) {
+        const t0 = performance.now();
+        function step(now) {
+            const t      = Math.min((now - t0) / duration, 1);
+            const eased  = 1 - Math.pow(1 - t, 3);
+            centerValueEl.textContent = Math.round(eased * finalVal).toLocaleString();
+            if (t < 1) requestAnimationFrame(step);
+            else centerValueEl.textContent = finalVal.toLocaleString();
+        }
+        requestAnimationFrame(step);
+    }
+
+    // Arrancar la animación de barrido radial clockwise
+    const donutStart = performance.now();
+    function animateDonut(now) {
+        const t        = Math.min((now - donutStart) / DONUT_DURATION, 1);
+        const progress = easeOutCubic(t);
+        drawDonutFrame(progress);
+        if (t < 1) requestAnimationFrame(animateDonut);
+        else drawDonutFrame(1); // frame final exacto
+    }
+    requestAnimationFrame(animateDonut);
+
+    // Iniciar contador en paralelo
+    animateCenterCounter(inventoryFinalTotal, DONUT_DURATION);
     </script>
 
     </div>
