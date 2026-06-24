@@ -40,6 +40,8 @@ if (isset($_COOKIE['auth_token'])) {
     if (isset($_SESSION['us_id'])) {
         \Controllers\AuthController::logout();
     }
+    // header("Location: " . $base_path . "/frontend/iniciar_sesion.php");
+    // exit();
 }
 
 $currentPage = basename($_SERVER['PHP_SELF']);
@@ -64,8 +66,8 @@ if (!function_exists('hasPermission')) {
         if (!isset($_SESSION['rol'])) return false;
         $userRol = strtoupper(trim($_SESSION['rol']));
         
-        // 2. Privilegios de SuperUsuario/Admin
-        if (strpos($userRol, 'ADMIN') !== false || strpos($userRol, 'SUPERUSUARIO') !== false) return true;
+        // 2. Privilegios de SuperUsuario
+        if (strtoupper($userRol) === 'SUPER ADMINISTRADOR') return true;
         
         if (!isset($_SESSION['permisos'])) return false;
         
@@ -75,8 +77,11 @@ if (!function_exists('hasPermission')) {
             $permisos = json_decode($permisos, true) ?: [];
         }
         
-        if (isset($permisos[$modulo]) && isset($permisos[$modulo][$accion])) {
-            return $permisos[$modulo][$accion] === true;
+        if (isset($permisos[$modulo])) {
+            if ($permisos[$modulo] === true) return true;
+            if (is_array($permisos[$modulo]) && isset($permisos[$modulo][$accion])) {
+                return $permisos[$modulo][$accion] === true;
+            }
         }
         return false;
     }
@@ -854,14 +859,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             <a href="espacios.php" class="nav-item <?php echo $currentPage == 'espacios.php' ? 'active' : ''; ?>">
                 <i class="bi bi-geo-alt"></i> <span>Espacios</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (hasPermission('Aprobaciones')): ?>
             <a href="aprobacion_reservas.php" class="nav-item <?php echo $currentPage == 'aprobacion_reservas.php' ? 'active' : ''; ?>">
                 <i class="bi bi-check2-square"></i> <span>Aprobaciones</span>
             </a>
             <?php endif; ?>
 
+            <?php if (hasPermission('Prestamos')): ?>
             <a href="prestamos.php" class="nav-item <?php echo $currentPage == 'prestamos.php' ? 'active' : ''; ?>">
                 <i class="bi bi-arrow-left-right"></i> <span>Préstamos</span>
             </a>
+            <?php endif; ?>
 
             <?php if (hasPermission('Inventario')): ?>
             <a href="inventario.php" class="nav-item <?php echo $currentPage == 'inventario.php' ? 'active' : ''; ?>">
@@ -874,7 +884,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <i class="bi bi-heart-pulse"></i> <span>Auditoría</span>
             </a>
             <?php endif; ?>
-            <?php if (isset($_SESSION['rol']) && strtoupper(trim($_SESSION['rol'])) !== 'USUARIO'): ?>
+
+            <?php if (hasPermission('RFID')): ?>
             <a href="rfid.php" class="nav-item <?php echo $currentPage == 'rfid.php' ? 'active' : ''; ?>">
                 <i class="bi bi-broadcast"></i> <span>Monitor RFID</span>
             </a>

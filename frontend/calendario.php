@@ -1362,6 +1362,7 @@ include 'header.php';
                 <i class="bi bi-search"></i>
                 <input type="text" id="searchInput" placeholder="Buscar espacio, sala...">
             </div>
+            <?php if (hasPermission('Calendario', 'ver_todas_reservas')): ?>
             <div class="btn-action-outline" style="cursor: default; display: flex; align-items: center; gap: 10px; user-select: none;">
                 <span style="font-weight: 700; color: var(--text-primary);">Mis reservas</span>
                 <label class="toggle-switch" style="margin-bottom: 0;">
@@ -1369,6 +1370,9 @@ include 'header.php';
                     <span class="toggle-slider"></span>
                 </label>
             </div>
+            <?php else: ?>
+            <input type="checkbox" id="quickFilterSoloMisReservas" checked style="display: none;">
+            <?php endif; ?>
             <button class="btn-action-outline" id="btnToggleFilters">
                 <i class="bi bi-funnel"></i> Filtros avanz.
             </button>
@@ -1513,6 +1517,7 @@ include 'header.php';
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
             <!-- Resumen del Día -->
+            <?php if (hasPermission('Calendario', 'ver_resumen')): ?>
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
                     <span>Resumen del día</span>
@@ -1532,6 +1537,7 @@ include 'header.php';
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Próximas Reservaciones -->
             <div class="sidebar-section-card">

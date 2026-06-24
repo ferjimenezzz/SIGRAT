@@ -35,8 +35,9 @@ class ReservationApprovalController
      *
      * @return array List of reservations.
      */
-    public function getPending(): array
+    public function getPending(int $userId, bool $isAdmin): array
     {
+        $where = $isAdmin ? "r.status = 'pending'" : "r.us_id = " . (int)$userId;
         // Join with usuario and espacio to get readable names
         $stmt = $this->pdo->prepare("
             SELECT r.re_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.status,
@@ -44,6 +45,7 @@ class ReservationApprovalController
             FROM reserva r
             LEFT JOIN usuario u ON r.us_id = u.us_id
             LEFT JOIN espacio e ON r.esp_id = e.esp_id
+            WHERE $where
             ORDER BY r.fecha_uso DESC, r.hora_ent DESC
             LIMIT 100
         ");
@@ -56,9 +58,10 @@ class ReservationApprovalController
      *
      * @param int $reservationId ID of the reservation to approve.
      * @param int $adminId       ID of the admin performing the action.
+     * @param int|null $newEspId  Optional new space ID to reassign.
      * @throws Exception If the reservation cannot be approved.
      */
-    public function approve(int $reservationId, int $adminId): void
+    public function approve(int $reservationId, int $adminId, ?int $newEspId = null): void
     {
         try {
             $this->pdo->beginTransaction();
@@ -76,29 +79,31 @@ class ReservationApprovalController
                 throw new Exception('Solo las reservas pendientes pueden ser aprobadas.');
             }
 
-            // Check for overlapping approved reservations
+            $targetEspId = $newEspId ? $newEspId : $row['esp_id'];
+
+            // Check for overlapping approved reservations using target space
             $overlapStmt = $this->pdo->prepare(
                 "SELECT COUNT(*) FROM reserva 
                  WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso 
                  AND status = 'approved' AND hora_ent < :hora_sal AND hora_sal > :hora_ent"
             );
             $overlapStmt->execute([
-                ':esp_id' => $row['esp_id'],
+                ':esp_id' => $targetEspId,
                 ':fecha_uso' => $row['fecha_uso'],
                 ':hora_sal' => $row['hora_sal'],
                 ':hora_ent' => $row['hora_ent']
             ]);
             
             if ($overlapStmt->fetchColumn() > 0) {
-                throw new Exception('El espacio ya cuenta con una reservación aprobada en este horario.');
+                throw new Exception('El espacio seleccionado ya cuenta con una reservación aprobada en este horario.');
             }
 
-            // Update status to approved
+            // Update status to approved, and update space if changed
             $update = $this->pdo->prepare(
-                "UPDATE reserva SET status = 'approved', estatus = 'Aprobada', approved_by = :admin, approved_at = NOW() WHERE re_id = :id"
+                "UPDATE reserva SET status = 'approved', estatus = 'Aprobada', esp_id = :esp_id, approved_by = :admin, approved_at = NOW() WHERE re_id = :id"
             );
-            $update->execute([':admin' => $adminId, ':id' => $reservationId]);
-            $this->logAction($adminId, 'Aprobó reserva #' . $reservationId, 'reserva');
+            $update->execute([':esp_id' => $targetEspId, ':admin' => $adminId, ':id' => $reservationId]);
+            $this->logAction($adminId, 'Aprobó reserva #' . $reservationId . ($newEspId ? " (Reasignada a espacio $newEspId)" : ""), 'reserva');
 
             // Notify user
             try {
@@ -128,7 +133,7 @@ class ReservationApprovalController
             );
             $rejectStmt->execute([
                 ':admin' => $adminId,
-                ':esp_id' => $row['esp_id'],
+                ':esp_id' => $targetEspId,
                 ':fecha_uso' => $row['fecha_uso'],
                 ':hora_sal' => $row['hora_sal'],
                 ':hora_ent' => $row['hora_ent'],
@@ -199,6 +204,54 @@ class ReservationApprovalController
             }
         } catch (Exception $e) {
             error_log("Error notificando rechazo (ApprovalController): " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cancel a reservation.
+     *
+     * @param int    $reservationId ID of the reservation to cancel.
+     * @param int    $userId        ID of the user performing the action.
+     * @param bool   $isAdmin       Whether the user is an admin.
+     * @param string $reason        Reason for cancellation.
+     * @throws Exception If the reservation cannot be cancelled.
+     */
+    public function cancel(int $reservationId, int $userId, bool $isAdmin, string $reason): void
+    {
+        $stmt = $this->pdo->prepare("SELECT status, us_id FROM reserva WHERE re_id = :id FOR UPDATE");
+        $stmt->execute([':id' => $reservationId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$row) {
+            throw new Exception('La reserva no existe.');
+        }
+        
+        if (!$isAdmin && $row['us_id'] != $userId) {
+            throw new Exception('No tienes permiso para cancelar esta reserva.');
+        }
+        
+        if (in_array($row['status'], ['cancelled', 'rejected'])) {
+            throw new Exception('La reserva ya ha sido cancelada o rechazada.');
+        }
+        
+        $update = $this->pdo->prepare(
+            "UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', motivo_cancelacion = :motivo WHERE re_id = :id"
+        );
+        $update->execute([':motivo' => $reason, ':id' => $reservationId]);
+        
+        $this->logAction($userId, "Canceló reserva #$reservationId. Motivo: $reason", 'reserva');
+
+        // Notify user via email
+        try {
+            $stmtUser = $this->pdo->prepare("SELECT correo FROM usuario WHERE us_id = :uid");
+            $stmtUser->execute([':uid' => $row['us_id']]);
+            $correo = $stmtUser->fetchColumn();
+            
+            if ($correo) {
+                $this->emailService->sendReservationCancelled($correo, $reservationId, $reason);
+            }
+        } catch (Exception $e) {
+            error_log("Error notificando cancelación (ApprovalController): " . $e->getMessage());
         }
     }
 
