@@ -153,9 +153,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <p>Gestiona y controla los activos y mobiliario institucional</p>
     </div>
     <div class="premium-header-right">
-        <button class="bell-btn" onclick="Swal.fire({icon: 'info', title: 'Notificaciones', text: 'No hay notificaciones nuevas por el momento.', showConfirmButton: false, timer: 2500})">
+        <button class="bell-btn" onclick="const n = document.getElementById('notifBtn'); if(n) n.click();">
             <i class="bi bi-bell"></i>
-            <span class="bell-badge">3</span>
+            <!-- <span class="bell-badge">3</span> -->
         </button>
     </div>
 </div>
@@ -868,7 +868,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         background: white;
         border-radius: 16px;
         border: 1px solid #e2e8f0;
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: auto;
+        max-height: calc(100vh - 250px);
         box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .premium-table {
@@ -878,6 +880,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .premium-table th {
         background: #f8fafc;
         padding: 8px 12px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
         font-size: 11px;
         font-weight: 700;
         color: #475569;
@@ -1570,7 +1575,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
             let matchesStatus = true;
             if (statusVal) {
-                matchesStatus = (rowStatus === statusVal);
+                if (statusVal === 'Disponible' && rowStatus === 'Disponible') matchesStatus = true;
+                else if (statusVal === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo' || rowStatus === 'En uso')) matchesStatus = true;
+                else if (statusVal === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) matchesStatus = true;
+                else if (statusVal === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) matchesStatus = true;
+                else matchesStatus = false;
             } else if (selectedStatuses.length > 0) {
                 matchesStatus = selectedStatuses.some(sel => {
                     if (sel === 'Disponible' && rowStatus === 'Disponible') return true;
