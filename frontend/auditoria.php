@@ -58,6 +58,7 @@ switch ($tipo_reporte) {
 }
 
 $usuarios = $db->query("SELECT us_id, nombre FROM usuario ORDER BY nombre")->fetchAll();
+$edificios_db = $db->query("SELECT DISTINCT edificio FROM ESPACIO WHERE edificio IS NOT NULL ORDER BY edificio")->fetchAll(PDO::FETCH_COLUMN);
 
 include 'header.php';
 ?>
@@ -177,6 +178,7 @@ include 'header.php';
                     <span class="preset-chip" onclick="setPreset('hoy')">Hoy</span>
                     <span class="preset-chip" onclick="setPreset('semana')">Esta semana</span>
                     <span class="preset-chip" onclick="setPreset('mes')">Este mes</span>
+                    <span class="preset-chip" onclick="setPreset('cuatrimestre')">Este cuatrimestre</span>
                     <span class="preset-chip" onclick="setPreset('30dias')">Últimos 30 días</span>
                     <span class="preset-chip" onclick="setPreset('custom')">Limpiar fechas</span>
                 </div>
@@ -189,8 +191,9 @@ include 'header.php';
                     <label>Edificio</label>
                     <select name="edificio">
                         <option value="Todos">Todos los edificios</option>
-                        <option value="CIC" <?php echo $filtros['edificio'] == 'CIC' ? 'selected' : ''; ?>>CIC</option>
-                        <option value="Edificio 1" <?php echo $filtros['edificio'] == 'Edificio 1' ? 'selected' : ''; ?>>Edificio 1</option>
+                        <?php foreach($edificios_db as $ed): ?>
+                            <option value="<?php echo htmlspecialchars($ed); ?>" <?php echo $filtros['edificio'] == $ed ? 'selected' : ''; ?>><?php echo htmlspecialchars($ed); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
@@ -210,14 +213,7 @@ include 'header.php';
                     </select>
                 </div>
 
-                <div class="filter-group fg-estado" style="display:none;">
-                    <label>Estado de la Acción</label>
-                    <select name="estado">
-                        <option value="Todos">Cualquier estado</option>
-                        <option value="Exitoso" <?php echo $filtros['estado'] == 'Exitoso' ? 'selected' : ''; ?>>Exitoso</option>
-                        <option value="Error" <?php echo $filtros['estado'] == 'Error' ? 'selected' : ''; ?>>Error / Falla</option>
-                    </select>
-                </div>
+
 
                 <div class="filter-group fg-metrica" style="display:none;">
                     <label>Métrica de Ordenamiento</label>
@@ -337,7 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(val === 'actividad') {
             document.querySelector('.fg-usuario').style.display = 'flex';
             document.querySelector('.fg-modulo').style.display = 'flex';
-            document.querySelector('.fg-estado').style.display = 'flex';
         } else if(val === 'asistencia') {
             document.querySelector('.fg-edificio').style.display = 'flex';
         } else if(val === 'aulas_top') {
@@ -372,6 +367,21 @@ function setPreset(preset) {
         start.setDate(diff);
     } else if (preset === 'mes') {
         start = new Date(today.getFullYear(), today.getMonth(), 1);
+    } else if (preset === 'cuatrimestre') {
+        const m = today.getMonth(); // 0-11
+        if (m < 4) {
+            // Ene-Abr (0-3)
+            start = new Date(today.getFullYear(), 0, 1);
+            end = new Date(today.getFullYear(), 3, 30);
+        } else if (m < 8) {
+            // May-Ago (4-7)
+            start = new Date(today.getFullYear(), 4, 1);
+            end = new Date(today.getFullYear(), 7, 31);
+        } else {
+            // Sep-Dic (8-11)
+            start = new Date(today.getFullYear(), 8, 1);
+            end = new Date(today.getFullYear(), 11, 31);
+        }
     } else if (preset === '30dias') {
         start.setDate(today.getDate() - 30);
     } else if (preset === 'custom') {
