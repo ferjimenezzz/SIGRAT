@@ -216,7 +216,7 @@ try {
         case 'reservations':
             // Módulo de aprobación de reservas
             $action_url = end($uri);
-            if (in_array($action_url, ['pending', 'approve', 'reject'])) {
+            if (in_array($action_url, ['pending', 'approved', 'approve', 'reject', 'cancel'])) {
                 require_once '../routes.php';
                 handleReservationApproval($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 break;
