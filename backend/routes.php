@@ -24,9 +24,9 @@ function handleReservationApproval(string $method, string $path)
     $reservationId = $segments[$resIdx + 1] ?? null;
     $action = $segments[$resIdx + 2] ?? null;
 
-    // Support GET /reservations/pending (no ID)
-    if ($reservationId === 'pending' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-        $action = 'pending';
+    // Support GET /reservations/pending or /reservations/approved (no ID)
+    if (in_array($reservationId, ['pending', 'approved']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $action = $reservationId;
         $reservationId = null;
     } elseif (!ctype_digit($reservationId) || !in_array($action, ['approve', 'reject', 'cancel'])) {
         return false;
@@ -59,7 +59,7 @@ function handleReservationApproval(string $method, string $path)
 
     // Authorization check – allow any admin or 'Personal Académico'.
     // Note: Cancel can be done by non-admins as well, so we only restrict approve/reject to admins.
-    if (!$isAdmin && $role !== 'Personal Académico' && !($action === 'cancel' || $action === 'pending')) {
+    if (!$isAdmin && $role !== 'Personal Académico' && !in_array($action, ['cancel', 'pending', 'approved'])) {
         http_response_code(403);
         echo json_encode(['error' => "Forbidden: insufficient role or expired session. User Role: " . ($role ?: 'None')]);
         exit;
@@ -68,10 +68,10 @@ function handleReservationApproval(string $method, string $path)
     $input = json_decode(file_get_contents('php://input'), true);
 
     try {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'pending') {
-            $pending = $controller->getPending((int)$adminId, $isAdmin);
+        if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($action, ['pending', 'approved'])) {
+            $data = $controller->getByStatus((int)$adminId, $isAdmin, $action);
             http_response_code(200);
-            echo json_encode($pending);
+            echo json_encode($data);
         } elseif ($action === 'approve') {
             $newEspId = isset($input['esp_id']) ? (int)$input['esp_id'] : null;
             $controller->approve((int)$reservationId, (int)$adminId, $newEspId);

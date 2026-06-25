@@ -31,13 +31,17 @@ class ReservationApprovalController
     }
 
     /**
-     * Get all reservations for the approval module.
+     * Get reservations by status for the approval module.
      *
+     * @param int $userId ID of the user.
+     * @param bool $isAdmin Whether the user is an admin.
+     * @param string $status The status to filter by (e.g., 'pending', 'approved').
      * @return array List of reservations.
      */
-    public function getPending(int $userId, bool $isAdmin): array
+    public function getByStatus(int $userId, bool $isAdmin, string $status = 'pending'): array
     {
-        $where = $isAdmin ? "r.status = 'pending'" : "r.us_id = " . (int)$userId;
+        // Admins see all by status, regular users see their own filtered by status
+        $where = $isAdmin ? "r.status = :status" : "r.us_id = :uid AND r.status = :status";
         // Join with usuario and espacio to get readable names
         $stmt = $this->pdo->prepare("
             SELECT r.re_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.status,
@@ -47,9 +51,15 @@ class ReservationApprovalController
             LEFT JOIN espacio e ON r.esp_id = e.esp_id
             WHERE $where
             ORDER BY r.fecha_uso DESC, r.hora_ent DESC
-            LIMIT 100
+            LIMIT 200
         ");
-        $stmt->execute();
+        
+        $params = [':status' => $status];
+        if (!$isAdmin) {
+            $params[':uid'] = $userId;
+        }
+        
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
