@@ -38,7 +38,7 @@ class ReservationController {
             $vis_id = $data['vis_id'] ?? null;
             $us_id = $data['us_id'] ?? null;
 
-            $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND estatus = 'Aprobada' AND fecha_uso = ?
+            $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND status = 'approved' AND fecha_uso = ?
                               AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
             $stmt = $this->db->prepare($conflictQuery);
             $stmt->execute([$data['esp_id'], $data['fecha_uso'], $data['hora_sal'], $data['hora_ent'], $data['hora_sal'], $data['hora_ent'], $data['hora_ent'], $data['hora_sal']]);

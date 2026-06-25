@@ -18,6 +18,19 @@ include 'header.php';
     <div id="react-approval-app"></div>
 </div>
 
+<style>
+    /* Reset label styles from header.php so they don't break MUI TextFields */
+    .MuiInputLabel-root {
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        margin-bottom: 0 !important;
+        font-weight: 400 !important;
+    }
+    .MuiInputLabel-root.Mui-focused {
+        color: #1976d2 !important;
+    }
+</style>
+
 <!-- React Dependencies for Aprobaciones -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
