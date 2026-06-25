@@ -11,7 +11,7 @@ namespace Backend;
 use PDO;
 use Exception;
 
-require_once __DIR__ . '/services/EmailService.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class ReservationApprovalController
 {
@@ -117,7 +117,7 @@ class ReservationApprovalController
 
             // Notify user
             try {
-                require_once __DIR__ . '/controllers/NotificationController.php';
+                require_once __DIR__ . '/NotificationController.php';
                 $notifCtrl = new \Controllers\NotificationController();
                 $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
                 $stmtUser->execute([':id' => $reservationId]);
@@ -196,7 +196,7 @@ class ReservationApprovalController
 
         // Notify user
         try {
-            require_once __DIR__ . '/controllers/NotificationController.php';
+            require_once __DIR__ . '/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
             $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
             $stmtUser->execute([':id' => $reservationId]);
