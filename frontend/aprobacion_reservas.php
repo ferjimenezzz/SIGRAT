@@ -82,6 +82,7 @@ function ReservationApprovalApp() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [rejectSelectReason, setRejectSelectReason] = useState("Espacio no disponible");
   const [actionLoading, setActionLoading] = useState(false);
   const [spaces, setSpaces] = useState([]);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
@@ -160,20 +161,51 @@ function ReservationApprovalApp() {
     }
   };
   const handleCancel = async (id) => {
-    const { value: reason } = await Swal.fire({
+    const { value: reason, isConfirmed } = await Swal.fire({
       title: "Cancelar Reserva",
-      input: "text",
-      inputLabel: "Motivo de la cancelaci\xF3n",
-      inputPlaceholder: "Ingresa el motivo aqu\xED...",
+      html: `
+        <div style="text-align: left; margin-top: 10px;">
+          <label style="font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block; color: #334155;">Selecciona el motivo:</label>
+          <select id="swal-select" class="swal2-select" style="display: flex; width: 100%; margin: 0; padding: 10px; font-size: 15px;">
+            <option value="Cancelado por el usuario">Cancelado por el usuario</option>
+            <option value="Espacio en mantenimiento">Espacio en mantenimiento</option>
+            <option value="Falta de personal / profesor ausente">Falta de personal / profesor ausente</option>
+            <option value="Cambio de horario/fecha">Cambio de horario/fecha</option>
+            <option value="Otro">Otro (Especificar)</option>
+          </select>
+          <input id="swal-input" class="swal2-input" style="display: none; width: 100%; margin: 10px 0 0 0; box-sizing: border-box; font-size: 15px;" placeholder="Escribe el motivo aquí...">
+        </div>
+      `,
+      didOpen: () => {
+        const select = Swal.getPopup().querySelector('#swal-select');
+        const input = Swal.getPopup().querySelector('#swal-input');
+        select.addEventListener('change', () => {
+          if (select.value === 'Otro') {
+            input.style.display = 'flex';
+            input.focus();
+          } else {
+            input.style.display = 'none';
+          }
+        });
+      },
+      preConfirm: () => {
+        const select = Swal.getPopup().querySelector('#swal-select');
+        const input = Swal.getPopup().querySelector('#swal-input');
+        if (select.value === 'Otro') {
+          if (!input.value.trim()) {
+            Swal.showValidationMessage('\\xA1Necesitas escribir un motivo!');
+            return false;
+          }
+          return input.value.trim();
+        }
+        return select.value;
+      },
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
       cancelButtonText: "No, regresar",
-      confirmButtonText: "S\xED, cancelar",
-      inputValidator: (value) => {
-        if (!value) return "\xA1Necesitas escribir un motivo!";
-      }
+      confirmButtonText: "S\\xED, cancelar"
     });
-    if (reason) {
+    if (isConfirmed && reason) {
       setActionLoading(true);
       try {
         const response = await fetch(`../backend/api/index.php/reservations/${id}/cancel`, {
@@ -197,7 +229,8 @@ function ReservationApprovalApp() {
   };
   const openRejectDialog = (reservation) => {
     setSelectedReservation(reservation);
-    setRejectReason("");
+    setRejectSelectReason("Espacio no disponible");
+    setRejectReason("Espacio no disponible");
     setRejectDialogOpen(true);
   };
   const closeRejectDialog = () => {
@@ -270,7 +303,14 @@ function ReservationApprovalApp() {
     return idMatch || userMatch || spaceMatch;
   });
 
-  return /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontFamily: "Outfit, sans-serif", display: "flex", flexDirection: "column", alignItems: "flex-end" } }, error && /* @__PURE__ */ React.createElement(Alert, { severity: "error", sx: { mb: 3, width: "100%" } }, error), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "16px" } }, /* @__PURE__ */ React.createElement(TextField, { placeholder: "Buscar ID, usuario o espacio...", variant: "outlined", size: "small", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), sx: { width: "300px", bgcolor: "#fff", '& .MuiOutlinedInput-root': { borderRadius: 2 } } }), /* @__PURE__ */ React.createElement(Tabs, { value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, /* @__PURE__ */ React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px" } }), /* @__PURE__ */ React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px" } }), /* @__PURE__ */ React.createElement(Tab, { label: "Canceladas", sx: { fontWeight: 800, fontSize: "14px" } }))), /* @__PURE__ */ React.createElement(Paper, { elevation: 0, sx: { width: "100%", borderRadius: 3, overflow: "hidden", border: "1px solid #e2e8f0" } }, loading ? /* @__PURE__ */ React.createElement("div", { style: { padding: 60, textAlign: "center" } }, /* @__PURE__ */ React.createElement(CircularProgress, { sx: { color: "#3b82f6" } })) : /* @__PURE__ */ React.createElement(TableContainer, { sx: { maxHeight: 450 } }, /* @__PURE__ */ React.createElement(Table, { stickyHeader: true }, /* @__PURE__ */ React.createElement(TableHead, null, /* @__PURE__ */ React.createElement(TableRow, null, /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ID"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "USUARIO"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ESPACIO"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "FECHA Y HORA"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ESTADO"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px", textAlign: "center" } }, currentTab === 2 ? "MOTIVO" : "ACCIONES"))), /* @__PURE__ */ React.createElement(TableBody, null, filteredReservations.length === 0 ? /* @__PURE__ */ React.createElement(TableRow, null, /* @__PURE__ */ React.createElement(TableCell, { colSpan: 6, align: "center", sx: { py: 5, color: "#94a3b8" } }, currentTab === 0 ? "No hay solicitudes pendientes o coincidan con la búsqueda" : currentTab === 1 ? "No hay reservas aprobadas o coincidan con la búsqueda" : "No hay reservas canceladas o coincidan con la búsqueda")) : filteredReservations.map((row) => /* @__PURE__ */ React.createElement(TableRow, { key: row.re_id, hover: true, sx: { "&:last-child td, &:last-child th": { border: 0 } } }, /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#94a3b8" } }, typeof row.re_id === 'string' && row.re_id.startsWith('grp_') ? row.re_id.substring(4, 10) : "#" + row.re_id), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 700 } }, row.usuario_nombre || "Desconocido"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 700, color: "#334155" } }, row.espacio_nombre || "Desconocido"), /* @__PURE__ */ React.createElement(TableCell, null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800 } }, row.fecha_uso), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600 } }, row.hora_ent, " a ", row.hora_sal)), /* @__PURE__ */ React.createElement(TableCell, null, row.status === "pending" && /* @__PURE__ */ React.createElement(Chip, { label: "PENDIENTE", size: "small", sx: { fontWeight: 800, bgcolor: "#fef3c7", color: "#d97706", borderRadius: 2 } }), row.status === "approved" && /* @__PURE__ */ React.createElement(Chip, { label: "APROBADA", size: "small", sx: { fontWeight: 800, bgcolor: "#dcfce3", color: "#10b981", borderRadius: 2 } }), row.status === "cancelled" && /* @__PURE__ */ React.createElement(Chip, { label: "CANCELADA", size: "small", sx: { fontWeight: 800, bgcolor: "#f1f5f9", color: "#64748b", borderRadius: 2 } }), row.status === "rejected" && /* @__PURE__ */ React.createElement(Chip, { label: "RECHAZADA", size: "small", sx: { fontWeight: 800, bgcolor: "#fee2e2", color: "#ef4444", borderRadius: 2 } })), /* @__PURE__ */ React.createElement(TableCell, { align: "center", sx: { fontSize: currentTab === 2 ? "13px" : undefined, color: currentTab === 2 ? "#ef4444" : undefined } }, currentTab === 2 ? (row.cancel_reason || "-") : renderRowAction(row)))))))), /* @__PURE__ */ React.createElement(Dialog, { open: rejectDialogOpen, onClose: closeRejectDialog }, /* @__PURE__ */ React.createElement(DialogTitle, null, "Rechazar Solicitud"), /* @__PURE__ */ React.createElement(DialogContent, null, /* @__PURE__ */ React.createElement(TextField, { autoFocus: true, margin: "dense", label: "Motivo de rechazo (opcional)", fullWidth: true, variant: "outlined", value: rejectReason, onChange: (e) => setRejectReason(e.target.value) })), /* @__PURE__ */ React.createElement(DialogActions, null, /* @__PURE__ */ React.createElement(Button, { onClick: closeRejectDialog }, "Cancelar"), /* @__PURE__ */ React.createElement(Button, { onClick: handleReject, color: "error", variant: "contained" }, "Confirmar Rechazo"))));
+  return /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontFamily: "Outfit, sans-serif", display: "flex", flexDirection: "column", alignItems: "flex-end" } }, error && /* @__PURE__ */ React.createElement(Alert, { severity: "error", sx: { mb: 3, width: "100%" } }, error), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "16px" } }, /* @__PURE__ */ React.createElement(TextField, { placeholder: "Buscar ID, usuario o espacio...", variant: "outlined", size: "small", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), sx: { width: "300px", bgcolor: "#fff", '& .MuiOutlinedInput-root': { borderRadius: 2 } } }), /* @__PURE__ */ React.createElement(Tabs, { value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, /* @__PURE__ */ React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px" } }), /* @__PURE__ */ React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px" } }), /* @__PURE__ */ React.createElement(Tab, { label: "Canceladas", sx: { fontWeight: 800, fontSize: "14px" } }))), /* @__PURE__ */ React.createElement(Paper, { elevation: 0, sx: { width: "100%", borderRadius: 3, overflow: "hidden", border: "1px solid #e2e8f0" } }, loading ? /* @__PURE__ */ React.createElement("div", { style: { padding: 60, textAlign: "center" } }, /* @__PURE__ */ React.createElement(CircularProgress, { sx: { color: "#3b82f6" } })) : /* @__PURE__ */ React.createElement(TableContainer, { sx: { maxHeight: 450 } }, /* @__PURE__ */ React.createElement(Table, { stickyHeader: true }, /* @__PURE__ */ React.createElement(TableHead, null, /* @__PURE__ */ React.createElement(TableRow, null, /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ID"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "USUARIO"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ESPACIO"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "FECHA Y HORA"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ESTADO"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px", textAlign: "center" } }, currentTab === 2 ? "MOTIVO" : "ACCIONES"))), /* @__PURE__ */ React.createElement(TableBody, null, filteredReservations.length === 0 ? /* @__PURE__ */ React.createElement(TableRow, null, /* @__PURE__ */ React.createElement(TableCell, { colSpan: 6, align: "center", sx: { py: 5, color: "#94a3b8" } }, currentTab === 0 ? "No hay solicitudes pendientes o coincidan con la búsqueda" : currentTab === 1 ? "No hay reservas aprobadas o coincidan con la búsqueda" : "No hay reservas canceladas o coincidan con la búsqueda")) : filteredReservations.map((row) => /* @__PURE__ */ React.createElement(TableRow, { key: row.re_id, hover: true, sx: { "&:last-child td, &:last-child th": { border: 0 } } }, /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 800, color: "#94a3b8" } }, typeof row.re_id === 'string' && row.re_id.startsWith('grp_') ? row.re_id.substring(4, 10) : "#" + row.re_id), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 700 } }, row.usuario_nombre || "Desconocido"), /* @__PURE__ */ React.createElement(TableCell, { sx: { fontWeight: 700, color: "#334155" } }, row.espacio_nombre || "Desconocido"), /* @__PURE__ */ React.createElement(TableCell, null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800 } }, row.fecha_uso), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#64748b", fontWeight: 600 } }, row.hora_ent, " a ", row.hora_sal)), /* @__PURE__ */ React.createElement(TableCell, null, row.status === "pending" && /* @__PURE__ */ React.createElement(Chip, { label: "PENDIENTE", size: "small", sx: { fontWeight: 800, bgcolor: "#fef3c7", color: "#d97706", borderRadius: 2 } }), row.status === "approved" && /* @__PURE__ */ React.createElement(Chip, { label: "APROBADA", size: "small", sx: { fontWeight: 800, bgcolor: "#dcfce3", color: "#10b981", borderRadius: 2 } }), row.status === "cancelled" && /* @__PURE__ */ React.createElement(Chip, { label: "CANCELADA", size: "small", sx: { fontWeight: 800, bgcolor: "#f1f5f9", color: "#64748b", borderRadius: 2 } }), row.status === "rejected" && /* @__PURE__ */ React.createElement(Chip, { label: "RECHAZADA", size: "small", sx: { fontWeight: 800, bgcolor: "#fee2e2", color: "#ef4444", borderRadius: 2 } })), /* @__PURE__ */ React.createElement(TableCell, { align: "center", sx: { fontSize: currentTab === 2 ? "13px" : undefined, color: currentTab === 2 ? "#ef4444" : undefined } }, currentTab === 2 ? (row.cancel_reason || "-") : renderRowAction(row)))))))), /* @__PURE__ */ React.createElement(Dialog, { open: rejectDialogOpen, onClose: closeRejectDialog }, /* @__PURE__ */ React.createElement(DialogTitle, null, "Rechazar Solicitud"), /* @__PURE__ */ React.createElement(DialogContent, { style: { display: "flex", flexDirection: "column", gap: "16px", paddingTop: "10px", width: "400px" } }, /* @__PURE__ */ React.createElement(FormControl, { fullWidth: true, size: "small" }, /* @__PURE__ */ React.createElement(InputLabel, null, "Motivo de rechazo"), /* @__PURE__ */ React.createElement(Select, { value: rejectSelectReason, label: "Motivo de rechazo", onChange: (e) => {
+  setRejectSelectReason(e.target.value);
+  if (e.target.value !== "Otro") {
+    setRejectReason(e.target.value);
+  } else {
+    setRejectReason("");
+  }
+} }, /* @__PURE__ */ React.createElement(MenuItem, { value: "Espacio no disponible" }, "Espacio no disponible"), /* @__PURE__ */ React.createElement(MenuItem, { value: "Horario fuera de servicio" }, "Horario fuera de servicio"), /* @__PURE__ */ React.createElement(MenuItem, { value: "Uso indebido del espacio" }, "Uso indebido del espacio"), /* @__PURE__ */ React.createElement(MenuItem, { value: "Otro" }, "Otro (Especificar)"))), rejectSelectReason === "Otro" && /* @__PURE__ */ React.createElement(TextField, { autoFocus: true, margin: "dense", label: "Escribe el motivo...", fullWidth: true, variant: "outlined", value: rejectReason, onChange: (e) => setRejectReason(e.target.value) })), /* @__PURE__ */ React.createElement(DialogActions, null, /* @__PURE__ */ React.createElement(Button, { onClick: closeRejectDialog }, "Cancelar"), /* @__PURE__ */ React.createElement(Button, { onClick: handleReject, color: "error", variant: "contained", disabled: rejectSelectReason === "Otro" && !rejectReason.trim() }, "Confirmar Rechazo"))));
 }
 const root = ReactDOM.createRoot(document.getElementById("react-approval-app"));
 root.render(/* @__PURE__ */ React.createElement(ReservationApprovalApp, null));
