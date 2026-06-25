@@ -6,7 +6,7 @@
  * Registers API endpoints for approving and rejecting reservations.
  */
 
-require_once __DIR__ . '/ReservationApprovalController.php';
+require_once __DIR__ . '/controllers/ReservationApprovalController.php';
 
 // Simple router function to handle approval actions.
 function handleReservationApproval(string $method, string $path)
