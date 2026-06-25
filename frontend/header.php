@@ -127,11 +127,14 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        html {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-main);
             color: var(--text-primary);
-            display: flex;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -141,12 +144,15 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             width: 240px;
             min-width: 240px;
             background-color: var(--sidebar-bg);
-            height: 100vh;
             position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
             z-index: 100;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            overflow-x: hidden;
             transition: width 0.3s ease, min-width 0.3s ease;
         }
 
@@ -316,6 +322,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         body.sidebar-collapsed .main-container {
             margin-left: 80px;
+            width: calc(100% - 80px);
         }
 
         body.sidebar-collapsed .sidebar-brand,
@@ -371,12 +378,13 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         .main-container {
             flex: 1;
             margin-left: 240px;
+            width: calc(100% - 240px);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             min-width: 0;
             overflow-x: hidden;
-            transition: margin-left 0.3s ease;
+            transition: margin-left 0.3s ease, width 0.3s ease;
         }
 
         /* ==================== TOP BAR ==================== */
@@ -676,6 +684,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
             .main-container {
                 margin-left: 72px;
+                width: calc(100% - 72px);
             }
             .sidebar-brand,
             .nav-item span,
@@ -781,9 +790,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
             .main-container {
                 margin-left: 0;
+                width: 100%;
             }
             body.sidebar-collapsed .main-container {
                 margin-left: 0;
+                width: 100%;
             }
 
             .topbar-date {
