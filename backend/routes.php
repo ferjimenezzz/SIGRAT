@@ -24,11 +24,11 @@ function handleReservationApproval(string $method, string $path)
     $reservationId = $segments[$resIdx + 1] ?? null;
     $action = $segments[$resIdx + 2] ?? null;
 
-    // Support GET /reservations/pending or /reservations/approved (no ID)
-    if (in_array($reservationId, ['pending', 'approved']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Support GET /reservations/pending, /reservations/approved, or /reservations/cancelled
+    if (in_array($reservationId, ['pending', 'approved', 'cancelled']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $action = $reservationId;
         $reservationId = null;
-    } elseif (!ctype_digit($reservationId) || !in_array($action, ['approve', 'reject', 'cancel'])) {
+    } elseif ((!ctype_digit($reservationId) && strpos($reservationId, 'grp_') !== 0) || !in_array($action, ['approve', 'reject', 'cancel'])) {
         return false;
     }
 
@@ -68,25 +68,25 @@ function handleReservationApproval(string $method, string $path)
     $input = json_decode(file_get_contents('php://input'), true);
 
     try {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($action, ['pending', 'approved'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($action, ['pending', 'approved', 'cancelled'])) {
             $data = $controller->getByStatus((int)$adminId, $isAdmin, $action);
             http_response_code(200);
             echo json_encode($data);
         } elseif ($action === 'approve') {
-            $newEspId = isset($input['esp_id']) ? (int)$input['esp_id'] : null;
-            $controller->approve((int)$reservationId, (int)$adminId, $newEspId);
-            $response = ['message' => 'Reservation approved'];
+            $newEspId = $input['new_esp_id'] ?? null;
+            $controller->approve($reservationId, (int)$adminId, $newEspId ? (int)$newEspId : null);
+            $response = ['message' => 'Reservation(s) approved'];
             http_response_code(200);
             echo json_encode($response);
         } elseif ($action === 'reject') {
             $reason = $input['reason'] ?? null;
-            $controller->reject((int)$reservationId, (int)$adminId, $reason);
-            $response = ['message' => 'Reservation rejected'];
+            $controller->reject($reservationId, (int)$adminId, $reason);
+            $response = ['message' => 'Reservation(s) rejected'];
             http_response_code(200);
             echo json_encode($response);
         } elseif ($action === 'cancel') {
             $reason = $input['reason'] ?? 'Cancelada por el usuario';
-            $controller->cancel((int)$reservationId, (int)$adminId, $isAdmin, $reason);
+            $controller->cancel($reservationId, (int)$adminId, $isAdmin, $reason);
             $response = ['message' => 'Reservation cancelled'];
             http_response_code(200);
             echo json_encode($response);

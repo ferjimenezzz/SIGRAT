@@ -216,7 +216,7 @@ try {
         case 'reservations':
             // Módulo de aprobación de reservas
             $action_url = end($uri);
-            if (in_array($action_url, ['pending', 'approved', 'approve', 'reject', 'cancel'])) {
+            if (in_array($action_url, ['pending', 'approved', 'cancelled', 'approve', 'reject', 'cancel'])) {
                 require_once '../routes.php';
                 handleReservationApproval($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 break;
@@ -231,25 +231,46 @@ try {
                 
                 // Si viene un arreglo de fechas para reservaciones múltiples
                 if (isset($input['fechas_uso']) && is_array($input['fechas_uso'])) {
-                    $results = [];
-                    $has_error = false;
-                    $error_msg = "";
+                    require_once '../config/Database.php';
+                    $db = \Config\Database::getConnection();
+                    
+                    $conflicts = [];
+                    // Pre-check conflicts
+                    $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND status = 'approved' AND fecha_uso = ? AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
+                    $stmtConf = $db->prepare($conflictQuery);
                     foreach ($input['fechas_uso'] as $fecha) {
-                        $single_input = $input;
-                        $single_input['fecha_uso'] = $fecha;
-                        unset($single_input['fechas_uso']);
-                        $res = $controller->create($single_input, true); // true = skip individual email
-                        if (!$res['success']) {
-                            $has_error = true;
-                            $error_msg = "Error en la fecha " . $fecha . ": " . ($res['error'] ?? 'Conflicto de horario.');
-                            break;
+                        $stmtConf->execute([$input['esp_id'], $fecha, $input['hora_sal'], $input['hora_ent'], $input['hora_sal'], $input['hora_ent'], $input['hora_ent'], $input['hora_sal']]);
+                        if ($stmtConf->fetch()) {
+                            $conflicts[] = $fecha;
                         }
-                        $results[] = $res['id'];
                     }
-                    if ($has_error) {
-                        $response = ["success" => false, "error" => $error_msg];
-                        $status_code = 400;
+                    
+                    if (count($conflicts) > 0 && empty($input['skip_conflicts'])) {
+                        $response = ["success" => false, "error" => "Conflicto", "conflicts" => $conflicts];
+                        $status_code = 409;
                     } else {
+                        $results = [];
+                        // Generar group_id solo si hay múltiples fechas (o siempre, no afecta)
+                        $group_id = count($input['fechas_uso']) > 1 ? uniqid('grp_') : null;
+                        
+                        foreach ($input['fechas_uso'] as $fecha) {
+                            if (in_array($fecha, $conflicts)) continue;
+                            
+                            $single_input = $input;
+                            $single_input['fecha_uso'] = $fecha;
+                            $single_input['group_id'] = $group_id;
+                            unset($single_input['fechas_uso'], $single_input['skip_conflicts']);
+                            
+                            $res = $controller->create($single_input, true); // true = skip individual email
+                            if ($res['success']) {
+                                $results[] = $res['id'];
+                            }
+                        }
+                        
+                        if (empty($results)) {
+                            $response = ["success" => false, "error" => "Todas las fechas seleccionadas están ocupadas."];
+                            $status_code = 400;
+                        } else {
                         // CREAR PRESTAMOS DE EQUIPAMIENTO SI EXISTEN
                         if (!empty($input['equipamiento_ids']) && is_array($input['equipamiento_ids'])) {
                             $loanController = new LoanController();
@@ -271,6 +292,7 @@ try {
 
                         $response = ["success" => true, "ids" => $results];
                         $status_code = 201;
+                        }
                     }
                 } else {
                     // Crear reservación - El input debe traer esp_id, fecha_uso, hora_ent, hora_sal, etc.

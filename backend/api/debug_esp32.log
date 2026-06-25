@@ -2,3 +2,331 @@
 Cuerpo: 
 2026-06-25 20:09:20 - GET /Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
+2026-06-25 20:10:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:10:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:11:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:11:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:12:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:12:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:13:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:13:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:14:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:14:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:15:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:15:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:16:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:16:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:17:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:17:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:18:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:18:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:19:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:19:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:20:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:20:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:21:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:21:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:22:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:22:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:23:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:23:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:23:51 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:23:52 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:23:52 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:23:53 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:09 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:24:10 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:24:10 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:11 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:13 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:24:13 - GET /Estadias/backend/api/index.php/reservations/approved
+Cuerpo: 
+2026-06-25 20:24:17 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:24:17 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:24:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:21 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:22 - GET /Estadias/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-25 20:24:22 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:23 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:24 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:24 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:26 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:27 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:28 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:28 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:24:29 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:24:29 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:30 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:31 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:31 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:32 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:24:32 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:24:33 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:24:53 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:24:53 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:25:46 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:25:47 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:26:07 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:26:08 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:26:08 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:26:08 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:27:07 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:27:08 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:27:50 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:27:51 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:27:55 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:27:55 - GET /Estadias/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-25 20:27:56 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:27:59 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:28:00 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:29:00 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:29:00 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:30:00 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:30:00 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:30:59 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:31:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:31:04 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:31:04 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:31:05 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:31:05 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:31:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:31:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:32:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:32:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:33:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:33:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:34:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:34:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:35:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:35:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:36:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:36:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:37:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:37:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:38:08 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:38:09 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:39:06 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:39:06 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:40:20 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:40:20 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:41:17 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:41:17 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:48:11 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:48:11 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:49:11 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:49:11 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:50:11 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:50:11 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:50:24 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:51:11 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:51:11 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:51:12 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:51:12 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:51:13 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:51:14 - GET /Estadias/backend/api/index.php/reservations/approved
+Cuerpo: 
+2026-06-25 20:51:14 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:51:15 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:51:15 - GET /Estadias/backend/api/index.php/reservations/cancelled
+Cuerpo: 
+2026-06-25 20:51:26 - GET /Estadias/backend/api/index.php/reservations/approved
+Cuerpo: 
+2026-06-25 20:51:27 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:51:28 - GET /Estadias/backend/api/index.php/reservations/cancelled
+Cuerpo: 
+2026-06-25 20:51:29 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:52:12 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:52:12 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:52:52 - GET /Estadias/backend/api/index.php/reservations/cancelled
+Cuerpo: 
+2026-06-25 20:53:12 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:53:12 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:53:21 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:53:21 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:53:22 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:53:23 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:53:23 - GET /Estadias/backend/api/index.php/reservations/cancelled
+Cuerpo: 
+2026-06-25 20:53:23 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:53:32 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:53:32 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:54:22 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:54:22 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:54:45 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:54:46 - GET /Estadias/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-25 20:54:46 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:54:59 - GET /Estadias/backend/api/index.php/reservations?esp_id=37&date=2026-06-25
+Cuerpo: 
+2026-06-25 20:55:04 - POST /Estadias/backend/api/index.php/reservations
+Cuerpo: {"esp_id":37,"hora_ent":"08:00:00","hora_sal":"10:00:00","num_alumnos":10,"motivo":"","vis_id":null,"fecha_uso":"2026-06-25"}
+2026-06-25 20:55:07 - GET /Estadias/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-25 20:55:43 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:55:43 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:55:46 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:55:46 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:55:47 - GET /Estadias/backend/api/index.php/reservations/pending
+Cuerpo: 
+2026-06-25 20:55:47 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:55:51 - GET /Estadias/backend/api/index.php/spaces
+Cuerpo: 
+2026-06-25 20:55:51 - GET /Estadias/backend/api/index.php/reservations/approved
+Cuerpo: 
+2026-06-25 20:56:37 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:56:38 - GET /Estadias/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-06-25 20:56:38 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:56:44 - GET /Estadias/backend/api/index.php/reservations?esp_id=37&date=2026-06-25
+Cuerpo: 
+2026-06-25 20:57:37 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-25 20:57:38 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-25 20:57:43 - GET /Estadias/backend/api/index.php/reservations?esp_id=37&date=2026-06-26
+Cuerpo: 
