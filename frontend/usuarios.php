@@ -28,16 +28,6 @@ if (isset($_GET['action'])) {
             foreach ($exportUsers as $row) {
                 fputcsv($output, [$row['nombre'], $row['apellido'], $row['correo'], $row['empresa'] ?: $row['rfc_matricula'], $row['rol_nombre'], $row['estatus'], $row['ultima_conexion'] ?: 'Nunca']);
             }
-        } elseif ($_GET['action'] === 'export_roles') {
-            header('Content-Disposition: attachment; filename=roles_export_' . date('Y-m-d') . '.csv');
-            fputcsv($output, ['ID', 'Nombre', 'Descripcion', 'Permisos']);
-            $exportRoles = $db->query("SELECT * FROM ROLES")->fetchAll();
-            foreach ($exportRoles as $row) {
-                fputcsv($output, [$row['rol_id'], $row['nombre'], $row['descripcion'], $row['permisos']]);
-            }
-        } elseif ($_GET['action'] === 'export_invitaciones') {
-            header('Content-Disposition: attachment; filename=invitaciones_export_' . date('Y-m-d') . '.csv');
-            fputcsv($output, ['Invitado', 'Correo', 'Codigo', 'Estatus', 'Anfitrion']);
             $exportInvites = $inviteController->getAllActive();
             foreach ($exportInvites as $row) {
                 fputcsv($output, [$row['nombre'], $row['correo'], $row['codigo_acceso'], $row['estatus'], $row['anfitrion_nombre']]);
@@ -73,21 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         header("Location: usuarios.php?tab=usuarios&success=1");
         exit();
-    } elseif ($_POST['action'] === 'save_role') {
-        $nombre = $_POST['nombre_rol'];
-        $descripcion = $_POST['descripcion_rol'];
-        $permisos = $_POST['permisos'] ?? [];
-        $rol_id = $_POST['rol_id'] ?? null;
-
-        if ($rol_id) {
-            $stmt = $db->prepare("UPDATE ROLES SET nombre = ?, descripcion = ?, permisos = ? WHERE rol_id = ?");
-            $stmt->execute([$nombre, $descripcion, json_encode($permisos), $rol_id]);
-        } else {
-            $stmt = $db->prepare("INSERT INTO ROLES (nombre, descripcion, permisos) VALUES (?, ?, ?)");
-            $stmt->execute([$nombre, $descripcion, json_encode($permisos)]);
-        }
-        header("Location: usuarios.php?tab=roles&success=1");
-        exit();
     } elseif ($_POST['action'] === 'generate_code') {
         header('Content-Type: application/json');
         try {
@@ -105,12 +80,6 @@ if (isset($_GET['delete_user'])) {
     $stmt = $db->prepare("UPDATE usuario SET estatus = 'Inactivo' WHERE us_id = ?");
     $stmt->execute([$_GET['delete_user']]);
     header("Location: usuarios.php?tab=usuarios&deleted=1");
-    exit();
-}
-if (isset($_GET['delete_rol'])) {
-    $stmt = $db->prepare("DELETE FROM ROLES WHERE rol_id = ?");
-    $stmt->execute([$_GET['delete_rol']]);
-    header("Location: usuarios.php?tab=roles&deleted=1");
     exit();
 }
 
@@ -190,7 +159,6 @@ $tab = $_GET['tab'] ?? 'usuarios';
         <div style="display: flex; gap: 12px;">
             <button onclick="window.open('../backend/reports/users_pdf.php', '_blank')" id="btn-export" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #e2e8f0; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="file-text" style="width: 16px;"></i> Exportar PDF</button>
             <button onclick="openUserModal()" id="btn-action-user" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'usuarios' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo usuario</button>
-            <button onclick="openRoleModal()" id="btn-action-role" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'roles' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo rol</button>
         </div>
     </header>
 
@@ -223,7 +191,6 @@ $tab = $_GET['tab'] ?? 'usuarios';
         
         <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 10px; border: 1px solid #e2e8f0;">
             <button onclick="switchTab('usuarios')" id="btn-usuarios" class="btn-tab <?php echo $tab === 'usuarios' ? 'active' : ''; ?>">USUARIOS</button>
-            <button onclick="switchTab('roles')" id="btn-roles" class="btn-tab <?php echo $tab === 'roles' ? 'active' : ''; ?>">ROLES</button>
             <button onclick="switchTab('invitaciones')" id="btn-invitaciones" class="btn-tab <?php echo $tab === 'invitaciones' ? 'active' : ''; ?>">INVITACIONES</button>
         </div>
     </div>
@@ -338,33 +305,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
         </table>
     </div>
 
-    <!-- Pestaña Roles -->
-    <div id="tab-roles" style="display: <?php echo $tab === 'roles' ? 'block' : 'none'; ?>;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
-            <?php foreach ($roles as $rol): ?>
-            <?php $p = json_decode($rol['permisos'] ?? '', true) ?: []; ?>
-            <div style="padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;">
-                <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 8px;">
-                    <button onclick='editRole(<?php echo json_encode($rol); ?>)' style="background: #f1f5f9; border: none; border-radius: 6px; padding: 6px; color: #475569; cursor: pointer;"><i data-lucide="edit-2" style="width: 14px; height: 14px;"></i></button>
-                    <button onclick="confirmDelete(event, '?delete_rol=<?php echo $rol['rol_id']; ?>', '¿Eliminar este rol definitivamente?')" style="background: #fef2f2; border: none; border-radius: 6px; padding: 6px; color: #ef4444; cursor: pointer; display: inline-block;"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
-                </div>
-                
-                <h4 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 6px 0;"><?php echo htmlspecialchars($rol['nombre']); ?></h4>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 20px; font-weight: 500;"><?php echo htmlspecialchars($rol['descripcion']); ?></p>
-                
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <?php foreach ($p as $modulo => $acciones): 
-                        $countVal = is_array($acciones) ? count($acciones) : ($acciones === true ? 'Todo' : htmlspecialchars((string)$acciones));
-                    ?>
-                        <span style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase;">
-                            <?php echo htmlspecialchars($modulo); ?>: <?php echo $countVal; ?>
-                        </span>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
+    <!-- Pestaña Roles (Eliminada) -->
 
     <!-- Pestaña Invitaciones -->
     <div id="tab-invitaciones" style="display: <?php echo $tab === 'invitaciones' ? 'grid' : 'none'; ?>; grid-template-columns: 2fr 1fr; gap: 32px;">
@@ -471,57 +412,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
     </div>
 </div>
 
-<!-- Modal Rol -->
-<div id="modal-rol" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: white; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 32px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <h2 id="role-modal-title" style="font-size: 20px; font-weight: 800; color: #1e293b;">Configurar Rol</h2>
-            <button onclick="closeRoleModal()" style="background: none; border: none; cursor: pointer; color: #94a3b8;"><i data-lucide="x"></i></button>
-        </div>
-        <p style="font-size: 13px; color: #64748b; margin-bottom: 24px;">Defina las acciones permitidas (CRUD) por módulo para este perfil.</p>
-        
-        <form method="POST" id="form-rol">
-            <input type="hidden" name="action" value="save_role">
-            <input type="hidden" name="rol_id" id="rol_id">
-            
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre del Rol</label>
-                    <input type="text" name="nombre_rol" id="nombre_rol" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
-                </div>
-                
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Descripción</label>
-                    <textarea name="descripcion_rol" id="descripcion_rol" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; height: 60px; resize: none;"></textarea>
-                </div>
-
-                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: #1e293b; text-transform: uppercase; margin-bottom: 16px;">Permisos Granulares</label>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <?php foreach ($modulos as $mod => $acciones): ?>
-                        <div>
-                            <p style="font-size: 12px; font-weight: 700; color: #475569; margin: 0 0 8px 0;"><?php echo $mod; ?></p>
-                            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-                                <?php foreach ($acciones as $acc): ?>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #64748b; cursor: pointer;">
-                                    <input type="checkbox" name="permisos[<?php echo $mod; ?>][]" value="<?php echo $acc; ?>" class="perm-check" data-mod="<?php echo $mod; ?>" data-acc="<?php echo $acc; ?>" style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid #cbd5e1;"> <?php echo $acc; ?>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 12px; padding-top: 8px;">
-                    <button type="button" onclick="closeRoleModal()" style="flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Cancelar</button>
-                    <button type="submit" style="flex: 1; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Guardar Cambios</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
+<!-- Modal Rol (Eliminado) -->
 
 <style>
     .btn-tab {
@@ -536,18 +427,16 @@ $tab = $_GET['tab'] ?? 'usuarios';
     function switchTab(tab) {
         currentActiveTab = tab;
         document.getElementById('tab-usuarios').style.display = tab === 'usuarios' ? 'block' : 'none';
-        document.getElementById('tab-roles').style.display = tab === 'roles' ? 'block' : 'none';
         document.getElementById('tab-invitaciones').style.display = tab === 'invitaciones' ? 'grid' : 'none';
         
         // Mostrar u ocultar estadísticas
-        document.getElementById('stats-usuarios').style.display = (tab === 'usuarios' || tab === 'roles') ? 'grid' : 'none';
+        document.getElementById('stats-usuarios').style.display = tab === 'usuarios' ? 'grid' : 'none';
         document.getElementById('stats-invitaciones').style.display = tab === 'invitaciones' ? 'grid' : 'none';
         
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
         if(document.getElementById('btn-' + tab)) document.getElementById('btn-' + tab).classList.add('active');
         
         document.getElementById('btn-action-user').style.display = tab === 'usuarios' ? 'flex' : 'none';
-        document.getElementById('btn-action-role').style.display = tab === 'roles' ? 'flex' : 'none';
     }
 
     function exportToPDF() {

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@babel/standalone": "^8.0.2"
+    "@babel/standalone": "^8.0.2",
+    "puppeteer": "^25.2.1"
   }
 }

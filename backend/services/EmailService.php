@@ -234,6 +234,26 @@ class EmailService {
     }
 
     /**
+     * @summary Envía correo cuando una reserva es cancelada.
+     * 
+     * @param string $to Correo del usuario.
+     * @param int $re_id ID de la reserva.
+     * @param string $motivo Motivo de la cancelación (opcional).
+     */
+    public function sendReservationCancelled($to, $re_id, $motivo = '') {
+        $subject = "Reserva Cancelada #$re_id";
+        $motivoHtml = $motivo ? "<p>Motivo de cancelación: <strong>$motivo</strong></p>" : "";
+        $body = "
+            <h2>Notificación sobre tu reserva</h2>
+            <p>Te informamos que la reserva con el número de folio <strong>#$re_id</strong> ha sido <strong>cancelada</strong>.</p>
+            $motivoHtml
+            <br>
+            <p>Saludos cordiales,<br>Equipo SIGRAT</p>
+        ";
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    /**
      * @summary Envía un correo con el enlace para restablecer la contraseña.
      * 
      * @param string $to Correo del usuario.

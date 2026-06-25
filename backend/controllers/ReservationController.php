@@ -44,18 +44,50 @@ class ReservationController {
             $stmt->execute([$data['esp_id'], $data['fecha_uso'], $data['hora_sal'], $data['hora_ent'], $data['hora_sal'], $data['hora_ent'], $data['hora_ent'], $data['hora_sal']]);
             if ($stmt->fetch()) throw new \Exception("Conflicto de horario.");
 
-            // Revisar el tipo de acceso del espacio para determinar estatus inicial
-            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
-            $stmtEspacio->execute([$data['esp_id']]);
-            $espacio = $stmtEspacio->fetch();
-            
-            $estatus_inicial = 'Aprobada'; // Auto-aprobación por defecto para General y División
-            if ($espacio && $espacio['acceso_tipo'] === 'Restringido') {
-                $estatus_inicial = 'Pendiente'; // Requiere revisión del admin
+            // Obtener la carrera del usuario solicitante
+            $usuario_carrera = '';
+            if ($us_id) {
+                $stmtUs = $this->db->prepare("SELECT carrera FROM USUARIO WHERE us_id = ?");
+                $stmtUs->execute([$us_id]);
+                $usuario_carrera = $stmtUs->fetchColumn();
             }
 
-            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, motivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial, $data['motivo'] ?? null]);
+            // Revisar el tipo de acceso del espacio para determinar estatus inicial
+            $stmtEspacio = $this->db->prepare("SELECT acceso, division_restringida, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio->execute([$data['esp_id']]);
+            $espacio = $stmtEspacio->fetch();
+
+            if (!$espacio) {
+                throw new \Exception("El espacio no existe.");
+            }
+
+            $acceso = strtolower(trim($espacio['acceso'] ?? 'general'));
+            $estatus_inicial = 'Aprobada'; // Auto-aprobación para General y Por división
+            $status_inicial = 'approved';
+
+            if ($acceso === 'por división') {
+                $division = trim($espacio['division_restringida'] ?? '');
+                if (strcasecmp(trim($usuario_carrera ?? ''), $division) !== 0) {
+                    throw new \Exception("No tienes permiso para reservar este espacio. Sólo está permitido para la división: " . ($division ?: 'Ninguna'));
+                }
+            } elseif ($acceso === 'restringido') {
+                $estatus_inicial = 'Pendiente'; // Requiere revisión del admin
+                $status_inicial = 'pending';
+            }
+
+            // REGLA DE NEGOCIO: Si dura más de 2 horas, forzar a Pendiente (solicitado por usuario)
+            $hora_ent_ts = strtotime($data['hora_ent']);
+            $hora_sal_ts = strtotime($data['hora_sal']);
+            if ($hora_ent_ts !== false && $hora_sal_ts !== false) {
+                $duracion_horas = ($hora_sal_ts - $hora_ent_ts) / 3600;
+                if ($duracion_horas > 2) {
+                    $estatus_inicial = 'Pendiente';
+                    $status_inicial = 'pending';
+                }
+            }
+
+            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, status, motivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial, $status_inicial, $data['motivo'] ?? null]);
             
             $new_res_id = $this->db->lastInsertId();
             $this->db->commit();

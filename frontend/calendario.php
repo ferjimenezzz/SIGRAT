@@ -1362,6 +1362,7 @@ include 'header.php';
                 <i class="bi bi-search"></i>
                 <input type="text" id="searchInput" placeholder="Buscar espacio, sala...">
             </div>
+            <?php if (hasPermission('Calendario', 'ver_todas_reservas')): ?>
             <div class="btn-action-outline" style="cursor: default; display: flex; align-items: center; gap: 10px; user-select: none;">
                 <span style="font-weight: 700; color: var(--text-primary);">Mis reservas</span>
                 <label class="toggle-switch" style="margin-bottom: 0;">
@@ -1369,6 +1370,9 @@ include 'header.php';
                     <span class="toggle-slider"></span>
                 </label>
             </div>
+            <?php else: ?>
+            <input type="checkbox" id="quickFilterSoloMisReservas" checked style="display: none;">
+            <?php endif; ?>
             <button class="btn-action-outline" id="btnToggleFilters">
                 <i class="bi bi-funnel"></i> Filtros avanz.
             </button>
@@ -1513,6 +1517,7 @@ include 'header.php';
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
             <!-- Resumen del Día -->
+            <?php if ($isAdmin): ?>
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
                     <span>Resumen del día</span>
@@ -1532,6 +1537,7 @@ include 'header.php';
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Próximas Reservaciones -->
             <div class="sidebar-section-card">
@@ -1844,6 +1850,7 @@ include 'header.php';
                                 <option value="4">4 horas</option>
                                 <option value="5">5 horas</option>
                             </select>
+                            <small id="resWarningLong" style="color: #ef4444; font-size: 10px; display: none; font-weight: 700; margin-top: 4px;">Reservas > 2 horas requieren aprobación del admin.</small>
                         </div>
                     </div>
 
@@ -2107,6 +2114,7 @@ include 'header.php';
 
         function openFilters() {
             filtersOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
             setTimeout(() => {
                 filtersOverlay.style.opacity = '1';
                 filtersSidebar.classList.add('show');
@@ -2118,6 +2126,7 @@ include 'header.php';
             filtersOverlay.style.opacity = '0';
             setTimeout(() => {
                 filtersOverlay.style.display = 'none';
+                document.body.style.overflow = '';
             }, 300);
         }
 
@@ -2297,6 +2306,8 @@ include 'header.php';
             if (eqCont) eqCont.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
             document.getElementById('resMotivo').value = "";
             document.getElementById('charCount').textContent = "0";
+            document.getElementById('resWarningLong').style.display = 'none';
+            document.getElementById('resDuracion').value = "2";
 
             // Forzar volver a Día Único al abrir
             btnResModeSingle.click();
@@ -2364,6 +2375,19 @@ include 'header.php';
         const resFecha = document.getElementById('resFecha');
         if (resFecha) {
             resFecha.addEventListener('change', checkAvailability);
+        }
+
+        const resDuracionSelect = document.getElementById('resDuracion');
+        const resWarningLong = document.getElementById('resWarningLong');
+        if (resDuracionSelect && resWarningLong) {
+            resDuracionSelect.addEventListener('change', (e) => {
+                if (parseInt(e.target.value) > 2) {
+                    resWarningLong.style.display = 'block';
+                } else {
+                    resWarningLong.style.display = 'none';
+                }
+                checkAvailability();
+            });
         }
 
         function checkAvailability() {

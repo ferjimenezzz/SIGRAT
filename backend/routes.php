@@ -28,7 +28,7 @@ function handleReservationApproval(string $method, string $path)
     if ($reservationId === 'pending' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $action = 'pending';
         $reservationId = null;
-    } elseif (!ctype_digit($reservationId) || ($action !== 'approve' && $action !== 'reject')) {
+    } elseif (!ctype_digit($reservationId) || !in_array($action, ['approve', 'reject', 'cancel'])) {
         return false;
     }
 
@@ -58,7 +58,8 @@ function handleReservationApproval(string $method, string $path)
     $isAdmin = strpos($userRol, 'ADMIN') !== false;
 
     // Authorization check – allow any admin or 'Personal Académico'.
-    if (!$isAdmin && $role !== 'Personal Académico') {
+    // Note: Cancel can be done by non-admins as well, so we only restrict approve/reject to admins.
+    if (!$isAdmin && $role !== 'Personal Académico' && !($action === 'cancel' || $action === 'pending')) {
         http_response_code(403);
         echo json_encode(['error' => "Forbidden: insufficient role or expired session. User Role: " . ($role ?: 'None')]);
         exit;
@@ -68,11 +69,12 @@ function handleReservationApproval(string $method, string $path)
 
     try {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'pending') {
-            $pending = $controller->getPending();
+            $pending = $controller->getPending((int)$adminId, $isAdmin);
             http_response_code(200);
             echo json_encode($pending);
         } elseif ($action === 'approve') {
-            $controller->approve((int)$reservationId, (int)$adminId);
+            $newEspId = isset($input['esp_id']) ? (int)$input['esp_id'] : null;
+            $controller->approve((int)$reservationId, (int)$adminId, $newEspId);
             $response = ['message' => 'Reservation approved'];
             http_response_code(200);
             echo json_encode($response);
@@ -80,6 +82,12 @@ function handleReservationApproval(string $method, string $path)
             $reason = $input['reason'] ?? null;
             $controller->reject((int)$reservationId, (int)$adminId, $reason);
             $response = ['message' => 'Reservation rejected'];
+            http_response_code(200);
+            echo json_encode($response);
+        } elseif ($action === 'cancel') {
+            $reason = $input['reason'] ?? 'Cancelada por el usuario';
+            $controller->cancel((int)$reservationId, (int)$adminId, $isAdmin, $reason);
+            $response = ['message' => 'Reservation cancelled'];
             http_response_code(200);
             echo json_encode($response);
         } else {
