@@ -129,7 +129,7 @@ class RFIDController {
             // Si last_ping es menos de 2 minutos atrás (120 segundos), la consideramos conectada
             $query = "SELECT ant_id, ubicacion, estatus, last_ping,
                              CASE 
-                                WHEN last_ping IS NOT NULL AND TIMESTAMPDIFF(SECOND, last_ping, NOW()) <= 120 THEN 1 
+                                WHEN last_ping IS NOT NULL AND last_ping >= NOW() - INTERVAL '120 seconds' THEN 1 
                                 ELSE 0 
                              END as is_connected
                       FROM ANTENA";
