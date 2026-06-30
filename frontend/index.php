@@ -647,14 +647,14 @@ if (isset($_SESSION['us_id'])) {
             <div class="chart-header">
                 <h3 class="chart-title">Estado de inventario</h3>
             </div>
-            <div class="donut-container" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                <div class="donut-wrapper" style="width: 250px; height: 250px;">
+            <div class="donut-container" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; flex-wrap: wrap; gap: 16px;">
+                <div class="donut-wrapper" style="width: 210px; height: 210px; flex-shrink: 0;">
                     <canvas id="inventoryDonut"></canvas>
                     <div class="donut-center-text">
                         <div class="donut-value" id="donutCenterValue">0</div>
                     </div>
                 </div>
-                <div class="donut-legend">
+                <div class="donut-legend" style="min-width: 140px; margin-left: 0;">
                     <div class="donut-legend-item">
                         <div class="donut-legend-dot" style="background: #10b981;"></div>
                         Disponibles
