@@ -164,8 +164,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
             <i class="bi bi-funnel"></i> Filtros
         </button>
-        <button type="button" class="btn-outline" onclick="window.open('../backend/reports/inventory_pdf.php', '_blank')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
-            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        <button type="button" class="btn-outline" onclick="window.open('../backend/reports/inventory_pdf.php', '_blank')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border-color: #ef4444; color: #ef4444;">
+            <i class="bi bi-file-earmark-pdf"></i> PDF
+        </button>
+        <button type="button" class="btn-outline" onclick="exportTableToExcel('inventoryTable', 'Inventario_SIGRAT')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border-color: #10b981; color: #10b981;">
+            <i class="bi bi-file-earmark-excel"></i> Excel
         </button>
         <button class="btn-primary" type="button" onclick="document.getElementById('newAssetModal').style.display='flex'; document.body.style.overflow='hidden';" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
             <i class="bi bi-plus-lg"></i> Nuevo activo

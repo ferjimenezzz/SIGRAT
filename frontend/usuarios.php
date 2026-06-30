@@ -157,7 +157,8 @@ $tab = $_GET['tab'] ?? 'usuarios';
             <p style="font-size: 13px; color: #64748b; font-weight: 500;">Administra usuarios y permisos del sistema</p>
         </div>
         <div style="display: flex; gap: 12px;">
-            <button onclick="window.open('../backend/reports/users_pdf.php', '_blank')" id="btn-export" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #e2e8f0; color: #1e293b; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="file-text" style="width: 16px;"></i> Exportar PDF</button>
+            <button onclick="window.open('../backend/reports/users_pdf.php', '_blank')" id="btn-export-pdf" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #ef4444; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="file-text" style="width: 16px;"></i> PDF</button>
+            <button onclick="exportTableToExcel('usersTable', 'Usuarios_SIGRAT')" id="btn-export-excel" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #10b981; color: #10b981; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="table" style="width: 16px;"></i> Excel</button>
             <button onclick="openUserModal()" id="btn-action-user" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'usuarios' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo usuario</button>
         </div>
     </header>

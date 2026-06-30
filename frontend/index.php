@@ -911,6 +911,33 @@ if (isset($_SESSION['us_id'])) {
 
     // Iniciar contador en paralelo
     animateCenterCounter(inventoryFinalTotal, DONUT_DURATION);
+    // ==================== RFID REALTIME POLLING ====================
+    let lastRfidCheck = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    
+    function pollRFID() {
+        fetch(`../backend/api/poll_rfid.php?last_check=${encodeURIComponent(lastRfidCheck)}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.success && data.scans && data.scans.length > 0) {
+                    data.scans.forEach(scan => {
+                        let msg = `Nuevo escaneo RFID detectado: ${scan.marca} ${scan.modelo || ''}`;
+                        if(typeof showToast === 'function') {
+                            showToast(msg, 'info');
+                        } else {
+                            console.log(msg);
+                        }
+                    });
+                }
+                if(data.success && data.current_time) {
+                    lastRfidCheck = data.current_time;
+                }
+            })
+            .catch(err => console.error("Error polling RFID:", err));
+    }
+
+    // Ejecutar cada 5 segundos
+    setInterval(pollRFID, 5000);
+
     </script>
 
     </div>
