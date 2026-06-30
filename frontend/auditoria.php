@@ -99,33 +99,12 @@ include 'header.php';
     th { padding: 16px 20px; font-size: 12px; font-weight: 700; color: var(--text-muted); background: var(--bg-main); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
     td { padding: 14px 20px; font-size: 13px; border-bottom: 1px solid var(--secondary); color: var(--text-main); }
 
-    /* Timeline Styles */
-    .timeline-container { padding: 20px 24px; }
-    .timeline { position: relative; max-width: 800px; margin: 0 auto; }
-    .timeline::before { content: ''; position: absolute; top: 0; bottom: 0; left: 24px; width: 2px; background: var(--border); }
-    .timeline-item { position: relative; margin-bottom: 24px; padding-left: 60px; }
-    .timeline-item:last-child { margin-bottom: 0; }
-    .timeline-dot { position: absolute; left: 16px; top: 0; width: 18px; height: 18px; border-radius: 50%; background: white; border: 4px solid var(--primary); z-index: 2; box-shadow: 0 0 0 4px white; }
-    .timeline-dot.inventario { border-color: #f59e0b; }
-    .timeline-dot.incidencias { border-color: #ef4444; }
-    .timeline-content { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid var(--border); position: relative; }
-    .timeline-content::before { content: ''; position: absolute; left: -6px; top: 12px; width: 10px; height: 10px; background: #f8fafc; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
-    .timeline-time { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
-    .timeline-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-    .timeline-desc { font-size: 13px; color: #475569; }
-    .timeline-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #e0e7ff; color: #4f46e5; margin-left: 8px; vertical-align: middle; }
-
-    @media screen {
-        .print-only { display: none !important; }
-    }
-
     /* Print Styles */
     @media print {
         /* Ocultar elementos no deseados */
-        .sidebar, .top-bar, form#filterForm, .btn-primary, .btn-secondary, .btn-outline, .preset-dates, .audit-container > div:first-child, .screen-only {
+        .sidebar, .top-bar, form#filterForm, .btn-primary, .btn-secondary, .btn-outline, .preset-dates, .audit-container > div:first-child {
             display: none !important;
         }
-        .print-only { display: block !important; }
         
         /* Ajustar contenedor principal */
         body, .main-container {
@@ -145,11 +124,10 @@ include 'header.php';
         }
         
         /* Quitar scroll y expandir tabla completa */
-        .table-container, .table-container.print-only {
+        .table-container {
             overflow: visible !important;
             max-height: none !important;
             border: none !important;
-            display: block !important;
         }
         th {
             position: static !important;
@@ -273,39 +251,7 @@ include 'header.php';
             <button class="btn btn-outline" onclick="window.print()"><i data-lucide="printer"></i> Imprimir</button>
         </div>
         
-        <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
-            <!-- TIMELINE VISTA PANTALLA -->
-            <div class="timeline-container screen-only">
-                <?php if (empty($logs)): ?>
-                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">No hay registros para este periodo.</div>
-                <?php else: ?>
-                    <div class="timeline">
-                        <?php foreach ($logs as $log): 
-                            $dotClass = '';
-                            if ($tipo_reporte == 'inventario') $dotClass = 'inventario';
-                            if ($tipo_reporte == 'incidencias') $dotClass = 'incidencias';
-                        ?>
-                            <div class="timeline-item">
-                                <div class="timeline-dot <?php echo $dotClass; ?>"></div>
-                                <div class="timeline-content">
-                                    <div class="timeline-time"><?php echo date('d M Y, H:i A', strtotime($log['fecha_hora'])); ?></div>
-                                    <div class="timeline-title">
-                                        <?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?>
-                                        <span class="timeline-badge"><?php echo htmlspecialchars($log['modulo_afectado']); ?></span>
-                                    </div>
-                                    <div class="timeline-desc"><?php echo htmlspecialchars($log['accion']); ?></div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-            
-            <!-- TABLA VISTA IMPRESIÓN -->
-            <div class="table-container print-only">
-        <?php else: ?>
-            <div class="table-container">
-        <?php endif; ?>
+        <div class="table-container">
             <table>
                 <thead>
                     <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
