@@ -155,6 +155,16 @@ include 'header.php';
             overflow: visible !important;
             max-height: none !important;
             border: none !important;
+            box-shadow: none !important;
+        }
+        table {
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+        td, th {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
         }
         th {
             position: static !important;
