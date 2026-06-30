@@ -38,7 +38,7 @@ class ReservationController {
             $vis_id = $data['vis_id'] ?? null;
             $us_id = $data['us_id'] ?? null;
 
-            $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND estatus = 'Aprobada' AND fecha_uso = ?
+            $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND status = 'approved' AND fecha_uso = ?
                               AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
             $stmt = $this->db->prepare($conflictQuery);
             $stmt->execute([$data['esp_id'], $data['fecha_uso'], $data['hora_sal'], $data['hora_ent'], $data['hora_sal'], $data['hora_ent'], $data['hora_ent'], $data['hora_sal']]);
@@ -86,8 +86,9 @@ class ReservationController {
                 }
             }
 
-            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, status, motivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial, $status_inicial, $data['motivo'] ?? null]);
+            $group_id = $data['group_id'] ?? null;
+            $stmt = $this->db->prepare("INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, status, motivo, group_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['esp_id'], $us_id, $vis_id, $data['num_alumnos'] ?? 0, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal'], $estatus_inicial, $status_inicial, $data['motivo'] ?? null, $group_id]);
             
             $new_res_id = $this->db->lastInsertId();
             $this->db->commit();

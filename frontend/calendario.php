@@ -2396,11 +2396,22 @@ include 'header.php';
             const fecha = document.getElementById('resFecha').value;
             if (!espId || !fecha) return;
             
+            const now = new Date();
+            const tzOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 10);
+            const isTodayExact = fecha === localISOTime;
+            const currentHour = now.getHours();
+
             // Habilitar todos primero
             Array.from(document.getElementById('resHoraEnt').options).forEach(opt => {
                 opt.disabled = false;
                 const h = parseInt(opt.value);
                 opt.text = opt.value + (h < 12 ? ' AM' : ' PM');
+                
+                if (isTodayExact && h <= currentHour) {
+                    opt.disabled = true;
+                    opt.text = opt.value + ' (Pasada)';
+                }
             });
             
             fetch(`../backend/api/index.php/reservations?esp_id=${espId}&date=${fecha}`)
@@ -3264,6 +3275,12 @@ include 'header.php';
             return;
         }
 
+        const now = new Date();
+        const currentHour = now.getHours();
+        const selectedHour = parseInt(horaEnt.split(':')[0]);
+        const tzOffset = now.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 10);
+
         // Calcular hora de salida
         const entParts = horaEnt.split(':').map(Number);
         let salHour = entParts[0] + duracionHoras;
@@ -3289,6 +3306,10 @@ include 'header.php';
                 Swal.fire('Atención', 'Por favor, selecciona una fecha.', 'warning');
                 return;
             }
+            if (fecha === localISOTime && selectedHour <= currentHour) {
+                Swal.fire('Atención', 'No puedes reservar en una hora que ya pasó el día de hoy.', 'warning');
+                return;
+            }
             requestData.fecha_uso = fecha;
         } else {
             // Múltiples días
@@ -3297,6 +3318,10 @@ include 'header.php';
             if(!startStr || !endStr) {
                 Swal.fire('Atención', 'Por favor, selecciona el rango de fechas.', 'warning');
                 return;
+            }
+            if (startStr === localISOTime && selectedHour <= currentHour) {
+                 Swal.fire('Atención', 'No puedes reservar en una hora que ya pasó para el día de hoy (fecha de inicio).', 'warning');
+                 return;
             }
 
             const startDate = new Date(startStr + 'T00:00:00');
@@ -3351,49 +3376,70 @@ include 'header.php';
         btnConfirm.disabled = true;
         btnConfirm.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
 
-        fetch('../backend/api/index.php/reservations', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success || data.id || data.ids) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Reservación Solicitada!',
-                    text: 'Tu reservación ha sido programada con éxito. Revisa tu correo para más detalles.',
-                    confirmButtonColor: '#10b981'
-                });
-                window.closeResModal();
+        const performFetch = (dataToSubmit) => {
+            fetch('../backend/api/index.php/reservations', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSubmit)
+            })
+            .then(async res => {
+                const status = res.status;
+                const data = await res.json().catch(() => ({}));
                 
-                // Recargar eventos y actualizar vista
-                window.fetchEvents();
-            } else {
+                if (status === 409 && data.conflicts) {
+                    const result = await Swal.fire({
+                        icon: 'warning',
+                        title: 'Fechas Ocupadas',
+                        text: `Los siguientes días ya están ocupados: ${data.conflicts.join(', ')}. ¿Deseas reservar de todos modos omitiendo estos días?`,
+                        showCancelButton: true,
+                        confirmButtonColor: '#10b981',
+                        cancelButtonColor: '#ef4444',
+                        confirmButtonText: 'Sí, omitir ocupados',
+                        cancelButtonText: 'Cancelar reserva'
+                    });
+                    
+                    if (result.isConfirmed) {
+                        dataToSubmit.skip_conflicts = true;
+                        performFetch(dataToSubmit);
+                    } else {
+                        btnConfirm.disabled = false;
+                        btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
+                    }
+                } else if (data.success || data.id || data.ids) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Reservación Solicitada!',
+                        text: 'Tu reservación ha sido programada con éxito. Revisa tu correo para más detalles.',
+                        confirmButtonColor: '#10b981'
+                    });
+                    window.closeResModal();
+                    window.fetchEvents();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al agendar reserva',
+                        text: data.error || 'Conflicto de horario o espacio no disponible.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                    btnConfirm.disabled = false;
+                    btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
+                }
+            })
+            .catch(err => {
+                console.error("Error submitting reservation:", err);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error al agendar reserva',
-                    text: data.error || 'Conflicto de horario o espacio no disponible.',
+                    title: 'Error de conexión',
+                    text: 'Ocurrió un error al procesar la reservación: ' + err.message,
                     confirmButtonColor: '#ef4444'
                 });
-            }
-        })
-        .catch(err => {
-            console.error("Error submitting reservation:", err);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error de conexión',
-                text: 'Ocurrió un error al procesar la reservación: ' + err.message,
-                confirmButtonColor: '#ef4444'
+                btnConfirm.disabled = false;
+                btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
             });
-        })
-        .finally(() => {
-            btnConfirm.disabled = false;
-            btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
-        });
+        };
+        
+        performFetch(requestData);
     }
 
     // ----------------------------------------------------

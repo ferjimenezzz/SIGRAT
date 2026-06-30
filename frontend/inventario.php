@@ -159,16 +159,23 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     </div>
 </div>
 
-<!-- Barra de Pestañas -->
-<div class="tabs-row">
+<!-- Barra de Pestañas y Acciones Globales -->
+<div class="tabs-row" style="display: flex; justify-content: space-between; align-items: center;">
     <div class="tabs-container">
         <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active">INVENTARIO</button>
         <button onclick="switchAssetTab('mantenimiento')" id="tab-mantenimiento" class="btn-tab">MANTENIMIENTO</button>
     </div>
-    <button class="btn-primary" type="button" onclick="document.getElementById('newAssetModal').style.display='flex'; document.body.style.overflow='hidden';">
-        <i class="bi bi-plus-lg"></i>
-        Nuevo activo
-    </button>
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="bi bi-funnel"></i> Filtros
+        </button>
+        <button type="button" class="btn-outline" onclick="window.open('../backend/reports/inventory_pdf.php', '_blank')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </button>
+        <button class="btn-primary" type="button" onclick="document.getElementById('newAssetModal').style.display='flex'; document.body.style.overflow='hidden';" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="bi bi-plus-lg"></i> Nuevo activo
+        </button>
+    </div>
 </div>
 
 <!-- Sección de Inventario Principal -->
@@ -176,45 +183,71 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
     <!-- Columna Izquierda: Tabla y Filtros -->
     <div>
+        <?php 
+            // Data options dynamic for filters
+            $tiposDB = array_unique(array_filter(array_column($assets, 'tipo')));
+            sort($tiposDB);
+
+            $estadosDB = array_unique(array_filter(array_column($assets, 'estatus')));
+            sort($estadosDB);
+
+            $edificiosDB = array_unique(array_filter(array_column($assets, 'edificio')));
+            sort($edificiosDB);
+
+            $spacesByBuilding = [];
+            foreach ($assets as $a) {
+                $ed = $a['edificio'];
+                $sp = $a['espacio_nombre'];
+                if ($ed && $sp) {
+                    if (!isset($spacesByBuilding[$ed])) $spacesByBuilding[$ed] = [];
+                    if (!in_array($sp, $spacesByBuilding[$ed])) {
+                        $spacesByBuilding[$ed][] = $sp;
+                    }
+                }
+            }
+        ?>
         <!-- Barra de Filtros Rápidos -->
-        <div class="filters-bar">
-            <div class="filters-left">
-                <div class="search-input-wrapper">
-                    <i class="bi bi-search" style="color: #94a3b8;"></i>
-                    <input type="text" id="searchInventory" placeholder="Buscar activo, marca, modelo, serie o tag...">
-                </div>
-                <select id="quickTypeFilter" class="select-filter">
-                    <option value="">Tipo de archivo</option>
-                    <option value="Equipo">Equipo</option>
-                    <option value="Mobiliario">Mobiliario</option>
-                </select>
-                <select id="statusFilter" class="select-filter">
-                    <option value="">Estado</option>
-                    <option value="Disponible">Disponible</option>
-                    <option value="Prestado">Prestado</option>
-                    <option value="Mantenimiento">Mantenimiento</option>
-                    <option value="Extraviado">Extraviado</option>
-                </select>
-                <select id="quickLocationFilter" class="select-filter">
-                    <option value="">Ubicación</option>
-                    <?php 
-                    $uniqueLocations = array_unique(array_filter(array_map(function($a) { return $a['espacio_nombre']; }, $assets)));
-                    foreach($uniqueLocations as $loc): 
-                    ?>
-                        <option value="<?php echo htmlspecialchars($loc); ?>"><?php echo htmlspecialchars($loc); ?></option>
-                    <?php endforeach; ?>
-                </select>
+        <div class="filters-bar" style="display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; overflow-x: auto;">
+            <div class="search-input-wrapper" style="flex: 1 1 auto; min-width: 150px;">
+                <i class="bi bi-search" style="color: #94a3b8;"></i>
+                <input type="text" id="searchInventory" placeholder="Buscar activo, marca, modelo, serie o tag..." style="width: 100%;">
             </div>
-            <div class="filters-right">
-                <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()">
-                    <i class="bi bi-funnel"></i>
-                    Filtros
-                </button>
-                <button class="btn-outline" onclick="window.open('../backend/reports/inventory_pdf.php', '_blank')">
-                    <i class="bi bi-file-earmark-pdf"></i>
-                    Exportar PDF
-                </button>
-            </div>
+            
+            <select id="quickTypeFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
+                <option value="">Tipo de activo</option>
+                <?php foreach($tiposDB as $t): ?>
+                    <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
+                <?php endforeach; ?>
+            </select>
+            
+            <select id="statusFilter" class="select-filter" style="flex: 0 1 auto; min-width: 100px;">
+                <option value="">Estado</option>
+                <?php foreach($estadosDB as $st): ?>
+                    <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
+                <?php endforeach; ?>
+            </select>
+            
+            <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter()" style="flex: 0 1 auto; min-width: 110px;">
+                <option value="">Ubicación</option>
+                <?php foreach($edificiosDB as $ed): ?>
+                    <option value="<?php echo htmlspecialchars($ed); ?>"><?php echo htmlspecialchars($ed); ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
+                <option value="">Espacio</option>
+                <?php 
+                $allUniqueSpaces = array_unique(array_filter(array_column($assets, 'espacio_nombre')));
+                sort($allUniqueSpaces);
+                foreach($allUniqueSpaces as $sp): 
+                ?>
+                    <option value="<?php echo htmlspecialchars($sp); ?>"><?php echo htmlspecialchars($sp); ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <button type="button" class="btn-outline" id="clearFiltersTopBtn" onclick="clearAllFilters()" style="padding: 8px 16px; border-radius: 8px; flex: 0 0 auto; white-space: nowrap;">
+                <i class="bi bi-eraser"></i> Limpiar filtros
+            </button>
         </div>
 
         <!-- Tabla de Inventario -->
@@ -236,7 +269,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                         $tipoLower = strtolower($asset['tipo'] ?? '');
                         $isMobiliario = (strpos($tipoLower, 'silla') !== false || strpos($tipoLower, 'mesa') !== false || strpos($tipoLower, 'escritorio') !== false || strpos($tipoLower, 'pizarrón') !== false || strpos($tipoLower, 'pizarron') !== false || strpos($tipoLower, 'mobiliario') !== false || strpos($tipoLower, 'estante') !== false || strpos($tipoLower, 'archivero') !== false);
                     ?>
-                    <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
+                    <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
                         <td>
                             <div style="font-weight: 700; color: #0f172a;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
                             <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
@@ -303,23 +336,17 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
         <!-- Paginación -->
         <div class="pagination-footer">
-            <div class="pagination-info">
-                Mostrando 1 a <?php echo min(8, $totalAssets); ?> de <?php echo $totalAssets; ?> activos
+            <div class="pagination-info" id="paginationInfo">
+                Mostrando ...
             </div>
-            <div class="pagination-controls">
-                <button class="pagination-btn"><i class="bi bi-chevron-left"></i></button>
-                <button class="pagination-btn active">1</button>
-                <button class="pagination-btn">2</button>
-                <button class="pagination-btn">3</button>
-                <span style="color: #94a3b8; font-size: 13px;">...</span>
-                <button class="pagination-btn"><?php echo max(1, ceil($totalAssets / 8)); ?></button>
-                <button class="pagination-btn"><i class="bi bi-chevron-right"></i></button>
+            <div class="pagination-controls" id="paginationControls">
+                <!-- Javascript will render this -->
             </div>
             <div>
-                <select class="select-filter" style="padding: 6px 12px; font-size: 12.5px;">
-                    <option>8 por página</option>
-                    <option>15 por página</option>
-                    <option>30 por página</option>
+                <select id="itemsPerPageSelect" class="select-filter" style="padding: 6px 12px; font-size: 12.5px;" onchange="updateItemsPerPage()">
+                    <option value="8">8 por página</option>
+                    <option value="15">15 por página</option>
+                    <option value="30">30 por página</option>
                 </select>
             </div>
         </div>
@@ -1595,14 +1622,109 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             url.searchParams.delete('error');
             window.history.replaceState({}, document.title, url);
         }
+        applyFilters();
     });
     
     // Search inventory & Filters Logic
+    
+    let currentPage = 1;
+    let itemsPerPage = 8;
+
+    function updateItemsPerPage() {
+        const select = document.getElementById("itemsPerPageSelect");
+        itemsPerPage = parseInt(select.value) || 8;
+        currentPage = 1;
+        applyFilters();
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        applyFilters();
+    }
+
+    function clearAllFilters() {
+        if(searchInventory) searchInventory.value = "";
+        if(quickTypeFilter) quickTypeFilter.value = "";
+        if(statusFilter) statusFilter.value = "";
+        if(quickLocationFilter) quickLocationFilter.value = "";
+        if(document.getElementById('quickSpaceFilter')) document.getElementById('quickSpaceFilter').value = "";
+        if(drawerTypeFilter) drawerTypeFilter.value = "";
+        if(drawerLocationFilter) drawerLocationFilter.value = "";
+        if(drawerRfidInput) drawerRfidInput.value = "";
+        if(showOnlyAvailable) showOnlyAvailable.checked = false;
+        
+        document.querySelectorAll('.status-checkbox, .edificio-checkbox').forEach(cb => cb.checked = false);
+        
+        currentPage = 1;
+        applyFilters();
+    }
+
+    function renderPaginationControls(totalPages, totalItems, startIndex) {
+        const controls = document.getElementById('paginationControls');
+        const info = document.getElementById('paginationInfo');
+        
+        if (info) {
+            if (totalItems === 0) {
+                info.innerHTML = "No hay resultados";
+            } else {
+                const end = Math.min(startIndex + itemsPerPage, totalItems);
+                info.innerHTML = `Mostrando ${startIndex + 1}-${end} de ${totalItems}`;
+            }
+        }
+        
+        if (!controls) return;
+        let html = '';
+        html += `<button class="pagination-btn" onclick="goToPage(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}><i class="bi bi-chevron-left"></i></button>`;
+        
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                // Avoid multiple ellipsis
+                if (!html.endsWith('...</span>')) {
+                    html += `<span style="color: #94a3b8; font-size: 13px; margin: 0 4px;">...</span>`;
+                }
+            }
+        }
+        
+        html += `<button class="pagination-btn" onclick="goToPage(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}><i class="bi bi-chevron-right"></i></button>`;
+        controls.innerHTML = html;
+    }
+
+    const spacesByBuildingJS = <?php echo json_encode($spacesByBuilding ?? []); ?>;
+    const allUniqueSpacesJS = <?php echo json_encode(array_unique(array_filter(array_column($assets ?? [], 'espacio_nombre')))); ?>;
+    
+    function updateSpaceFilter() {
+        const edVal = document.getElementById('quickLocationFilter').value;
+        const spaceSelect = document.getElementById('quickSpaceFilter');
+        if(!spaceSelect) return;
+        
+        spaceSelect.innerHTML = '<option value="">Espacio</option>';
+        
+        let spacesToShow = [];
+        if (edVal && spacesByBuildingJS[edVal]) {
+            spacesToShow = spacesByBuildingJS[edVal];
+        } else if (!edVal) {
+            spacesToShow = Object.values(allUniqueSpacesJS);
+        }
+        
+        spacesToShow.sort();
+        spacesToShow.forEach(sp => {
+            const opt = document.createElement('option');
+            opt.value = sp;
+            opt.textContent = sp;
+            spaceSelect.appendChild(opt);
+        });
+        
+        currentPage = 1;
+        applyFilters();
+    }
+
     const searchInventory = document.getElementById("searchInventory");
     const quickTypeFilter = document.getElementById("quickTypeFilter");
     const statusFilter = document.getElementById("statusFilter");
     const quickLocationFilter = document.getElementById("quickLocationFilter");
-
+    
     const drawerTypeFilter = document.getElementById("drawerTypeFilter");
     const drawerLocationFilter = document.getElementById("drawerLocationFilter");
     const drawerRfidInput = document.getElementById("drawerRfidInput");
@@ -1617,25 +1739,38 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         const edificioBoxes = document.querySelectorAll('.edificio-checkbox:checked');
         const selectedEdificios = Array.from(edificioBoxes).map(cb => cb.value);
 
-        const typeVal = quickTypeFilter.value || drawerTypeFilter.value;
+        const typeVal = quickTypeFilter.value;
+        const drawerTypeVal = drawerTypeFilter.value;
         const statusVal = statusFilter.value;
-        const locVal = quickLocationFilter.value || drawerLocationFilter.value;
+        
+        const edifVal = quickLocationFilter.value;
+        const espVal = document.getElementById('quickSpaceFilter') ? document.getElementById('quickSpaceFilter').value : '';
+        const locValDrawer = drawerLocationFilter.value;
+        
         const rfidVal = drawerRfidInput.value.toLowerCase();
         const onlyAvail = showOnlyAvailable.checked;
+
+        const matchingRows = [];
 
         document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
             const text = row.innerText.toLowerCase();
             const rowStatus = row.dataset.status;
-            const rowTipo = row.dataset.tipoCat; // 'Equipo' or 'Mobiliario'
-            const rowLoc = row.dataset.ubicacion;
-            const rowEdificio = row.dataset.edificio;
+            const rowTipoCat = row.dataset.tipoCat; // 'Equipo' or 'Mobiliario'
+            const rowTipoExacto = row.dataset.tipo;
+            const rowLoc = row.dataset.ubicacion; // Espacio
+            const rowEdificio = row.dataset.edificio; // Edificio
             
             const matchesText = text.includes(searchVal);
-            const matchesType = !typeVal || rowTipo === typeVal;
+            
+            // quickTypeFilter has exact types, drawerTypeFilter has 'Equipo'/'Mobiliario'
+            const matchesExactType = !typeVal || rowTipoExacto === typeVal;
+            const matchesCatType = !drawerTypeVal || rowTipoCat === drawerTypeVal;
+            const matchesType = matchesExactType && matchesCatType;
 
             let matchesStatus = true;
             if (statusVal) {
-                if (statusVal === 'Disponible' && rowStatus === 'Disponible') matchesStatus = true;
+                if (statusVal === rowStatus) matchesStatus = true;
+                else if (statusVal === 'Disponible' && rowStatus === 'Disponible') matchesStatus = true;
                 else if (statusVal === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo' || rowStatus === 'En uso')) matchesStatus = true;
                 else if (statusVal === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) matchesStatus = true;
                 else if (statusVal === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) matchesStatus = true;
@@ -1651,20 +1786,45 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 });
             }
 
-            const matchesEdificio = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
-            const matchesLoc = !locVal || rowLoc === locVal;
+            const matchesEdificioTop = !edifVal || rowEdificio === edifVal;
+            const matchesEdificioDrawer = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
+            const matchesEdificio = matchesEdificioTop && matchesEdificioDrawer;
+            
+            const matchesLocTop = !espVal || rowLoc === espVal;
+            const matchesLocDrawer = !locValDrawer || rowLoc === locValDrawer;
+            const matchesLoc = matchesLocTop && matchesLocDrawer;
+            
             const matchesRfid = !rfidVal || text.includes(rfidVal);
             const matchesAvail = !onlyAvail || rowStatus === 'Disponible';
 
             if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesLoc && matchesRfid && matchesAvail) {
+                matchingRows.push(row);
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // Apply pagination
+        const totalItems = matchingRows.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+
+        matchingRows.forEach((row, index) => {
+            if (index >= startIndex && index < endIndex) {
                 row.style.display = "";
             } else {
                 row.style.display = "none";
             }
         });
+
+        renderPaginationControls(totalPages, totalItems, startIndex);
     }
 
-    [searchInventory, quickTypeFilter, statusFilter, quickLocationFilter].forEach(el => {
+    [searchInventory, quickTypeFilter, statusFilter, quickLocationFilter, document.getElementById('quickSpaceFilter')].forEach(el => {
         if(el) {
             el.addEventListener('input', applyFilters);
             el.addEventListener('change', applyFilters);
