@@ -158,6 +158,8 @@ include 'header.php';
         border-radius: 16px;
         border: 1px solid var(--border-color);
         box-shadow: var(--shadow-premium);
+        flex-wrap: wrap;
+        gap: 16px;
     }
 
     .nav-buttons-group {
@@ -796,6 +798,53 @@ include 'header.php';
         background: #f0fdfa;
         color: #0d9488;
         border-left-color: #0d9488;
+    }
+
+    /* RESPONSIVIDAD ESPECÍFICA PARA CALENDARIO */
+    @media (max-width: 768px) {
+        .calendar-header-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .calendar-actions, .search-input-wrapper {
+            width: 100%;
+        }
+        .search-input-wrapper input {
+            width: 100%;
+        }
+        .btn-action-primary, .btn-action-outline {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .calendar-navigation-bar {
+            justify-content: center;
+        }
+        .calendar-current-label {
+            width: 100%;
+            justify-content: center;
+            order: -1; /* Poner el mes/año arriba en móvil */
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .quick-filters-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .quick-filter-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+        .quick-filter-select {
+            flex: 1;
+            margin-left: 10px;
+            min-width: 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     }
 
     .week-event-card.event-color-red {

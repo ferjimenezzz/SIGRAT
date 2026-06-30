@@ -168,9 +168,25 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             z-index: 100;
             display: flex;
             flex-direction: column;
-            /* SIN overflow-y: auto — el sidebar NO hace scroll */
-            overflow: hidden;
+            /* Scroll independiente para móvil/tablet/laptops pequeñas */
+            overflow-y: auto;
+            overflow-x: hidden;
             transition: width 0.3s ease, min-width 0.3s ease;
+        }
+
+        /* Estilizar el scrollbar del sidebar para que no sea intrusivo */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .sidebar-toggle-btn {
@@ -667,6 +683,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             width: 100%; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 12px; 
             font-size: 14px; font-weight: 600; color: #1e293b; background: #f8fafc;
             transition: all 0.2s; font-family: inherit;
+            min-width: 0; 
+            text-overflow: ellipsis;
         }
         .form-control:focus { outline: none; border-color: var(--accent-blue); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         
@@ -768,6 +786,12 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         /* Móvil: sidebar oculto por defecto, se desliza al abrirse */
         @media (max-width: 768px) {
+            .top-bar {
+                padding: 0 16px;
+            }
+            .topbar-right {
+                gap: 10px;
+            }
             .mobile-menu-btn {
                 display: flex;
                 align-items: center;
@@ -1385,6 +1409,20 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 // Refrescar cada minuto
                 setInterval(fetchNotifications, 60000);
             }
+
+            // AUTO-RESPONSIVE TABLES: Envolver todas las tablas automáticamente
+            document.querySelectorAll("table").forEach(table => {
+                if (!table.parentElement.classList.contains("table-responsive")) {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "table-responsive";
+                    wrapper.style.overflowX = "auto";
+                    wrapper.style.width = "100%";
+                    wrapper.style.display = "block";
+                    wrapper.style.WebkitOverflowScrolling = "touch";
+                    table.parentNode.insertBefore(wrapper, table);
+                    wrapper.appendChild(table);
+                }
+            });
         });
         </script>
         <main class="content-padding">
