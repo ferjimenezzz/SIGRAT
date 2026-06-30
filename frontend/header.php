@@ -1156,72 +1156,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 min-width: 600px;
             }
         }
-        /* ==================== DARK MODE (SLATE PREMIUM) ==================== */
-        [data-theme="dark"] {
-            --bg-main: #020617;
-            --card-bg: #0f172a;
-            --sidebar-bg: #020617;
-            --topbar-bg: #020617;
-            --border-color: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --accent-blue: #3b82f6; /* Azul brillante para contraste oscuro */
-            color-scheme: dark;
-        }
 
-        [data-theme="dark"] body { background: var(--bg-main); color: var(--text-primary); }
-        [data-theme="dark"] .sidebar { background: var(--sidebar-bg); border-right: 1px solid var(--border-color); }
-        [data-theme="dark"] .sidebar-logo, [data-theme="dark"] .sidebar-nav .nav-item { color: var(--text-secondary); }
-        [data-theme="dark"] .sidebar-nav .nav-item:hover, [data-theme="dark"] .sidebar-nav .nav-item.active { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-        
-        [data-theme="dark"] .card, [data-theme="dark"] .premium-card, [data-theme="dark"] .chart-card, [data-theme="dark"] .reservations-card, [data-theme="dark"] .sidebar-card, [data-theme="dark"] .stats-card, [data-theme="dark"] .premium-table-card, [data-theme="dark"] .dashboard-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-        }
-        
-        [data-theme="dark"] .top-bar { background: var(--topbar-bg); border-bottom: 1px solid var(--border-color); }
-        
-        /* Formularios e Inputs */
-        [data-theme="dark"] .form-control, [data-theme="dark"] .search-input, [data-theme="dark"] #globalSearchInput { 
-            background: #1e293b; 
-            border: 1px solid #334155; 
-            color: var(--text-primary); 
-        }
-        [data-theme="dark"] .form-control:focus, [data-theme="dark"] .search-input:focus, [data-theme="dark"] #globalSearchInput:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-        
-        /* Tablas */
-        [data-theme="dark"] .premium-table th { background: #020617; border-bottom: 2px solid var(--border-color) !important; border-top: none; color: var(--text-secondary); }
-        [data-theme="dark"] .premium-table td { border-bottom: 1px solid var(--border-color) !important; }
-        [data-theme="dark"] .premium-table tr:hover { background: rgba(255,255,255,0.02); }
-        
-        /* Botones */
-        [data-theme="dark"] .btn-primary { background: var(--accent-blue); color: #fff; border: none; }
-        [data-theme="dark"] .btn-secondary, [data-theme="dark"] .btn-outline { 
-            background: transparent !important; 
-            color: var(--text-primary) !important; 
-            border-color: #334155 !important; 
-        }
-        [data-theme="dark"] .btn-secondary:hover, [data-theme="dark"] .btn-outline:hover { background: #1e293b !important; border-color: #475569 !important; }
-        
-        /* Otros Componentes */
-        [data-theme="dark"] .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5); }
-        [data-theme="dark"] .modal-header { border-bottom: 1px solid var(--border-color); }
-        [data-theme="dark"] .modal-footer { border-top: 1px solid var(--border-color); }
-        [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 { color: var(--text-primary); }
-        [data-theme="dark"] .stat-value { color: var(--text-primary); }
-        [data-theme="dark"] .category-header { color: var(--text-primary); }
-        [data-theme="dark"] .donut-number { color: var(--text-primary) !important; }
-        [data-theme="dark"] .donut-legend-item { color: var(--text-secondary); }
-        [data-theme="dark"] .notif-panel, [data-theme="dark"] #globalSearchResults { background: var(--card-bg) !important; border: 1px solid var(--border-color) !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important; }
-        [data-theme="dark"] .notif-header { border-bottom: 1px solid var(--border-color); }
-        [data-theme="dark"] .notif-item, [data-theme="dark"] .global-search-result { border-bottom: 1px solid var(--border-color) !important; }
-        [data-theme="dark"] .global-search-result:hover, [data-theme="dark"] .notif-item:hover { background: rgba(255,255,255,0.03) !important; }
-        [data-theme="dark"] .notif-item.read { background: transparent !important; opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -1335,9 +1270,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </div>
 
             <div class="topbar-right">
-                <button class="topbar-icon-btn" id="themeToggleBtn" title="Modo Oscuro/Claro">
-                    <i class="bi bi-moon"></i>
-                </button>
 
                 <div class="topbar-icon-btn" id="notifBtn">
                     <i class="bi bi-bell"></i>
@@ -1365,37 +1297,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         </header>
 
         <script>
-        // Theme Toggle Logic
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeBtn = document.getElementById('themeToggleBtn');
-            if (themeBtn) {
-                const icon = themeBtn.querySelector('i');
-                // Set initial icon
-                if (document.documentElement.getAttribute('data-theme') === 'dark') {
-                    icon.classList.remove('bi-moon');
-                    icon.classList.add('bi-sun');
-                }
-                
-                // Disparar evento para que gráficas y componentes se ajusten
-                setTimeout(() => document.dispatchEvent(new Event('themeChanged')), 100);
-
-                themeBtn.addEventListener('click', () => {
-                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                    if (isDark) {
-                        document.documentElement.removeAttribute('data-theme');
-                        localStorage.setItem('sigrat_theme', 'light');
-                        icon.classList.remove('bi-sun');
-                        icon.classList.add('bi-moon');
-                    } else {
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                        localStorage.setItem('sigrat_theme', 'dark');
-                        icon.classList.remove('bi-moon');
-                        icon.classList.add('bi-sun');
-                    }
-                    document.dispatchEvent(new Event('themeChanged'));
-                });
-            }
-        });
 
         // Sidebar Toggle Logic
         document.addEventListener('DOMContentLoaded', function() {

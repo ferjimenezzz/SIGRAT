@@ -938,20 +938,6 @@ if (isset($_SESSION['us_id'])) {
     // Ejecutar cada 5 segundos
     setInterval(pollRFID, 5000);
 
-    // ==================== DYNAMIC THEME UPDATES FOR CHARTS ====================
-    document.addEventListener('themeChanged', function() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const gridColor = isDark ? '#1e293b' : '#f1f5f9';
-        const tickColor = isDark ? '#94a3b8' : '#64748b';
-
-        if (typeof spacesBarChart !== 'undefined') {
-            spacesBarChart.options.scales.y.grid.color = gridColor;
-            spacesBarChart.options.scales.y.ticks.color = tickColor;
-            spacesBarChart.options.scales.x.ticks.color = tickColor;
-            spacesBarChart.update();
-        }
-    });
-
     </script>
 
     </div>
