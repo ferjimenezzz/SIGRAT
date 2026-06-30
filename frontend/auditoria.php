@@ -93,11 +93,38 @@ include 'header.php';
     .preset-chip { padding: 6px 12px; font-size: 11px; font-weight: 600; background: #f1f5f9; color: #475569; border-radius: 16px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
     .preset-chip:hover, .preset-chip.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
     
-    /* Table */
-    .table-container { overflow-x: auto; max-height: 500px; border: 1px solid var(--border); border-radius: var(--radius); }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th { padding: 16px 20px; font-size: 12px; font-weight: 700; color: var(--text-muted); background: var(--bg-main); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-    td { padding: 14px 20px; font-size: 13px; border-bottom: 1px solid var(--secondary); color: var(--text-main); }
+    /* Premium Table */
+    .table-container { 
+        overflow-x: auto; 
+        max-height: 600px; 
+        border: 1px solid var(--border); 
+        border-radius: var(--radius); 
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5); 
+        background: white;
+    }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; }
+    th { 
+        padding: 16px 20px; 
+        font-size: 11px; 
+        font-weight: 700; 
+        color: var(--text-muted); 
+        background: #f8fafc; 
+        border-bottom: 1px solid #cbd5e1; 
+        position: sticky; 
+        top: 0; 
+        z-index: 10; 
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    td { 
+        padding: 16px 20px; 
+        font-size: 13px; 
+        border-bottom: 1px solid var(--secondary); 
+        color: var(--text-main); 
+        transition: background-color 0.2s ease;
+    }
+    tbody tr:hover td { background-color: #f8fafc; }
+    tbody tr:last-child td { border-bottom: none; }
 
     /* Print Styles */
     @media print {
@@ -274,11 +301,28 @@ include 'header.php';
                     <?php else: ?>
                         <?php foreach ($logs as $log): ?>
                             <tr>
-                            <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
-                                <td><?php echo date('d/m/Y H:i', strtotime($log['fecha_hora'])); ?></td>
-                                <td><b><?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?></b></td>
-                                <td><span style="background: #eff6ff; color: #2563eb; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;"><?php echo htmlspecialchars($log['modulo_afectado']); ?></span></td>
-                                <td style="color: #475569;"><?php echo htmlspecialchars($log['accion']); ?></td>
+                            <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): 
+                                $mod = $log['modulo_afectado'];
+                                $badgeBg = '#eff6ff'; $badgeColor = '#2563eb';
+                                if($mod == 'ACTIVOS' || $mod == 'INVENTARIO') { $badgeBg = '#fff7ed'; $badgeColor = '#ea580c'; }
+                                elseif($mod == 'RESERVAS') { $badgeBg = '#f0fdf4'; $badgeColor = '#16a34a'; }
+                                elseif($mod == 'USUARIOS') { $badgeBg = '#f5f3ff'; $badgeColor = '#7c3aed'; }
+                                elseif($mod == 'INCIDENCIAS') { $badgeBg = '#fef2f2'; $badgeColor = '#dc2626'; }
+                            ?>
+                                <td>
+                                    <div style="font-weight: 600; color: #0f172a;"><?php echo date('d M Y', strtotime($log['fecha_hora'])); ?></div>
+                                    <div style="font-size: 11px; color: #64748b;"><?php echo date('H:i A', strtotime($log['fecha_hora'])); ?></div>
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #475569;">
+                                            <?php echo strtoupper(substr($log['usuario_nombre'] ?? 'S', 0, 1)); ?>
+                                        </div>
+                                        <b><?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?></b>
+                                    </div>
+                                </td>
+                                <td><span style="background: <?php echo $badgeBg; ?>; color: <?php echo $badgeColor; ?>; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;"><?php echo htmlspecialchars($mod); ?></span></td>
+                                <td style="color: #334155; line-height: 1.5;"><?php echo htmlspecialchars($log['accion']); ?></td>
                             <?php elseif ($tipo_reporte == 'asistencia'): ?>
                                 <td><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></td>
                                 <td><?php echo htmlspecialchars($log['hora_ent'] . ' a ' . $log['hora_sal']); ?></td>
