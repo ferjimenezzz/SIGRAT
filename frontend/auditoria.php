@@ -285,11 +285,14 @@ include 'header.php';
     <div class="card" style="padding: 0;">
         <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
             <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Resultados (<?php echo count($logs); ?>)</h3>
-            <button class="btn btn-outline" onclick="window.print()"><i data-lucide="printer"></i> Imprimir</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-outline" onclick="exportToExcel()" style="color: #16a34a; border-color: #16a34a;"><i data-lucide="file-spreadsheet"></i> Exportar Excel</button>
+                <button class="btn btn-outline" onclick="window.print()" style="color: #dc2626; border-color: #dc2626;"><i data-lucide="file-text"></i> Exportar PDF</button>
+            </div>
         </div>
         
         <div class="table-container">
-            <table>
+            <table id="auditTable">
                 <thead>
                     <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
                         <tr><th>FECHA Y HORA</th><th>USUARIO</th><th>MÓDULO</th><th>ACCIÓN REALIZADA</th></tr>
@@ -444,6 +447,20 @@ function setPreset(preset) {
 
     dIni.value = start.toISOString().split('T')[0];
     dFin.value = end.toISOString().split('T')[0];
+}
+function exportToExcel() {
+    var table = document.getElementById("auditTable");
+    if (!table) {
+        showToast("Error: No se encontró la tabla", "error");
+        return;
+    }
+    var wb = XLSX.utils.table_to_book(table, {sheet: "Auditoria"});
+    var reportType = document.getElementById('tipoReporte').options[document.getElementById('tipoReporte').selectedIndex].text;
+    var filename = "Reporte_" + reportType.replace(/ /g, "_") + ".xlsx";
+    XLSX.writeFile(wb, filename);
+    if(typeof showToast === 'function') {
+        showToast("Archivo Excel generado con éxito", "success");
+    }
 }
 </script>
 

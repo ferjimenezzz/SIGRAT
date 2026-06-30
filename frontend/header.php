@@ -1260,14 +1260,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     <p>Resumen general del sistema</p>
                 </div>
             </div>
-            <div class="global-search-container" style="position: relative; margin-left: 24px; margin-right: 24px; flex: 1; max-width: 450px;">
-                <div style="position: relative;">
-                    <i class="bi bi-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                    <input type="text" id="globalSearchInput" placeholder="Buscar por serie, TAG o nombre..." class="form-control" style="padding-left: 40px; border-radius: 20px; background: var(--bg-main); border: 1px solid var(--border-color); width: 100%;">
-                </div>
-                <div id="globalSearchResults" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-top: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 100; display: none; overflow: hidden; max-height: 400px; overflow-y: auto;">
-                </div>
-            </div>
+
 
             <div class="topbar-right">
 
@@ -1437,72 +1430,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     wrapper.appendChild(table);
                 }
             });
-            // Global Search Logic
-            const searchInput = document.getElementById('globalSearchInput');
-            const searchContainer = document.querySelector('.global-search-container');
-            const searchResults = document.getElementById('globalSearchResults');
-            let searchTimeout;
-
-            if (searchInput) {
-                searchContainer.style.display = 'block'; // Mostrar si JS está activo
-
-                searchInput.addEventListener('input', function(e) {
-                    clearTimeout(searchTimeout);
-                    const query = e.target.value.trim();
-                    
-                    if (query.length < 2) {
-                        searchResults.style.display = 'none';
-                        return;
-                    }
-
-                    searchTimeout = setTimeout(() => {
-                        fetch(`../backend/api/global_search.php?q=${encodeURIComponent(query)}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                searchResults.innerHTML = '';
-                                if (data.length === 0) {
-                                    searchResults.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">No se encontraron resultados</div>';
-                                } else {
-                                    data.forEach(item => {
-                                        const div = document.createElement('a');
-                                        div.href = item.url;
-                                        div.className = 'global-search-result';
-                                        div.style.cssText = 'display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); text-decoration: none; color: var(--text-primary); transition: background 0.2s;';
-                                        
-                                        const icon = item.type === 'activo' ? 'bi-box-seam' : 'bi-person';
-                                        const color = item.type === 'activo' ? 'var(--accent-blue)' : '#10b981';
-                                        
-                                        div.innerHTML = `
-                                            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; margin-right: 12px; color: ${color};">
-                                                <i class="bi ${icon}"></i>
-                                            </div>
-                                            <div style="flex: 1; overflow: hidden;">
-                                                <div style="font-weight: 600; font-size: 13px; margin-bottom: 2px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${item.title}</div>
-                                                <div style="font-size: 11px; color: var(--text-muted);">${item.subtitle}</div>
-                                            </div>
-                                        `;
-                                        searchResults.appendChild(div);
-                                    });
-                                }
-                                searchResults.style.display = 'block';
-                            })
-                            .catch(err => console.error(err));
-                    }, 300);
-                });
-
-                // Cerrar al clickear afuera
-                document.addEventListener('click', function(e) {
-                    if (!searchContainer.contains(e.target)) {
-                        searchResults.style.display = 'none';
-                    }
-                });
-                
-                searchInput.addEventListener('focus', function() {
-                    if (searchInput.value.trim().length >= 2) {
-                        searchResults.style.display = 'block';
-                    }
-                });
-            }
         });
         </script>
         <main class="content-padding">
