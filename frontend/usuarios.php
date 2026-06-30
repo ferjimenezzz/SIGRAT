@@ -244,7 +244,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
     </div>
 
     <!-- Pestaña Usuarios -->
-    <div id="tab-usuarios" class="card" style="display: <?php echo $tab === 'usuarios' ? 'block' : 'none'; ?>; padding: 0; overflow-y: auto; max-height: 450px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: white;">
+    <div id="tab-usuarios" class="card" style="display: <?php echo $tab === 'usuarios' ? 'block' : 'none'; ?>; padding: 0; overflow: auto; max-height: 450px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: white;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;" id="usersTable">
             <thead style="border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; background: #f8fafc;">
                 <tr>
@@ -309,7 +309,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
 
     <!-- Pestaña Invitaciones -->
     <div id="tab-invitaciones" style="display: <?php echo $tab === 'invitaciones' ? 'grid' : 'none'; ?>; grid-template-columns: 2fr 1fr; gap: 32px;">
-        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); max-height: 350px; overflow-y: auto; align-self: start;">
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); max-height: 350px; overflow: auto; align-self: start;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
                     <tr>

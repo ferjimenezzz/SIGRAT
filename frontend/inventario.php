@@ -793,12 +793,13 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         align-items: center;
         margin-bottom: 16px;
         gap: 12px;
+        flex-wrap: wrap;
     }
     .filters-left {
         display: flex;
         align-items: center;
         gap: 8px;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         flex-grow: 1;
         overflow-x: auto;
         padding-bottom: 4px; /* for scrollbar */
@@ -818,7 +819,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         padding: 8px 12px;
-        width: 280px;
+        width: 100%;
+        max-width: 280px;
+        min-width: 0;
     }
     .search-input-wrapper input {
         border: none;
@@ -875,6 +878,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .premium-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 650px;
     }
     .premium-table th {
         background: #f8fafc;
@@ -1351,6 +1355,63 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
     .modal-grid.full-width {
         grid-template-columns: 1fr;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+        .inventory-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .modal-grid {
+            grid-template-columns: minmax(0, 1fr) !important;
+        }
+        .premium-table-card {
+            max-height: 500px;
+        }
+        .premium-page-header {
+            padding: 10px 16px;
+            margin-left: -16px;
+            margin-right: -16px;
+            margin-top: -16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tabs-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+        .tabs-container {
+            width: 100%;
+            justify-content: center;
+        }
+        .tabs-row > .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+        .filters-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filters-left {
+            flex-wrap: wrap;
+            overflow-x: visible;
+        }
+        .search-input-wrapper {
+            max-width: 100%;
+            width: 100%;
+        }
+        .filters-right {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+    @media (max-width: 480px) {
+        .premium-header-left h1 {
+            font-size: 18px;
+        }
     }
 </style>
 

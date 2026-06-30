@@ -93,56 +93,74 @@ foreach ($loans as $l) {
 
 <style>
     /* ... Estilos anteriores simplificados por espacio ... */
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
     .page-title h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
     .page-title p { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-    .header-actions { display: flex; gap: 16px; align-items: center; }
-    .filters-bar { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .filters-group { display: flex; gap: 12px; }
-    .filter-btn { background: white; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .filters-bar { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .filters-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .filter-btn { background: white; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
     .filter-btn.active { background: #f1f5f9; color: var(--text-primary); border-color: #cbd5e1; }
     
-    .table-container { background: white; border-radius: 12px; border: 2px solid var(--accent-blue); max-height: 450px; overflow-y: auto; margin-bottom: 24px; }
-    .table-custom { width: 100%; border-collapse: collapse; }
-    .table-custom th { background: #1e293b; color: white; padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; }
-    .table-custom td { padding: 16px 24px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .table-container { background: white; border-radius: 12px; border: 2px solid var(--accent-blue); max-height: 450px; overflow-y: auto; overflow-x: auto; margin-bottom: 24px; -webkit-overflow-scrolling: touch; }
+    .table-custom { width: 100%; border-collapse: collapse; min-width: 700px; }
+    .table-custom th { background: #1e293b; color: white; padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+    .table-custom td { padding: 16px 24px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
     
     .item-cell, .user-cell, .date-cell { display: flex; align-items: center; gap: 10px; }
     .item-icon { font-size: 24px; color: var(--text-primary); }
     .item-info h4 { font-size: 14px; font-weight: 700; margin: 0; color: var(--text-primary); }
     .item-info p { font-size: 11px; color: var(--text-muted); margin: 0; font-weight: 600; }
-    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #475569; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #475569; flex-shrink: 0; }
     .user-name, .date-cell { font-size: 13px; font-weight: 600; color: var(--text-primary); }
     .date-cell i { font-size: 16px; }
     .date-cell i.red { color: #ef4444; } .date-cell i.blue { color: #3b82f6; }
     
-    .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+    .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
     .status-badge.activo { background: #dcfce7; color: #16a34a; }
     .status-badge.en-prestamo { background: #fef9c3; color: #ca8a04; }
     .status-badge.vencido { background: #fee2e2; color: #dc2626; }
     .status-badge.devuelto { background: #f3e8ff; color: #9333ea; }
 
     .action-btns { display: flex; gap: 8px; }
-    .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .btn-icon:hover { background: #f8fafc; color: var(--text-primary); }
     .btn-icon.delete:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 41, 0.6); z-index: 1000; display: none; align-items: center; justify-content: center; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 41, 0.6); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
     .modal-overlay.active { display: flex; }
-    .modal-content-box { background: white; border-radius: 16px; width: 100%; max-width: 650px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
-    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .modal-content-box { background: white; border-radius: 16px; width: 100%; max-width: 650px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
     .modal-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
     .close-btn { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-    .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+    .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
     .form-section { margin-bottom: 24px; }
     .form-section-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
     .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: #f8fafc; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: #f8fafc; flex-shrink: 0; flex-wrap: wrap; gap: 8px; }
 
-    /* Ajuste para que Select2 se vea igual al input de Bootstrap */
+    /* Select2 */
     .select2-container .select2-selection--single { height: 44px; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; font-size: 14px; font-weight: 600; background: #f8fafc; }
     .select2-container--default .select2-selection--single .select2-selection__arrow { height: 42px; right: 10px; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #1e293b; line-height: 44px; padding-left: 16px; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .page-header { flex-direction: column; align-items: flex-start; }
+        .header-actions { width: 100%; }
+        .header-actions .btn-primary { flex: 1; justify-content: center; }
+        .header-actions .search-box { width: 100%; }
+        .filters-bar { flex-direction: column; align-items: stretch; }
+        .filters-group { justify-content: flex-start; }
+        .form-grid { grid-template-columns: minmax(0, 1fr) !important; }
+        .modal-footer { flex-direction: column-reverse; }
+        .modal-footer .btn-primary,
+        .modal-footer .btn-secondary { width: 100%; justify-content: center; }
+    }
+    @media (max-width: 480px) {
+        .filter-btn span { display: none; }
+        .page-title h2 { font-size: 18px; }
+    }
 </style>
 
 <div class="page-header">
@@ -169,7 +187,7 @@ foreach ($loans as $l) {
         <button class="filter-btn" onclick="setFilter('Vencido', this)"><i class="bi bi-exclamation-triangle"></i> Vencidos (<?php echo $countVencidos; ?>)</button>
         <button class="filter-btn" onclick="setFilter('Finalizado', this)"><i class="bi bi-check-circle"></i> Devueltos (<?php echo $countDevueltos; ?>)</button>
     </div>
-    <div style="display: flex; gap: 8px; align-items: center;">
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
         <button class="btn-secondary" onclick="exportToPDF()"><i class="bi bi-download"></i> Exportar a PDF</button>
     </div>
 </div>
@@ -281,7 +299,7 @@ foreach ($loans as $l) {
                 <!-- Información del solicitante -->
                 <div class="form-section">
                     <div class="form-section-title"><i class="bi bi-person-fill" style="color: #0ea5e9;"></i> Información del solicitante</div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; flex-wrap: wrap;">
                         <div class="form-group">
                             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px;">Nombre del solicitante</label>
                             <input type="text" name="nombre" class="form-control" placeholder="Ingresa el nombre completo" style="width: 100%; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;" 

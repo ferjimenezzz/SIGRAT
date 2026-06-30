@@ -465,13 +465,13 @@ if (isset($_SESSION['us_id'])) {
         /* ==================== RESPONSIVE DASHBOARD ==================== */
         @media (max-width: 1200px) {
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
         @media (max-width: 992px) {
             .charts-grid {
-                grid-template-columns: 1fr !important;
+                grid-template-columns: minmax(0, 1fr) !important;
             }
             .donut-container {
                 flex-direction: column;
@@ -488,7 +488,7 @@ if (isset($_SESSION['us_id'])) {
 
         @media (max-width: 640px) {
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
             .stat-value {
                 font-size: 24px;

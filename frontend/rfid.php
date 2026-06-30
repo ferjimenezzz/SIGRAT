@@ -70,15 +70,15 @@ include 'header.php';
 ?>
 
 <div style="display: flex; flex-direction: column; gap: 32px;">
-    <header style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <header style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
         <div>
             <h1 style="font-size: 32px; font-weight: 800; color: #1e293b; letter-spacing: -1px;">Gestión RFID</h1>
             <p style="font-size: 14px; color: #94a3b8; font-weight: 500;">Enrolamiento de TAGs y simulador de hardware.</p>
         </div>
-        <div style="display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 12px;">
-            <button onclick="switchTab('enrolamiento')" id="tab-enrolamiento" class="btn-tab active">ENROLAMIENTO</button>
-            <button onclick="switchTab('simulador')" id="tab-simulador" class="btn-tab">LECTOR USB / SIMULADOR</button>
-            <button onclick="switchTab('monitor')" id="tab-monitor" class="btn-tab">MONITOR EN VIVO</button>
+        <div style="display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 12px; flex-wrap: wrap; width: 100%;">
+            <button onclick="switchTab('enrolamiento')" id="tab-enrolamiento" class="btn-tab active" style="flex: 1; text-align: center;">ENROLAMIENTO</button>
+            <button onclick="switchTab('simulador')" id="tab-simulador" class="btn-tab" style="flex: 1; text-align: center;">LECTOR USB</button>
+            <button onclick="switchTab('monitor')" id="tab-monitor" class="btn-tab" style="flex: 1; text-align: center;">MONITOR</button>
         </div>
     </header>
 
@@ -214,14 +214,14 @@ include 'header.php';
         </div>
 
         <!-- Escaneos Recientes -->
-        <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card" style="padding: 0; overflow-x: auto;">
             <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                 <div>
                     <h3 style="font-weight: 800; color: #1e293b; margin: 0;">Escaneos Recientes</h3>
                     <p style="font-size: 12px; color: #94a3b8; margin: 4px 0 0 0;">Actualización automática en tiempo real <span id="monitor-time" style="font-weight: bold; color: #3b82f6;"></span></p>
                 </div>
                 
-                <div style="display: flex; gap: 16px; align-items: center;">
+                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
                     <select id="filter-antena" onchange="fetchMonitorData()" class="form-control" style="width: auto; padding: 8px 16px; font-size: 13px; font-weight: 700;">
                         <option value="all">Todas las Antenas</option>
                         <?php foreach($antenas as $ant): ?>
@@ -235,7 +235,7 @@ include 'header.php';
                     </div>
                 </div>
             </div>
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
                 <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                     <tr>
                         <th style="padding: 16px 24px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Tag ID</th>

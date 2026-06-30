@@ -131,33 +131,45 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
+        /* ================================================================
+           MODELO DE SCROLL DEFINITIVO
+           - html y body: NO hacen scroll (overflow: hidden)
+           - .sidebar: posición fija, capa independiente, NO participa
+             en ningún scroll
+           - .main-container: ES el único contenedor con scroll vertical
+        ================================================================ */
         html {
-            overflow-x: hidden;
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-main);
             color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100%;
+            overflow: hidden;
         }
 
-        /* ==================== SIDEBAR ==================== */
+        /* ==================== SIDEBAR ====================
+           El sidebar es una CAPA INDEPENDIENTE anclada al viewport.
+           No forma parte del flujo de la página ni de ningún scroll.
+           Ningún padre tiene overflow, transform, sticky, ni translate.
+        ====================================================== */
         .sidebar {
             width: 240px;
             min-width: 240px;
             background-color: var(--sidebar-bg);
             position: fixed;
             top: 0;
-            bottom: 0;
             left: 0;
+            height: 100vh;
             z-index: 100;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            overflow-x: hidden;
+            /* SIN overflow-y: auto — el sidebar NO hace scroll */
+            overflow: hidden;
             transition: width 0.3s ease, min-width 0.3s ease;
         }
 
@@ -319,15 +331,13 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             color: #f87171;
         }
 
-        /* ==================== COLLAPSED SIDEBAR ==================== */
         body.sidebar-collapsed .sidebar {
             width: 80px;
             min-width: 80px;
         }
 
         body.sidebar-collapsed .main-container {
-            margin-left: 80px;
-            width: calc(100% - 80px);
+            left: 80px;
         }
 
         body.sidebar-collapsed .sidebar-brand,
@@ -379,28 +389,35 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             margin: 0;
         }
 
-        /* ==================== MAIN CONTAINER ==================== */
+        /* ==================== MAIN CONTAINER ====================
+           Este es el ÚNICO contenedor que hace scroll vertical.
+           Ocupa todo el alto del viewport y desplaza su contenido
+           internamente, dejando al sidebar completamente inmóvil.
+        ========================================================= */
         .main-container {
-            flex: 1;
-            margin-left: 240px;
-            width: calc(100% - 240px);
+            position: fixed;
+            top: 0;
+            left: 240px;
+            right: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            min-width: 0;
-            overflow-x: hidden;
-            transition: margin-left 0.3s ease, width 0.3s ease;
+            overflow: hidden;
+            transition: left 0.3s ease;
         }
 
         /* ==================== TOP BAR ==================== */
         .top-bar {
             height: 68px;
+            min-height: 68px;
+            flex-shrink: 0;
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 28px;
+            /* sticky funciona dentro de main-container (el scroll container) */
             position: sticky;
             top: 0;
             z-index: 90;
@@ -608,9 +625,17 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             color: var(--text-muted);
         }
 
-        /* ==================== CONTENT ==================== */
+        /* ==================== CONTENT ====================
+           El <main> es el área de scroll real.
+           flex: 1 + overflow-y: auto hacen que sea el único
+           elemento que se desplaza dentro de main-container.
+        ==================================================== */
         .content-padding {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
             padding: 24px 28px;
+            max-width: 100%;
         }
 
         /* ==================== DESIGN SYSTEM ==================== */
@@ -688,8 +713,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 min-width: 72px;
             }
             .main-container {
-                margin-left: 72px;
-                width: calc(100% - 72px);
+                left: 72px;
             }
             .sidebar-brand,
             .nav-item span,
@@ -742,7 +766,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
         }
 
-        /* Móvil: ocultar sidebar por completo, mostrar hamburguesa */
+        /* Móvil: sidebar oculto por defecto, se desliza al abrirse */
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: flex;
@@ -751,13 +775,14 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             .sidebar {
                 width: 260px;
                 min-width: 260px;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
+                /* Deslizamos el sidebar fuera del viewport en móvil */
+                left: -260px;
+                transition: left 0.3s ease;
                 box-shadow: 4px 0 24px rgba(0,0,0,0.15);
             }
-            /* Restaurar sidebar completa cuando está abierta */
+            /* Mostrar sidebar en móvil al abrir */
             body.sidebar-mobile-open .sidebar {
-                transform: translateX(0);
+                left: 0;
             }
             body.sidebar-mobile-open .sidebar-brand,
             body.sidebar-mobile-open .nav-item span,
@@ -794,12 +819,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
 
             .main-container {
-                margin-left: 0;
-                width: 100%;
+                left: 0;
             }
             body.sidebar-collapsed .main-container {
-                margin-left: 0;
-                width: 100%;
+                left: 0;
             }
 
             .topbar-date {
@@ -830,6 +853,277 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
             .content-padding {
                 padding: 12px;
+            }
+        }
+
+        /* ============================================================
+           CSS GLOBAL RESPONSIVO — aplica a todos los módulos
+        ============================================================ */
+
+        /* --- Página genérica --- */
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Encabezado de página: título + botones */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .page-header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+        .page-header p {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Barra de filtros / búsqueda */
+        .page-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .page-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+            min-width: 0;
+        }
+        .page-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Grids de tarjetas estadísticas */
+        .stats-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .stats-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .stats-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Tabla responsiva */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .table-responsive table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+        }
+        .table-responsive th,
+        .table-responsive td {
+            white-space: nowrap;
+        }
+
+        /* Cards de datos */
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .data-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Grid 2 columnas para formularios/layouts */
+        .grid-cols-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .grid-cols-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        /* ============================================================
+           BREAKPOINTS GLOBALES
+        ============================================================ */
+
+        /* Laptop ≤ 1200px */
+        @media (max-width: 1200px) {
+            .stats-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tablet ≤ 992px */
+        @media (max-width: 992px) {
+            .stats-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-cols-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tablet pequeña ≤ 768px */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .page-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .page-toolbar-left,
+            .page-toolbar-right {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .page-toolbar-right {
+                justify-content: flex-start;
+            }
+            .grid-cols-2 {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .grid-cols-3 {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .stats-grid-2 {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        /* Móvil ≤ 640px */
+        @media (max-width: 640px) {
+            .stats-grid-4 {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .stats-grid-3 {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .page-header h1 {
+                font-size: 18px;
+            }
+            .page-header-actions {
+                width: 100%;
+            }
+            .page-header-actions .btn-primary,
+            .page-header-actions .btn-secondary {
+                flex: 1;
+                justify-content: center;
+            }
+            .content-padding {
+                padding: 14px;
+            }
+        }
+
+        /* Móvil pequeño ≤ 480px */
+        @media (max-width: 480px) {
+            .page-header-actions {
+                flex-direction: column;
+            }
+            .page-header-actions .btn-primary,
+            .page-header-actions .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        /* ============================================================
+           FIXES PARA MÓDULOS CON INLINE STYLES
+           Aplicado con !important para sobrescribir estilos en línea
+        ============================================================ */
+
+        /* Stats con inline style grid (usuarios, inventario, etc.) */
+        @media (max-width: 1200px) {
+            [style*="grid-template-columns: repeat(4, 1fr)"] {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        @media (max-width: 640px) {
+            [style*="grid-template-columns: repeat(4, 1fr)"],
+            [style*="grid-template-columns: repeat(3, 1fr)"] {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+        }
+
+        /* Grids de 2 columnas en módulos */
+        @media (max-width: 768px) {
+            [style*="grid-template-columns: 2fr 1fr"],
+            [style*="grid-template-columns: 1.4fr 1fr"],
+            [style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+        }
+
+        /* Headers de módulos con inline flex */
+        @media (max-width: 640px) {
+            [style*="display: flex; justify-content: space-between; align-items: center"] {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px !important;
+            }
+        }
+
+        /* Fix input de búsqueda ancho fijo */
+        @media (max-width: 768px) {
+            [style*="position: relative; width: 300px"] {
+                width: 100% !important;
+            }
+            [style*="width: 300px"] input {
+                width: 100% !important;
+            }
+        }
+
+        /* Fix tablas sin wrapper — darles overflow horizontal */
+        @media (max-width: 768px) {
+            .card table,
+            [class*="card"] table {
+                min-width: 600px;
             }
         }
     </style>
