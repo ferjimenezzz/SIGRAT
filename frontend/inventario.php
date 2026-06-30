@@ -302,12 +302,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                                     break;
                                 case 'Mantenimiento':
                                 case 'En mantenimiento':
-                                    $badgeColor = '#ef4444';
-                                    $badgeBg = '#fef2f2';
+                                    $badgeColor = '#3b82f6';
+                                    $badgeBg = '#eff6ff';
                                     break;
                                 case 'Extraviado':
-                                    $badgeColor = '#6b7280';
-                                    $badgeBg = '#f9fafb';
+                                    $badgeColor = '#ef4444';
+                                    $badgeBg = '#fef2f2';
                                     break;
                             }
                             ?>
@@ -354,27 +354,28 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <div class="sidebar-card">
             <h3>Estado del inventario</h3>
             <div class="donut-chart-container">
-                <div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#10b981 0% <?php echo $pctDisp; ?>%, #2563eb <?php echo $pctDisp; ?>% <?php echo $pctDisp+$pctPres; ?>%, #ef4444 <?php echo $pctDisp+$pctPres; ?>% <?php echo $pctDisp+$pctPres+$pctMant; ?>%, #6b7280 <?php echo $pctDisp+$pctPres+$pctMant; ?>% 100%); display: flex; align-items: center; justify-content: center; position: relative;">
-                    <div style="width: 90px; height: 90px; border-radius: 50%; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="width: 140px; height: 140px; position: relative; margin: 0 auto;">
+                    <canvas id="inventoryDonutSidebar"></canvas>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
                         <span class="donut-number"><?php echo $totalAssets; ?></span>
                         <span class="donut-label">Activos</span>
                     </div>
                 </div>
-                <div class="donut-legends">
+                <div class="donut-legends" style="margin-top: 16px;">
                     <div class="legend-item">
                         <div class="legend-dot" style="background: #10b981;"></div>
                         <span>Disponibles (<?php echo $stats['Disponible']; ?>)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: #2563eb;"></div>
+                        <div class="legend-dot" style="background: #f59e0b;"></div>
                         <span>En préstamo (<?php echo $stats['Prestado']; ?>)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: #ef4444;"></div>
+                        <div class="legend-dot" style="background: #3b82f6;"></div>
                         <span>En mantenimiento (<?php echo $stats['Mantenimiento']; ?>)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: #6b7280;"></div>
+                        <div class="legend-dot" style="background: #ef4444;"></div>
                         <span>Extraviados (<?php echo $stats['Extraviado']; ?>)</span>
                     </div>
                 </div>
@@ -2184,5 +2185,48 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     </div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var canvas = document.getElementById('inventoryDonutSidebar');
+    if (canvas) {
+        var ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Disponibles', 'En préstamo', 'En mantenimiento', 'Extraviados'],
+                datasets: [{
+                    data: [
+                        <?php echo $stats['Disponible']; ?>, 
+                        <?php echo $stats['Prestado']; ?>, 
+                        <?php echo $stats['Mantenimiento']; ?>, 
+                        <?php echo $stats['Extraviado']; ?>
+                    ],
+                    backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { size: 12, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 
 <?php include 'footer.php'; ?>
