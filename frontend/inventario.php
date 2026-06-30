@@ -833,7 +833,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .premium-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 650px;
+        min-width: 0;
     }
     .premium-table th {
         background: #f8fafc;
