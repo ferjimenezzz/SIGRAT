@@ -146,18 +146,13 @@ $pctCat3 = $totalAssets > 0 ? ($categories['Herramientas'] / $totalAssets) * 100
 $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 ?>
 
-<!-- Cabecera Premium -->
-<div class="premium-page-header">
-    <div class="premium-header-left">
-        <h1>Inventario</h1>
-        <p>Gestiona y controla los activos y mobiliario institucional</p>
-    </div>
-    <div class="premium-header-right">
-        <button class="bell-btn" id="invCustomBellBtn">
-            <i class="bi bi-bell"></i>
-        </button>
-    </div>
-</div>
+<!-- Cabecera Estandar -->
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+            <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 4px;">Inventario</h1>
+            <p style="font-size: 13px; color: #64748b; font-weight: 500;">Gestiona y controla los activos y mobiliario institucional</p>
+        </div>
+    </header>
 
 <!-- Barra de Pestañas y Acciones Globales -->
 <div class="tabs-row" style="display: flex; justify-content: space-between; align-items: center;">
@@ -271,8 +266,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     ?>
                     <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
                         <td>
-                            <div style="font-weight: 700; color: #0f172a;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
-                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
+                            <div style="font-weight: 700; color: #0f172a; max-width: 180px; word-wrap: break-word;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px; max-width: 180px; word-break: break-all;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
                         </td>
                         <td>
                             <?php if ($isMobiliario): ?>
@@ -321,11 +316,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                             </span>
                         </td>
                         <td style="white-space: nowrap;">
-                            <button class="btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($asset), ENT_QUOTES, 'UTF-8'); ?>)" style="padding: 6px 12px; font-size: 12.5px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-right: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
-                                <i class="bi bi-pencil-square"></i> Editar
+                            <button class="btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($asset), ENT_QUOTES, 'UTF-8'); ?>)" title="Editar" style="width: 32px; height: 32px; padding: 0; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                                <i class="bi bi-pencil-square" style="margin: 0;"></i>
                             </button>
-                            <button onclick="confirmDeleteAsset(<?php echo $asset['act_id']; ?>)" style="padding: 6px 12px; font-size: 12.5px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
-                                <i class="bi bi-trash"></i> Eliminar
+                            <button onclick="confirmDeleteAsset(<?php echo $asset['act_id']; ?>)" title="Eliminar" style="width: 32px; height: 32px; padding: 0; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                                <i class="bi bi-trash" style="margin: 0;"></i>
                             </button>
                         </td>
                     </tr>
@@ -701,77 +696,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 </div>
 
 <style>
-    /* Ocultar barra superior por defecto */
-    .top-bar {
-        display: none !important;
-    }
-
     /* Ajustar margen y padding de contenedor principal */
     .main-container {
         background-color: #f8fafc !important;
-    }
-
-    /* Cabecera Premium */
-    .premium-page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #ffffff;
-        padding: 10px 28px;
-        border-bottom: 1px solid #e2e8f0;
-        margin-left: -28px;
-        margin-right: -28px;
-        margin-top: -24px;
-        margin-bottom: 12px;
-    }
-    .premium-header-left h1 {
-        font-size: 24px;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.5px;
-    }
-    .premium-header-left p {
-        font-size: 13px;
-        color: #64748b;
-        margin-top: 2px;
-    }
-    .premium-header-right {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-    .bell-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        color: #64748b;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .bell-btn:hover {
-        background: #e2e8f0;
-    }
-    .bell-badge {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        background: #2563eb;
-        color: white;
-        font-size: 9px;
-        font-weight: 800;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid white;
     }
 
     /* Pestañas estilizadas */
@@ -808,7 +735,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     /* Grid de Contenedor */
     .inventory-grid {
         display: grid;
-        grid-template-columns: 1fr 340px;
+        grid-template-columns: minmax(0, 1fr) 340px;
         gap: 16px;
         align-items: start;
     }
