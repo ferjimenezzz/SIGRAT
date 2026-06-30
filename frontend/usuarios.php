@@ -163,14 +163,14 @@ $tab = $_GET['tab'] ?? 'usuarios';
     </header>
 
     <!-- Barra de Búsqueda, Filtros y Pestañas -->
-    <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 16px 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-            <div style="position: relative; width: 300px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 16px 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1; flex-wrap: wrap;">
+            <div style="position: relative; width: 300px; max-width: 100%; flex-grow: 1;">
                 <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; color: #94a3b8;"></i>
-                <input type="text" id="searchInput" placeholder="Buscar usuario, email..." style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; outline: none;">
+                <input type="text" id="searchInput" placeholder="Buscar usuario, email..." style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; outline: none; box-sizing: border-box;">
             </div>
             
-            <div style="display: flex; gap: 12px; margin-left: 20px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                 <select id="roleFilter" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; outline: none; cursor: pointer;">
                     <option value="">Todos los roles</option>
                     <?php foreach ($roles as $r): ?>
