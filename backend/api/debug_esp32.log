@@ -3014,3 +3014,19 @@ Cuerpo:
 Cuerpo: 
 2026-06-30 22:25:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
+2026-06-30 22:26:09 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-30 22:26:10 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-30 22:26:14 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-30 22:26:14 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-30 22:26:19 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-30 22:26:19 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-06-30 22:27:19 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-06-30 22:27:20 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 

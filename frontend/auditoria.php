@@ -134,10 +134,18 @@ include 'header.php';
         }
         
         /* Ajustar contenedor principal */
-        body, .main-container {
+        html, body, .main-container, main.content-padding {
             margin: 0 !important;
             padding: 0 !important;
             background: white !important;
+            position: static !important;
+            height: auto !important;
+            min-height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: auto !important;
         }
         .audit-container {
             padding: 0 !important;
