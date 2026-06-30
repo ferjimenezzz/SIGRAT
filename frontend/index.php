@@ -727,6 +727,17 @@ if (isset($_SESSION['us_id'])) {
     </div>
 
     <script>
+    // ==================== TOOLTIP GLOBAL CONFIG ====================
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.95)';
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Outfit', sans-serif", size: 14, weight: 700 };
+        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', sans-serif", size: 13, weight: 500 };
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.plugins.tooltip.boxPadding = 6;
+        Chart.defaults.plugins.tooltip.usePointStyle = true;
+    }
+
     // ==================== BAR CHART: Espacios más utilizados ====================
     let spaceDataRaw = <?php echo json_encode($spaceUsageByName); ?>;
     
@@ -766,7 +777,14 @@ if (isset($_SESSION['us_id'])) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ` ${context.parsed.y} reservaciones`;
+                        }
+                    }
+                }
             },
             scales: {
                 y: {
@@ -831,82 +849,51 @@ if (isset($_SESSION['us_id'])) {
     const invColors = invLabels.map(label => statusColorMap[label] || '#cbd5e1');
 
     // Build segments (filter out zeros)
-    let donutSegments = invLabels
-        .map((label, i) => ({ value: invValues[i], color: invColors[i] }))
-        .filter(s => s.value > 0);
+    let donutSegments = invLabels.map((label, i) => ({ label: label, value: invValues[i], color: invColors[i] })).filter(s => s.value > 0);
 
     if (donutSegments.length === 0) {
-        donutSegments = [{ value: 1, color: '#e2e8f0' }];
+        donutSegments = [{ label: 'Sin datos', value: 1, color: '#e2e8f0' }];
     }
 
-    const donutCanvas  = document.getElementById('inventoryDonut');
-    const donutCtx     = donutCanvas.getContext('2d');
-    const DONUT_DURATION = 1200; // ms — 1 a 1.5 segundos
-    const CUTOUT_RATIO   = 0.72; // 72% cutout igual que antes
-    const GAP_RAD        = donutSegments.length > 1 ? 0.025 : 0; // espacio entre segmentos
+    const donutCanvas = document.getElementById('inventoryDonut').getContext('2d');
+    const DONUT_DURATION = 1200;
 
-    // Ease-out cúbico: arranca rápido, frena suavemente
-    function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-    }
-
-    // Ajustar el canvas al tamaño real del contenedor
-    function resizeDonutCanvas() {
-        const wrapper = donutCanvas.parentElement;
-        donutCanvas.width  = wrapper.offsetWidth;
-        donutCanvas.height = wrapper.offsetHeight;
-    }
-    resizeDonutCanvas();
-
-    /**
-     * Dibuja la dona al nivel de progreso indicado (0 → 1).
-     * progress=0  → dona vacía
-     * progress=1  → dona completa
-     * Los segmentos se trazan de forma secuencial, clockwise, desde las 12 en punto.
-     */
-    function drawDonutFrame(progress) {
-        const w  = donutCanvas.width;
-        const h  = donutCanvas.height;
-        const cx = w / 2;
-        const cy = h / 2;
-        const outerR = Math.min(w, h) / 2 - 2;
-        const innerR = outerR * CUTOUT_RATIO;
-
-        donutCtx.clearRect(0, 0, w, h);
-
-        const total    = donutSegments.reduce((s, seg) => s + seg.value, 0);
-        const maxAngle = 2 * Math.PI * progress; // arco total a revelar en este frame
-        const START    = -Math.PI / 2;            // 12 en punto
-
-        let cumulative = 0; // radianes ya asignados
-
-        for (let i = 0; i < donutSegments.length; i++) {
-            const seg        = donutSegments[i];
-            const segTotal   = (seg.value / total) * 2 * Math.PI; // arco completo del segmento
-            const segVisible = segTotal - GAP_RAD;                  // arco visible (sin gap)
-
-            const segStart = cumulative;             // donde empieza este segmento
-            const segEnd   = cumulative + segVisible; // donde termina la parte visible
-
-            // ¿Hasta dónde dibujamos este segmento en este frame?
-            const drawEnd = Math.min(segEnd, maxAngle);
-
-            if (drawEnd > segStart && segVisible > 0) {
-                const arcFrom = START + segStart;
-                const arcTo   = START + drawEnd;
-
-                donutCtx.beginPath();
-                donutCtx.arc(cx, cy, outerR, arcFrom, arcTo, false); // arco exterior
-                donutCtx.arc(cx, cy, innerR, arcTo, arcFrom, true);  // arco interior (inverso)
-                donutCtx.closePath();
-                donutCtx.fillStyle = seg.color;
-                donutCtx.fill();
+    new Chart(donutCanvas, {
+        type: 'doughnut',
+        data: {
+            labels: donutSegments.map(s => s.label),
+            datasets: [{
+                data: donutSegments.map(s => s.value),
+                backgroundColor: donutSegments.map(s => s.color),
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            animation: {
+                animateScale: false,
+                animateRotate: true,
+                duration: DONUT_DURATION,
+                easing: 'easeOutCubic'
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            let value = context.parsed;
+                            let percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return ` ${value} activos (${percentage}%)`;
+                        }
+                    }
+                }
             }
-
-            cumulative += segTotal; // avanza incluyendo el gap
-            if (cumulative >= maxAngle) break;
         }
-    }
+    });
 
     // Contador central animado sincronizado con la dona
     const centerValueEl = document.getElementById('donutCenterValue');
@@ -922,25 +909,8 @@ if (isset($_SESSION['us_id'])) {
         requestAnimationFrame(step);
     }
 
-    // Arrancar la animación de barrido radial clockwise
-    const donutStart = performance.now();
-    function animateDonut(now) {
-        const t        = Math.min((now - donutStart) / DONUT_DURATION, 1);
-        const progress = easeOutCubic(t);
-        drawDonutFrame(progress);
-        if (t < 1) requestAnimationFrame(animateDonut);
-        else drawDonutFrame(1); // frame final exacto
-    }
-    requestAnimationFrame(animateDonut);
-
     // Iniciar contador en paralelo
     animateCenterCounter(inventoryFinalTotal, DONUT_DURATION);
-
-    // Redibujar la dona al cambiar tamaño de ventana (responsividad)
-    window.addEventListener('resize', function() {
-        resizeDonutCanvas();
-        drawDonutFrame(1);
-    });
     </script>
 
     </div>
