@@ -223,39 +223,41 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 <input type="text" id="searchInventory" placeholder="Buscar activo, marca, modelo, serie o tag..." style="width: 100%;">
             </div>
             
-            <select id="quickTypeFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
-                <option value="">Tipo de activo</option>
-                <?php foreach($tiposDB as $t): ?>
-                    <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
-                <?php endforeach; ?>
-            </select>
-            
-            <select id="statusFilter" class="select-filter" style="flex: 0 1 auto; min-width: 100px;">
-                <option value="">Estado</option>
-                <?php foreach($estadosDB as $st): ?>
-                    <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
-                <?php endforeach; ?>
-            </select>
-            
-            <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter()" style="flex: 0 1 auto; min-width: 110px;">
-                <option value="">Ubicación</option>
-                <?php foreach($edificiosDB as $ed): ?>
-                    <option value="<?php echo htmlspecialchars($ed); ?>"><?php echo htmlspecialchars($ed); ?></option>
-                <?php endforeach; ?>
-            </select>
+            <div class="filters-selects-grid" style="display: contents;">
+                <select id="quickTypeFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
+                    <option value="">Tipo de activo</option>
+                    <?php foreach($tiposDB as $t): ?>
+                        <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                
+                <select id="statusFilter" class="select-filter" style="flex: 0 1 auto; min-width: 100px;">
+                    <option value="">Estado</option>
+                    <?php foreach($estadosDB as $st): ?>
+                        <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                
+                <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter()" style="flex: 0 1 auto; min-width: 110px;">
+                    <option value="">Ubicación</option>
+                    <?php foreach($edificiosDB as $ed): ?>
+                        <option value="<?php echo htmlspecialchars($ed); ?>"><?php echo htmlspecialchars($ed); ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-            <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
-                <option value="">Espacio</option>
-                <?php 
-                $allUniqueSpaces = array_unique(array_filter(array_column($assets, 'espacio_nombre')));
-                sort($allUniqueSpaces);
-                foreach($allUniqueSpaces as $sp): 
-                ?>
-                    <option value="<?php echo htmlspecialchars($sp); ?>"><?php echo htmlspecialchars($sp); ?></option>
-                <?php endforeach; ?>
-            </select>
+                <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
+                    <option value="">Espacio</option>
+                    <?php 
+                    $allUniqueSpaces = array_unique(array_filter(array_column($assets, 'espacio_nombre')));
+                    sort($allUniqueSpaces);
+                    foreach($allUniqueSpaces as $sp): 
+                    ?>
+                        <option value="<?php echo htmlspecialchars($sp); ?>"><?php echo htmlspecialchars($sp); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-            <button type="button" class="btn-outline" id="clearFiltersTopBtn" onclick="clearAllFilters()" style="padding: 8px 16px; border-radius: 8px; flex: 0 0 auto; white-space: nowrap;">
+            <button type="button" class="btn-outline filters-clear-btn" id="clearFiltersTopBtn" onclick="clearAllFilters()" style="padding: 8px 16px; border-radius: 8px; flex: 0 0 auto; white-space: nowrap;">
                 <i class="bi bi-eraser"></i> Limpiar filtros
             </button>
         </div>
@@ -297,8 +299,15 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                         <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: #2563eb;">
                             <?php echo htmlspecialchars($asset['tag_id'] ?? 'Sin asignar'); ?>
                         </td>
-                        <td style="font-weight: 600; color: #475569;">
-                            <?php echo htmlspecialchars($asset['espacio_nombre'] ?? 'Sin asignar'); ?>
+                        <td>
+                            <?php 
+                                $espNombre = htmlspecialchars($asset['espacio_nombre'] ?? 'Sin asignar');
+                                $edificio  = htmlspecialchars($asset['edificio'] ?? '');
+                            ?>
+                            <div style="font-weight: 600; color: #0f172a; white-space: nowrap;"><?php echo $espNombre; ?></div>
+                            <?php if ($edificio): ?>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;"><?php echo $edificio; ?></div>
+                            <?php endif; ?>
                         </td>
                         <td>
                             <?php
@@ -1363,13 +1372,31 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             width: 100%;
             justify-content: center;
         }
+        /* Filtros responsivos: grid de 2 columnas en vez de columna centrada */
         .filters-bar {
             flex-direction: column;
             align-items: stretch;
+            gap: 8px;
         }
-        .filters-left {
-            flex-wrap: wrap;
-            overflow-x: visible;
+        .filters-bar .search-input-wrapper {
+            grid-column: 1 / -1;
+            max-width: 100%;
+            width: 100%;
+        }
+        .filters-selects-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            width: 100%;
+        }
+        .filters-selects-grid .select-filter {
+            width: 100%;
+            min-width: 0 !important;
+            flex: none !important;
+        }
+        .filters-clear-btn {
+            width: 100%;
+            justify-content: center;
         }
         .search-input-wrapper {
             max-width: 100%;
