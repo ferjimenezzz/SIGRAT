@@ -293,7 +293,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
                         <td>
                             <div style="font-weight: 700; color: #0f172a; overflow-wrap: break-word; word-break: break-word;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
-                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; overflow-wrap: break-word; word-break: break-all; line-height: 1.4;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5; white-space: normal;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
                         </td>
                         <td>
                             <?php if ($isMobiliario): ?>
@@ -889,7 +889,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         color: #334155;
         font-size: 13.5px;
         vertical-align: top;
-        overflow: hidden;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
     .premium-table tbody tr:hover {
         background: #f8fafc;
