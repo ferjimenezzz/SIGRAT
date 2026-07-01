@@ -859,11 +859,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .premium-table-card {
         background: white;
         border-radius: 16px;
-        border: 1px solid #e2e8f0;
+        border: 2px solid #2563eb;
         overflow-y: auto;
         overflow-x: auto;
         max-height: calc(100vh - 250px);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        box-shadow: 0 4px 12px rgba(37,99,235,0.08);
     }
     .premium-table {
         width: 100%;
@@ -871,17 +871,19 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         table-layout: fixed;
     }
     .premium-table th {
-        background: #f8fafc;
-        padding: 8px 12px;
+        background: #1e293b;
+        padding: 14px 12px;
         position: sticky;
         top: 0;
         z-index: 10;
         font-size: 11px;
-        font-weight: 700;
-        color: #475569;
+        font-weight: 600;
+        color: white;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: none;
+        white-space: normal;
+        line-height: 1.3;
     }
     .premium-table td {
         padding: 10px 12px;
@@ -1416,6 +1418,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         .filters-right {
             width: 100%;
             justify-content: flex-end;
+        }
+        /* Ocultar columna Acción en móvil */
+        .premium-table th:last-child,
+        .premium-table td:last-child {
+            display: none;
         }
     }
     @media (max-width: 480px) {
