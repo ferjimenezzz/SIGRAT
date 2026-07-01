@@ -266,13 +266,13 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <div class="premium-table-card">
             <table id="inventoryTable" class="premium-table">
                 <colgroup>
-                    <col style="width: 22%;"><!-- Activo -->
-                    <col style="width: 10%;"><!-- Tipo -->
-                    <col style="width: 12%;"><!-- Nº Inventario -->
-                    <col style="width: 14%;"><!-- Tag RFID -->
+                    <col style="width: 20%;"><!-- Activo -->
+                    <col style="width: 13%;"><!-- Tipo -->
+                    <col style="width: 11%;"><!-- Nº Inventario -->
+                    <col style="width: 13%;"><!-- Tag RFID -->
                     <col style="width: 15%;"><!-- Ubicación -->
-                    <col style="width: 13%;"><!-- Estado -->
-                    <col style="width: 10%;"><!-- Acción -->
+                    <col style="width: 15%;"><!-- Estado -->
+                    <col style="width: 13%;"><!-- Acción -->
                 </colgroup>
                 <thead>
                     <tr>
@@ -295,11 +295,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                             <div style="font-weight: 700; color: #0f172a; overflow-wrap: break-word; word-break: break-word;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
                             <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5; white-space: normal;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
                         </td>
-                        <td>
+                        <td style="padding-top: 12px;">
                             <?php if ($isMobiliario): ?>
-                                <span class="type-badge mobiliario"><i class="bi bi-tablet-landscape"></i> Mobiliario</span>
+                                <span class="type-badge mobiliario" style="white-space: nowrap;"><i class="bi bi-tablet-landscape"></i> Mobiliario</span>
                             <?php else: ?>
-                                <span class="type-badge equipo"><i class="bi bi-laptop"></i> Equipo</span>
+                                <span class="type-badge equipo" style="white-space: nowrap;"><i class="bi bi-laptop"></i> Equipo</span>
                             <?php endif; ?>
                         </td>
                         <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: #475569;">
@@ -313,7 +313,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                                 $espNombre = htmlspecialchars($asset['espacio_nombre'] ?? 'Sin asignar');
                                 $edificio  = htmlspecialchars($asset['edificio'] ?? '');
                             ?>
-                            <div style="font-weight: 600; color: #0f172a; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5; white-space: normal;"><?php echo $espNombre; ?></div>
+                            <div style="font-weight: 600; color: #0f172a; overflow-wrap: break-word; word-break: break-word; line-height: 1.5; white-space: normal;"><?php echo $espNombre; ?></div>
                             <?php if ($edificio): ?>
                             <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;"><?php echo $edificio; ?></div>
                             <?php endif; ?>
