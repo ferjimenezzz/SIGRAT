@@ -218,9 +218,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         ?>
         <!-- Barra de Filtros Rápidos -->
         <div class="filters-bar" style="display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; overflow-x: auto;">
-            <div class="search-input-wrapper" style="flex: 1 1 auto; min-width: 150px;">
+            <div class="search-input-wrapper" style="flex: 1 1 auto; min-width: 130px; max-width: 220px;">
                 <i class="bi bi-search" style="color: #94a3b8;"></i>
-                <input type="text" id="searchInventory" placeholder="Buscar activo, marca, modelo, serie o tag..." style="width: 100%;">
+                <input type="text" id="searchInventory" placeholder="Buscar activo, marca, modelo, serie..." style="width: 100%;">
             </div>
             
             <div class="filters-selects-grid" style="display: contents;">
@@ -867,6 +867,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
     .premium-table {
         width: 100%;
+        min-width: 780px;
         border-collapse: collapse;
         table-layout: fixed;
     }
