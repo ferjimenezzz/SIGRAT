@@ -3,6 +3,11 @@
  * @file iniciar_sesion.php
  * @summary Inicio de sesión real con validación de base de datos.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 session_start();
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/AuthController.php';
@@ -59,6 +64,11 @@ if (isset($_POST['login'])) {
     }
 }
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -155,6 +165,11 @@ if (isset($_POST['login'])) {
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body>
 
 <div class="login-card">
@@ -207,6 +222,10 @@ if (isset($_POST['login'])) {
     </div>
 </div>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
 function mostrarPassword(){
     const input = document.getElementById("password");

@@ -3,6 +3,10 @@
  * @file calendario.php
  * @summary Módulo de calendario unificado con vistas Mensual y Semanal, filtros rápidos y creación de reservas recurrentes/multi-día.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
 require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 
@@ -34,7 +38,15 @@ include 'header.php';
 ?>
 
 <!-- Hojas de estilo y Fuentes adicionales -->
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <style>
     /* VARIABLES DE DISEÑO PREMIUM */
     :root {
@@ -1567,6 +1579,10 @@ include 'header.php';
         <div class="calendar-sidebar-details">
             <!-- Resumen del Día -->
             <?php if ($isAdmin): ?>
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
             <div class="sidebar-section-card">
                 <div class="sidebar-section-title">
                     <span>Resumen del día</span>

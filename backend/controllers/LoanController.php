@@ -5,6 +5,10 @@
  * @description Maneja el flujo de salida, retorno y seguimiento de préstamos de herramientas y equipo.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -16,6 +20,10 @@ use Controllers\NotificationController;
 use Services\EmailService;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class LoanController {
     private $db;
 
@@ -23,9 +31,14 @@ class LoanController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (create)
+// ============================================================================
     /**
      * Registra un nuevo préstamo.
      */
+
     public function create($act_id, $us_id) {
         try {
             $query = "INSERT INTO PRESTAMO (act_id, us_id, fecha_pres, estatus) VALUES (?, ?, NOW(), 'Activo')";
@@ -67,9 +80,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (createDynamicLoan)
+// ============================================================================
     /**
      * Crea un préstamo a partir de datos dinámicos (creando usuario y equipo si no existen).
      */
+
     public function createDynamicLoan($equipo, $categoria, $serie, $nombre, $correo, $area, $fecha_pres, $fecha_ent, $estatus, $obs) {
         try {
             $this->db->beginTransaction();
@@ -149,9 +167,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (returnAsset)
+// ============================================================================
     /**
      * Registra el retorno de un activo.
      */
+
     public function returnAsset($pres_id) {
         try {
             // Obtener el act_id antes de cerrar el préstamo
@@ -171,9 +194,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (getAllLoans)
+// ============================================================================
     /**
      * Obtiene todos los préstamos con detalles del equipo y del usuario.
      */
+
     public function getAllLoans($us_id = null, $isAdmin = true) {
         $query = "
             SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus,
@@ -201,9 +229,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (getAvailableAssets)
+// ============================================================================
     /**
      * Obtiene activos disponibles para préstamo.
      */
+
     public function getAvailableAssets() {
         $query = "SELECT act_id, tipo, marca, modelo, num_serie FROM ACTIVO WHERE estatus = 'Disponible'";
         try {
@@ -213,9 +246,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (getUsers)
+// ============================================================================
     /**
      * Obtiene usuarios registrados para asignarles el préstamo.
      */
+
     public function getUsers() {
         $query = "SELECT us_id, nombre, correo, carrera FROM USUARIO WHERE estatus = 'Activo'";
         try {
@@ -225,9 +263,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 9: LÓGICA DE NEGOCIO Y OPERACIÓN (updateLoan)
+// ============================================================================
     /**
      * Actualiza un préstamo existente (fechas y estado).
      */
+
     public function updateLoan($pres_id, $estatus, $fecha_pres, $fecha_ent) {
         try {
             // Manejar fechas vacías
@@ -255,9 +298,14 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 10: LÓGICA DE NEGOCIO Y OPERACIÓN (deleteLoan)
+// ============================================================================
     /**
      * Elimina un préstamo y libera el activo.
      */
+
     public function deleteLoan($pres_id) {
         try {
             $stmt = $this->db->prepare("SELECT act_id FROM PRESTAMO WHERE pres_id = ?");
@@ -276,6 +324,10 @@ class LoanController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 11: LÓGICA DE NEGOCIO Y OPERACIÓN (createScheduledLoan)
+// ============================================================================
     /**
      * @summary Crea un préstamo programado (a partir de una reservación).
      * @param int $act_id
@@ -283,6 +335,7 @@ class LoanController {
      * @param string $fecha_pres Fecha y hora de inicio del préstamo (Y-m-d H:i:s).
      * @param string $fecha_ent Fecha y hora de entrega del préstamo (Y-m-d H:i:s).
      */
+
     public function createScheduledLoan($act_id, $us_id, $fecha_pres, $fecha_ent) {
         try {
             $query = "INSERT INTO PRESTAMO (act_id, us_id, fecha_pres, fecha_ent, estatus) VALUES (?, ?, ?, ?, 'Activo')";

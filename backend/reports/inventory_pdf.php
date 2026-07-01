@@ -3,6 +3,11 @@
  * @file inventory_pdf.php
  * @summary Generador de reporte de inventario de activos en formato imprimible/PDF.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['us_id'])) die("Acceso denegado.");
 
@@ -35,6 +40,11 @@ $disponibles   = count(array_filter($assets, fn($a) => $a['estatus'] === 'Dispon
 $prestados     = count(array_filter($assets, fn($a) => $a['estatus'] === 'Prestado'));
 $mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'], ['Mantenimiento', 'Dañado', 'Extraviado'])));
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -156,6 +166,11 @@ $mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'], [
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body onload="window.print()">
     <div class="header">
         <div>

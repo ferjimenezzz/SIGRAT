@@ -5,6 +5,10 @@
  * @description Administra el registro físico de los tags (TAG_RFID) y maneja la vinculación (PUT) hacia activos, llaves y mobiliario.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -15,6 +19,10 @@ use Controllers\AuditController;
 use PDO;
 use PDOException;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class TagController {
     private $db;
     private $audit;
@@ -27,11 +35,16 @@ class TagController {
         $this->audit = new AuditController();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (create)
+// ============================================================================
     /**
      * Registra un nuevo Tag RFID en el catálogo maestro (Fase 1: Alta de Hardware).
      * @param array $data Arreglo con 'tag_id', 'tipo_tag' ('Activo'|'Llave'|'Mobiliario'), y opcionalmente 'estado'.
      * @return array Estructura de respuesta indicando éxito o el error ocurrido.
      */
+
     public function create($data) {
         try {
             // Consulta para insertar el tag en la tabla maestra
@@ -59,10 +72,15 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (getAll)
+// ============================================================================
     /**
      * Obtiene el listado de todos los tags registrados en el catálogo.
      * @return array Colección con todos los registros de la tabla TAG_RFID.
      */
+
     public function getAll() {
         try {
             $stmt = $this->db->query("SELECT * FROM TAG_RFID ORDER BY fecha_activacion DESC");
@@ -73,11 +91,16 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getById)
+// ============================================================================
     /**
      * Obtiene el detalle de un tag RFID específico por su ID.
      * @param string $id Identificador único (tag_id) del tag.
      * @return array Detalle del tag encontrado o estructura de error.
      */
+
     public function getById($id) {
         try {
             $stmt = $this->db->prepare("SELECT * FROM TAG_RFID WHERE tag_id = ?");
@@ -95,12 +118,17 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (updateStatus)
+// ============================================================================
     /**
      * Actualiza el estado físico de un tag (Activo, Inactivo, Extraviado).
      * @param string $id Identificador único del tag.
      * @param string $estado Nuevo estado a asignar.
      * @return array Resultado de la operación.
      */
+
     public function updateStatus($id, $estado) {
         try {
             $stmt = $this->db->prepare("UPDATE TAG_RFID SET estado = ? WHERE tag_id = ?");
@@ -114,11 +142,16 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (delete)
+// ============================================================================
     /**
      * Elimina un tag RFID del sistema.
      * @param string $id Identificador único del tag.
      * @return array Resultado de la operación.
      */
+
     public function delete($id) {
         try {
             $stmt = $this->db->prepare("DELETE FROM TAG_RFID WHERE tag_id = ?");
@@ -132,6 +165,10 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (link)
+// ============================================================================
     /**
      * Vincula un Tag RFID a un objeto de inventario (Fase 2: Vinculación - PUT).
      * @param string $tag_id Identificador del Tag RFID.
@@ -139,6 +176,7 @@ class TagController {
      * @param int $objeto_id ID numérico del registro del objeto en su respectiva tabla.
      * @return array Estructura de respuesta indicando el éxito.
      */
+
     public function link($tag_id, $tipo_objeto, $objeto_id) {
         // Iniciamos una transacción para garantizar la atomicidad en la desvinculación previa y vinculación nueva
         $this->db->beginTransaction();
@@ -184,11 +222,16 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 9: LÓGICA DE NEGOCIO Y OPERACIÓN (enrollManualBatch)
+// ============================================================================
     /**
      * Registra un lote de TAGs manualmente de forma masiva.
      * @param array $tags Arreglo de strings con los UIDs de los tags.
      * @return array Resultado de la operación detallando cuantos se insertaron.
      */
+
     public function enrollManualBatch(array $tags) {
         $tags = array_unique(array_filter(array_map('trim', $tags)));
         if (empty($tags)) return ["success" => false, "error" => "No hay tags válidos para enrolar."];
@@ -219,12 +262,17 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 10: LÓGICA DE NEGOCIO Y OPERACIÓN (enrollSingleWithLabel)
+// ============================================================================
     /**
      * Registra un TAG individualmente con su clave de etiqueta física.
      * @param string $tag_id UID del tag.
      * @param string $clave_etiqueta Texto de la etiqueta física.
      * @return array Resultado de la operación.
      */
+
     public function enrollSingleWithLabel($tag_id, $clave_etiqueta) {
         $tag_id = trim($tag_id);
         $clave_etiqueta = trim($clave_etiqueta);
@@ -244,11 +292,16 @@ class TagController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 11: LÓGICA DE NEGOCIO Y OPERACIÓN (getAvailableTags)
+// ============================================================================
     /**
      * Obtiene los TAGs que no han sido asociados a ningún elemento (Disponibles).
      * Utiliza un LEFT JOIN masivo sobre ACTIVO, LLAVE y MOBILIARIO.
      * @return array Arreglo con la clave data conteniendo los strings de tag_id.
      */
+
     public function getAvailableTags() {
         try {
             // Buscamos tags que no estén referenciados en ninguna tabla hija y estén activos

@@ -3,9 +3,19 @@
  * @file recuperar_password.php
  * @summary Interfaz gráfica unificada para la recuperación y restablecimiento de contraseñas.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 session_start();
 $token = $_GET['token'] ?? null;
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -99,6 +109,11 @@ $token = $_GET['token'] ?? null;
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body>
 
 <div class="login-card">
@@ -169,6 +184,10 @@ $token = $_GET['token'] ?? null;
     </div>
 </div>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
 // Función para mostrar/ocultar contraseñas
 function togglePassword(inputId, button) {

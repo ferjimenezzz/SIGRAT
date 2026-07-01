@@ -5,6 +5,10 @@
  * @description Permite el registro masivo de tags detectados y la administración de dispositivos.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -14,6 +18,10 @@ use Config\Database;
 use Controllers\AuditController;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class AssetController {
     private $db;
     private $audit;
@@ -23,9 +31,14 @@ class AssetController {
         $this->audit = new AuditController();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (create)
+// ============================================================================
     /**
      * Crea un nuevo activo.
      */
+
     public function create($data) {
         try {
             // 0. Validación estricta en TAG_RFID (Maestra)
@@ -63,9 +76,14 @@ class AssetController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (update)
+// ============================================================================
     /**
      * Actualiza un activo existente.
      */
+
     public function update($id, $data) {
         try {
             // 1. Obtener el tag actual del activo
@@ -111,16 +129,26 @@ class AssetController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAll)
+// ============================================================================
     /**
      * Obtiene todos los activos.
      */
+
     public function getAll() {
         return $this->db->query("SELECT * FROM ACTIVO ORDER BY act_id DESC")->fetchAll();
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (delete)
+// ============================================================================
     /**
      * Elimina un activo.
      */
+
     public function delete($id) {
         try {
             $stmt = $this->db->prepare("DELETE FROM ACTIVO WHERE act_id = ?");
@@ -132,9 +160,14 @@ class AssetController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (bulkSave)
+// ============================================================================
     /**
      * Registra un lote de activos.
      */
+
     public function bulkSave($assets, $tipo) {
         $this->db->beginTransaction();
         try {

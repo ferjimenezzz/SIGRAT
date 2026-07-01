@@ -5,6 +5,10 @@
  * @description Implementa la lógica de envío de correos (confirmaciones, autorizaciones) de manera centralizada.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Services;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -16,6 +20,10 @@ if (file_exists($composerAutoload)) {
     require_once $composerAutoload;
 }
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class EmailService {
     private $mail;
 
@@ -61,6 +69,10 @@ class EmailService {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (sendEmail)
+// ============================================================================
     /**
      * @summary Envía un correo electrónico.
      * 
@@ -69,6 +81,7 @@ class EmailService {
      * @param string $body Contenido en formato HTML.
      * @return bool True si se envió correctamente, False en caso contrario.
      */
+
     public function sendEmail($to, $subject, $body) {
         // Validar que se haya cargado el Username, de lo contrario no intentar enviar para no colgar la app
         if (empty($this->mail->Username)) {
@@ -94,6 +107,10 @@ class EmailService {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationCreated)
+// ============================================================================
     /**
      * @summary Envía correo de confirmación de reserva recién creada.
      * 
@@ -105,6 +122,7 @@ class EmailService {
      * @param string $hora_ent Hora de entrada (opcional).
      * @param string $hora_sal Hora de salida (opcional).
      */
+
     public function sendReservationCreated($to, $re_id, $estatus, $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
         $subject = "Confirmación de solicitud de reserva #$re_id";
         
@@ -133,6 +151,10 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (sendBulkReservationCreated)
+// ============================================================================
     /**
      * @summary Envía correo de confirmación para reservas múltiples.
      * 
@@ -144,6 +166,7 @@ class EmailService {
      * @param string $hora_ent Hora de entrada (opcional).
      * @param string $hora_sal Hora de salida (opcional).
      */
+
     public function sendBulkReservationCreated($to, $re_ids, $fechas, $estatus, $espacio_nombre = '', $hora_ent = '', $hora_sal = '') {
         $subject = "Confirmación de solicitudes de reserva múltiples";
         
@@ -180,12 +203,17 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationApproved)
+// ============================================================================
     /**
      * @summary Envía correo cuando una reserva es autorizada.
      * 
      * @param string $to Correo del usuario.
      * @param int $re_id ID de la reserva.
      */
+
     public function sendReservationApproved($to, $re_id, $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
         $subject = "Reserva Aprobada #$re_id";
         
@@ -213,6 +241,10 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationRejected)
+// ============================================================================
     /**
      * @summary Envía correo cuando una reserva es rechazada.
      * 
@@ -220,6 +252,7 @@ class EmailService {
      * @param int $re_id ID de la reserva.
      * @param string $motivo Motivo del rechazo (opcional).
      */
+
     public function sendReservationRejected($to, $re_id, $motivo = '') {
         $subject = "Reserva Rechazada #$re_id";
         $motivoHtml = $motivo ? "<p>Motivo: <strong>$motivo</strong></p>" : "";
@@ -233,6 +266,10 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationCancelled)
+// ============================================================================
     /**
      * @summary Envía correo cuando una reserva es cancelada.
      * 
@@ -240,6 +277,7 @@ class EmailService {
      * @param int $re_id ID de la reserva.
      * @param string $motivo Motivo de la cancelación (opcional).
      */
+
     public function sendReservationCancelled($to, $re_id, $motivo = '') {
         $subject = "Reserva Cancelada #$re_id";
         $motivoHtml = $motivo ? "<p>Motivo de cancelación: <strong>$motivo</strong></p>" : "";
@@ -253,12 +291,17 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
+
+// ============================================================================
+// SECCIÓN 9: LÓGICA DE NEGOCIO Y OPERACIÓN (sendPasswordRecovery)
+// ============================================================================
     /**
      * @summary Envía un correo con el enlace para restablecer la contraseña.
      * 
      * @param string $to Correo del usuario.
      * @param string $token Token de recuperación seguro.
      */
+
     public function sendPasswordRecovery($to, $token) {
         $subject = "Recuperación de Contraseña - SIGRAT";
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
@@ -292,6 +335,10 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
+
+// ============================================================================
+// SECCIÓN 10: LÓGICA DE NEGOCIO Y OPERACIÓN (sendLoanCreated)
+// ============================================================================
     /**
      * @summary Envía correo de confirmación de un préstamo (ya sea dinámico o estándar).
      * 
@@ -302,6 +349,7 @@ class EmailService {
      * @param string $fecha_pres Fecha de inicio del préstamo.
      * @param string $fecha_ent Fecha de entrega esperada (opcional).
      */
+
     public function sendLoanCreated($to, $pres_id, $equipo, $serie, $fecha_pres, $fecha_ent = '') {
         $subject = "Confirmación de Préstamo de Equipo #$pres_id";
         

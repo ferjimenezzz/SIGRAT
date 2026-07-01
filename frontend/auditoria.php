@@ -4,6 +4,11 @@
  * @summary Módulo de Auditoría y Reportes dinámicos.
  * @description Interfaz adaptativa según el reporte seleccionado.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 require_once '../backend/controllers/AuditController.php';
 require_once '../backend/config/Database.php';
@@ -63,6 +68,10 @@ $edificios_db = $db->query("SELECT DISTINCT edificio FROM ESPACIO WHERE edificio
 include 'header.php';
 ?>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <style>
     :root {
         --primary: #2563eb;
@@ -259,7 +268,6 @@ include 'header.php';
                 </div>
 
 
-
                 <div class="filter-group fg-metrica" style="display:none;">
                     <label>Métrica de Ordenamiento</label>
                     <select name="metrica">
@@ -386,6 +394,10 @@ include 'header.php';
     </div>
 </div>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
 // Dynamic Filters Engine
 document.addEventListener('DOMContentLoaded', () => {

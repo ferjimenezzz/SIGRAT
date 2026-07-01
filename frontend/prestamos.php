@@ -4,6 +4,11 @@
  * @summary Interfaz de gestión de préstamos.
  * @description Módulo administrativo para listar, buscar, filtrar y registrar préstamos de equipo.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 require_once '../backend/controllers/LoanController.php';
 
@@ -80,6 +85,11 @@ foreach ($loans as $l) {
 ?>
 
 <!-- jQuery y Select2 (Para campos con buscador) -->
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -91,6 +101,10 @@ foreach ($loans as $l) {
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <style>
     /* ... Estilos anteriores simplificados por espacio ... */
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }

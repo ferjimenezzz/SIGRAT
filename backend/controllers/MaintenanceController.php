@@ -1,10 +1,15 @@
 <?php
+
 /**
  * @file MaintenanceController.php
  * @summary Controlador para la gestión de mantenimiento de equipo.
  * @description Registra mantenimientos preventivos y correctivos para asegurar la operatividad de los activos.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -12,6 +17,10 @@ require_once __DIR__ . '/../config/Database.php';
 use Config\Database;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class MaintenanceController {
     private $db;
 
@@ -19,9 +28,14 @@ class MaintenanceController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (logMaintenance)
+// ============================================================================
     /**
      * Registra un evento de mantenimiento.
      */
+
     public function logMaintenance($act_id, $descripcion, $responsable) {
         try {
             $query = "INSERT INTO MANTENIMIENTO (act_id, fecha, descripcion, responsable, estatus) VALUES (?, (CURRENT_DATE), ?, ?, 'En Proceso')";

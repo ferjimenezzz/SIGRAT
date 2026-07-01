@@ -5,6 +5,10 @@
  * @description Gestión de Dashboard Administrativo y Portal Público de Invitados.
  */
 
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once '../backend/controllers/CalendarController.php';
@@ -64,8 +68,16 @@ if (isset($_SESSION['us_id'])) {
     }
     ?>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <style>
         /* ==================== STAT CARDS ==================== */
         .stats-grid {

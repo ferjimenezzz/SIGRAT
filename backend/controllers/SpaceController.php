@@ -5,6 +5,10 @@
  * @description Maneja el CRUD de la tabla ESPACIO (CIC/PIDET).
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -14,6 +18,10 @@ use Config\Database;
 use Controllers\AuditController;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class SpaceController {
     private $db;
     private $audit;
@@ -23,19 +31,29 @@ class SpaceController {
         $this->audit = new AuditController();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (getTiposPermitidos)
+// ============================================================================
     /**
      * Obtiene los valores permitidos del ENUM de la base de datos de manera centralizada.
      * @return array Lista de strings con los tipos válidos.
      */
+
     public function getTiposPermitidos() {
         return ['Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas'];
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (create)
+// ============================================================================
     /**
      * Crea un nuevo espacio.
      * @param array $data Arreglo con los datos del espacio (edificio, nombre_numero, tipo, capacidad).
      * @return array Retorna un arreglo asociativo con 'success' y opcionalmente 'error'.
      */
+
     public function create($data) {
         // Validamos que el tipo pertenezca a los valores permitidos del ENUM
         $tiposPermitidos = $this->getTiposPermitidos();
@@ -79,10 +97,15 @@ class SpaceController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAll)
+// ============================================================================
     /**
      * Obtiene todos los espacios.
      * @return array Un arreglo de registros con los espacios.
      */
+
     public function getAll() {
         // Realizamos un fetch de todos los registros ordenados por edificio y nombre
         $espacios = $this->db->query("SELECT * FROM ESPACIO ORDER BY edificio, nombre_numero")->fetchAll();
@@ -95,6 +118,10 @@ class SpaceController {
         return $espacios;
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (getUnoccupied)
+// ============================================================================
     /**
      * Obtiene los espacios que no tienen reservas en una fecha y rango horario específicos.
      * @param string $fecha Fecha de la consulta (formato YYYY-MM-DD).
@@ -102,6 +129,7 @@ class SpaceController {
      * @param string $hora_fin Hora de fin del bloque solicitado (formato HH:MM:SS).
      * @return array Estructura de respuesta indicando el éxito y el listado de espacios desocupados o el mensaje de error.
      */
+
     public function getUnoccupied($fecha, $hora_inicio, $hora_fin) {
         try {
             // Consulta SQL estructurada con subconsulta NOT IN para excluir los espacios que ya cuenten con reservaciones aprobadas que se traslapen con el horario solicitado
@@ -135,12 +163,17 @@ class SpaceController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (update)
+// ============================================================================
     /**
      * Actualiza un espacio existente.
      * @param int $esp_id El identificador del espacio.
      * @param array $data Los datos a actualizar.
      * @return array Resultado de la operación.
      */
+
     public function update($esp_id, $data) {
         $tiposPermitidos = $this->getTiposPermitidos();
         if (!in_array($data['tipo'], $tiposPermitidos)) {
@@ -178,11 +211,16 @@ class SpaceController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (delete)
+// ============================================================================
     /**
      * Elimina un espacio por ID.
      * @param int $id El identificador único del espacio.
      * @return array Retorna un arreglo asociativo con 'success' y opcionalmente 'error'.
      */
+
     public function delete($id) {
         try {
             // Preparamos la eliminación por llave primaria

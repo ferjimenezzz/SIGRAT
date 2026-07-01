@@ -4,6 +4,11 @@
  * @summary Módulo de Gestión RFID.
  * @description Permite el enrolamiento manual de tags y la simulación de hardware.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 
 // Validar que el rol no sea USUARIO
@@ -78,6 +83,11 @@ include 'header.php';
 ?>
 
 <div style="display: flex; flex-direction: column; gap: 32px;">
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <header style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
         <div>
             <h1 style="font-size: 32px; font-weight: 800; color: #1e293b; letter-spacing: -1px;">Gestión RFID</h1>
@@ -92,6 +102,11 @@ include 'header.php';
 
     <!-- Sección: Enrolamiento -->
     <div id="section-enrolamiento" style="display: grid; grid-template-columns: 1fr; gap: 32px;">
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
         <main class="card" style="max-width: 800px; margin: 0 auto; width: 100%;">
             <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 24px;">Enrolamiento Manual de TAGs</h3>
             
@@ -286,6 +301,10 @@ include 'header.php';
     .btn-tab.active { background: white; color: var(--active-blue); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 </style>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
     function toggleEnrollMode() {
         const mode = document.getElementById('enroll_mode').value;

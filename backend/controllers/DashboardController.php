@@ -1,10 +1,15 @@
 <?php
+
 /**
  * @file DashboardController.php
  * @summary Controlador para las estadísticas del panel de control.
  * @description Centraliza el conteo de datos dinámicos para el dashboard administrativo.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -12,6 +17,10 @@ require_once __DIR__ . '/../config/Database.php';
 use Config\Database;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class DashboardController {
     private $db;
 
@@ -22,9 +31,14 @@ class DashboardController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (calculateGrowth)
+// ============================================================================
     /**
      * Calcula el porcentaje de crecimiento entre dos valores.
      */
+
     private function calculateGrowth($current, $previous) {
         if ($previous == 0) {
             return $current > 0 ? 100 : 0;
@@ -32,10 +46,15 @@ class DashboardController {
         return round((($current - $previous) / $previous) * 100);
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (getStats)
+// ============================================================================
     /**
      * Obtiene el resumen de estadísticas para los contadores superiores.
      * @return array Conjunto de conteos para el dashboard.
      */
+
     public function getStats() {
         // 1. Reservas programadas para la fecha actual y ayer
         $resToday = $this->db->query("SELECT COUNT(*) FROM RESERVA WHERE fecha_uso = CURRENT_DATE")->fetchColumn();
@@ -59,10 +78,15 @@ class DashboardController {
         ];
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getSpaceUsage)
+// ============================================================================
     /**
      * Obtiene el uso de espacios por edificio.
      * @return array
      */
+
     public function getSpaceUsage() {
         $cic = $this->db->query("SELECT COUNT(*) FROM RESERVA r JOIN ESPACIO e ON r.esp_id = e.esp_id WHERE e.edificio = 'CIC'")->fetchColumn();
         $pidet = $this->db->query("SELECT COUNT(*) FROM RESERVA r JOIN ESPACIO e ON r.esp_id = e.esp_id WHERE e.edificio = 'PIDET'")->fetchColumn();
@@ -73,10 +97,15 @@ class DashboardController {
         ];
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (getReservationsByDay)
+// ============================================================================
     /**
      * Obtiene el total de reservas agrupado por los últimos 7 días.
      * @return array
      */
+
     public function getReservationsByDay() {
         $query = "
             SELECT fecha_uso, COUNT(*) as total 
@@ -92,10 +121,15 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (getVisitsStats)
+// ============================================================================
     /**
      * Obtiene la distribución de estatus de las visitas.
      * @return array
      */
+
     public function getVisitsStats() {
         $query = "SELECT estatus, COUNT(*) as total FROM visita GROUP BY estatus";
         try {
@@ -105,10 +139,15 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (getClassroomUsageStats)
+// ============================================================================
     /**
      * Calcula las estadísticas de uso de aulas (semana actual vs pasada).
      * @return array Arreglo con uso actual y crecimiento.
      */
+
     public function getClassroomUsageStats() {
         try {
             $totalSpaces = $this->db->query("SELECT COUNT(*) FROM ESPACIO")->fetchColumn();
@@ -129,10 +168,15 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 9: LÓGICA DE NEGOCIO Y OPERACIÓN (getRFIDAccessStats)
+// ============================================================================
     /**
      * Obtiene estadísticas de accesos RFID de hoy vs ayer.
      * @return array
      */
+
     public function getRFIDAccessStats() {
         try {
             $today = (int) $this->db->query("SELECT COUNT(*) FROM LECTOR WHERE fecha = CURRENT_DATE")->fetchColumn();
@@ -147,10 +191,15 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 10: LÓGICA DE NEGOCIO Y OPERACIÓN (getLoanStats)
+// ============================================================================
     /**
      * Obtiene estadísticas de préstamos.
      * @return array
      */
+
     public function getLoanStats() {
         try {
             $active = (int) $this->db->query("SELECT COUNT(*) FROM PRESTAMO WHERE estatus = 'Activo'")->fetchColumn();
@@ -166,11 +215,16 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 11: LÓGICA DE NEGOCIO Y OPERACIÓN (getSpaceUsageByName)
+// ============================================================================
     /**
      * Obtiene el uso de cada espacio individual (para gráfica de barras).
      * @param string $rango Puede ser 'semana', 'mes' o 'ano'.
      * @return array Lista de espacios con su conteo de reservas.
      */
+
     public function getSpaceUsageByName($rango = 'semana') {
         $interval = "INTERVAL '7 days'";
         if ($rango === 'mes') {
@@ -194,10 +248,15 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 12: LÓGICA DE NEGOCIO Y OPERACIÓN (getInventoryStatus)
+// ============================================================================
     /**
      * Obtiene la distribución de estatus del inventario de activos.
      * @return array Conteo de activos por estatus.
      */
+
     public function getInventoryStatus() {
         $query = "SELECT estatus, COUNT(*) as total FROM ACTIVO GROUP BY estatus";
         try {
@@ -207,10 +266,15 @@ class DashboardController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 13: LÓGICA DE NEGOCIO Y OPERACIÓN (getTodayReservations)
+// ============================================================================
     /**
      * Obtiene la lista de reservaciones programadas para hoy con detalles.
      * @return array Lista de reservaciones con información del espacio y usuario.
      */
+
     public function getTodayReservations() {
         $query = "
             SELECT r.re_id, r.hora_ent, r.hora_sal, r.estatus, r.num_alumnos,

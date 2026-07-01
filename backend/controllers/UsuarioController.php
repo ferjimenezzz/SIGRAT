@@ -7,6 +7,10 @@
  * los usuarios ya no utilizan tarjetas físicas; su control de acceso es estrictamente lógico.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -15,6 +19,10 @@ use Config\Database;
 use PDO;
 use PDOException;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class UsuarioController {
     private $db;
 
@@ -22,10 +30,15 @@ class UsuarioController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (getAllUsers)
+// ============================================================================
     /**
      * Obtiene la lista completa de usuarios activos.
      * @return array Objeto JSON estándar con data o mensaje de error.
      */
+
     public function getAllUsers() {
         try {
             // Se utiliza LEFT JOIN para evitar descartar usuarios que momentáneamente no tengan rol
@@ -44,6 +57,10 @@ class UsuarioController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (createUser)
+// ============================================================================
     /**
      * Crea un nuevo usuario en el sistema.
      * @param string $nombre Nombre completo.
@@ -52,6 +69,7 @@ class UsuarioController {
      * @param int $rol_id ID del rol asignado.
      * @return array
      */
+
     public function createUser($nombre, $correo, $contrasena_plana, $rol_id) {
         try {
             // Protección mediante password_hash nativo de PHP (Bcrypt/Argon2)
@@ -73,11 +91,16 @@ class UsuarioController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (softDeleteUser)
+// ============================================================================
     /**
      * Ejecuta un Soft Delete sobre el usuario.
      * @param int $us_id ID del usuario a eliminar.
      * @return array
      */
+
     public function softDeleteUser($us_id) {
         try {
             // Se actualiza el estatus a 'Inactivo' en lugar de un DELETE físico.

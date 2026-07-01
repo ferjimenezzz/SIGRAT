@@ -5,6 +5,10 @@
  * @description Gestiona el hashing de contraseñas, validación de credenciales y manejo de sesiones mediante JWT.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -14,6 +18,10 @@ use Config\Database;
 use Services\EmailService;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class AuthController {
     private $db;
     private $secret_key = "SIGRAT_SECRET_KEY_2026_IPN_SECURE"; 
@@ -30,14 +38,26 @@ class AuthController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (hashPassword)
+// ============================================================================
     public static function hashPassword($password) {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (verifyPassword)
+// ============================================================================
     public static function verifyPassword($password, $hash) {
         return password_verify($password, $hash);
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (generateJWT)
+// ============================================================================
     public function generateJWT($payload) {
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $payload['iat'] = time();
@@ -53,6 +73,10 @@ class AuthController {
         return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (validateJWT)
+// ============================================================================
     public function validateJWT($token) {
         $parts = explode('.', $token);
         if (count($parts) !== 3) return false;
@@ -80,10 +104,18 @@ class AuthController {
         return $payload_data;
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (base64UrlEncode)
+// ============================================================================
     private function base64UrlEncode($data) {
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (register)
+// ============================================================================
     /**
      * @summary Registra un nuevo usuario en la base de datos.
      * @description Verifica si el correo ya existe, busca un rol por defecto, hashea la contraseña e inserta el registro.
@@ -94,6 +126,7 @@ class AuthController {
      * @param string $password Contraseña en texto plano.
      * @return array Arreglo asociativo con success (booleano) y message (string).
      */
+
     public function register($nombre, $correo, $telefono, $carrera, $password) {
         try {
             // 1. Verificar si el correo ya está en uso
@@ -110,7 +143,6 @@ class AuthController {
             if ($rol = $stmtRole->fetch()) {
                 $rol_id = $rol['rol_id'];
             }
-
 
 
             // 3. Hashear la contraseña por seguridad
@@ -130,6 +162,10 @@ class AuthController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 9: LÓGICA DE NEGOCIO Y OPERACIÓN (logout)
+// ============================================================================
     public static function logout() {
         // Limpiar cookie con ruta genérica
         // Limpiar cookie a nivel de dominio
@@ -156,9 +192,14 @@ class AuthController {
         session_destroy();
     }
 
+
+// ============================================================================
+// SECCIÓN 10: LÓGICA DE NEGOCIO Y OPERACIÓN (requestPasswordReset)
+// ============================================================================
     /**
      * @summary Solicita restablecer la contraseña (genera token y envía correo).
      */
+
     public function requestPasswordReset($correo) {
         $stmt = $this->db->prepare("SELECT us_id FROM usuario WHERE correo = ? AND estatus = 'Activo'");
         $stmt->execute([$correo]);
@@ -185,9 +226,14 @@ class AuthController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 11: LÓGICA DE NEGOCIO Y OPERACIÓN (resetPassword)
+// ============================================================================
     /**
      * @summary Restablece la contraseña si el token es válido.
      */
+
     public function resetPassword($token, $newPassword) {
         $stmt = $this->db->prepare("SELECT us_id FROM usuario WHERE reset_token = ? AND reset_expires > NOW()");
         $stmt->execute([$token]);

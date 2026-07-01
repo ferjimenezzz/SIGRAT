@@ -1,7 +1,15 @@
 <?php
 /**
  * @file header.php
+ * @summary Plantilla principal superior y barra de navegación (Navbar) del Frontend.
+ * @description Inicia la sesión de usuario, configura los encabezados HTTP contra caché, incluye librerías visuales (Bootstrap 5, Lucide Icons, JetBrains Mono) y renderiza la barra de navegación lateral y superior de manera dinámica según el rol del usuario autenticado.
+ * @package Frontend\Templates
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -106,6 +114,11 @@ if (count($partesNombre) > 1) {
 }
 $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -114,6 +127,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     <title>SIGRAT - Sistema Universitario</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
     <script>
         const savedTheme = localStorage.getItem('sigrat_theme');
         if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -648,6 +666,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         /* ==================== CONTENT ====================
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
            El <main> es el área de scroll real.
            flex: 1 + overflow-y: auto hacen que sea el único
            elemento que se desplaza dentro de main-container.

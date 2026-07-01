@@ -4,7 +4,17 @@
  * @summary Portal público para usuarios externos (sin sidebar).
  * @description Permite a personas con código de invitación validar su acceso y reservar.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,6 +22,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGRAT - Reservación de Invitados</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
@@ -94,6 +109,11 @@
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body>
     <div class="guest-card">
         <div class="guest-header">

@@ -5,6 +5,10 @@
  * @description Ajustado para PostgreSQL (Supabase) con nombres de tabla en minúsculas.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -14,6 +18,10 @@ use Config\Database;
 use Controllers\AuditController;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class InviteController {
     private $db;
     private $audit;
@@ -23,9 +31,14 @@ class InviteController {
         $this->audit = new AuditController();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (generate)
+// ============================================================================
     /**
      * Genera un código de invitación y crea el registro de visita.
      */
+
     public function generate($nombre, $correo, $anfitrion_id) {
         try {
             $codigo = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8));
@@ -48,9 +61,14 @@ class InviteController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (validate)
+// ============================================================================
     /**
      * Valida un código de invitación.
      */
+
     public function validate($codigo) {
         $query = "SELECT * FROM visita WHERE codigo_acceso = ? AND estatus = 'Generado'";
         $stmt = $this->db->prepare($query);
@@ -58,9 +76,14 @@ class InviteController {
         return $stmt->fetch();
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAllActive)
+// ============================================================================
     /**
      * Obtiene todas las invitaciones activas.
      */
+
     public function getAllActive() {
         $query = "SELECT v.*, u.nombre as anfitrion_nombre 
                   FROM visita v 

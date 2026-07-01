@@ -1,28 +1,35 @@
 <?php
 /**
- * ReservationApprovalController.php
- *
- * Handles approval and rejection of reservation requests.
- * Implements SOLID principles and uses PDO with prepared statements.
+ * @file ReservationApprovalController.php
+ * @summary Controlador para la gestión y flujo de aprobación de reservas.
+ * @description Maneja la aprobación, rechazo y auditoría de solicitudes de reserva de espacios, enviando notificaciones por correo electrónico y garantizando principios SOLID.
+ * @package Backend\Controllers
  */
 
 namespace Backend;
 
+// ============================================================================
+// SECCIÓN 1: IMPORTACIÓN DE DEPENDENCIAS Y SERVICIOS DE COMUNICACIÓN
+// ============================================================================
 use PDO;
 use Exception;
 
+// Importar servicio para notificaciones automáticas por correo (EmailService)
 require_once __DIR__ . '/../services/EmailService.php';
 
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE Y CONSTRUCTOR (INYECCIÓN DE DEPENDENCIAS)
+// ============================================================================
 class ReservationApprovalController
 {
-    /** @var PDO $pdo Database connection */
+    /** @var PDO $pdo Instancia de conexión PDO a MySQL en modo estricto */
     private PDO $pdo;
+    /** @var \Services\EmailService $emailService Servicio para despacho de correos SMTP */
     private $emailService;
 
     /**
-     * Constructor.
-     *
-     * @param PDO $pdo PDO instance connected to the SIGRAT database.
+     * Constructor de la clase de aprobación de reservas.
+     * @param PDO $pdo Instancia PDO inyectada por el enrutador para operaciones ACID.
      */
     public function __construct(PDO $pdo)
     {
@@ -30,6 +37,9 @@ class ReservationApprovalController
         $this->emailService = new \Services\EmailService();
     }
 
+    // ============================================================================
+    // SECCIÓN 3: CONSULTAS DE SOLICITUDES Y LIMPIEZA DE EXPIRACIONES
+    // ============================================================================
     /**
      * Get reservations by status for the approval module.
      *

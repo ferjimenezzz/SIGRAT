@@ -4,6 +4,11 @@
  * @summary Módulo Administrativo de Visitas.
  * @description Permite a los administradores visualizar el registro de visitantes y gestionar su estatus. Ajustado para PostgreSQL.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 
@@ -34,6 +39,11 @@ include 'header.php';
 ?>
 
 <div style="display: flex; flex-direction: column; gap: 32px;">
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <header style="display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
             <h1 style="font-size: 32px; font-weight: 800; color: #1e293b; letter-spacing: -1px;">Control de Visitas</h1>

@@ -1,15 +1,24 @@
 <?php
+
 /**
  * @file Database.php
  * @summary Clase de conexión a la base de datos Supabase (PostgreSQL).
  * @description Credenciales actualizadas tras reset de contraseña.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Config;
 
 use PDO;
 use PDOException;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class Database {
     private static $instance = null;
     private $conn;
@@ -40,6 +49,10 @@ class Database {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (getConnection)
+// ============================================================================
     public static function getConnection() {
         if (self::$instance === null) {
             self::$instance = new self();

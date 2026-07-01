@@ -1,10 +1,15 @@
 <?php
+
 /**
  * @file NotificationController.php
  * @summary Controlador de Notificaciones
  * @description Maneja la creación, lectura y marcado de notificaciones. Incluye lógica de verificación de préstamos por vencer.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -12,6 +17,10 @@ require_once __DIR__ . '/../config/Database.php';
 use Config\Database;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class NotificationController {
     private $db;
 
@@ -19,12 +28,17 @@ class NotificationController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (createNotification)
+// ============================================================================
     /**
      * @param int $us_id ID del usuario destino
      * @param string $tipo Tipo de notificación (Prestamo, Reserva, Sistema)
      * @param string $mensaje El mensaje de la notificación
      * @param string $enlace URL relativa a la que debe redirigir
      */
+
     public function createNotification($us_id, $tipo, $mensaje, $enlace = '') {
         try {
             $query = "INSERT INTO NOTIFICACION (us_id, tipo, mensaje, enlace, leido) VALUES (?, ?, ?, ?, FALSE)";
@@ -37,10 +51,15 @@ class NotificationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (getUnreadNotifications)
+// ============================================================================
     /**
      * @param int $us_id
      * @return array
      */
+
     public function getUnreadNotifications($us_id) {
         try {
             $query = "SELECT * FROM NOTIFICACION WHERE us_id = ? AND leido = FALSE ORDER BY fecha_creacion DESC LIMIT 50";
@@ -52,10 +71,15 @@ class NotificationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAllNotifications)
+// ============================================================================
     /**
      * @param int $us_id
      * @return array
      */
+
     public function getAllNotifications($us_id) {
         try {
             $query = "SELECT * FROM NOTIFICACION WHERE us_id = ? ORDER BY fecha_creacion DESC LIMIT 50";
@@ -67,10 +91,15 @@ class NotificationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (markAsRead)
+// ============================================================================
     /**
      * @param int $not_id
      * @param int $us_id Validar pertenencia
      */
+
     public function markAsRead($not_id, $us_id) {
         try {
             $query = "UPDATE NOTIFICACION SET leido = TRUE WHERE not_id = ? AND us_id = ?";
@@ -82,10 +111,15 @@ class NotificationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (checkExpiringLoans)
+// ============================================================================
     /**
      * Verifica préstamos activos con fecha_ent próxima (Hoy y Mañana)
      * y genera notificaciones para el usuario si no existen ya ese día.
      */
+
     public function checkExpiringLoans() {
         try {
             $query = "

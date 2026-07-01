@@ -4,6 +4,11 @@
  * @summary Interfaz de enrolamiento masivo de activos RFID en PHP.
  * @description Permite la captura de tags en tiempo real y el registro por lotes.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/AssetController.php';
@@ -96,8 +101,6 @@ uasort($locations, function($a, $b) {
 $topLocations = array_slice($locations, 0, 5, true);
 
 
-
-
 // Manejar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_asset') {
     $res = $assetController->update($_POST['act_id'], $_POST);
@@ -120,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 
-
 // Manejar eliminación
 if (isset($_GET['delete_id'])) {
     $assetController->delete($_GET['delete_id']);
@@ -130,6 +132,11 @@ if (isset($_GET['delete_id'])) {
 
 include 'header.php';
 // Add SweetAlert2
+
+
+// ============================================================================
+// SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API
+// ============================================================================
 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
 ?>
 
@@ -147,6 +154,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 ?>
 
 <!-- Cabecera Estandar -->
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div>
             <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 4px;">Inventario</h1>
@@ -354,6 +366,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     <div class="stats-sidebar" id="statsSidebar">
 
         <!-- Panel 1: Estado del inventario (Donut Chart) -->
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
         <div class="sidebar-card">
             <h3>Estado del inventario</h3>
             <div class="donut-chart-container">
@@ -586,9 +603,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     </div>
 
 </div>
-
-
-
 
 
     <!-- Sección: Mantenimiento -->
@@ -1450,14 +1464,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
 
-
     function toggleEnrollMode() {
         const mode = document.getElementById('enroll_mode').value;
         document.getElementById('mode-single').style.display = mode === 'single' ? 'block' : 'none';
         document.getElementById('mode-range').style.display = mode === 'range' ? 'block' : 'none';
         document.getElementById('mode-list').style.display = mode === 'list' ? 'block' : 'none';
     }
-
 
 
     function switchAssetTab(tab) {
@@ -1473,7 +1485,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     let activeTab = urlParams.get('tab') || 'inventario';
     if (urlParams.get('filtro') === 'alerta') activeTab = 'inventario'; // Opcional: forzar pestaña
     switchAssetTab(activeTab);
-
 
 
     // Funciones del Modal de Edición
@@ -2047,7 +2058,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
 
-
     // Space filtering based on Building in Modals
     function setupSpaceFilter(edificioSelectId, spaceSelectId) {
         const edSelect = document.getElementById(edificioSelectId);
@@ -2072,7 +2082,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         setupSpaceFilter('edit_edificio', 'edit_esp_asignado');
     });
 </script>
-
 
 
 <!-- Modal de Nuevo Activo Premium -->

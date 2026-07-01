@@ -3,6 +3,11 @@
  * @file users_pdf.php
  * @summary Generador de reporte de usuarios en formato imprimible/PDF.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['us_id'])) die("Acceso denegado.");
 
@@ -29,6 +34,11 @@ $activos      = count(array_filter($users, fn($u) => $u['estatus'] === 'Activo')
 $inactivos    = $totalUsers - $activos;
 $totalRoles   = count($roles);
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -161,6 +171,11 @@ $totalRoles   = count($roles);
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body onload="window.print()">
     <div class="header">
         <div>

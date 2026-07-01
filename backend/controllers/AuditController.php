@@ -1,9 +1,14 @@
 <?php
+
 /**
  * @file AuditController.php
  * @summary Controlador de Auditoría y Trazabilidad ampliado para nuevos reportes.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -11,6 +16,10 @@ require_once __DIR__ . '/../config/Database.php';
 use Config\Database;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class AuditController {
     private $db;
 
@@ -18,9 +27,14 @@ class AuditController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (log)
+// ============================================================================
     /**
      * Registra una acción en la bitácora.
      */
+
     public function log($us_id, $accion, $modulo) {
         try {
             $query = "INSERT INTO bitacora (us_id, accion, modulo_afectado) VALUES (?, ?, ?)";
@@ -32,9 +46,14 @@ class AuditController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (getGeneralActivity)
+// ============================================================================
     /**
      * Reporte: Actividad general del sistema (Bitácora raw)
      */
+
     public function getGeneralActivity($filters) {
         $query = "SELECT b.*, u.nombre as usuario_nombre 
                   FROM bitacora b 
@@ -72,9 +91,14 @@ class AuditController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAttendanceReport)
+// ============================================================================
     /**
      * Reporte: Asistencia a Aulas
      */
+
     public function getAttendanceReport($filters) {
         $query = "SELECT r.re_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.num_alumnos,
                          e.nombre_numero as espacio, e.edificio,
@@ -104,9 +128,14 @@ class AuditController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (getTopSpaces)
+// ============================================================================
     /**
      * Reporte: Aulas más utilizadas
      */
+
     public function getTopSpaces($filters) {
         $query = "SELECT e.esp_id, e.nombre_numero, e.edificio, e.tipo, 
                          COUNT(r.re_id) as total_reservas, 
@@ -146,9 +175,14 @@ class AuditController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (getUsageByBuilding)
+// ============================================================================
     /**
      * Reporte: Uso por edificio
      */
+
     public function getUsageByBuilding($filters) {
         $query = "SELECT e.edificio,
                          COUNT(DISTINCT e.esp_id) as total_espacios,
@@ -175,9 +209,14 @@ class AuditController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+// ============================================================================
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (getAttendanceByUser)
+// ============================================================================
     /**
      * Reporte: Asistencia por usuario (profesores)
      */
+
     public function getAttendanceByUser($filters) {
         $query = "SELECT u.us_id, u.nombre, u.rol,
                          COUNT(r.re_id) as total_reservas, 
@@ -206,9 +245,14 @@ class AuditController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+// ============================================================================
+// SECCIÓN 9: LÓGICA DE NEGOCIO Y OPERACIÓN (getAssetLoans)
+// ============================================================================
     /**
      * Reporte: Préstamos de activos
      */
+
     public function getAssetLoans($filters) {
         $query = "SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus,
                          a.tipo as activo_tipo, a.marca as activo_marca, a.num_inv as activo_inv,
@@ -243,25 +287,40 @@ class AuditController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+// ============================================================================
+// SECCIÓN 10: LÓGICA DE NEGOCIO Y OPERACIÓN (getInventoryMovements)
+// ============================================================================
     /**
      * Reporte: Movimientos de inventario
      */
+
     public function getInventoryMovements($filters) {
         $filters['modulo'] = 'ACTIVOS';
         return $this->getGeneralActivity($filters);
     }
 
+
+// ============================================================================
+// SECCIÓN 11: LÓGICA DE NEGOCIO Y OPERACIÓN (getIncidents)
+// ============================================================================
     /**
      * Reporte: Incidencias, alertas y mantenimientos
      */
+
     public function getIncidents($filters) {
         $filters['modulo'] = 'MANTENIMIENTO'; // O buscar por LIKE %incidencia%
         return $this->getGeneralActivity($filters);
     }
 
+
+// ============================================================================
+// SECCIÓN 12: LÓGICA DE NEGOCIO Y OPERACIÓN (getAuditStats)
+// ============================================================================
     /**
      * Estadísticas generales (KPIs base)
      */
+
     public function getAuditStats() {
         $stats = [
             'total' => 0,

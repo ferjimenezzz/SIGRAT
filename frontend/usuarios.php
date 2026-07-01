@@ -1,4 +1,9 @@
 <?php
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 /**
  * @file usuarios.php
@@ -151,6 +156,11 @@ $tab = $_GET['tab'] ?? 'usuarios';
 
 <div style="display: flex; flex-direction: column; gap: 24px;">
     <!-- Encabezado con título y botones -->
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 4px;">Gestión de Usuarios</h1>
@@ -422,6 +432,10 @@ $tab = $_GET['tab'] ?? 'usuarios';
     .btn-tab.active { background: white; color: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 </style>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
     let currentActiveTab = '<?php echo $tab; ?>';
 
@@ -621,6 +635,11 @@ $tab = $_GET['tab'] ?? 'usuarios';
                     }
                 </style>
             </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
             <body>
                 <div class="header">
                     <div class="logo-area">

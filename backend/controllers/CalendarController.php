@@ -1,10 +1,15 @@
 <?php
+
 /**
  * @file CalendarController.php
  * @summary Controlador para la visualización y filtrado del calendario.
  * @description Ajustado para compatibilidad con PostgreSQL (Supabase) usando minúsculas.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -12,6 +17,10 @@ require_once __DIR__ . '/../config/Database.php';
 use Config\Database;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class CalendarController {
     private $db;
 
@@ -19,9 +28,14 @@ class CalendarController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (getEvents)
+// ============================================================================
     /**
      * Obtiene todos los eventos (Reservas Aprobadas) con filtros opcionales.
      */
+
     public function getEvents($edificio = null, $esp_id = null) {
         // Usamos minúsculas para compatibilidad nativa con PostgreSQL
         $query = "SELECT r.*, e.nombre_numero, e.edificio, u.nombre as usuario_nombre
@@ -45,9 +59,14 @@ class CalendarController {
         return $stmt->fetchAll();
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (getEventsFiltered)
+// ============================================================================
     /**
      * Obtiene eventos del calendario con filtros avanzados y soporte de estados.
      */
+
     public function getEventsFiltered($edificio = null, $esp_id = null, $tipo = null, $fecha_inicio = null, $fecha_fin = null, $us_id = null, $status = null) {
         $query = "SELECT r.*, e.nombre_numero, e.tipo as espacio_tipo, e.edificio, e.capacidad as espacio_capacidad, u.nombre as usuario_nombre, u.correo as usuario_correo
                   FROM reserva r

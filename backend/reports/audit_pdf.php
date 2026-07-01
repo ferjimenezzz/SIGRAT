@@ -1,4 +1,9 @@
 <?php
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['us_id'])) die("Acceso denegado.");
 
@@ -35,6 +40,11 @@ if ($tipo_reporte === 'uso_espacios') {
     $titulo_reporte = "Reporte de Auditoría General";
 }
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -56,6 +66,11 @@ if ($tipo_reporte === 'uso_espacios') {
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body onload="window.print()">
     <div class="header">
         <div class="logo">SIGRAT</div>

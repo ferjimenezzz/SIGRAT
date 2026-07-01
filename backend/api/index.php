@@ -4,6 +4,11 @@
  * @summary Punto de entrada único (Router) para la API de SIGRAT en PHP.
  * @description Centraliza las peticiones, gestiona CORS, decodifica JSON y despacha a los controladores correspondientes.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 session_start();
 ob_start();
 ini_set('display_errors', 0);

@@ -3,11 +3,21 @@
  * @file aprobacion_reservas.php
  * @summary Módulo independiente para la gestión y aprobación de reservas.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 // require_once 'seguridad.php';
 include 'header.php';
 ?>
 
 <div style="display: flex; flex-direction: column; gap: 24px;">
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 4px;">Aprobaciones de Reservas</h1>
@@ -32,6 +42,11 @@ include 'header.php';
 </style>
 
 <!-- React Dependencies for Aprobaciones -->
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 

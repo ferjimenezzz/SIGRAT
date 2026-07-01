@@ -3,6 +3,11 @@
  * @file espacios.php
  * @summary Gestión Unificada de Espacios, Reservas y Aprobaciones.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/SpaceController.php';
@@ -94,9 +99,13 @@ $tab = $_GET['tab'] ?? 'espacios';
 ?>
 
 
-
 <div style="display: flex; flex-direction: column; gap: 24px;">
     <!-- Encabezado con título y botones -->
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 4px;">Gestión de Espacios</h1>
@@ -484,6 +493,10 @@ $tab = $_GET['tab'] ?? 'espacios';
     .btn-tab.active { background: white; color: var(--active-blue); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 </style>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
     function switchTab(tab) {
         document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'grid' : 'none';
@@ -663,7 +676,6 @@ $tab = $_GET['tab'] ?? 'espacios';
         }
     }
 </script>
-
 
 
 <?php include 'footer.php'; ?>

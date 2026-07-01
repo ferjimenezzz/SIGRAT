@@ -5,6 +5,10 @@
  * @description Permite a los externos validar su código de invitación y realizar una reservación.
  */
 
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/InviteController.php';
 require_once '../backend/controllers/ReservationController.php';
@@ -54,6 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 $spaces = $spaceController->getAll();
 ?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -463,6 +472,11 @@ $spaces = $spaceController->getAll();
         }
     </style>
 </head>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body>
 
 <div class="card-container">
@@ -598,6 +612,10 @@ $spaces = $spaceController->getAll();
     </div>
 </div>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script>
     function toggleCode() {
         const input = document.getElementById('codigoInput');

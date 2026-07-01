@@ -3,6 +3,11 @@
  * @file logout.php
  * @summary Finaliza la sesión del usuario eliminando el token JWT.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once __DIR__ . '/../backend/controllers/AuthController.php';
 use Controllers\AuthController;
 

@@ -5,6 +5,10 @@
  * @description Maneja la creación, disponibilidad y validación de reservaciones para internos y externos.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -18,6 +22,10 @@ use Controllers\NotificationController;
 use Services\EmailService;
 use PDO;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class ReservationController {
     private $db;
     private $audit;
@@ -29,9 +37,14 @@ class ReservationController {
         $this->emailService = new EmailService();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (create)
+// ============================================================================
     /**
      * Crea una reservación (Inicia en estado 'Pendiente').
      */
+
     public function create($data, $skip_email = false) {
         $this->db->beginTransaction();
         try {
@@ -134,6 +147,10 @@ class ReservationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (approve)
+// ============================================================================
     public function approve($id, $admin_id, $comments = '') {
         $this->db->beginTransaction();
         try {
@@ -178,6 +195,10 @@ class ReservationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAvailability)
+// ============================================================================
     public function getAvailability($esp_id, $date) {
         try {
             $query = "SELECT re_id, hora_ent, hora_sal, estatus 
@@ -192,6 +213,10 @@ class ReservationController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (sendBulkEmail)
+// ============================================================================
     /**
      * @summary Envía un solo correo confirmando múltiples reservaciones creadas a la vez.
      * 
@@ -200,6 +225,7 @@ class ReservationController {
      * @param array $fechas Array de fechas
      * @param int $esp_id
      */
+
     public function sendBulkEmail($us_id, $re_ids, $fechas, $esp_id) {
         try {
             if (!$us_id || empty($re_ids) || empty($fechas)) return false;

@@ -1,3 +1,21 @@
+<?php
+/**
+ * @file login.php
+ * @summary Pantalla e interfaz de inicio de sesión de usuario en SIGRAT.
+ * @description Renderiza el formulario de autenticación con diseño moderno (Glassmorphism / Material-inspired), maneja la validación de campos, comunicación con la API de autenticación y redirección al panel principal tras un login exitoso.
+ * @package Frontend\Views
+ */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
+?>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 2: ESTRUCTURA HTML, ESTILOS CSS Y CABECERAS VISUALES -->
+<!-- ============================================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -103,6 +121,10 @@
     </style>
 </head>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
+<!-- ============================================================================ -->
 <body>
 
 <div class="card-sigrat">
@@ -128,7 +150,6 @@
         </a>
     </div>
 </div>
-
 
 
 <!--modal de registro-->
@@ -235,6 +256,10 @@
     </div>
 </div>
 
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>

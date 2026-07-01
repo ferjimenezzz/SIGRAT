@@ -3,6 +3,11 @@
  * @file perfil.php
  * @summary Interfaz de Mi Perfil - campos editables: nombre, teléfono, correo, organización.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/AuthController.php';

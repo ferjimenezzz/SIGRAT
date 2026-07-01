@@ -6,6 +6,10 @@
  * Ya no procesa entradas/salidas de usuarios por regla de negocio actualizada.
  */
 
+
+// ============================================================================
+// SECCIÓN 1: ESPACIO DE NOMBRES, CARGA DE ARCHIVOS Y DEPENDENCIAS
+// ============================================================================
 namespace Controllers;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -14,6 +18,10 @@ use Config\Database;
 use PDO;
 use PDOException;
 
+
+// ============================================================================
+// SECCIÓN 2: DEFINICIÓN DE CLASE, PROPIEDADES Y CONSTRUCTOR
+// ============================================================================
 class RFIDController {
     private $db;
 
@@ -21,12 +29,17 @@ class RFIDController {
         $this->db = Database::getConnection();
     }
 
+
+// ============================================================================
+// SECCIÓN 3: LÓGICA DE NEGOCIO Y OPERACIÓN (processScan)
+// ============================================================================
     /**
      * Procesa un escaneo de RFID proveniente de una antena.
      * @param string $tag_id ID único del tag detectado.
      * @param int $lec_id ID del dispositivo lector donde se detectó.
      * @return array Resultado del procesamiento.
      */
+
     public function processScan($tag_id, $lec_id) {
         try {
             // 1. Verificar existencia y estatus del tag en el catálogo maestro
@@ -95,11 +108,16 @@ class RFIDController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 4: LÓGICA DE NEGOCIO Y OPERACIÓN (getRecentScans)
+// ============================================================================
     /**
      * Obtiene los escaneos más recientes para el monitor en tiempo real.
      * @param int|null $ant_id ID de la antena para filtrar
      * @return array Lista de logs recientes con detalles del lector.
      */
+
     public function getRecentScans($ant_id = null) {
         try {
             $query = "SELECT m.*, l.ant_id, a.ubicacion 
@@ -124,9 +142,14 @@ class RFIDController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 5: LÓGICA DE NEGOCIO Y OPERACIÓN (getAntennasStatus)
+// ============================================================================
     /**
      * Obtiene el estado de conexión de todas las antenas.
      */
+
     public function getAntennasStatus() {
         try {
             // Si last_ping es menos de 2 minutos atrás (120 segundos), la consideramos conectada
@@ -144,9 +167,14 @@ class RFIDController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (updateAntennaPing)
+// ============================================================================
     /**
      * Actualiza el last_ping de una antena (Heartbeat de hardware)
      */
+
     public function updateAntennaPing($ant_id) {
         if (!$ant_id) return ["success" => false, "error" => "Falta ID de antena"];
         try {
@@ -159,11 +187,16 @@ class RFIDController {
         }
     }
 
+
+// ============================================================================
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (getLatestUnknownTag)
+// ============================================================================
     /**
      * Obtiene el último tag desconocido detectado en los últimos 60 segundos.
      * Útil para enrolamiento desde las antenas IP.
      * @return array
      */
+
     public function getLatestUnknownTag() {
         $logFile = __DIR__ . '/../api/unknown_tags.log';
         if (!file_exists($logFile)) return ["success" => true, "tag_id" => null];

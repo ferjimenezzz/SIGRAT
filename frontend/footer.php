@@ -4,9 +4,19 @@
  * @summary Cierre del layout principal.
  * @description Finaliza las etiquetas de cuerpo y HTML e inicializa Lucide Icons para páginas que aún lo usan.
  */
+
+// ============================================================================
+// SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
+// ============================================================================
+
 ?>
         </main>
     </div>
+
+
+<!-- ============================================================================ -->
+<!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
+<!-- ============================================================================ -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         // Inicializar iconos de Lucide (para páginas que aún los usan)
