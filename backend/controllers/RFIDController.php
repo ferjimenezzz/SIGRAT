@@ -37,6 +37,9 @@ class RFIDController {
             $tag = $stmt->fetch();
 
             if (!$tag) {
+                // Registrar el tag desconocido para posible enrolamiento
+                $logLine = $tag_id . '|' . time() . "\n";
+                file_put_contents(__DIR__ . '/../api/unknown_tags.log', $logLine, FILE_APPEND);
                 return ["success" => false, "error" => "Tag no registrado en el sistema. Acceso denegado."];
             }
 
@@ -154,6 +157,28 @@ class RFIDController {
             error_log("Error en updateAntennaPing: " . $e->getMessage());
             return ["success" => false, "error" => "Error interno"];
         }
+    }
+
+    /**
+     * Obtiene el último tag desconocido detectado en los últimos 60 segundos.
+     * Útil para enrolamiento desde las antenas IP.
+     * @return array
+     */
+    public function getLatestUnknownTag() {
+        $logFile = __DIR__ . '/../api/unknown_tags.log';
+        if (!file_exists($logFile)) return ["success" => true, "tag_id" => null];
+        
+        $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (empty($lines)) return ["success" => true, "tag_id" => null];
+        
+        $lastLine = array_pop($lines);
+        list($tag_id, $timestamp) = explode('|', $lastLine);
+        
+        // Retornar solo si fue escaneado en los últimos 60 segundos
+        if (time() - $timestamp <= 60) {
+            return ["success" => true, "tag_id" => $tag_id, "timestamp" => date('Y-m-d H:i:s', $timestamp)];
+        }
+        return ["success" => true, "tag_id" => null];
     }
 }
 ?>

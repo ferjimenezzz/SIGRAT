@@ -25,6 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     
     if ($mode === 'single' && !empty($_POST['single_tag'])) {
         $tagsToEnroll[] = trim($_POST['single_tag']);
+        $clave_etiqueta = trim($_POST['clave_etiqueta'] ?? '');
+        $res = $tagController->enrollSingleWithLabel(trim($_POST['single_tag']), $clave_etiqueta);
+        if ($res['success']) {
+            header("Location: rfid.php?tab=enrolamiento&success=1");
+        } else {
+            header("Location: rfid.php?tab=enrolamiento&error=" . urlencode($res['error']));
+        }
+        exit();
     } elseif ($mode === 'range') {
         $prefixForm = trim($_POST['range_prefix'] ?? '');
         $startStrRaw = trim($_POST['range_start'] ?? '');
@@ -135,8 +143,22 @@ include 'header.php';
 
                 <!-- MODO SINGLE -->
                 <div id="mode-single" style="display: none; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 8px;">UID de la Tarjeta</label>
-                    <input type="text" name="single_tag" class="form-control" placeholder="Haz clic aquí y pasa la tarjeta..." style="font-family: 'JetBrains Mono', monospace; font-size: 16px; padding: 16px; color: var(--active-blue);">
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-end; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <label style="display: block; font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 8px;">UID de la Tarjeta (Electrónico)</label>
+                            <input type="text" name="single_tag" id="single_tag_input" class="form-control" placeholder="Haz clic en Escuchar Antena o usa escáner..." style="font-family: 'JetBrains Mono', monospace; font-size: 16px; padding: 16px; color: var(--active-blue);">
+                        </div>
+                        <div>
+                            <button type="button" onclick="escucharAntenaIP()" id="btn-escuchar-antena" class="btn-secondary" style="height: 54px; padding: 0 24px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="radio"></i> <span id="btn-escuchar-text">ESCUCHAR ANTENA IP</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 8px;">Clave de Etiqueta (Física)</label>
+                        <input type="text" name="clave_etiqueta" class="form-control" placeholder="Escribe aquí lo que dice la etiqueta impresa..." minlength="50" style="font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 16px;" required>
+                        <p style="font-size: 11px; color: #64748b; margin-top: 8px;">* Se requiere un mínimo de 50 caracteres alfanuméricos.</p>
+                    </div>
                 </div>
 
                 <!-- MODO LIST -->
@@ -279,6 +301,46 @@ include 'header.php';
         
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    let pollInterval = null;
+    function escucharAntenaIP() {
+        const btnText = document.getElementById('btn-escuchar-text');
+        const btn = document.getElementById('btn-escuchar-antena');
+        const input = document.getElementById('single_tag_input');
+        
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+            btnText.innerText = 'ESCUCHAR ANTENA IP';
+            btn.style.color = '';
+            return;
+        }
+
+        input.value = '';
+        input.placeholder = 'Esperando lectura de antena...';
+        btnText.innerText = 'ESCUCHANDO... (DETENER)';
+        btn.style.color = '#10b981';
+
+        pollInterval = setInterval(async () => {
+            try {
+                const res = await fetch('../backend/api/index.php/hardware/latest-unknown-tag');
+                const data = await res.json();
+                if (data.success && data.tag_id) {
+                    input.value = data.tag_id;
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+                    btnText.innerText = 'ESCUCHAR ANTENA IP';
+                    btn.style.color = '';
+                    
+                    // Add subtle effect to notify user
+                    input.style.backgroundColor = '#dcfce3';
+                    setTimeout(() => input.style.backgroundColor = '', 1000);
+                }
+            } catch (e) {
+                console.error("Error polling antena", e);
+            }
+        }, 2000);
     }
 
     var serialPort = null;

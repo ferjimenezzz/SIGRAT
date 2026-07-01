@@ -338,6 +338,10 @@ try {
                 $ant_id = $input['ant_id'] ?? null;
                 $response = $controller->updateAntennaPing($ant_id);
                 $status_code = 200;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $uri[count($uri)-1] === 'latest-unknown-tag') {
+                $controller = new RFIDController();
+                $response = $controller->getLatestUnknownTag();
+                $status_code = 200;
             }
             break;
 

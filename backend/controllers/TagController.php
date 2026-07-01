@@ -35,16 +35,18 @@ class TagController {
     public function create($data) {
         try {
             // Consulta para insertar el tag en la tabla maestra
-            $query = "INSERT INTO TAG_RFID (tag_id, tipo_tag, estado) VALUES (?, ?, ?)";
+            $query = "INSERT INTO TAG_RFID (tag_id, tipo_tag, estado, clave_etiqueta) VALUES (?, ?, ?, ?)";
             $stmt = $this->db->prepare($query);
             
             // Si no se provee un estado, por defecto será 'Activo'
             $estado = $data['estado'] ?? 'Activo';
+            $clave = $data['clave_etiqueta'] ?? null;
             
             $stmt->execute([
                 $data['tag_id'],
                 $data['tipo_tag'],
-                $estado
+                $estado,
+                $clave
             ]);
 
             // Registrar acción en la bitácora del sistema
@@ -213,6 +215,31 @@ class TagController {
             return ["success" => true, "enrolled" => $enrolledCount];
         } catch (\Exception $e) {
             $this->db->rollBack();
+            return ["success" => false, "error" => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Registra un TAG individualmente con su clave de etiqueta física.
+     * @param string $tag_id UID del tag.
+     * @param string $clave_etiqueta Texto de la etiqueta física.
+     * @return array Resultado de la operación.
+     */
+    public function enrollSingleWithLabel($tag_id, $clave_etiqueta) {
+        $tag_id = trim($tag_id);
+        $clave_etiqueta = trim($clave_etiqueta);
+        if (empty($tag_id)) return ["success" => false, "error" => "El TAG ID es obligatorio."];
+
+        try {
+            $stmt = $this->db->prepare("INSERT INTO TAG_RFID (tag_id, tipo_tag, estado, clave_etiqueta) VALUES (?, 'Sin Asignar', 'Activo', ?)");
+            $stmt->execute([$tag_id, $clave_etiqueta]);
+            
+            $this->audit->log(1, "Enrolado TAG manual con etiqueta: $tag_id", "RFID");
+            return ["success" => true, "enrolled" => 1];
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23505' || $e->getCode() == '23000') {
+                return ["success" => false, "error" => "El TAG ya está registrado en el sistema."];
+            }
             return ["success" => false, "error" => $e->getMessage()];
         }
     }
