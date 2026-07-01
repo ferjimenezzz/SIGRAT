@@ -102,7 +102,9 @@ function ReservationApprovalApp() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Estado para filtrado por pestañas: 0 = Pendientes, 1 = Aprobadas, 2 = Canceladas
   const [currentTab, setCurrentTab] = useState(0);
+  // Estado para barra de búsqueda interactiva en tiempo real por ID, usuario o espacio
   const [searchTerm, setSearchTerm] = useState("");
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
@@ -319,6 +321,7 @@ function ReservationApprovalApp() {
       }
     }
   };
+  // Algoritmo de filtrado en tiempo real: evalúa si el término de búsqueda coincide con el ID, el nombre de usuario o el espacio asignado
   const filteredReservations = reservations.filter(row => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
