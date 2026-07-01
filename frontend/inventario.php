@@ -270,8 +270,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <col style="width: 10%;"><!-- Tipo -->
                     <col style="width: 12%;"><!-- Nº Inventario -->
                     <col style="width: 14%;"><!-- Tag RFID -->
-                    <col style="width: 20%;"><!-- Ubicación -->
-                    <col style="width: 12%;"><!-- Estado -->
+                    <col style="width: 15%;"><!-- Ubicación -->
+                    <col style="width: 13%;"><!-- Estado -->
                     <col style="width: 10%;"><!-- Acción -->
                 </colgroup>
                 <thead>
@@ -313,7 +313,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                                 $espNombre = htmlspecialchars($asset['espacio_nombre'] ?? 'Sin asignar');
                                 $edificio  = htmlspecialchars($asset['edificio'] ?? '');
                             ?>
-                            <div style="font-weight: 600; color: #0f172a; overflow-wrap: break-word; word-break: break-word; line-height: 1.4;"><?php echo $espNombre; ?></div>
+                            <div style="font-weight: 600; color: #0f172a; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5; white-space: normal;"><?php echo $espNombre; ?></div>
                             <?php if ($edificio): ?>
                             <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;"><?php echo $edificio; ?></div>
                             <?php endif; ?>
