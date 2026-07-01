@@ -1419,11 +1419,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             width: 100%;
             justify-content: flex-end;
         }
-        /* Ocultar columna Acción en móvil */
-        .premium-table th:last-child,
-        .premium-table td:last-child {
-            display: none;
-        }
     }
     @media (max-width: 480px) {
         .premium-header-left h1 {
