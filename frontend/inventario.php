@@ -265,6 +265,15 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <!-- Tabla de Inventario -->
         <div class="premium-table-card">
             <table id="inventoryTable" class="premium-table">
+                <colgroup>
+                    <col style="width: 22%;"><!-- Activo -->
+                    <col style="width: 10%;"><!-- Tipo -->
+                    <col style="width: 12%;"><!-- Nº Inventario -->
+                    <col style="width: 14%;"><!-- Tag RFID -->
+                    <col style="width: 20%;"><!-- Ubicación -->
+                    <col style="width: 12%;"><!-- Estado -->
+                    <col style="width: 10%;"><!-- Acción -->
+                </colgroup>
                 <thead>
                     <tr>
                         <th>Activo</th>
@@ -283,8 +292,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     ?>
                     <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
                         <td>
-                            <div style="font-weight: 700; color: #0f172a; max-width: 180px; word-wrap: break-word;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
-                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px; max-width: 180px; word-break: break-all;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
+                            <div style="font-weight: 700; color: #0f172a; overflow-wrap: break-word; word-break: break-word;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; overflow-wrap: break-word; word-break: break-all; line-height: 1.4;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
                         </td>
                         <td>
                             <?php if ($isMobiliario): ?>
@@ -304,7 +313,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                                 $espNombre = htmlspecialchars($asset['espacio_nombre'] ?? 'Sin asignar');
                                 $edificio  = htmlspecialchars($asset['edificio'] ?? '');
                             ?>
-                            <div style="font-weight: 600; color: #0f172a; white-space: nowrap;"><?php echo $espNombre; ?></div>
+                            <div style="font-weight: 600; color: #0f172a; overflow-wrap: break-word; word-break: break-word; line-height: 1.4;"><?php echo $espNombre; ?></div>
                             <?php if ($edificio): ?>
                             <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 2px;"><?php echo $edificio; ?></div>
                             <?php endif; ?>
@@ -859,7 +868,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     .premium-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 0;
+        table-layout: fixed;
     }
     .premium-table th {
         background: #f8fafc;
@@ -875,11 +884,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         border-bottom: 1px solid #e2e8f0;
     }
     .premium-table td {
-        padding: 8px 12px;
+        padding: 10px 12px;
         border-bottom: 1px solid #f1f5f9;
         color: #334155;
         font-size: 13.5px;
-        vertical-align: middle;
+        vertical-align: top;
+        overflow: hidden;
     }
     .premium-table tbody tr:hover {
         background: #f8fafc;
