@@ -502,32 +502,181 @@ foreach ($loans as $l) {
 
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const doc = new jsPDF('p', 'mm', 'a4');
         
-        doc.text("Reporte de Préstamos", 14, 15);
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
         
+        // Colores institucionales
+        const primaryColor = [15, 23, 41]; // Azul oscuro SIGRAT
+        const textDark = [30, 41, 59];
+        const textGray = [100, 116, 139];
+        
+        // --- ENCABEZADO ---
+        doc.setFontSize(24);
+        doc.setTextColor(...primaryColor);
+        doc.setFont("helvetica", "bold");
+        doc.text("SIGRAT", 14, 22);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(...textGray);
+        doc.setFont("helvetica", "normal");
+        doc.text("Sistema Integral de Gestión de Recursos", 14, 27);
+        
+        doc.setFontSize(16);
+        doc.setTextColor(...primaryColor);
+        doc.setFont("helvetica", "bold");
+        doc.text("REPORTE DE PRÉSTAMOS", pageWidth - 14, 22, { align: "right" });
+        
+        const dateObj = new Date();
+        const dateStr = dateObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = dateObj.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(...textGray);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Fecha de generación: ${dateStr} ${timeStr}`, pageWidth - 14, 27, { align: "right" });
+        
+        const userName = "<?php echo isset($_SESSION['nombre']) ? htmlspecialchars($_SESSION['nombre'] . ' ' . ($_SESSION['apellido'] ?? '')) : 'Administrador'; ?>";
+        doc.text(`Generado por: ${userName.trim() === '' ? 'Administrador' : userName}`, pageWidth - 14, 32, { align: "right" });
+        
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(14, 36, pageWidth - 14, 36);
+        
+        // --- RECOLECCIÓN DE DATOS ---
         let bodyData = [];
+        let totalActivos = 0, totalDevueltos = 0, totalVencidos = 0, totalPendientes = 0;
+        
         document.querySelectorAll("#loansTable tbody tr").forEach(row => {
             if (row.style.display !== 'none') {
                 const cols = row.querySelectorAll("td");
-                bodyData.push([
-                    cols[0].innerText.trim(),
-                    cols[1].innerText.trim(),
-                    cols[2].innerText.trim(),
-                    cols[3].innerText.trim(),
-                    cols[4].innerText.trim()
-                ]);
+                
+                let equipo = "";
+                if (cols[0].querySelector('.item-info h4') && cols[0].querySelector('.item-info p')) {
+                    equipo = cols[0].querySelector('.item-info h4').innerText + '\n' + cols[0].querySelector('.item-info p').innerText;
+                } else {
+                    equipo = cols[0].innerText.trim();
+                }
+
+                let solicitante = "";
+                if (cols[1].querySelector('.user-name')) {
+                    solicitante = cols[1].querySelector('.user-name').innerText;
+                } else {
+                    solicitante = cols[1].innerText.trim();
+                }
+                
+                const fechaPres = cols[2].innerText.trim();
+                const fechaDev = cols[3].innerText.trim();
+                
+                const estadoNode = cols[4].querySelector('.status-badge');
+                const estadoTexto = estadoNode ? estadoNode.innerText.trim() : cols[4].innerText.trim();
+                
+                if (estadoTexto.toLowerCase().includes('activo')) totalActivos++;
+                else if (estadoTexto.toLowerCase().includes('devuelto') || estadoTexto.toLowerCase().includes('finalizado')) totalDevueltos++;
+                else if (estadoTexto.toLowerCase().includes('vencido') || estadoTexto.toLowerCase().includes('atrasado')) totalVencidos++;
+                else totalPendientes++;
+
+                bodyData.push([ equipo, solicitante, fechaPres, fechaDev, estadoTexto ]);
             }
         });
 
+        // Resumen
+        doc.setFontSize(10);
+        doc.setTextColor(...textDark);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Resumen del Reporte:`, 14, 44);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Total de registros: ${bodyData.length}   |   Activos: ${totalActivos}   |   Devueltos: ${totalDevueltos}   |   Vencidos: ${totalVencidos}`, 14, 49);
+        
+        // --- TABLA ---
         doc.autoTable({
             head: [['Equipo', 'Solicitante', 'Fecha Préstamo', 'Fecha Devolución', 'Estado']],
             body: bodyData,
-            startY: 20,
-            styles: { fontSize: 9 }
+            startY: 55,
+            theme: 'plain',
+            styles: { 
+                font: 'helvetica',
+                fontSize: 9,
+                cellPadding: { top: 6, right: 6, bottom: 6, left: 6 },
+                textColor: textDark,
+                valign: 'middle'
+            },
+            headStyles: { 
+                fillColor: primaryColor, 
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                halign: 'left'
+            },
+            alternateRowStyles: { 
+                fillColor: [248, 250, 252] 
+            },
+            columnStyles: {
+                0: { cellWidth: 55, fontStyle: 'bold' },
+                1: { cellWidth: 45 },
+                2: { cellWidth: 28, halign: 'center' },
+                3: { cellWidth: 28, halign: 'center' },
+                4: { cellWidth: 28, halign: 'center' }
+            },
+            didParseCell: function(data) {
+                // Hacer el texto de "Serie: xxx" normal (no bold) y gris en la columna de equipo
+                if (data.section === 'body' && data.column.index === 0) {
+                    // jspdf-autotable no permite multiformato en la misma celda fácilmente por texto,
+                    // usaremos un estilo bold general para la celda.
+                }
+                // Ocultar texto de estado para dibujarlo como badge
+                if (data.section === 'body' && data.column.index === 4) {
+                    data.cell.customText = data.cell.text[0];
+                    data.cell.text = [];
+                }
+            },
+            didDrawCell: function(data) {
+                // Dibujar Badge de Estado
+                if (data.section === 'body' && data.column.index === 4 && data.cell.customText) {
+                    const text = data.cell.customText;
+                    const textLower = text.toLowerCase();
+                    
+                    let bgColor, txColor;
+                    if (textLower.includes('activo')) { bgColor = [220, 252, 231]; txColor = [22, 163, 74]; }
+                    else if (textLower.includes('devuelto') || textLower.includes('finalizado')) { bgColor = [243, 232, 255]; txColor = [147, 51, 234]; }
+                    else if (textLower.includes('vencido') || textLower.includes('atrasado')) { bgColor = [254, 226, 226]; txColor = [220, 38, 38]; }
+                    else { bgColor = [254, 249, 195]; txColor = [202, 138, 4]; }
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(8);
+                    const txtWidth = doc.getTextWidth(text);
+                    
+                    const paddingX = 4;
+                    const paddingY = 2;
+                    const w = txtWidth + (paddingX * 2);
+                    const h = 6;
+                    const x = data.cell.x + (data.cell.width - w) / 2;
+                    const y = data.cell.y + (data.cell.height - h) / 2;
+                    
+                    doc.setFillColor(...bgColor);
+                    doc.roundedRect(x, y, w, h, 2, 2, 'F');
+                    
+                    doc.setTextColor(...txColor);
+                    doc.text(text, x + paddingX, y + h - 1.8);
+                }
+            },
+            didDrawPage: function (data) {
+                // Pie de página
+                const str = "Página " + doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.setTextColor(...textGray);
+                doc.setFont("helvetica", "normal");
+                
+                doc.setDrawColor(226, 232, 240);
+                doc.setLineWidth(0.5);
+                doc.line(14, pageHeight - 15, pageWidth - 14, pageHeight - 15);
+                
+                doc.text("SIGRAT - Sistema Integral de Gestión de Recursos", 14, pageHeight - 10);
+                doc.text(str, pageWidth - 14, pageHeight - 10, { align: "right" });
+            }
         });
         
-        doc.save('reporte_prestamos.pdf');
+        doc.save('reporte_prestamos_sigrat.pdf');
     }
 
     // Funciones SweetAlert2

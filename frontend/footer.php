@@ -49,31 +49,92 @@
         }
     </script>
 
-    <!-- Librería para Exportar a Excel (SheetJS) -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script>
         function exportTableToExcel(tableID, filename = 'Exportacion_SIGRAT') {
             let table = document.getElementById(tableID);
-            if(!table) {
+            if (!table) {
                 console.error("Tabla no encontrada");
                 return;
             }
-            
-            // Clonar tabla
-            let cloneTable = table.cloneNode(true);
-            
-            // Remover última columna (Acciones) y elementos ocultos
-            let rows = cloneTable.querySelectorAll('tr');
-            rows.forEach(row => {
-                if(row.children.length > 0) {
-                    row.removeChild(row.lastElementChild);
-                }
-            });
 
-            // Convertir a libro y descargar
-            let wb = XLSX.utils.table_to_book(cloneTable, {sheet: "Hoja 1"});
-            XLSX.writeFile(wb, filename + ".xlsx");
-            showToast("Archivo Excel generado con éxito", "success");
+            let headers = [];
+            let rows = [];
+            let ignoreCols = [];
+            
+            let thead = table.querySelector('thead');
+            if (thead) {
+                let ths = thead.querySelectorAll('th');
+                ths.forEach((th, index) => {
+                    let text = th.innerText.trim().toUpperCase();
+                    if (text === 'ACCIONES' || text === 'ACCIÓN' || text === 'OPCIONES') {
+                        ignoreCols.push(index);
+                    } else {
+                        headers.push(th.innerText.trim());
+                    }
+                });
+            } else {
+                // Caso tablas sin thead (por si acaso)
+                let firstRow = table.querySelector('tr');
+                if(firstRow) {
+                    firstRow.querySelectorAll('th, td').forEach((cell, index) => {
+                        let text = cell.innerText.trim().toUpperCase();
+                        if (text === 'ACCIONES' || text === 'ACCIÓN' || text === 'OPCIONES') {
+                            ignoreCols.push(index);
+                        } else {
+                            headers.push(cell.innerText.trim());
+                        }
+                    });
+                }
+            }
+
+            let tbody = table.querySelector('tbody') || table;
+            if (tbody) {
+                let trs = tbody.querySelectorAll('tr');
+                let isFirst = !table.querySelector('thead');
+                
+                trs.forEach((tr, trIndex) => {
+                    if (isFirst && trIndex === 0) return; // Si no hay thead, la primera es header
+                    if (tr.style.display === 'none') return;
+                    
+                    let rowData = [];
+                    let tds = tr.querySelectorAll('td');
+                    if (tds.length === 1 && tds[0].colSpan > 1) return; // Mensajes vacíos
+                    
+                    tds.forEach((td, index) => {
+                        if (!ignoreCols.includes(index)) {
+                            let text = td.innerText.trim().replace(/\n\s*\n/g, ' ');
+                            text = text.replace(/\n/g, ' - ');
+                            rowData.push(text);
+                        }
+                    });
+                    if (rowData.length > 0) rows.push(rowData);
+                });
+            }
+
+            let payload = {
+                title: filename.replace(/_/g, ' '),
+                headers: headers,
+                rows: rows
+            };
+
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '../backend/reports/excel_export.php';
+            form.style.display = 'none';
+
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'exportData';
+            input.value = JSON.stringify(payload);
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            if (typeof showToast === 'function') {
+                showToast("Iniciando descarga de Excel...", "success");
+            }
         }
     </script>
 </body>

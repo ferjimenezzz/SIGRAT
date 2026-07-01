@@ -302,8 +302,8 @@ include 'header.php';
         <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
             <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Resultados (<?php echo count($logs); ?>)</h3>
             <div style="display: flex; gap: 8px;">
-                <button class="btn btn-outline" onclick="exportToExcel()" style="color: #16a34a; border-color: #16a34a;"><i data-lucide="file-spreadsheet"></i> Exportar Excel</button>
-                <button class="btn btn-outline" onclick="window.print()" style="color: #dc2626; border-color: #dc2626;"><i data-lucide="file-text"></i> Exportar PDF</button>
+                <button class="btn btn-outline" onclick="exportTableToExcel('auditTable', 'Reporte_Auditoria')" style="color: #16a34a; border-color: #16a34a;"><i data-lucide="file-spreadsheet"></i> Exportar Excel</button>
+                <button class="btn btn-outline" onclick="exportToPDF()" style="color: #dc2626; border-color: #dc2626;"><i data-lucide="file-text"></i> Exportar PDF</button>
             </div>
         </div>
         
@@ -398,7 +398,116 @@ include 'header.php';
 <!-- ============================================================================ -->
 <!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
 <!-- ============================================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script>
+function exportToPDF() {
+    if (!window.jspdf) {
+        alert("Error cargando librería PDF. Por favor recarga la página.");
+        return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); 
+    
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    const primaryColor = [15, 23, 41];
+    const textDark = [30, 41, 59];
+    const textGray = [100, 116, 139];
+    
+    doc.setFontSize(24);
+    doc.setTextColor(...primaryColor);
+    doc.setFont("helvetica", "bold");
+    doc.text("SIGRAT", 14, 22);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...textGray);
+    doc.setFont("helvetica", "normal");
+    doc.text("Sistema Integral de Gestión de Recursos", 14, 27);
+    
+    const titleSelect = document.getElementById('tipoReporte');
+    const reportTitle = titleSelect.options[titleSelect.selectedIndex].text.toUpperCase();
+    
+    doc.setFontSize(16);
+    doc.setTextColor(...primaryColor);
+    doc.setFont("helvetica", "bold");
+    doc.text("REPORTE DE AUDITORÍA", pageWidth - 14, 22, { align: "right" });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...textDark);
+    doc.text(reportTitle, pageWidth - 14, 28, { align: "right" });
+    
+    const dateObj = new Date();
+    const dateStr = dateObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = dateObj.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    
+    doc.setFontSize(9);
+    doc.setTextColor(...textGray);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha de generación: ${dateStr} ${timeStr}`, pageWidth - 14, 33, { align: "right" });
+    
+    const userName = "<?php echo isset($_SESSION['nombre']) ? htmlspecialchars($_SESSION['nombre'] . ' ' . ($_SESSION['apellido'] ?? '')) : 'Administrador'; ?>";
+    doc.text(`Generado por: ${userName.trim() === '' ? 'Administrador' : userName}`, 14, 33);
+    
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.5);
+    doc.line(14, 36, pageWidth - 14, 36);
+    
+    let headData = [];
+    document.querySelectorAll("#auditTable thead tr th").forEach(th => {
+        headData.push(th.innerText.trim());
+    });
+    
+    let bodyData = [];
+    document.querySelectorAll("#auditTable tbody tr").forEach(row => {
+        let rowData = [];
+        row.querySelectorAll("td").forEach(td => {
+            let text = td.innerText.trim();
+            text = text.replace(/\n\s*\n/g, '\n');
+            rowData.push(text);
+        });
+        if(rowData.length > 0) bodyData.push(rowData);
+    });
+
+    doc.autoTable({
+        head: [headData],
+        body: bodyData,
+        startY: 45,
+        theme: 'plain',
+        styles: { 
+            font: 'helvetica',
+            fontSize: 9,
+            cellPadding: { top: 6, right: 6, bottom: 6, left: 6 },
+            textColor: textDark,
+            valign: 'middle'
+        },
+        headStyles: { 
+            fillColor: primaryColor, 
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'left'
+        },
+        alternateRowStyles: { 
+            fillColor: [248, 250, 252] 
+        },
+        didDrawPage: function (data) {
+            const str = "Página " + doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.setTextColor(...textGray);
+            doc.setFont("helvetica", "normal");
+            
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.5);
+            doc.line(14, pageHeight - 15, pageWidth - 14, pageHeight - 15);
+            
+            doc.text("SIGRAT - Sistema Integral de Gestión de Recursos", 14, pageHeight - 10);
+            doc.text(str, pageWidth - 14, pageHeight - 10, { align: "right" });
+        }
+    });
+    
+    doc.save('reporte_auditoria_sigrat.pdf');
+}
 // Dynamic Filters Engine
 document.addEventListener('DOMContentLoaded', () => {
     const reportType = document.getElementById('tipoReporte');
@@ -468,20 +577,7 @@ function setPreset(preset) {
     dIni.value = start.toISOString().split('T')[0];
     dFin.value = end.toISOString().split('T')[0];
 }
-function exportToExcel() {
-    var table = document.getElementById("auditTable");
-    if (!table) {
-        showToast("Error: No se encontró la tabla", "error");
-        return;
-    }
-    var wb = XLSX.utils.table_to_book(table, {sheet: "Auditoria"});
-    var reportType = document.getElementById('tipoReporte').options[document.getElementById('tipoReporte').selectedIndex].text;
-    var filename = "Reporte_" + reportType.replace(/ /g, "_") + ".xlsx";
-    XLSX.writeFile(wb, filename);
-    if(typeof showToast === 'function') {
-        showToast("Archivo Excel generado con éxito", "success");
-    }
-}
+
 </script>
 
 <?php include 'footer.php'; ?>
