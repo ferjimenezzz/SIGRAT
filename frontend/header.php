@@ -371,6 +371,370 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             color: #f87171;
         }
 
+        /* === HELP CENTER BUTTON === */
+        .sidebar-help-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            margin: 0 12px 4px 12px;
+            border-radius: 10px;
+            color: #8892a5;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            width: calc(100% - 24px);
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .sidebar-help-btn i { font-size: 18px; flex-shrink: 0; }
+        .sidebar-help-btn:hover {
+            background: rgba(37, 99, 235, 0.12);
+            color: #93c5fd;
+        }
+
+        /* === HELP CENTER DRAWER === */
+        .hc-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 9998;
+            backdrop-filter: blur(2px);
+            animation: hcFadeIn 0.25s ease;
+        }
+        .hc-overlay.open { display: block; }
+
+        .hc-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 480px;
+            max-width: 100vw;
+            height: 100vh;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.15);
+        }
+        .hc-drawer.open { transform: translateX(0); }
+
+        /* Header del drawer */
+        .hc-head {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            padding: 24px 24px 20px 24px;
+            flex-shrink: 0;
+        }
+        .hc-head-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .hc-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .hc-title-icon {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: white;
+        }
+        .hc-title h2 {
+            font-size: 18px; font-weight: 800;
+            color: #ffffff; margin: 0;
+            letter-spacing: -0.3px;
+        }
+        .hc-title p {
+            font-size: 11px; color: rgba(255,255,255,0.65);
+            margin: 2px 0 0 0; font-weight: 500;
+        }
+        .hc-close-btn {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.15);
+            border: none; border-radius: 8px;
+            color: white; font-size: 18px;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .hc-close-btn:hover { background: rgba(255,255,255,0.25); }
+
+        /* Buscador */
+        .hc-search-wrap {
+            position: relative;
+        }
+        .hc-search-icon {
+            position: absolute; left: 12px; top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.55); font-size: 15px;
+        }
+        .hc-search {
+            width: 100%; padding: 10px 14px 10px 38px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 10px; color: white;
+            font-size: 13px; font-weight: 500;
+            font-family: inherit; outline: none;
+            box-sizing: border-box;
+            transition: background 0.2s, border 0.2s;
+        }
+        .hc-search::placeholder { color: rgba(255,255,255,0.55); }
+        .hc-search:focus {
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* Tabs */
+        .hc-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 14px 24px 0 24px;
+            border-bottom: 1px solid #f1f5f9;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        .hc-tab {
+            padding: 9px 16px;
+            font-size: 12px; font-weight: 700;
+            color: #64748b; cursor: pointer;
+            border: none; background: none;
+            border-bottom: 2px solid transparent;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .hc-tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .hc-tab:hover:not(.active) { color: #1e293b; }
+
+        /* Cuerpo scrollable */
+        .hc-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 24px;
+        }
+        .hc-body::-webkit-scrollbar { width: 5px; }
+        .hc-body::-webkit-scrollbar-track { background: transparent; }
+        .hc-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* Panel tab */
+        .hc-panel { display: none; }
+        .hc-panel.active { display: block; }
+
+        /* Sección de módulos — grid */
+        .hc-modules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .hc-module-card {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .hc-module-card:hover {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.08);
+        }
+        .hc-module-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .hc-mod-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: white; flex-shrink: 0;
+        }
+        .hc-mod-name {
+            font-size: 12px; font-weight: 700;
+            color: #1e293b; line-height: 1.2;
+        }
+        .hc-mod-desc-short {
+            font-size: 10px; color: #64748b;
+            font-weight: 500; margin-top: 1px;
+            white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Detalle de módulo */
+        .hc-module-detail {
+            display: none;
+            animation: hcSlideDown 0.2s ease;
+        }
+        .hc-module-detail.visible { display: block; }
+
+        .hc-detail-back {
+            display: flex; align-items: center; gap: 6px;
+            background: none; border: none;
+            color: #2563eb; font-size: 12px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            padding: 0 0 16px 0;
+            transition: opacity 0.2s;
+        }
+        .hc-detail-back:hover { opacity: 0.7; }
+
+        .hc-detail-header {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+        .hc-detail-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: white; flex-shrink: 0;
+        }
+        .hc-detail-header h3 {
+            font-size: 16px; font-weight: 800;
+            color: #0f172a; margin: 0 0 4px 0;
+        }
+        .hc-detail-header p {
+            font-size: 12px; color: #64748b;
+            font-weight: 500; margin: 0; line-height: 1.5;
+        }
+
+        .hc-section-title {
+            font-size: 10px; font-weight: 800;
+            color: #94a3b8; text-transform: uppercase;
+            letter-spacing: 0.8px; margin: 0 0 10px 0;
+        }
+        .hc-func-list {
+            list-style: none; padding: 0; margin: 0 0 20px 0;
+        }
+        .hc-func-list li {
+            display: flex; align-items: flex-start; gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px; color: #334155;
+            font-weight: 500; line-height: 1.4;
+        }
+        .hc-func-list li:last-child { border-bottom: none; }
+        .hc-func-list li::before {
+            content: '';
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #2563eb; flex-shrink: 0; margin-top: 5px;
+        }
+        .hc-tips-list {
+            display: flex; flex-direction: column; gap: 8px;
+            margin-bottom: 20px;
+        }
+        .hc-tip-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 10px 12px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            font-size: 12px; color: #78350f;
+            font-weight: 500; line-height: 1.5;
+        }
+        .hc-tip-item i { font-size: 14px; color: #d97706; flex-shrink: 0; margin-top: 1px; }
+
+        /* FAQ */
+        .hc-faq-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .hc-faq-item.open { border-color: #bfdbfe; }
+        .hc-faq-q {
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            background: #f8fafc;
+            font-size: 13px; font-weight: 700;
+            color: #1e293b;
+            transition: background 0.2s;
+        }
+        .hc-faq-q:hover { background: #f1f5f9; }
+        .hc-faq-item.open .hc-faq-q { background: #eff6ff; color: #1d4ed8; }
+        .hc-faq-chevron { font-size: 16px; flex-shrink: 0; transition: transform 0.25s; }
+        .hc-faq-item.open .hc-faq-chevron { transform: rotate(180deg); }
+        .hc-faq-a {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            font-size: 13px; color: #475569;
+            font-weight: 500; line-height: 1.6;
+            padding: 0 16px;
+            background: white;
+        }
+        .hc-faq-item.open .hc-faq-a {
+            max-height: 200px;
+            padding: 12px 16px;
+        }
+
+        /* Footer con botón de manual */
+        .hc-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f1f5f9;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        .hc-manual-btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; width: 100%;
+            padding: 11px 20px;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white; border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .hc-manual-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Chip de no resultados */
+        .hc-no-results {
+            text-align: center; padding: 32px 16px;
+            color: #94a3b8; font-size: 13px; font-weight: 500;
+        }
+        .hc-no-results i { font-size: 36px; display: block; margin-bottom: 8px; }
+
+        /* Colapsar help btn en sidebar colapsado */
+        body.sidebar-collapsed .sidebar-help-btn span { display: none; }
+        body.sidebar-collapsed .sidebar-help-btn { justify-content: center; padding: 10px 0; }
+        @media (max-width: 992px) {
+            .sidebar-help-btn span { display: none; }
+            .sidebar-help-btn { justify-content: center; padding: 10px 0; }
+            .hc-drawer { width: 420px; }
+        }
+        @media (max-width: 768px) {
+            body.sidebar-mobile-open .sidebar-help-btn span { display: block; }
+            body.sidebar-mobile-open .sidebar-help-btn { justify-content: flex-start; padding: 10px 14px; }
+            .hc-drawer { width: 100vw; }
+            .hc-modules-grid { grid-template-columns: 1fr; }
+        }
+
+        @keyframes hcFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes hcSlideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
         body.sidebar-collapsed .sidebar {
             width: 80px;
             min-width: 80px;
@@ -1260,6 +1624,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <div class="sidebar-user-role"><?php echo ucfirst($rolUsuario); ?></div>
             </div>
         </a>
+        <!-- Centro de Ayuda -->
+        <button class="sidebar-help-btn" id="helpCenterBtn" onclick="openHelpCenter()" title="Centro de Ayuda">
+            <i class="bi bi-question-circle"></i> <span>Centro de ayuda</span>
+        </button>
         <a href="logout.php" class="sidebar-logout">
             <i class="bi bi-box-arrow-left"></i> <span>Cerrar sesión</span>
         </a>
@@ -1267,6 +1635,279 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
     <!-- Overlay para cerrar sidebar en móvil -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ====== CENTRO DE AYUDA ====== -->
+    <div class="hc-overlay" id="hcOverlay" onclick="closeHelpCenter()"></div>
+    <div class="hc-drawer" id="hcDrawer" role="dialog" aria-modal="true" aria-label="Centro de Ayuda">
+        <!-- Header -->
+        <div class="hc-head">
+            <div class="hc-head-top">
+                <div class="hc-title">
+                    <div class="hc-title-icon"><i class="bi bi-question-circle-fill"></i></div>
+                    <div>
+                        <h2>Centro de Ayuda</h2>
+                        <p>SIGRAT &mdash; Guía de usuario</p>
+                    </div>
+                </div>
+                <button class="hc-close-btn" onclick="closeHelpCenter()" title="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="hc-search-wrap">
+                <i class="bi bi-search hc-search-icon"></i>
+                <input type="text" class="hc-search" id="hcSearch" placeholder="Buscar módulo, función o pregunta..." autocomplete="off">
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="hc-tabs">
+            <button class="hc-tab active" data-panel="hcPanelModules" onclick="switchHcTab(this)">Módulos</button>
+            <button class="hc-tab" data-panel="hcPanelFaq" onclick="switchHcTab(this)">Preguntas frecuentes</button>
+        </div>
+
+        <!-- Body -->
+        <div class="hc-body">
+
+            <!-- Panel: Módulos -->
+            <div class="hc-panel active" id="hcPanelModules">
+                <!-- Vista: lista de módulos (grid) -->
+                <div id="hcModulesList">
+                    <p class="hc-section-title" style="margin-bottom:12px;">Selecciona un módulo para ver su guía</p>
+                    <div class="hc-modules-grid" id="hcModulesGrid"></div>
+                </div>
+                <!-- Vista: detalle de módulo -->
+                <div class="hc-module-detail" id="hcModuleDetail">
+                    <button class="hc-detail-back" onclick="backToModuleList()">
+                        <i class="bi bi-arrow-left"></i> Volver a módulos
+                    </button>
+                    <div id="hcDetailContent"></div>
+                </div>
+            </div>
+
+            <!-- Panel: FAQ -->
+            <div class="hc-panel" id="hcPanelFaq">
+                <p class="hc-section-title" style="margin-bottom:12px;">Preguntas frecuentes</p>
+                <div id="hcFaqList"></div>
+                <div class="hc-no-results" id="hcFaqNoResults" style="display:none;">
+                    <i class="bi bi-search"></i>
+                    No se encontraron resultados para tu búsqueda.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="hc-footer">
+            <a href="manual_usuario.php" target="_blank" class="hc-manual-btn" id="hcManualBtn">
+                <i class="bi bi-file-earmark-text"></i>
+                Ver / Descargar Manual de Usuario (PDF)
+            </a>
+        </div>
+    </div>
+
+    <script>
+    // ====== HELP CENTER ENGINE ====== //
+    let hcData = null;
+    let hcActiveModuleId = null;
+
+    // Mapa de permisos generado desde PHP según el rol y permisos del usuario actual
+    // Cada clave corresponde al campo "permissionKey" en help_center.json
+    // Módulos sin clave (Dashboard, Calendario) son siempre visibles
+    const HC_USER_PERMISSIONS = {
+        'Usuarios':     <?php echo hasPermission('Usuarios')    ? 'true' : 'false'; ?>,
+        'Espacios':     <?php echo hasPermission('Espacios')    ? 'true' : 'false'; ?>,
+        'Aprobaciones': <?php echo hasPermission('Aprobaciones')? 'true' : 'false'; ?>,
+        'Prestamos':    <?php echo hasPermission('Prestamos')   ? 'true' : 'false'; ?>,
+        'Inventario':   <?php echo hasPermission('Inventario')  ? 'true' : 'false'; ?>,
+        'Auditorias':   <?php echo hasPermission('Auditorias')  ? 'true' : 'false'; ?>,
+        'RFID':         <?php echo hasPermission('RFID')        ? 'true' : 'false'; ?>
+    };
+
+    /**
+     * Filtra un array de módulos según los permisos del usuario.
+     * Un módulo sin campo "permissionKey" se considera de acceso libre (Dashboard, Calendario).
+     */
+    function filterModulesByPermission(modules) {
+        return modules.filter(mod => {
+            if (!mod.permissionKey) return true; // Acceso libre
+            return HC_USER_PERMISSIONS[mod.permissionKey] === true;
+        });
+    }
+
+    function openHelpCenter() {
+        document.getElementById('hcOverlay').classList.add('open');
+        document.getElementById('hcDrawer').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('hcSearch').focus();
+        if (!hcData) loadHelpData();
+    }
+
+    function closeHelpCenter() {
+        document.getElementById('hcOverlay').classList.remove('open');
+        document.getElementById('hcDrawer').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function loadHelpData() {
+        fetch('assets/data/help_center.json')
+            .then(r => r.json())
+            .then(data => {
+                hcData = data;
+                // Filtrar módulos según permisos antes de renderizar
+                const allowedModules = filterModulesByPermission(data.modules);
+                renderModulesGrid(allowedModules);
+                renderFaq(data.faq);
+            })
+            .catch(() => {
+                document.getElementById('hcModulesGrid').innerHTML = '<p style="color:#94a3b8;font-size:13px;">No se pudo cargar el contenido. Intenta de nuevo.</p>';
+            });
+    }
+
+    function renderModulesGrid(modules) {
+        const grid = document.getElementById('hcModulesGrid');
+        grid.innerHTML = '';
+        if (!modules.length) {
+            grid.innerHTML = '<div class="hc-no-results"><i class="bi bi-search"></i>Sin resultados para tu búsqueda.</div>';
+            return;
+        }
+        modules.forEach(mod => {
+            const card = document.createElement('button');
+            card.className = 'hc-module-card';
+            card.setAttribute('data-id', mod.id);
+            card.innerHTML = `
+                <div class="hc-mod-icon" style="background:${mod.color}">
+                    <i class="bi ${mod.icon}"></i>
+                </div>
+                <div style="min-width:0;flex:1;">
+                    <div class="hc-mod-name">${mod.name}</div>
+                </div>
+                <i class="bi bi-chevron-right" style="font-size:12px;color:#94a3b8;flex-shrink:0;"></i>
+            `;
+            card.addEventListener('click', () => showModuleDetail(mod));
+            grid.appendChild(card);
+        });
+    }
+
+    function showModuleDetail(mod) {
+        hcActiveModuleId = mod.id;
+        document.getElementById('hcModulesList').style.display = 'none';
+        const detail = document.getElementById('hcModuleDetail');
+        detail.classList.add('visible');
+
+        const funcsHtml = mod.functions.map(f => `<li>${f}</li>`).join('');
+        const tipsHtml = mod.tips.map(t => `<div class="hc-tip-item"><i class="bi bi-lightbulb"></i><span>${t}</span></div>`).join('');
+
+        document.getElementById('hcDetailContent').innerHTML = `
+            <div class="hc-detail-header">
+                <div class="hc-detail-icon" style="background:${mod.color}">
+                    <i class="bi ${mod.icon}"></i>
+                </div>
+                <div>
+                    <h3>${mod.name}</h3>
+                    <p>${mod.description}</p>
+                </div>
+            </div>
+            <p class="hc-section-title">Funciones principales</p>
+            <ul class="hc-func-list">${funcsHtml}</ul>
+            <p class="hc-section-title">Consejos de uso</p>
+            <div class="hc-tips-list">${tipsHtml}</div>
+        `;
+        document.querySelector('.hc-body').scrollTop = 0;
+    }
+
+    function backToModuleList() {
+        hcActiveModuleId = null;
+        document.getElementById('hcModulesList').style.display = '';
+        document.getElementById('hcModuleDetail').classList.remove('visible');
+        document.querySelector('.hc-body').scrollTop = 0;
+    }
+
+    function renderFaq(faqs) {
+        const list = document.getElementById('hcFaqList');
+        list.innerHTML = '';
+        faqs.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'hc-faq-item';
+            div.setAttribute('data-question', item.question.toLowerCase());
+            div.setAttribute('data-answer', item.answer.toLowerCase());
+            div.innerHTML = `
+                <div class="hc-faq-q" onclick="toggleFaq(this.parentElement)">
+                    <span>${item.question}</span>
+                    <i class="bi bi-chevron-down hc-faq-chevron"></i>
+                </div>
+                <div class="hc-faq-a">${item.answer}</div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function toggleFaq(item) {
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.hc-faq-item').forEach(el => el.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+    }
+
+    function switchHcTab(btn) {
+        document.querySelectorAll('.hc-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.hc-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.getAttribute('data-panel')).classList.add('active');
+        document.getElementById('hcSearch').value = '';
+        if (hcData) {
+            renderModulesGrid(hcData.modules);
+            renderFaq(hcData.faq);
+            backToModuleList();
+        }
+    }
+
+    // Buscador en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('hcSearch');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            if (!hcData) return;
+
+            // Si estamos viendo el detalle, volver al grid
+            backToModuleList();
+
+            // Detectar panel activo
+            const modulesPanelActive = document.getElementById('hcPanelModules').classList.contains('active');
+
+            if (modulesPanelActive) {
+                // Siempre partir de los módulos a los que tiene permiso el usuario
+                const allowed = filterModulesByPermission(hcData.modules);
+                if (!q) { renderModulesGrid(allowed); return; }
+                const filtered = allowed.filter(m =>
+                    m.name.toLowerCase().includes(q) ||
+                    m.description.toLowerCase().includes(q) ||
+                    m.functions.some(f => f.toLowerCase().includes(q)) ||
+                    m.tips.some(t => t.toLowerCase().includes(q))
+                );
+                renderModulesGrid(filtered);
+            } else {
+                // FAQ panel
+                const items = document.querySelectorAll('.hc-faq-item');
+                let visible = 0;
+                items.forEach(item => {
+                    const match = !q ||
+                        item.getAttribute('data-question').includes(q) ||
+                        item.getAttribute('data-answer').includes(q);
+                    item.style.display = match ? '' : 'none';
+                    if (match) visible++;
+                });
+                document.getElementById('hcFaqNoResults').style.display = visible === 0 ? 'block' : 'none';
+            }
+        });
+
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('hcDrawer').classList.contains('open')) {
+                closeHelpCenter();
+            }
+        });
+    });
+    </script>
 
     <div class="main-container">
         <header class="top-bar">
