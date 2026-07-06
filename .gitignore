@@ -16,3 +16,7 @@ Desktop.ini
 # Logs
 *.log
 backend/api/*.log
+
+# Documentación confidencial y reportes de seguridad interna (Solo entorno local)
+Documentacion/blindaje_seguridad_omnistack.md
+Documentacion/inmunidad_sqli_y_reglas_mantenimiento.md
