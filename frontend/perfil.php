@@ -80,6 +80,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// Manejar POST (Cambiar Contraseña)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_password') {
+    $actual        = $_POST['contrasena_actual']  ?? '';
+    $nueva         = $_POST['contrasena_nueva']   ?? '';
+    $confirmacion  = $_POST['contrasena_confirm'] ?? '';
+
+    // Obtener hash actual de la BD
+    $stmtHash = $db->prepare("SELECT contrasena FROM USUARIO WHERE us_id = ?");
+    $stmtHash->execute([$us_id]);
+    $hashActual = $stmtHash->fetchColumn();
+
+    if (empty($actual) || empty($nueva) || empty($confirmacion)) {
+        $pwError = "Todos los campos son obligatorios.";
+    } elseif (!\Controllers\AuthController::verifyPassword($actual, $hashActual)) {
+        $pwError = "La contraseña actual no es correcta.";
+    } elseif (strlen($nueva) < 6) {
+        $pwError = "La nueva contraseña debe tener al menos 6 caracteres.";
+    } elseif ($nueva !== $confirmacion) {
+        $pwError = "La nueva contraseña y su confirmación no coinciden.";
+    } elseif (\Controllers\AuthController::verifyPassword($nueva, $hashActual)) {
+        $pwError = "La nueva contraseña no puede ser igual a la actual.";
+    } else {
+        $nuevoHash = \Controllers\AuthController::hashPassword($nueva);
+        $stmtUpd   = $db->prepare("UPDATE USUARIO SET contrasena = ? WHERE us_id = ?");
+        $stmtUpd->execute([$nuevoHash, $us_id]);
+        header("Location: perfil.php?pwok=1");
+        exit();
+    }
+}
+
 // Recargar datos frescos siempre
 $usuarioInfo = getUsuario($db, $us_id);
 
@@ -109,12 +139,17 @@ include 'header.php';
 
 <!-- Mensajes -->
 <?php if (isset($_GET['ok'])): ?>
-<div style="background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 12px 20px; border-radius: 10px; margin-bottom: 24px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 10px;">
-    <i class="bi bi-check-circle-fill" style="font-size: 16px;"></i> Perfil actualizado correctamente.
+<div style="background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;padding:12px 20px;border-radius:10px;margin-bottom:24px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px;">
+    <i class="bi bi-check-circle-fill" style="font-size:16px;"></i> Perfil actualizado correctamente.
+</div>
+<?php endif; ?>
+<?php if (isset($_GET['pwok'])): ?>
+<div style="background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;padding:12px 20px;border-radius:10px;margin-bottom:24px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px;">
+    <i class="bi bi-check-circle-fill" style="font-size:16px;"></i> Contraseña actualizada correctamente.
 </div>
 <?php endif; ?>
 <?php if (isset($error)): ?>
-<div style="background: #fef2f2; border: 1px solid #f87171; color: #b91c1c; padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 10px;">
+<div style="background:#fef2f2;border:1px solid #f87171;color:#b91c1c;padding:12px 16px;border-radius:8px;margin-bottom:24px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px;">
     <i class="bi bi-exclamation-triangle-fill"></i> <?php echo htmlspecialchars($error); ?>
 </div>
 <?php endif; ?>
@@ -269,5 +304,127 @@ include 'header.php';
     </div>
 
 </div>
+
+<!-- ====== CAMBIAR CONTRASEÑA ====== -->
+<div class="card" style="padding:32px; margin-top:24px;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:22px;">
+            <i class="bi bi-shield-lock"></i>
+        </div>
+        <div>
+            <h3 style="font-size:18px;font-weight:800;color:#1e293b;margin-bottom:2px;">Cambiar contraseña</h3>
+            <p style="font-size:12px;color:#64748b;font-weight:500;margin:0;">Disponible para todos los usuarios independientemente del rol</p>
+        </div>
+    </div>
+
+    <?php if (isset($pwError)): ?>
+    <div style="background:#fef2f2;border:1px solid #f87171;color:#b91c1c;padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px;">
+        <i class="bi bi-exclamation-triangle-fill"></i> <?php echo htmlspecialchars($pwError); ?>
+    </div>
+    <?php endif; ?>
+
+    <form method="POST" id="formCambiarPassword">
+        <input type="hidden" name="action" value="change_password">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+
+            <!-- Contraseña actual -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Contraseña actual</label>
+                <div style="position:relative;">
+                    <input type="password" name="contrasena_actual" id="pwActual" class="form-control" style="background:white;padding-right:42px;" placeholder="••••••••" required>
+                    <button type="button" onclick="togglePw('pwActual','eyeActual')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
+                        <i class="bi bi-eye" id="eyeActual"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nueva contraseña -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Nueva contraseña</label>
+                <div style="position:relative;">
+                    <input type="password" name="contrasena_nueva" id="pwNueva" class="form-control" style="background:white;padding-right:42px;" placeholder="Mín. 6 caracteres" required minlength="6" oninput="checkPwStrength(this.value)">
+                    <button type="button" onclick="togglePw('pwNueva','eyeNueva')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
+                        <i class="bi bi-eye" id="eyeNueva"></i>
+                    </button>
+                </div>
+                <!-- Barra de fortaleza -->
+                <div style="margin-top:6px;height:4px;border-radius:4px;background:#e2e8f0;overflow:hidden;">
+                    <div id="pwStrengthBar" style="height:100%;width:0%;border-radius:4px;transition:width 0.3s,background 0.3s;"></div>
+                </div>
+                <div id="pwStrengthLabel" style="font-size:10px;color:#94a3b8;margin-top:3px;"></div>
+            </div>
+
+            <!-- Confirmar contraseña -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Confirmar contraseña</label>
+                <div style="position:relative;">
+                    <input type="password" name="contrasena_confirm" id="pwConfirm" class="form-control" style="background:white;padding-right:42px;" placeholder="Repite la contraseña" required oninput="checkMatch()">
+                    <button type="button" onclick="togglePw('pwConfirm','eyeConfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
+                        <i class="bi bi-eye" id="eyeConfirm"></i>
+                    </button>
+                </div>
+                <div id="matchLabel" style="font-size:10px;margin-top:3px;"></div>
+            </div>
+
+        </div>
+
+        <div style="margin-top:28px;display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:12px 32px;font-size:14px;border-radius:8px;display:flex;align-items:center;gap:8px;">
+                <i class="bi bi-shield-check"></i> Actualizar contraseña
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function togglePw(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+
+function checkPwStrength(val) {
+    const bar   = document.getElementById('pwStrengthBar');
+    const label = document.getElementById('pwStrengthLabel');
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+        { pct: '20%', color: '#ef4444', text: 'Muy débil' },
+        { pct: '40%', color: '#f97316', text: 'Débil'    },
+        { pct: '60%', color: '#eab308', text: 'Regular'   },
+        { pct: '80%', color: '#22c55e', text: 'Fuerte'    },
+        { pct: '100%',color: '#16a34a', text: 'Muy fuerte'},
+    ];
+    const lvl = levels[Math.max(0, score - 1)] || levels[0];
+    bar.style.width     = val.length ? lvl.pct   : '0%';
+    bar.style.background= val.length ? lvl.color : 'transparent';
+    label.textContent   = val.length ? lvl.text  : '';
+    label.style.color   = val.length ? lvl.color : '#94a3b8';
+}
+
+function checkMatch() {
+    const nueva    = document.getElementById('pwNueva').value;
+    const confirm  = document.getElementById('pwConfirm').value;
+    const lbl      = document.getElementById('matchLabel');
+    if (!confirm) { lbl.textContent = ''; return; }
+    if (nueva === confirm) {
+        lbl.textContent = '✓ Las contraseñas coinciden';
+        lbl.style.color = '#16a34a';
+    } else {
+        lbl.textContent = '✗ No coinciden';
+        lbl.style.color = '#ef4444';
+    }
+}
+</script>
 
 <?php include 'footer.php'; ?>
