@@ -720,6 +720,241 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         /* Colapsar help btn en sidebar colapsado */
         body.sidebar-collapsed .sidebar-help-btn span { display: none; }
         body.sidebar-collapsed .sidebar-help-btn { justify-content: center; padding: 10px 0; }
+
+        /* ==================== ABOUT SIGRAT ==================== */
+        .sidebar-version-btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; margin: 0 12px 4px 12px;
+            padding: 5px 10px; border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.35);
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .sidebar-version-btn:hover {
+            background: rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.65);
+            border-color: rgba(255,255,255,0.20);
+        }
+        body.sidebar-collapsed .sidebar-version-btn span { display: none; }
+        body.sidebar-collapsed .sidebar-version-btn { padding: 5px 0; margin: 0 0 4px 0; width: 100%; border-radius: 0; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
+        @media (max-width: 992px) {
+            .sidebar-version-btn span { display: none; }
+            .sidebar-version-btn { padding: 5px 0; margin: 0 0 4px 0; width: 100%; border-radius: 0; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
+        }
+        @media (max-width: 768px) {
+            body.sidebar-mobile-open .sidebar-version-btn span { display: inline; }
+            body.sidebar-mobile-open .sidebar-version-btn { padding: 5px 10px; margin: 0 12px 4px 12px; width: auto; border-radius: 20px; border: 1px solid rgba(255,255,255,0.10); }
+        }
+
+        /* About modal overlay */
+        .about-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .about-overlay.open { opacity: 1; pointer-events: all; }
+
+        /* About modal box */
+        .about-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -48%) scale(0.97);
+            width: 520px; max-width: calc(100vw - 32px);
+            max-height: 90vh; overflow-y: auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.20);
+            z-index: 9999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s, transform 0.25s;
+        }
+        .about-modal.open {
+            opacity: 1; pointer-events: all;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* About modal header */
+        .about-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
+            padding: 32px 28px 28px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+        }
+        .about-close {
+            position: absolute; top: 14px; right: 14px;
+            background: rgba(255,255,255,0.12); border: none;
+            color: rgba(255,255,255,0.75);
+            width: 30px; height: 30px; border-radius: 8px;
+            font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .about-close:hover { background: rgba(255,255,255,0.22); color: white; }
+        .about-logo-ring {
+            width: 72px; height: 72px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.20);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .about-logo-ring img { width: 44px; height: 44px; object-fit: contain; filter: brightness(0) invert(1); }
+        .about-logo-ring-text { font-size: 28px; font-weight: 900; color: white; letter-spacing: -1px; }
+        .about-header h2 {
+            font-size: 22px; font-weight: 900; color: white;
+            letter-spacing: -0.5px; margin-bottom: 5px;
+        }
+        .about-header p {
+            font-size: 11px; color: rgba(255,255,255,0.55);
+            font-weight: 500; line-height: 1.5; max-width: 340px; margin: 0 auto 16px;
+        }
+        .about-version-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.20);
+            color: rgba(255,255,255,0.80);
+            padding: 4px 14px; border-radius: 20px;
+            font-size: 10px; font-weight: 800;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* About modal body */
+        .about-body { padding: 24px 28px; }
+        .about-section-label {
+            font-size: 9px; font-weight: 800; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 12px; display: block;
+        }
+        .about-period {
+            background: #eff6ff; border: 1px solid #bfdbfe;
+            border-left: 3px solid #2563eb;
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 12px; font-weight: 600; color: #1d4ed8;
+            margin-bottom: 20px; line-height: 1.5;
+        }
+
+        /* Team groups */
+        .about-teams { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .about-team-group {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px; overflow: hidden;
+        }
+        .about-team-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .about-team-badge {
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; padding: 3px 10px; border-radius: 20px;
+        }
+        .about-team-badge.frontend  { background: #eff6ff; color: #1d4ed8; }
+        .about-team-badge.backend   { background: #f0fdf4; color: #15803d; }
+        .about-team-badge.backend2  { background: #faf5ff; color: #7e22ce; }
+        .about-team-label {
+            font-size: 11px; font-weight: 700; color: #64748b;
+        }
+        .about-team-members { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
+        .about-team-member {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .about-dev-avatar {
+            width: 28px; height: 28px; border-radius: 8px;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white; font-size: 9px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; letter-spacing: 0.3px;
+        }
+        .about-team-member-name {
+            font-size: 12px; font-weight: 600; color: #334155;
+        }
+        .about-collab-note {
+            font-size: 11px; color: #64748b; font-weight: 500;
+            line-height: 1.6; padding: 10px 14px;
+            background: #f8fafc; border-radius: 8px;
+            border: 1px solid #f1f5f9;
+            margin-bottom: 4px;
+        }
+
+        /* About footer */
+        .about-footer {
+            border-top: 1px solid #f1f5f9;
+            padding: 14px 28px;
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 0 0 20px 20px;
+        }
+        .about-footer p { font-size: 11px; color: #94a3b8; font-weight: 500; }
+        .about-footer strong { color: #64748b; }
+
+        /* ====== LOGOUT CONFIRMATION MODAL ====== */
+        .logout-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,23,42,0.45); backdrop-filter: blur(3px);
+            z-index: 4000;
+        }
+        .logout-overlay.open { display: block; }
+        .logout-modal {
+            display: none; position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -48%);
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(15,23,42,0.18);
+            padding: 32px 28px 24px;
+            width: 340px; max-width: calc(100vw - 32px);
+            z-index: 4001; text-align: center;
+            animation: logoutPop 0.22s cubic-bezier(.34,1.56,.64,1) forwards;
+        }
+        .logout-modal.open { display: block; }
+        @keyframes logoutPop {
+            from { opacity: 0; transform: translate(-50%, -44%) scale(0.94); }
+            to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .logout-icon-wrap {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: #fee2e2;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .logout-icon-wrap i { font-size: 22px; color: #dc2626; }
+        .logout-title {
+            font-size: 16px; font-weight: 800; color: #0f172a;
+            margin-bottom: 8px;
+        }
+        .logout-msg {
+            font-size: 13px; color: #64748b; line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .logout-actions {
+            display: flex; gap: 10px;
+        }
+        .logout-btn-cancel {
+            flex: 1; padding: 10px;
+            background: #f1f5f9; color: #475569;
+            border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: background 0.15s;
+        }
+        .logout-btn-cancel:hover { background: #e2e8f0; }
+        .logout-btn-confirm {
+            flex: 1; padding: 10px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white; border-radius: 10px;
+            font-size: 13px; font-weight: 700;
+            text-decoration: none;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: opacity 0.15s;
+        }
+        .logout-btn-confirm:hover { opacity: 0.88; }
         @media (max-width: 992px) {
             .sidebar-help-btn span { display: none; }
             .sidebar-help-btn { justify-content: center; padding: 10px 0; }
@@ -1628,13 +1863,135 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         <button class="sidebar-help-btn" id="helpCenterBtn" onclick="openHelpCenter()" title="Centro de Ayuda">
             <i class="bi bi-question-circle"></i> <span>Centro de ayuda</span>
         </button>
-        <a href="logout.php" class="sidebar-logout">
+        <!-- Versión / Acerca de -->
+        <button class="sidebar-version-btn" onclick="openAbout()" title="Acerca de SIGRAT">
+            <i class="bi bi-info-circle" style="font-size:11px;"></i>
+            <span>SIGRAT &nbsp;v1.0</span>
+        </button>
+        <a href="#" class="sidebar-logout" onclick="openLogoutConfirm(); return false;">
             <i class="bi bi-box-arrow-left"></i> <span>Cerrar sesión</span>
         </a>
     </aside>
 
     <!-- Overlay para cerrar sidebar en móvil -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ====== CERRAR SESIÓN: CONFIRMACIÓN ====== -->
+    <div class="logout-overlay" id="logoutOverlay" onclick="closeLogoutConfirm()"></div>
+    <div class="logout-modal" id="logoutModal" role="dialog" aria-modal="true" aria-label="Confirmar cierre de sesión">
+        <div class="logout-icon-wrap">
+            <i class="bi bi-box-arrow-left"></i>
+        </div>
+        <h3 class="logout-title">Cerrar sesión</h3>
+        <p class="logout-msg">¿Deseas cerrar tu sesión actual?<br>Tendrás que iniciar sesión nuevamente para acceder al sistema.</p>
+        <div class="logout-actions">
+            <button class="logout-btn-cancel" onclick="closeLogoutConfirm()">Cancelar</button>
+            <a href="logout.php" class="logout-btn-confirm"><i class="bi bi-box-arrow-left"></i> Cerrar sesión</a>
+        </div>
+    </div>
+
+    <!-- ====== ACERCA DE SIGRAT ====== -->
+    <div class="about-overlay" id="aboutOverlay" onclick="closeAbout()"></div>
+    <div class="about-modal" id="aboutModal" role="dialog" aria-modal="true" aria-label="Acerca de SIGRAT">
+        <!-- Header -->
+        <div class="about-header">
+            <button class="about-close" onclick="closeAbout()" title="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="about-logo-ring">
+                <?php if (file_exists(__DIR__ . '/assets/images/sigrat_logo.png')): ?>
+                    <img src="assets/images/sigrat_logo.png" alt="SIGRAT">
+                <?php else: ?>
+                    <div class="about-logo-ring-text">S</div>
+                <?php endif; ?>
+            </div>
+            <h2>SIGRAT</h2>
+            <p>Sistema Integral de Gestión de Recursos<br>y Actividades Tecnológicas</p>
+            <span class="about-version-badge">Versión 1.0 &nbsp;&middot;&nbsp; 2026</span>
+        </div>
+        <!-- Body -->
+        <div class="about-body">
+            <div class="about-period">
+                Desarrollado durante el <strong>período de Estadías Profesionales 2026</strong>,
+                como proyecto integrador del programa educativo de Técnico Superior Universitario
+                en Tecnologías de la Información e Innovación Digital dentro de la
+                <strong>Universidad Tecnológica de Querétaro (UTEQ)</strong>.
+            </div>
+            <span class="about-section-label">Distribución del equipo</span>
+            <div class="about-teams">
+
+                <!-- Frontend -->
+                <div class="about-team-group">
+                    <div class="about-team-header">
+                        <span class="about-team-badge frontend">Frontend</span>
+                        <span class="about-team-label">Interfaz de usuario y experiencia visual</span>
+                    </div>
+                    <div class="about-team-members">
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">COM</div>
+                            <span class="about-team-member-name">Cesar Oswaldo Medina Ornelas</span>
+                        </div>
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">LEB</div>
+                            <span class="about-team-member-name">Laura Michelle Escamilla Barrera</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend principal -->
+                <div class="about-team-group">
+                    <div class="about-team-header">
+                        <span class="about-team-badge backend">Backend</span>
+                        <span class="about-team-label">Lógica del sistema y servicios principales</span>
+                    </div>
+                    <div class="about-team-members">
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">DPM</div>
+                            <span class="about-team-member-name">Diego Pérez Mendoza</span>
+                        </div>
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">FJA</div>
+                            <span class="about-team-member-name">Fernando Jimenez Angeles</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend e integración -->
+                <div class="about-team-group">
+                    <div class="about-team-header">
+                        <span class="about-team-badge backend2">Backend &amp; Integración</span>
+                        <span class="about-team-label">Módulos, RFID, reportes y pruebas</span>
+                    </div>
+                    <div class="about-team-members">
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">LVS</div>
+                            <span class="about-team-member-name">Leonardo Abraham Valencia Sanchez</span>
+                        </div>
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">JNM</div>
+                            <span class="about-team-member-name">Jonathan Brandon Nava Morales</span>
+                        </div>
+                        <div class="about-team-member">
+                            <div class="about-dev-avatar">KCH</div>
+                            <span class="about-team-member-name">Kevin Cruz Hernández</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <p class="about-collab-note">
+                El proyecto se desarrolló mediante una distribución colaborativa de responsabilidades.
+                El equipo de Frontend estuvo encargado del diseño e implementación de la interfaz de usuario,
+                mientras que los equipos de Backend se enfocaron en la lógica del sistema,
+                la integración de funcionalidades, la base de datos y los servicios internos.
+            </p>
+        </div>
+        <!-- Footer -->
+        <div class="about-footer">
+            <p>&copy; 2026 <strong>SIGRAT</strong> &mdash; Todos los derechos reservados</p>
+            <p style="margin-top:3px;">Desarrollado con dedicación para la institución</p>
+        </div>
+    </div>
 
     <!-- ====== CENTRO DE AYUDA ====== -->
     <div class="hc-overlay" id="hcOverlay" onclick="closeHelpCenter()"></div>
@@ -1704,6 +2061,40 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             </a>
         </div>
     </div>
+
+    <script>
+    // ====== CERRAR SESIÓN: CONFIRMACIÓN ====== //
+    function openLogoutConfirm() {
+        document.getElementById('logoutOverlay').classList.add('open');
+        document.getElementById('logoutModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLogoutConfirm() {
+        document.getElementById('logoutOverlay').classList.remove('open');
+        document.getElementById('logoutModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // ====== ACERCA DE SIGRAT ====== //
+    function openAbout() {
+        document.getElementById('aboutOverlay').classList.add('open');
+        document.getElementById('aboutModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeAbout() {
+        document.getElementById('aboutOverlay').classList.remove('open');
+        document.getElementById('aboutModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // ESC cierra cualquier modal activo
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('logoutModal').classList.contains('open')) closeLogoutConfirm();
+            if (document.getElementById('aboutModal').classList.contains('open')) closeAbout();
+        }
+    });
+    </script>
 
     <script>
     // ====== HELP CENTER ENGINE ====== //

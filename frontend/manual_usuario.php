@@ -12,8 +12,11 @@ $fechaGeneracion = date('d/m/Y');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manual de Usuario — SIGRAT</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
 
         :root {
             --blue-dark:  #1e3a8a;
@@ -116,19 +119,43 @@ $fechaGeneracion = date('d/m/Y');
         .toc-list { list-style: none; }
         .toc-row {
             display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; padding: 9px 0;
+            gap: 10px; padding: 0;
             border-bottom: 1px dashed var(--gray-300);
         }
         .toc-row:last-child { border-bottom: none; }
-        .toc-left { display: flex; align-items: center; gap: 12px; }
-        .toc-num {
-            width: 26px; height: 26px; border-radius: 7px;
-            background: var(--blue-light); color: var(--blue);
-            font-size: 11px; font-weight: 800;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        .toc-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .toc-icon {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--blue-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--blue); font-size: 13px;
+            transition: background 0.2s, color 0.2s;
         }
-        .toc-name { font-size: 13.5px; font-weight: 600; color: var(--gray-900); }
-        .toc-page { font-size: 11px; color: var(--gray-500); font-weight: 600; }
+        .toc-num-badge {
+            width: 20px; height: 20px; border-radius: 6px;
+            background: var(--gray-200); color: var(--gray-500);
+            font-size: 10px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s, color 0.2s;
+        }
+        .toc-link {
+            flex: 1; display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 0; text-decoration: none;
+            gap: 10px;
+            transition: color 0.2s;
+        }
+        .toc-link:hover .toc-name { color: var(--blue); }
+        .toc-row:hover .toc-icon { background: var(--blue); color: white; }
+        .toc-row:hover .toc-num-badge { background: var(--blue-light); color: var(--blue); }
+        .toc-name {
+            font-size: 13.5px; font-weight: 600; color: var(--gray-900);
+            transition: color 0.2s;
+        }
+        .toc-section-num {
+            font-size: 10px; color: var(--gray-500); font-weight: 700;
+            white-space: nowrap; letter-spacing: 0.3px;
+        }
 
         /* ===================== SECCIONES ===================== */
         .section { page-break-before: always; padding-top: 64px; }
@@ -227,6 +254,25 @@ $fechaGeneracion = date('d/m/Y');
         .badge-blue   { background: #dbeafe; color: #1d4ed8; }
         .badge-red    { background: #fee2e2; color: #991b1b; }
 
+        /* ===================== BOTÓN VOLVER AL ÍNDICE ===================== */
+        .back-to-index {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 32px;
+            padding: 7px 16px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 11px; font-weight: 700; color: var(--gray-500);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .back-to-index:hover {
+            background: var(--blue-light);
+            color: var(--blue);
+            border-color: #bfdbfe;
+        }
+        .back-to-index i { font-size: 12px; }
+
         /* ===================== PIE DE PAGINA ===================== */
         footer.doc-footer {
             border-top: 1px solid var(--gray-300);
@@ -266,9 +312,25 @@ $fechaGeneracion = date('d/m/Y');
         }
         .main-doc { padding-top: 60px; }
 
+        /* ===================== OPTIMIZACIÓN PARA IMPRESIÓN ===================== */
         @media print {
+            html { scroll-behavior: auto; }
             .action-bar { display: none !important; }
+            .back-to-index { display: none !important; }
             .main-doc { padding-top: 0; }
+            .toc-link { color: inherit; text-decoration: none; }
+            .toc-row:hover .toc-icon { background: var(--blue-light); color: var(--blue); }
+            .section { page-break-before: always; break-before: page; }
+            .data-table { page-break-inside: avoid; break-inside: avoid; }
+            .tip-box, .info-box, .success-box { page-break-inside: avoid; break-inside: avoid; }
+            a[href]::after { content: none !important; }
+            @page {
+                margin: 2cm 2.2cm;
+                size: A4 portrait;
+            }
+            @page :first {
+                margin: 0;
+            }
         }
     </style>
 </head>
@@ -277,8 +339,8 @@ $fechaGeneracion = date('d/m/Y');
     <div class="action-bar">
         <div class="action-bar-brand"><span>SIGRAT</span> &mdash; Manual de Usuario</div>
         <div class="action-bar-btns">
-            <a href="javascript:window.close()" class="btn-back">&#8592; Cerrar</a>
-            <button class="btn-print" onclick="window.print()">Guardar / Imprimir como PDF</button>
+            <a href="javascript:window.close()" class="btn-back"><i class="bi bi-arrow-left"></i> Cerrar</a>
+            <button class="btn-print" onclick="window.print()"><i class="bi bi-file-earmark-pdf"></i> Exportar Manual a PDF</button>
         </div>
     </div>
 
@@ -315,27 +377,158 @@ $fechaGeneracion = date('d/m/Y');
         <div class="content-wrap">
 
             <!-- ÍNDICE -->
-            <div class="toc">
+            <div class="toc" id="toc">
                 <div class="toc-heading">Tabla de Contenidos</div>
                 <div class="toc-rule"></div>
                 <ul class="toc-list">
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">1</div><span class="toc-name">Introducción al Sistema</span></div><span class="toc-page">3</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">2</div><span class="toc-name">Acceso y Sesión</span></div><span class="toc-page">4</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">3</div><span class="toc-name">Dashboard — Pantalla Principal</span></div><span class="toc-page">5</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">4</div><span class="toc-name">Módulo de Calendario</span></div><span class="toc-page">6</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">5</div><span class="toc-name">Gestión de Usuarios</span></div><span class="toc-page">7</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">6</div><span class="toc-name">Módulo de Espacios</span></div><span class="toc-page">8</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">7</div><span class="toc-name">Aprobaciones de Reservas</span></div><span class="toc-page">9</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">8</div><span class="toc-name">Módulo de Préstamos</span></div><span class="toc-page">10</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">9</div><span class="toc-name">Inventario de Activos</span></div><span class="toc-page">11</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">10</div><span class="toc-name">Módulo de Auditoría</span></div><span class="toc-page">12</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">11</div><span class="toc-name">Monitor RFID</span></div><span class="toc-page">13</span></div></li>
-                    <li><div class="toc-row"><div class="toc-left"><div class="toc-num">12</div><span class="toc-name">Preguntas Frecuentes</span></div><span class="toc-page">14</span></div></li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-info-circle-fill"></i></div>
+                                <a class="toc-link" href="#sec-intro">
+                                    <span class="toc-name">Introducción al Sistema</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">1</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                                <a class="toc-link" href="#sec-acceso">
+                                    <span class="toc-name">Acceso y Sesión</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">2</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-grid-1x2-fill"></i></div>
+                                <a class="toc-link" href="#sec-dashboard">
+                                    <span class="toc-name">Dashboard &mdash; Pantalla Principal</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">3</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-calendar3"></i></div>
+                                <a class="toc-link" href="#sec-calendario">
+                                    <span class="toc-name">Módulo de Calendario</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">4</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-people-fill"></i></div>
+                                <a class="toc-link" href="#sec-usuarios">
+                                    <span class="toc-name">Gestión de Usuarios</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">5</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                                <a class="toc-link" href="#sec-espacios">
+                                    <span class="toc-name">Módulo de Espacios</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">6</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-check2-square"></i></div>
+                                <a class="toc-link" href="#sec-aprobaciones">
+                                    <span class="toc-name">Aprobaciones de Reservas</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">7</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-arrow-left-right"></i></div>
+                                <a class="toc-link" href="#sec-prestamos">
+                                    <span class="toc-name">Módulo de Préstamos</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">8</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-box-seam-fill"></i></div>
+                                <a class="toc-link" href="#sec-inventario">
+                                    <span class="toc-name">Inventario de Activos</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">9</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-activity"></i></div>
+                                <a class="toc-link" href="#sec-auditoria">
+                                    <span class="toc-name">Módulo de Auditoría</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">10</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-broadcast"></i></div>
+                                <a class="toc-link" href="#sec-rfid">
+                                    <span class="toc-name">Monitor RFID</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">11</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-question-circle-fill"></i></div>
+                                <a class="toc-link" href="#sec-faq">
+                                    <span class="toc-name">Preguntas Frecuentes</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">12</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="toc-row">
+                            <div class="toc-left">
+                                <div class="toc-icon"><i class="bi bi-person-lines-fill"></i></div>
+                                <a class="toc-link" href="#sec-creditos">
+                                    <span class="toc-name">Equipo de Desarrollo</span>
+                                </a>
+                            </div>
+                            <div class="toc-num-badge">13</div>
+                        </div>
+                    </li>
                 </ul>
             </div>
 
             <!-- 1. INTRODUCCIÓN -->
-            <div class="section">
+            <div class="section" id="sec-intro">
                 <span class="section-label">Sección 1</span>
                 <h2 class="section-title">Introducción al Sistema</h2>
                 <p class="section-intro">
@@ -357,10 +550,11 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div><strong>Auditoría</strong> — Trazabilidad, reportes y análisis del sistema.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>Monitor RFID</strong> — Integración con lectores de tarjetas físicos.</div></li>
                 </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 2. ACCESO -->
-            <div class="section">
+            <div class="section" id="sec-acceso">
                 <span class="section-label">Sección 2</span>
                 <h2 class="section-title">Acceso y Sesión</h2>
                 <p class="section-intro">Para ingresar al sistema, el administrador debe proporcionarte tus credenciales: correo electrónico y contraseña. En el primer acceso, se utiliza una contraseña temporal que deberás cambiar de inmediato.</p>
@@ -381,10 +575,11 @@ $fechaGeneracion = date('d/m/Y');
                         Usa siempre el botón "Cerrar Sesión" del menú lateral para salir de forma segura y evitar que alguien más acceda a tu cuenta.
                     </div>
                 </div>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 3. DASHBOARD -->
-            <div class="section">
+            <div class="section" id="sec-dashboard">
                 <span class="section-label">Sección 3</span>
                 <h2 class="section-title">Dashboard — Pantalla Principal</h2>
                 <p class="section-intro">El Dashboard es el punto de partida del sistema. Muestra un resumen ejecutivo del estado actual en tiempo real, con acceso directo a las principales funciones.</p>
@@ -395,10 +590,11 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div><strong>Menú lateral</strong> — Navegación rápida hacia todos los módulos disponibles según tu rol.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>Centro de Ayuda</strong> — Botón de signo de interrogación en la parte inferior del menú lateral, disponible en todo momento.</div></li>
                 </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 4. CALENDARIO -->
-            <div class="section">
+            <div class="section" id="sec-calendario">
                 <span class="section-label">Sección 4</span>
                 <h2 class="section-title">Módulo de Calendario</h2>
                 <p class="section-intro">Gestiona todas las reservas de espacios físicos. Visualiza la disponibilidad y crea solicitudes de uso de instalaciones en pocos pasos.</p>
@@ -420,10 +616,11 @@ $fechaGeneracion = date('d/m/Y');
                         Las reservas que aún no han sido aprobadas aparecerán en un color diferente. Consulta el módulo de Aprobaciones para seguimiento.
                     </div>
                 </div>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 5. USUARIOS -->
-            <div class="section">
+            <div class="section" id="sec-usuarios">
                 <span class="section-label">Sección 5</span>
                 <h2 class="section-title">Gestión de Usuarios</h2>
                 <p class="section-intro">Administra todas las cuentas del sistema, asigna roles con permisos diferenciados y gestiona el acceso de visitantes mediante códigos de invitación. Disponible únicamente para administradores.</p>
@@ -438,10 +635,11 @@ $fechaGeneracion = date('d/m/Y');
                 <div class="success-box">
                     La contraseña inicial de todo usuario nuevo es <strong>123456</strong>. El usuario debe cambiarla obligatoriamente al primer inicio de sesión.
                 </div>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 6. ESPACIOS -->
-            <div class="section">
+            <div class="section" id="sec-espacios">
                 <span class="section-label">Sección 6</span>
                 <h2 class="section-title">Módulo de Espacios</h2>
                 <p class="section-intro">Catálogo maestro de todos los espacios físicos disponibles en la institución: aulas, laboratorios, oficinas y salas de reunión. Disponible para administradores.</p>
@@ -452,10 +650,11 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div>Consultar el historial de uso y reservas de cada espacio.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Eliminar espacios del catálogo cuando dejen de estar en servicio.</div></li>
                 </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 7. APROBACIONES -->
-            <div class="section">
+            <div class="section" id="sec-aprobaciones">
                 <span class="section-label">Sección 7</span>
                 <h2 class="section-title">Aprobaciones de Reservas</h2>
                 <p class="section-intro">Centro de autorización de solicitudes de reserva. Los administradores revisan, aprueban o rechazan peticiones de uso antes de que se confirmen en el calendario.</p>
@@ -467,10 +666,11 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div>Filtrar solicitudes por fecha, espacio o usuario solicitante.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Consultar historial completo de decisiones de aprobación.</div></li>
                 </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 8. PRÉSTAMOS -->
-            <div class="section">
+            <div class="section" id="sec-prestamos">
                 <span class="section-label">Sección 8</span>
                 <h2 class="section-title">Módulo de Préstamos</h2>
                 <p class="section-intro">Controla el ciclo completo de préstamo de activos tecnológicos: desde la salida hasta la devolución, con registro del responsable, fechas y estado del activo.</p>
@@ -488,10 +688,11 @@ $fechaGeneracion = date('d/m/Y');
                         Filtra por estado "En Curso" para identificar rápidamente los activos que aún no han sido devueltos y realizar seguimiento.
                     </div>
                 </div>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 9. INVENTARIO -->
-            <div class="section">
+            <div class="section" id="sec-inventario">
                 <span class="section-label">Sección 9</span>
                 <h2 class="section-title">Inventario de Activos</h2>
                 <p class="section-intro">Catálogo maestro de todos los activos tecnológicos e institucionales. Permite su registro, actualización de estado, baja definitiva y seguimiento en tiempo real.</p>
@@ -517,10 +718,11 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div>Dar de baja activos dañados o fuera de servicio de forma definitiva.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Exportar el inventario completo a Excel con formato profesional.</div></li>
                 </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 10. AUDITORÍA -->
-            <div class="section">
+            <div class="section" id="sec-auditoria">
                 <span class="section-label">Sección 10</span>
                 <h2 class="section-title">Módulo de Auditoría</h2>
                 <p class="section-intro">Centro de trazabilidad y reportes. Registra automáticamente cada acción realizada en el sistema para análisis, cumplimiento normativo y seguimiento de incidencias.</p>
@@ -542,10 +744,11 @@ $fechaGeneracion = date('d/m/Y');
                         Exporta los reportes en PDF para entregarlos como documentos oficiales a directivos o instancias externas.
                     </div>
                 </div>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 11. RFID -->
-            <div class="section">
+            <div class="section" id="sec-rfid">
                 <span class="section-label">Sección 11</span>
                 <h2 class="section-title">Monitor RFID</h2>
                 <p class="section-intro">Interfaz en tiempo real que conecta SIGRAT con lectores RFID y NFC físicos para el registro automático de asistencia y control de acceso a instalaciones.</p>
@@ -563,10 +766,11 @@ $fechaGeneracion = date('d/m/Y');
                         Si el monitor no muestra lecturas, verifica que el dispositivo RFID esté encendido y conectado correctamente al equipo o servidor.
                     </div>
                 </div>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
             <!-- 12. FAQ -->
-            <div class="section">
+            <div class="section" id="sec-faq">
                 <span class="section-label">Sección 12</span>
                 <h2 class="section-title">Preguntas Frecuentes</h2>
                 <p class="section-intro">Respuestas a las consultas más habituales de los usuarios del sistema SIGRAT.</p>
@@ -580,6 +784,88 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Los datos se guardan automáticamente?</strong> — Sí, cada acción confirmada se guarda de inmediato. No dejes formularios a medio completar si vas a cerrar el navegador.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo reporto un error técnico?</strong> — Contacta al equipo de soporte de tu institución y describe el error con una captura de pantalla.</div></li>
                 </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
+            </div>
+
+            <!-- CRÉDITOS -->
+            <div class="section" id="sec-creditos">
+                <span class="section-label">Créditos</span>
+                <h2 class="section-title">Equipo de Desarrollo</h2>
+                <p class="section-intro">
+                    SIGRAT fue desarrollado durante el <strong>período de Estadías Profesionales 2026</strong>,
+                    como proyecto integrador del programa educativo de Técnico Superior Universitario
+                    en Tecnologías de la Información e Innovación Digital dentro de la
+                    <strong>Universidad Tecnológica de Querétaro (UTEQ)</strong>.
+                </p>
+
+                <span class="block-label">Distribución de responsabilidades</span>
+
+                <!-- Frontend -->
+                <table class="data-table" style="margin-bottom: 12px;">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Frontend &mdash; Interfaz de usuario y experiencia visual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cesar Oswaldo Medina Ornelas</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">Diseño e implementación de interfaces, UX/UI, animaciones e integración visual de módulos</td>
+                        </tr>
+                        <tr>
+                            <td>Laura Michelle Escamilla Barrera</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">Diseño responsivo, adaptación de Figma al sistema, experiencia de usuario</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Backend principal -->
+                <table class="data-table" style="margin-bottom: 12px;">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Backend &mdash; Lógica del sistema y servicios principales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Diego Pérez Mendoza</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">Lógica de negocio, autenticación, seguridad y gestión de usuarios</td>
+                        </tr>
+                        <tr>
+                            <td>Fernando Jimenez Angeles</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">API REST, conexión con base de datos y estructura de permisos</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Backend e integración -->
+                <table class="data-table" style="margin-bottom: 20px;">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Backend &amp; Integración &mdash; Módulos, RFID, reportes y pruebas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Leonardo Abraham Valencia Sanchez</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">Desarrollo de módulos específicos e integración RFID</td>
+                        </tr>
+                        <tr>
+                            <td>Jonathan Brandon Nava Morales</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">Reportes, validaciones y optimización de funcionalidades</td>
+                        </tr>
+                        <tr>
+                            <td>Kevin Cruz Hernández</td>
+                            <td style="width:200px; color:#64748b; font-size:11px;">Pruebas funcionales e integración de componentes del sistema</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box" style="margin-bottom:0;">
+                    <span class="note-label">Nota sobre el desarrollo colaborativo</span>
+                    El proyecto se desarrolló mediante una distribución colaborativa de responsabilidades. El equipo de Frontend estuvo encargado del diseño e implementación de la interfaz de usuario, mientras que los equipos de Backend se enfocaron en la lógica del sistema, la integración de funcionalidades, la base de datos y los servicios internos.
+                </div>
+                <a href="#toc" class="back-to-index" style="margin-top: 20px;"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
         </div><!-- /content-wrap -->
