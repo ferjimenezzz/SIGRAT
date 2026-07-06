@@ -41,7 +41,7 @@ Una vez configurado el motor de base de datos y el archivo de entorno, proceda a
 2. Abra un navegador web moderno (Google Chrome, Mozilla Firefox).
 3. Acceda al módulo frontend (interfaz de usuario) mediante la siguiente URI:
    ```http
-   http://localhost/creaciones%20antigravity/Estadias/frontend/
+   http://localhost/Estadias/frontend/
    ```
 4. Verifique que la pantalla de inicio cargue sin errores de conexión a la base de datos.
 ## Consideraciones de Seguridad y Mantenimiento
