@@ -128,6 +128,12 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- React, ReactDOM, MUI y TutorialGuide de forma global -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@mui/material@5/umd/material-ui.production.min.js" crossorigin></script>
+    <script src="assets/js/tutorial-guide.js"></script>
+
 
 <!-- ============================================================================ -->
 <!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
@@ -2055,6 +2061,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         <!-- Footer -->
         <div class="hc-footer">
+            <button class="hc-manual-btn" id="hcTourBtn" style="display: none; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 20px; background: #ffffff; color: #2563eb; border: 1.5px solid #2563eb; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 8px; transition: all 0.2s;" onclick="if (window.triggerTutorialGuide) { window.triggerTutorialGuide(); closeHelpCenter(); }" onmouseover="this.style.backgroundColor='#eff6ff'" onmouseout="this.style.backgroundColor='#ffffff'">
+                <i class="bi bi-compass"></i>
+                Ver recorrido guiado
+            </button>
             <a href="manual_usuario.php" target="_blank" class="hc-manual-btn" id="hcManualBtn">
                 <i class="bi bi-file-earmark-text"></i>
                 Ver / Descargar Manual de Usuario (PDF)
@@ -2319,6 +2329,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
             <div class="topbar-right">
 
+                <!-- Botón de Recorrido Guiado (Tutorial) -->
+                <div class="topbar-icon-btn" id="topbarTourBtn" title="Ver recorrido guiado" style="display: none; align-items: center; justify-content: center;" onclick="if (window.triggerTutorialGuide) { window.triggerTutorialGuide(); }">
+                    <i class="bi bi-compass"></i>
+                </div>
+
                 <div class="topbar-icon-btn" id="notifBtn">
                     <i class="bi bi-bell"></i>
                     <div class="notification-badge" id="notifBadge"></div>
@@ -2485,6 +2500,320 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     wrapper.appendChild(table);
                 }
             });
+
+            // Inicialización de recorrido guiado para todos los módulos
+            let tutorialRoot = document.getElementById("sigrat-global-tutorial-root");
+            if (!tutorialRoot) {
+                tutorialRoot = document.createElement("div");
+                tutorialRoot.id = "sigrat-global-tutorial-root";
+                document.body.appendChild(tutorialRoot);
+            }
+
+            const currentPage = window.location.pathname.split("/").pop() || "index.php";
+            const allModulesSteps = {
+                "index.php": [
+                    {
+                        title: "¡Bienvenido al Panel de Control!",
+                        description: "Este es el centro operativo de <b>SIGRAT</b>. Aquí obtendrás un panorama completo del estado físico y digital del campus.",
+                        position: "center"
+                    },
+                    {
+                        target: ".stats-grid",
+                        title: "Indicadores Clave (KPIs)",
+                        description: "Esta sección consolida las métricas del día: reservas de hoy, aulas en uso activo, préstamos realizados y alertas de stock de inventario.",
+                        position: "bottom"
+                    },
+                    {
+                        target: ".charts-grid",
+                        title: "Análisis de Uso e Inventario",
+                        description: "Gráficas interactivas que detallan el uso histórico de los espacios y la distribución del inventario (disponibles, prestados, en mantenimiento). Puedes usar el selector de rango de tiempo para actualizar la información en tiempo real.",
+                        position: "top"
+                    },
+                    {
+                        target: ".reservations-card",
+                        title: "Próximas Reservaciones",
+                        description: "Consulta rápidamente el listado de las reservas programadas para hoy, con su respectivo horario y estado de confirmación.",
+                        position: "left"
+                    },
+                    {
+                        target: ".topbar-right",
+                        title: "Barra de Navegación Superior",
+                        description: "Ubicada en la esquina superior derecha. Aquí encontrarás accesos rápidos al panel de notificaciones (🔔), la brújula para iniciar esta guía (🧭) y la fecha de hoy.",
+                        position: "left"
+                    },
+                    {
+                        target: ".sidebar",
+                        title: "Barra de Navegación Lateral",
+                        description: "Este es el menú principal del sistema. Utilízalo para moverte y navegar entre los diferentes módulos disponibles (Dashboard, Calendario, Espacios, Inventario, Préstamos, RFID, Usuarios y Auditoría).",
+                        position: "right"
+                    },
+                    {
+                        target: "#helpCenterBtn",
+                        title: "Centro de Ayuda y Reinicio",
+                        description: "Para consultar documentación detallada o resolver dudas, haz clic en <b>Centro de Ayuda</b> en la barra lateral. Si deseas volver a ejecutar este tutorial en cualquier momento, presiona el ícono de brújula (🧭) en la barra superior.",
+                        position: "right"
+                    }
+                ],
+                "usuarios.php": [
+                    {
+                        title: "Control de Usuarios y Accesos",
+                        description: "Módulo integral para administrar cuentas del personal, roles, privilegios del sistema e invitaciones a visitas externas.",
+                        position: "center"
+                    },
+                    {
+                        target: "header div[style*='gap: 12px']",
+                        title: "Registro y Exportación de Datos",
+                        description: "Agrupa las acciones para dar de alta nuevos usuarios y exportar todo el padrón de personal a reportes descargables en Excel o PDF.",
+                        position: "left"
+                    },
+                    {
+                        target: "#userFiltersContainer",
+                        title: "Búsqueda y Filtros de Cuentas",
+                        description: "Utiliza el buscador y los selectores de rol o estado a su lado para filtrar y ubicar rápidamente cualquier cuenta del sistema.",
+                        position: "bottom"
+                    },
+                    {
+                        target: "table, .table-responsive",
+                        title: "Listado General de Cuentas",
+                        description: "Aquí puedes monitorear la fecha de última conexión de cada usuario, editar sus perfiles o desactivar cuentas de forma directa.",
+                        position: "top"
+                    },
+                    {
+                        target: "#btn-invitaciones",
+                        title: "Sección de Invitaciones",
+                        description: "Esta es la pestaña de Invitaciones. Haz clic en este botón o pulsa <b>Siguiente</b> para abrir la sección de visitas y generar códigos de acceso.",
+                        position: "bottom",
+                        actionSelectorClick: "#btn-usuarios"
+                    },
+                    {
+                        target: "#tab-invitaciones",
+                        title: "Lista y Generación de Códigos",
+                        description: "En esta sección puedes ver la lista de códigos de acceso generados para tus visitas y utilizar el formulario de la derecha para generar un nuevo código ingresando el nombre y correo del invitado.",
+                        position: "top",
+                        actionSelectorClick: "#btn-invitaciones"
+                    }
+                ],
+                "espacios.php": [
+                    {
+                        title: "Catálogo de Espacios y Aulas",
+                        description: "Te damos la bienvenida al módulo de Espacios. Desde aquí podrás administrar de forma centralizada todas las áreas del campus (aulas, laboratorios, auditorios y salas de juntas) y consultar la agenda diaria de ocupación.",
+                        position: "center"
+                    },
+                    {
+                        target: "header div[style*='gap: 12px']",
+                        title: "Acciones de Espacios y Reservas",
+                        description: "Agrupa los botones principales de la cabecera. Dependiendo del rol y de la pestaña activa, podrás dar de alta nuevos espacios o registrar solicitudes de reservación de manera inmediata.",
+                        position: "left"
+                    },
+                    {
+                        target: "#spaceFiltersContainer",
+                        title: "Buscador y Filtros de Áreas",
+                        description: "Te permite ubicar rápidamente cualquier instalación buscando por su nombre o edificio en la barra de texto, o filtrando las salas de forma directa por Edificio (CIC, PIDET) y por Tipo de espacio.",
+                        position: "bottom"
+                    },
+                    {
+                        target: "#stats-espacios",
+                        title: "Indicadores Operativos de Espacios",
+                        description: "Muestra en tiempo real el resumen numérico de las áreas: el total de espacios catalogados en el sistema, cuántos se encuentran disponibles (operativos), las reservaciones programadas para hoy y las aprobaciones pendientes de respuesta.",
+                        position: "bottom"
+                    },
+                    {
+                        target: "#spacesTable thead",
+                        title: "Catálogo e Inventario de Áreas",
+                        description: "Detalla la información técnica y de acceso de cada espacio: el nombre, el edificio, el tipo de salón, la capacidad oficial en personas, el estatus operativo (Activo/Inactivo) y las acciones rápidas de edición o baja.",
+                        position: "top"
+                    },
+                    {
+                        target: "#btn-calendario",
+                        title: "Agenda Diaria de Ocupación",
+                        description: "Haz clic en este botón o pulsa <b>Siguiente</b> para abrir el calendario de uso y consultar la programación diaria de reservaciones hora por hora.",
+                        position: "bottom",
+                        actionSelectorClick: "#btn-espacios"
+                    },
+                    {
+                        target: "#tab-calendario",
+                        title: "Reservaciones Programadas",
+                        description: "En esta sección visualizas el cronograma de ocupación del día seleccionado. Podrás ver el horario exacto, el espacio, el nombre del docente o responsable y el estado de la reserva (Pendiente/Aprobada).",
+                        position: "top",
+                        actionSelectorClick: "#btn-calendario"
+                    }
+                ],
+                "calendario.php": [
+                    {
+                        title: "Agenda y Horarios del Campus",
+                        description: "Te damos la bienvenida al módulo de Calendario. Este es el centro de control de ocupación en tiempo real del campus, diseñado para gestionar reservaciones, revisar la disponibilidad de las salas y evitar conflictos de horarios.",
+                        position: "center"
+                    },
+                    {
+                        target: ".calendar-actions",
+                        title: "Reservación y Filtros Avanzados",
+                        description: "Aquí puedes agendar una nueva reserva ingresando los datos del evento, la periodicidad o recurrencia y los activos requeridos. También puedes buscar espacios específicos o usar los filtros avanzados para ver solo tus propias reservaciones.",
+                        position: "left"
+                    },
+                    {
+                        target: ".calendar-navigation-bar",
+                        title: "Navegación e Intervalos de Vista",
+                        description: "Te permite moverte de manera rápida a través de las fechas (ir a hoy, mes anterior o siguiente). También puedes cambiar la visualización completa entre las pestañas de vista Mensual y Semanal, o hacer clic en el selector del mes para saltar a una fecha específica.",
+                        position: "bottom"
+                    },
+                    {
+                        target: ".month-calendar-card",
+                        title: "Cuadrícula del Calendario",
+                        description: "Muestra las celdas del mes con los días y eventos agendados. Al pulsar sobre cualquier celda de fecha, la vista se actualizará para mostrar el desglose de horarios y reservas asociadas. También puedes hacer doble clic en un día libre para comenzar una reserva.",
+                        position: "top"
+                    },
+                    {
+                        target: ".calendar-sidebar-details",
+                        title: "Resumen Diario y Disponibilidad",
+                        description: "Ubicado en el panel lateral derecho. Te proporciona una vista ejecutiva rápida: el conteo de reservas agendadas, espacios libres y solicitudes pendientes, seguido por la agenda detallada de próximas reservaciones y la lista de espacios disponibles del día.",
+                        position: "left"
+                    }
+                ],
+                "inventario.php": [
+                    {
+                        title: "Inventario de Activos y Equipos",
+                        description: "Te damos la bienvenida al módulo de Inventario de Activos. Desde aquí podrás registrar, buscar y auditar todo el equipamiento tecnológico y mobiliario del campus.",
+                        position: "center"
+                    },
+                    {
+                        target: ".tabs-row",
+                        title: "Operaciones y Registro de Activos",
+                        description: "Agrupa las pestañas de navegación interna (Inventario / Mantenimiento) y los botones de acción rápida, como la exportación de reportes (PDF y Excel) y el botón para registrar un <b>Nuevo activo</b>.",
+                        position: "bottom"
+                    },
+                    {
+                        target: "#section-inventario .filters-bar",
+                        title: "Buscador y Filtros de Inventario",
+                        description: "Utiliza la barra de búsqueda para ubicar activos por nombre o número de serie, y aplica filtros rápidos por tipo de activo, estado operativo, edificio y aula específica.",
+                        position: "bottom"
+                    },
+                    {
+                        target: "#section-inventario .premium-table-card",
+                        title: "Tabla General de Inventario",
+                        description: "Muestra todos los activos registrados, detallando su etiqueta RFID, ubicación, tipo y estado actual. Aquí puedes editar o dar de baja cada activo.",
+                        position: "top"
+                    },
+                    {
+                        target: "#statsSidebar",
+                        title: "Estado de Inventario y Categorías",
+                        description: "Ubicado en la columna derecha. Muestra la gráfica analítica del estado de los activos (disponibles, prestados, en mantenimiento) y la distribución porcentual por categorías.",
+                        position: "left",
+                        actionSelectorClick: "#tab-inventario"
+                    },
+                    {
+                        target: "#tab-mantenimiento",
+                        title: "Sección de Mantenimiento",
+                        description: "Haz clic en esta pestaña o presiona <b>Siguiente</b> para ingresar a la bitácora de mantenimiento y reparación de activos.",
+                        position: "bottom",
+                        actionSelectorClick: "#tab-inventario"
+                    },
+                    {
+                        target: "#section-mantenimiento",
+                        title: "Bitácora de Mantenimiento",
+                        description: "En esta sección se listan los equipos que se encuentran actualmente en reparación o revisión técnica. Podrás registrar nuevos mantenimientos, detallar fallas y registrar el retorno de equipos reparados al inventario activo.",
+                        position: "top",
+                        actionSelectorClick: "#tab-mantenimiento"
+                    }
+                ],
+                "prestamos.php": [
+                    {
+                        title: "Préstamos de Equipamiento",
+                        description: "Te damos la bienvenida a la interfaz de Préstamos. Desde aquí podrás llevar un control estricto sobre las entregas temporales y devoluciones de equipamiento tecnológico y herramientas del campus, asegurando la trazabilidad de los activos asignados a docentes y alumnos.",
+                        position: "center"
+                    },
+                    {
+                        target: ".header-actions",
+                        title: "Registro de Salidas e Historial",
+                        description: "Este panel agrupa la barra de búsqueda y los botones de acción rápida. Puedes buscar préstamos por número de serie o solicitante. El botón de <b>Registrar Préstamo</b> te permite abrir el formulario de salida para vincular los materiales con su respectivo código RFID y asignar un responsable con fecha límite de retorno.",
+                        position: "left"
+                    },
+                    {
+                        target: ".filters-bar",
+                        title: "Filtros de Estado de Préstamos",
+                        description: "Te permite clasificar y depurar el listado general mediante pestañas de estado rápido: consulta todos los préstamos históricos, filtra los préstamos <b>Activos</b> (actualmente en manos del usuario), identifica préstamos <b>Vencidos</b> (fuera de la fecha límite de retorno) para aplicar avisos, o visualiza los ya <b>Devueltos</b>.",
+                        position: "top"
+                    },
+                    {
+                        target: ".table-container",
+                        title: "Control de Devoluciones y Registro de Daños",
+                        description: "Muestra el listado de préstamos activos y su fecha de vencimiento. En la columna de acciones, podrás procesar el retorno del activo al inventario de forma inmediata y, en caso de anomalías, reportar cualquier incidencia física, pérdida o daño para el seguimiento de mantenimiento.",
+                        position: "top"
+                    }
+                ],
+                "auditoria.php": [
+                    {
+                        title: "Historial de Auditoría",
+                        description: "Acceso al registro inmutable de seguridad del sistema. Monitorea y audita cada cambio realizado.",
+                        position: "center"
+                    },
+                    {
+                        target: "#filterForm",
+                        title: "Configuración del Reporte",
+                        description: "Define los parámetros para el reporte: selecciona el tipo de auditoría (como actividad de usuarios, asistencia a espacios, uso de edificios, movimientos de inventario o préstamos) y acota el periodo estableciendo fechas de inicio y fin, o usando los botones de periodos rápidos (Últimos 7 días, Últimos 30 días, Mes actual) para actualizar la consulta de inmediato.",
+                        position: "top"
+                    },
+                    {
+                        target: "#auditTable thead",
+                        title: "Tabla de Resultados",
+                        description: "Muestra la información de auditoría generada en orden cronológico según tus filtros. Visualizarás la fecha y hora exacta del evento, el usuario responsable, el módulo del sistema afectado y la descripción detallada de la acción realizada.",
+                        position: "top"
+                    }
+                ],
+                "rfid.php": [
+                    {
+                        title: "Control de Acceso y Gestión RFID",
+                        description: "Te damos la bienvenida al módulo de Gestión RFID. Aquí podrás administrar el enrolamiento de las tarjetas universitarias, comprobar la conexión de los lectores y monitorear los accesos en vivo en las diferentes aulas.",
+                        position: "center"
+                    },
+                    {
+                        target: "form",
+                        title: "Enrolamiento de Tarjetas",
+                        description: "Utiliza este formulario para dar de alta credenciales universitarias. Puedes seleccionar la modalidad de captura: enrolar por rangos automáticos (lotes), capturar de forma individual (usando el lector USB), o ingresar una lista manual de códigos.",
+                        position: "top",
+                        actionSelectorClick: "#tab-enrolamiento"
+                    },
+                    {
+                        target: "#tab-simulador",
+                        title: "Lector USB / Simulador",
+                        description: "Haz clic en esta pestaña o presiona <b>Siguiente</b> para abrir el simulador y comprobar el funcionamiento de las antenas o lectores físicos conectados por USB.",
+                        position: "bottom",
+                        actionSelectorClick: "#tab-enrolamiento"
+                    },
+                    {
+                        target: "#section-simulador",
+                        title: "Consola del Simulador",
+                        description: "En esta sección interactiva puedes conectar y verificar en tiempo real la comunicación con el microcontrolador USB (como un Arduino) y simular lecturas de tarjetas para comprobar el comportamiento del sistema.",
+                        position: "top",
+                        actionSelectorClick: "#tab-simulador"
+                    },
+                    {
+                        target: "#tab-monitor",
+                        title: "Acceso al Monitor en Vivo",
+                        description: "Haz clic en esta pestaña o presiona <b>Siguiente</b> para abrir la consola de monitoreo en tiempo real del campus.",
+                        position: "bottom",
+                        actionSelectorClick: "#tab-simulador"
+                    },
+                    {
+                        target: "#section-monitor",
+                        title: "Monitor en Vivo y Estado de Antenas",
+                        description: "Muestra en tiempo real la conectividad de las antenas instaladas en las aulas y un listado interactivo con los últimos escaneos de tarjetas RFID. Puedes filtrar los accesos por una antena específica.",
+                        position: "top",
+                        actionSelectorClick: "#tab-monitor"
+                    }
+                ]
+            };
+
+            const steps = allModulesSteps[currentPage];
+            if (steps && window.TutorialGuide) {
+                const moduleId = currentPage.replace(".php", "");
+                const root = ReactDOM.createRoot(tutorialRoot);
+                root.render(
+                    React.createElement(window.TutorialGuide, {
+                        steps: steps,
+                        moduleId: moduleId
+                    })
+                );
+            }
         });
         </script>
         <main class="content-padding">
