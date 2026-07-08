@@ -1503,6 +1503,7 @@ include 'header.php';
         <div class="view-switcher-group">
             <button class="btn-switch-view active" data-view="month">Mes</button>
             <button class="btn-switch-view" data-view="week">Semana</button>
+            <button class="btn-switch-view" data-view="map">Mapa Interactivo</button>
         </div>
     </div>
 
@@ -1645,6 +1646,103 @@ include 'header.php';
                 <!-- Inyectado vía JS -->
             </tbody>
         </table>
+    </div>
+
+    <!-- MAPA INTERACTIVO -->
+    <div class="map-calendar-container" id="mapViewGrid" style="display: none; flex-direction: column; gap: 20px;">
+        <!-- Controles del Mapa -->
+        <div style="display: flex; gap: 16px; align-items: center; background: white; padding: 12px 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; gap: 12px;">
+                <select id="mapEdificio" onchange="updateMapImage()" style="padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #1e293b; background: #f8fafc; outline: none; cursor: pointer;">
+                    <option value="PIDET">Edificio PIDET</option>
+                    <option value="CIC">Edificio CIC 4.0</option>
+                </select>
+                <select id="mapPlanta" onchange="updateMapImage()" style="padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #1e293b; background: #f8fafc; outline: none; cursor: pointer;">
+                    <option value="alta">Planta Alta</option>
+                    <option value="baja">Planta Baja</option>
+                </select>
+            </div>
+            
+            <div style="position: relative; flex: 1; max-width: 300px; margin-left: auto;">
+                <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; color: #94a3b8;"></i>
+                <input type="text" id="mapSearch" oninput="highlightMapSpace(this.value)" placeholder="Buscar espacio en el mapa..." style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; outline: none; background: #f8fafc;">
+            </div>
+        </div>
+
+        <!-- Contenedor del Mapa -->
+        <div class="card" style="padding: 0; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; background: #f8fafc; position: relative; min-height: 500px; display: flex; align-items: center; justify-content: center;">
+            
+            <!-- Aquí cargamos la imagen del plano sin alteraciones -->
+            <div id="mapContainer" style="position: relative; width: 100%; height: 600px; overflow: auto; text-align: center;">
+                <img id="mapImage" src="assets/img/mapas/PIDET_p_a.png" alt="Plano" style="max-width: 100%; height: auto; display: block; margin: 0 auto; object-fit: contain;">
+                
+                <!-- Overlay SVG para zonas interactivas (se posiciona exactamente sobre la imagen) -->
+                <svg id="mapOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
+                    <!-- Las zonas se generarán aquí mediante JS -->
+                </svg>
+
+                <!-- Textos Digitales de Nombres en el mapa -->
+                <div id="mapLabelsOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+            </div>
+
+            <!-- Tooltip del mapa (Hover) -->
+            <div id="mapTooltip" style="position: absolute; display: none; background: rgba(255, 255, 255, 0.95); color: #0f172a; padding: 12px 16px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 50; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); transform: translate(-50%, -100%); margin-top: -10px; border: 1px solid #e2e8f0;">
+                <div id="ttName" style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Aula L1</div>
+                <div id="ttType" style="color: #64748b; margin-bottom: 8px;">Laboratorio</div>
+                <div id="ttStatusBadge" style="display: inline-block; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 10px; background: #22c55e; color: white;">DISPONIBLE</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Drawer (Panel Lateral) de Detalles del Espacio -->
+<div id="mapDrawerOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.4); z-index: 1050; opacity: 0; transition: opacity 0.3s;" onclick="closeMapDrawer()"></div>
+<div id="mapDrawer" style="position: fixed; top: 0; right: -400px; width: 400px; height: 100%; background: white; z-index: 1060; box-shadow: -4px 0 25px rgba(0,0,0,0.1); transition: right 0.3s ease; display: flex; flex-direction: column;">
+    
+    <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; background: #f8fafc;">
+        <div>
+            <div id="drawerBuildingBadge" style="background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; display: inline-block; margin-bottom: 8px;">PIDET</div>
+            <h2 id="drawerName" style="font-size: 22px; font-weight: 800; color: #1e293b; margin: 0;">Aula Magna</h2>
+            <p id="drawerType" style="font-size: 13px; color: #64748b; margin: 4px 0 0 0;">Auditorio</p>
+        </div>
+        <button onclick="closeMapDrawer()" style="background: white; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+
+    <div style="padding: 24px; flex: 1; overflow-y: auto;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div style="background: white; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase;">Capacidad</div>
+                <div style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-weight: 700; font-size: 16px;">
+                    <i class="bi bi-people" style="color: #3b82f6;"></i>
+                    <span id="drawerCapacity">100 personas</span>
+                </div>
+            </div>
+            <div style="background: white; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase;">Estado Actual</div>
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;">
+                    <div id="drawerStatusDot" style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></div>
+                    <span id="drawerStatusText" style="color: #166534;">Disponible</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+            <h4 style="font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 12px;">Información de Acceso</h4>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; font-size: 13px; color: #475569; line-height: 1.5;">
+                <strong id="drawerAccessType" style="color: #1e293b;">General</strong><br>
+                <span id="drawerAccessDesc">Espacio de uso general, aprobación automática.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="padding: 24px; border-top: 1px solid #e2e8f0; background: white; display: flex; flex-direction: column; gap: 12px;">
+        <button onclick="reserveFromMap()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+            <i class="bi bi-calendar-plus"></i> Reservar este espacio
+        </button>
     </div>
 </div>
 
@@ -2156,6 +2254,13 @@ include 'header.php';
                 // Ajustar UI según la vista
                 document.getElementById('monthViewGrid').style.display = state.currentView === 'month' ? 'grid' : 'none';
                 document.getElementById('weekViewGrid').style.display = state.currentView === 'week' ? 'block' : 'none';
+                document.getElementById('mapViewGrid').style.display = state.currentView === 'map' ? 'flex' : 'none';
+
+                if (state.currentView === 'map') {
+                    initMap();
+                } else {
+                    renderActiveCalendar();
+                }
 
                 renderActiveCalendar();
             });
@@ -3606,6 +3711,258 @@ include 'header.php';
         const tooltip = document.getElementById('calendarTooltip');
         if (tooltip) tooltip.style.display = 'none';
     };
+
+    // ============================================================================
+    // MAPA INTERACTIVO - LÓGICA Y DATOS
+    // ============================================================================
+    
+    // Zonas del Mapa: Polígonos SVG (Arquitectura Universal)
+    const mapZones = {
+        'PIDET_alta': [
+            { db_name: 'Posgrado 2', path: 'M 140 180 L 260 270 L 300 220 L 190 120 Z' },
+            { db_name: 'Posgrado 1', path: 'M 260 270 L 350 340 L 410 290 L 310 200 Z' },
+            { db_name: 'Aula Magna', path: 'M 480 200 L 680 200 L 680 430 L 480 430 Z' },
+            { db_name: 'Salón 1', path: 'M 320 480 L 410 480 L 410 520 L 320 520 Z' },
+            { db_name: 'Aula 1', path: 'M 480 480 L 590 480 L 590 540 L 480 540 Z' },
+            { db_name: 'Aula 2', path: 'M 490 540 L 610 560 L 590 620 L 480 590 Z' },
+            { db_name: 'Aula 3', path: 'M 500 600 L 630 650 L 600 700 L 490 650 Z' },
+            { db_name: 'Aula 4', path: 'M 530 670 L 660 740 L 620 790 L 500 710 Z' },
+            { db_name: 'Aula 5 Digital', path: 'M 550 740 L 690 840 L 630 920 L 490 810 Z' },
+            { db_name: 'Cubículos', path: 'M 320 530 L 410 530 L 410 570 L 320 570 Z' },
+            { db_name: 'Oficina City', path: 'M 300 580 L 410 580 L 410 700 L 300 700 Z' }
+        ],
+        'PIDET_baja': [
+            // Placeholders listos para poblar
+        ],
+        'CIC_alta': [
+            // Placeholders listos para poblar
+        ],
+        'CIC_baja': [
+            // Placeholders listos para poblar
+        ]
+    };
+
+    // Textos digitales superpuestos (Arquitectura Universal)
+    const mapLabels = {
+        'PIDET_alta': [
+            { db_name: 'Posgrado 2', top: '18%', left: '23%' },
+            { db_name: 'Posgrado 1', top: '28%', left: '33%' },
+            { db_name: 'Aula Magna', top: '32%', left: '57%' },
+            { db_name: 'Salón 1', top: '50%', left: '36%' },
+            { db_name: 'Cubículos', top: '55%', left: '36%' },
+            { db_name: 'Oficina City', top: '64%', left: '36%' },
+            { db_name: 'Aula 1', top: '51%', left: '53%' },
+            { db_name: 'Aula 2', top: '58%', left: '54%' },
+            { db_name: 'Aula 3', top: '64%', left: '56%' },
+            { db_name: 'Aula 4', top: '70%', left: '58%' },
+            { db_name: 'Aula 5 Digital', top: '82%', left: '58%' }
+        ],
+        'PIDET_baja': [],
+        'CIC_alta': [],
+        'CIC_baja': []
+    };
+
+    let currentMapKey = 'PIDET_alta';
+
+    function initMap() {
+        updateMapImage();
+    }
+
+    // Buscador auxiliar para extraer info de la DB
+    function getSpaceFromDB(matchName, matchEdificio) {
+        if (!matchName) return null;
+        return allSpaces.find(sp => {
+            const sameEdificio = sp.edificio === matchEdificio;
+            const sameName = sp.nombre_numero.toLowerCase().includes(matchName.toLowerCase()) || matchName.toLowerCase().includes(sp.nombre_numero.toLowerCase());
+            return sameEdificio && sameName;
+        });
+    }
+
+    window.updateMapImage = function() {
+        const edificio = document.getElementById('mapEdificio').value;
+        const planta = document.getElementById('mapPlanta').value;
+        
+        currentMapKey = `${edificio}_${planta}`;
+        
+        let imgSrc = '';
+        if (edificio === 'PIDET') {
+            imgSrc = planta === 'alta' ? 'assets/img/mapas/PIDET_p_a.png' : 'assets/img/mapas/PIDET_p_b.png';
+        } else {
+            imgSrc = planta === 'alta' ? 'assets/img/mapas/PLANTA_ALTA_CIC_4_0.png' : 'assets/img/mapas/PLANTA_BAJA_CIC_4_0.png';
+        }
+        
+        document.getElementById('mapImage').src = imgSrc;
+        renderMapZones();
+        renderMapLabels();
+    };
+
+    function renderMapLabels() {
+        const labelsContainer = document.getElementById('mapLabelsOverlay');
+        labelsContainer.innerHTML = '';
+        
+        const labels = mapLabels[currentMapKey];
+        if (!labels) return;
+
+        const edificioFilter = document.getElementById('mapEdificio').value;
+
+        labels.forEach(lbl => {
+            // Extraer nombre de la DB
+            const realSpace = getSpaceFromDB(lbl.db_name, edificioFilter);
+            const finalName = realSpace ? realSpace.nombre_numero : lbl.db_name;
+
+            const el = document.createElement('div');
+            el.style.position = 'absolute';
+            el.style.top = lbl.top;
+            el.style.left = lbl.left;
+            el.style.transform = 'translate(-50%, -50%)';
+            el.style.color = '#1e293b'; // Color oscuro institucional
+            el.style.fontSize = '12px';
+            el.style.fontWeight = '800';
+            el.style.background = 'rgba(255, 255, 255, 0.7)';
+            el.style.padding = '2px 6px';
+            el.style.borderRadius = '4px';
+            el.style.border = '1px solid rgba(0,0,0,0.1)';
+            el.style.letterSpacing = '0.5px';
+            el.textContent = finalName;
+            labelsContainer.appendChild(el);
+        });
+    }
+
+    function renderMapZones() {
+        const svg = document.getElementById('mapOverlay');
+        svg.innerHTML = '';
+        
+        const zones = mapZones[currentMapKey];
+        if (!zones) return;
+
+        const edificioFilter = document.getElementById('mapEdificio').value;
+
+        zones.forEach(zone => {
+            const realSpace = getSpaceFromDB(zone.db_name, edificioFilter);
+            const finalName = realSpace ? realSpace.nombre_numero : zone.db_name;
+            const finalType = realSpace ? realSpace.tipo : 'Espacio';
+
+            const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            polygon.setAttribute('d', zone.path);
+            polygon.setAttribute('fill', 'transparent'); // 100% transparente
+            polygon.setAttribute('stroke', 'transparent'); // Sin bordes
+            polygon.style.pointerEvents = 'auto';
+            polygon.style.cursor = 'pointer';
+            polygon.style.transition = 'all 0.2s ease';
+            
+            // Interaction purista
+            polygon.addEventListener('mouseenter', (e) => {
+                polygon.setAttribute('fill', 'rgba(37, 99, 235, 0.15)'); // Sombra azul claro
+                showMapTooltip(e, finalName, finalType);
+            });
+            
+            polygon.addEventListener('mouseleave', () => {
+                polygon.setAttribute('fill', 'transparent');
+                hideMapTooltip();
+            });
+
+            polygon.addEventListener('mousemove', (e) => {
+                moveMapTooltip(e);
+            });
+
+            polygon.addEventListener('click', () => {
+                openMapDrawer(zone.db_name, finalName, finalType, realSpace);
+            });
+
+            svg.appendChild(polygon);
+        });
+    }
+
+    window.highlightMapSpace = function(query) {
+        // En un futuro se puede cambiar la opacidad de los paths en base a la busqueda
+    };
+
+    // Tooltip logic
+    const mapTooltip = document.getElementById('mapTooltip');
+    
+    function showMapTooltip(e, name, type) {
+        document.getElementById('ttName').textContent = name;
+        document.getElementById('ttType').textContent = type;
+        mapTooltip.style.display = 'block';
+        moveMapTooltip(e);
+    }
+    
+    function moveMapTooltip(e) {
+        const container = document.getElementById('mapContainer').getBoundingClientRect();
+        const x = e.clientX - container.left;
+        const y = e.clientY - container.top;
+        mapTooltip.style.left = x + 'px';
+        mapTooltip.style.top = y + 'px';
+    }
+    
+    function hideMapTooltip() {
+        mapTooltip.style.display = 'none';
+    }
+
+    // Drawer logic
+    window.openMapDrawer = function(db_name, finalName, finalType, realSpace) {
+        document.getElementById('drawerBuildingBadge').textContent = document.getElementById('mapEdificio').value;
+        document.getElementById('drawerName').textContent = finalName;
+        document.getElementById('drawerType').textContent = finalType;
+        
+        if (realSpace) {
+            document.getElementById('drawerCapacity').textContent = realSpace.capacidad + ' personas';
+            document.getElementById('mapDrawer').dataset.espid = realSpace.esp_id;
+            document.getElementById('mapDrawer').dataset.edificio = realSpace.edificio;
+        } else {
+            document.getElementById('drawerCapacity').textContent = 'No registrado';
+            document.getElementById('mapDrawer').dataset.espid = '';
+            document.getElementById('mapDrawer').dataset.edificio = '';
+        }
+
+        document.getElementById('mapDrawerOverlay').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('mapDrawerOverlay').style.opacity = '1';
+            document.getElementById('mapDrawer').style.right = '0';
+        }, 10);
+    };
+
+    window.closeMapDrawer = function() {
+        document.getElementById('mapDrawer').style.right = '-400px';
+        document.getElementById('mapDrawerOverlay').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('mapDrawerOverlay').style.display = 'none';
+        }, 300);
+    };
+
+    window.reserveFromMap = function() {
+        const espId = document.getElementById('mapDrawer').dataset.espid;
+        const edificio = document.getElementById('mapDrawer').dataset.edificio;
+        
+        closeMapDrawer();
+        
+        // Cambiar a vista mensual (o semana)
+        document.querySelector('.btn-switch-view[data-view="month"]').click();
+        
+        // Abrir modal de reserva y precargar el espacio
+        if (espId) {
+            setTimeout(() => {
+                openResModal();
+                const selEdif = document.getElementById('resEdificio');
+                if (selEdif && edificio) {
+                    selEdif.value = edificio;
+                    selEdif.dispatchEvent(new Event('change'));
+                }
+                setTimeout(() => {
+                    const selEsp = document.getElementById('resEspacio');
+                    if (selEsp) {
+                        selEsp.value = espId;
+                        selEsp.dispatchEvent(new Event('change'));
+                    }
+                }, 100);
+            }, 300);
+        } else {
+            setTimeout(() => {
+                openResModal();
+            }, 300);
+        }
+    };
+
 </script>
 
 <?php
