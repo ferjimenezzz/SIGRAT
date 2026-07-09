@@ -2502,8 +2502,16 @@ include 'header.php';
                 const filtered = allSpaces.filter(sp => sp.edificio === edif);
                 
                 let opts = '<option value="">Seleccione espacio...</option>';
+                let magnaAdded = false;
                 filtered.forEach(sp => {
-                    opts += `<option value="${sp.esp_id}">${sp.nombre_numero} (${sp.tipo})</option>`;
+                    if (sp.nombre_numero && sp.nombre_numero.startsWith('Sala Magna')) {
+                        if (!magnaAdded) {
+                            opts += `<option value="SALA_MAGNA_MODULAR">Sala Magna (Modular 1 a 4 salas - Hasta 96 pers.)</option>`;
+                            magnaAdded = true;
+                        }
+                    } else {
+                        opts += `<option value="${sp.esp_id}">${sp.nombre_numero} (${sp.tipo})</option>`;
+                    }
                 });
                 resEspacio.innerHTML = opts;
                 document.getElementById('resCapacidadLabel').value = "0 personas";
@@ -2515,11 +2523,82 @@ include 'header.php';
         // Al cambiar espacio en la reserva
         if(resEspacio) {
             resEspacio.addEventListener('change', (e) => {
-                const espId = parseInt(e.target.value);
-                const spObj = allSpaces.find(sp => sp.esp_id === espId);
+                const val = e.target.value;
                 const eqContainer = document.getElementById('resEquipamientoContainer');
+                const btnConfirm = document.getElementById('btnConfirmReserva');
+                const numInput = document.getElementById('resNumAlumnos');
+
+                // Quitar banners informativos anteriores
+                const prevBox = document.getElementById('resDynamicInfoBox');
+                if (prevBox) prevBox.remove();
+
+                const infoBox = document.createElement('div');
+                infoBox.id = 'resDynamicInfoBox';
+                infoBox.style.marginTop = '10px';
+
+                if (val === 'SALA_MAGNA_MODULAR') {
+                    document.getElementById('resCapacidadLabel').value = "Modular: 24 a 96 personas (1-4 salas)";
+                    btnConfirm.disabled = false;
+
+                    const updateMagnaBadge = () => {
+                        const count = parseInt(numInput.value) || 1;
+                        const salasReq = Math.max(1, Math.min(4, Math.ceil(count / 24)));
+                        infoBox.innerHTML = `<div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                            <i class="bi bi-info-circle-fill"></i> <strong>Aforo: ${count} asistente(s)</strong> — El sistema asignará automáticamente <strong>${salasReq} Sala(s) Magna</strong> (${salasReq * 24} cap. máxima).
+                        </div>`;
+                    };
+                    if (window._magnaInputHandler) {
+                        numInput.removeEventListener('input', window._magnaInputHandler);
+                    }
+                    window._magnaInputHandler = updateMagnaBadge;
+                    numInput.addEventListener('input', window._magnaInputHandler);
+                    updateMagnaBadge();
+                    e.target.parentElement.appendChild(infoBox);
+
+                    // Cargar equipamiento de PIDET
+                    const spAssets = allAssets.filter(as => as.edificio === 'PIDET');
+                    if(spAssets.length > 0) {
+                        let html = '';
+                        spAssets.forEach(as => {
+                            html += `<label style='display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); cursor: pointer;'>
+                                <input type='checkbox' class='equipamiento-checkbox' value='${as.act_id}'>
+                                ${as.tipo} ${as.marca} ${as.modelo || ''}
+                            </label>`;
+                        });
+                        eqContainer.innerHTML = html;
+                    } else {
+                        eqContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Sin equipamiento específico disponible.</div>';
+                    }
+                    checkAvailability();
+                    return;
+                }
+
+                const espId = parseInt(val);
+                const spObj = allSpaces.find(sp => sp.esp_id === espId);
                 if (spObj) {
                     document.getElementById('resCapacidadLabel').value = `${spObj.capacidad} personas`;
+
+                    // Lógica para espacios reservados a Administrador
+                    const accLower = (spObj.acceso || spObj.acceso_tipo || '').toLowerCase();
+                    if (accLower === 'administrador') {
+                        if (!isUserAdmin) {
+                            infoBox.innerHTML = `<div style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;">
+                                <i class="bi bi-shield-lock-fill"></i> Acceso Exclusivo: Este espacio está catalogado para uso exclusivo de Administradores.
+                            </div>`;
+                            e.target.parentElement.appendChild(infoBox);
+                            btnConfirm.disabled = true;
+                        } else {
+                            infoBox.innerHTML = `<div style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                                <i class="bi bi-calendar-range"></i> Espacio de Administrador: Se requiere reserva por periodo cuatrimestral (modo multi-día recurrente).
+                            </div>`;
+                            e.target.parentElement.appendChild(infoBox);
+                            btnConfirm.disabled = false;
+                            const btnMulti = document.getElementById('btnResModeMultiple');
+                            if (btnMulti) btnMulti.click();
+                        }
+                    } else {
+                        btnConfirm.disabled = false;
+                    }
                     
                     // Buscar equipamiento asignado a este espacio o edificio
                     const spAssets = allAssets.filter(as => as.esp_asignado == espId || (as.edificio === spObj.edificio && !as.esp_asignado));
@@ -3461,7 +3540,9 @@ include 'header.php';
         const horaSal = `${salHourStr}:${salMinStr}`;
 
         const requestData = {
-            esp_id: parseInt(espId),
+            esp_id: espId === 'SALA_MAGNA_MODULAR' ? 'SALA_MAGNA_MODULAR' : parseInt(espId),
+            is_sala_magna_modular: espId === 'SALA_MAGNA_MODULAR',
+            is_cuatrimestre: state.resMode === 'multiple',
             hora_ent: `${horaEnt}:00`,
             hora_sal: `${horaSal}:00`,
             num_alumnos: numAlumnos,

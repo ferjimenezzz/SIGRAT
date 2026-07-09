@@ -51,6 +51,81 @@ class ReservationController {
             $vis_id = $data['vis_id'] ?? null;
             $us_id = $data['us_id'] ?? null;
 
+            // -------------------------------------------------------------------------
+            // LÓGICA ESPECIAL: SALA MAGNA MODULAR (1, 2, 3 o 4 salas según aforo)
+            // -------------------------------------------------------------------------
+            if (($data['esp_id'] ?? '') === 'SALA_MAGNA_MODULAR' || !empty($data['is_sala_magna_modular'])) {
+                $num_asistentes = max(1, intval($data['num_alumnos'] ?? 1));
+                $salas_requeridas = max(1, min(4, (int) ceil($num_asistentes / 24)));
+
+                $stmtSalas = $this->db->prepare("
+                    SELECT esp_id, nombre_numero 
+                    FROM ESPACIO 
+                    WHERE edificio = 'PIDET' AND nombre_numero LIKE 'Sala Magna%' AND estatus = 'Disponible'
+                      AND esp_id NOT IN (
+                          SELECT esp_id FROM RESERVA 
+                          WHERE status = 'approved' AND fecha_uso = ? 
+                            AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))
+                      )
+                    ORDER BY nombre_numero ASC
+                ");
+                $stmtSalas->execute([
+                    $data['fecha_uso'],
+                    $data['hora_sal'], $data['hora_ent'],
+                    $data['hora_sal'], $data['hora_ent'],
+                    $data['hora_ent'], $data['hora_sal']
+                ]);
+                $salas_disponibles = $stmtSalas->fetchAll(\PDO::FETCH_ASSOC);
+
+                if (count($salas_disponibles) < $salas_requeridas) {
+                    throw new \Exception("Disponibilidad insuficiente en Sala Magna para {$num_asistentes} asistentes: se requieren {$salas_requeridas} sala(s) pero solo hay " . count($salas_disponibles) . " disponible(s) en ese horario.");
+                }
+
+                $group_id = $data['group_id'] ?? ('MAGNA_' . uniqid());
+                $primer_res_id = null;
+
+                for ($i = 0; $i < $salas_requeridas; $i++) {
+                    $sala = $salas_disponibles[$i];
+                    $stmtIns = $this->db->prepare("
+                        INSERT INTO RESERVA (esp_id, us_id, vis_id, num_alumnos, fecha_uso, hora_ent, hora_sal, estatus, status, motivo, group_id)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'Aprobada', 'approved', ?, ?)
+                    ");
+                    $stmtIns->execute([
+                        $sala['esp_id'],
+                        $us_id,
+                        $vis_id,
+                        $num_asistentes,
+                        $data['fecha_uso'],
+                        $data['hora_ent'],
+                        $data['hora_sal'],
+                        ($data['motivo'] ?? 'Reserva modular Sala Magna') . " [{$sala['nombre_numero']}]",
+                        $group_id
+                    ]);
+                    if ($i === 0) {
+                        $primer_res_id = $this->db->lastInsertId();
+                    }
+                }
+
+                $this->db->commit();
+                $this->audit->log($us_id, "Reserva Modular Sala Magna ({$salas_requeridas} salas) Grupo ID: " . $group_id, "RESERVAS", $vis_id);
+
+                if (!$skip_email && $us_id) {
+                    try {
+                        $stmtCorreo = $this->db->prepare("SELECT correo FROM USUARIO WHERE us_id = ?");
+                        $stmtCorreo->execute([$us_id]);
+                        $correo = $stmtCorreo->fetchColumn();
+                        if ($correo) {
+                            $espacio_nombre = "PIDET - Sala Magna Modular ({$salas_requeridas} sala(s) asignadas)";
+                            $this->emailService->sendReservationCreated($correo, $primer_res_id, 'Aprobada', $espacio_nombre, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']);
+                        }
+                    } catch (\Exception $e) {
+                        error_log("Error enviando correo de confirmación Sala Magna Modular: " . $e->getMessage());
+                    }
+                }
+
+                return ["success" => true, "id" => $primer_res_id, "group_id" => $group_id, "salas_reservadas" => $salas_requeridas];
+            }
+
             $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND status = 'approved' AND fecha_uso = ?
                               AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
             $stmt = $this->db->prepare($conflictQuery);
@@ -78,7 +153,24 @@ class ReservationController {
             $estatus_inicial = 'Aprobada'; // Auto-aprobación para General y Por división
             $status_inicial = 'approved';
 
-            if ($acceso === 'por división') {
+            if ($acceso === 'administrador') {
+                $is_admin = false;
+                if ($us_id) {
+                    $stmtAdmin = $this->db->prepare("
+                        SELECT COUNT(*) FROM USUARIO u 
+                        JOIN ROLES r ON u.rol_id = r.rol_id 
+                        WHERE u.us_id = ? AND UPPER(r.nombre) LIKE '%ADMIN%'
+                    ");
+                    $stmtAdmin->execute([$us_id]);
+                    $is_admin = ($stmtAdmin->fetchColumn() > 0);
+                }
+                if (!$is_admin) {
+                    throw new \Exception("Acceso restringido: Este espacio es de uso exclusivo para Administradores.");
+                }
+                if (empty($data['group_id']) && empty($data['is_cuatrimestre'])) {
+                    throw new \Exception("Los espacios exclusivos para Administradores solo pueden reservarse por periodo cuatrimestral (recurrente), nunca por días individuales.");
+                }
+            } elseif ($acceso === 'por división') {
                 $division = trim($espacio['division_restringida'] ?? '');
                 if (strcasecmp(trim($usuario_carrera ?? ''), $division) !== 0) {
                     throw new \Exception("No tienes permiso para reservar este espacio. Sólo está permitido para la división: " . ($division ?: 'Ninguna'));
@@ -232,11 +324,15 @@ class ReservationController {
             
             // Determinar estatus inicial
             $estatus_inicial = 'Aprobada';
-            $stmtEspacio = $this->db->prepare("SELECT acceso_tipo, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
-            $stmtEspacio->execute([$esp_id]);
-            $espacio = $stmtEspacio->fetch();
-            if ($espacio && $espacio['acceso_tipo'] === 'Restringido') {
-                $estatus_inicial = 'Pendiente';
+            if ($esp_id === 'SALA_MAGNA_MODULAR') {
+                $espacio = ['acceso_tipo' => 'General', 'nombre_numero' => 'Sala Magna Modular', 'edificio' => 'PIDET'];
+            } else {
+                $stmtEspacio = $this->db->prepare("SELECT acceso_tipo, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
+                $stmtEspacio->execute([$esp_id]);
+                $espacio = $stmtEspacio->fetch();
+                if ($espacio && $espacio['acceso_tipo'] === 'Restringido') {
+                    $estatus_inicial = 'Pendiente';
+                }
             }
 
             $stmtCorreo = $this->db->prepare("SELECT correo FROM USUARIO WHERE us_id = ?");
