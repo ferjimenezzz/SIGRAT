@@ -1607,7 +1607,15 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             url.searchParams.delete('error');
             window.history.replaceState({}, document.title, url);
         }
-        applyFilters();
+        if (!urlParams.has('filtro')) {
+            if (typeof clearAllFilters === 'function') {
+                clearAllFilters();
+            } else {
+                applyFilters();
+            }
+        } else {
+            applyFilters();
+        }
     });
     
     // Search inventory & Filters Logic
@@ -1738,7 +1746,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         const matchingRows = [];
 
         document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
-            const text = row.innerText.toLowerCase();
+            const text = (row.textContent || row.innerText || '').toLowerCase();
             const rowStatus = row.dataset.status;
             const rowTipoCat = row.dataset.tipoCat; // 'Equipo' or 'Mobiliario'
             const rowTipoExacto = row.dataset.tipo;
