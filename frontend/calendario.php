@@ -1409,6 +1409,156 @@ include 'header.php';
         backdrop-filter: blur(4px);
         border: 1px solid rgba(255,255,255,0.1);
     }
+
+    /* ==================== MODAL ANCHO: NUEVA RESERVA CON MAPA ==================== */
+    .res-modal-wide-card {
+        background: white;
+        width: 92vw;
+        max-width: 1400px;
+        height: 92vh;
+        max-height: 920px;
+        border-radius: 20px;
+        box-shadow: 0 30px 80px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideIn {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .res-modal-wide-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+        border-bottom: 1px solid #f1f5f9;
+        flex-shrink: 0;
+        background: white;
+    }
+
+    .res-modal-two-col {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* COLUMNA IZQUIERDA: FORMULARIO */
+    .form-pane {
+        border-right: 1px solid #f1f5f9;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        background: #fafbfc;
+    }
+
+    .form-pane::-webkit-scrollbar { width: 4px; }
+    .form-pane::-webkit-scrollbar-track { background: transparent; }
+    .form-pane::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .form-pane form {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        height: 100%;
+    }
+
+    /* COLUMNA DERECHA: MAPA */
+    .map-pane {
+        display: flex;
+        flex-direction: column;
+        background: #f8fafc;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .map-pane-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        background: white;
+        border-bottom: 1px solid #f1f5f9;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+    }
+
+    /* Viewport del mapa con zoom/pan */
+    .map-pane-viewport {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        cursor: grab;
+        background: #f1f5f9;
+    }
+
+    .map-pane-viewport:active { cursor: grabbing; }
+
+    .map-pane-inner {
+        position: relative;
+        display: inline-block;
+        transform-origin: 0 0;
+        transition: transform 0.15s ease;
+    }
+
+    /* Leyenda */
+    .map-pane-legend {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 8px 16px;
+        background: white;
+        border-top: 1px solid #f1f5f9;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+    }
+
+    .map-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+    }
+
+    .map-legend-item span {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    /* Tooltip del mapa dentro del modal */
+    .modal-map-tooltip {
+        position: fixed;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.95);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        font-size: 12px;
+        line-height: 1.5;
+        pointer-events: none;
+        max-width: 220px;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-map-tooltip .tt-name  { font-weight: 800; font-size: 13px; margin-bottom: 3px; }
+    .modal-map-tooltip .tt-type  { opacity: 0.75; font-size: 11px; }
+    .modal-map-tooltip .tt-cap   { margin-top: 4px; font-size: 11px; }
+    .modal-map-tooltip .tt-status { margin-top: 2px; font-size: 11px; font-weight: 700; }
+    .modal-map-tooltip .tt-status.libre { color: #4ade80; }
+    .modal-map-tooltip .tt-status.ocupado { color: #f87171; }
+    .modal-map-tooltip .tt-status.nores  { color: #94a3b8; }
 </style>
 
 <div class="calendar-wrapper">
@@ -1503,7 +1653,6 @@ include 'header.php';
         <div class="view-switcher-group">
             <button class="btn-switch-view active" data-view="month">Mes</button>
             <button class="btn-switch-view" data-view="week">Semana</button>
-            <button class="btn-switch-view" data-view="map">Mapa Interactivo</button>
         </div>
     </div>
 
@@ -1648,101 +1797,6 @@ include 'header.php';
         </table>
     </div>
 
-    <!-- MAPA INTERACTIVO -->
-    <div class="map-calendar-container" id="mapViewGrid" style="display: none; flex-direction: column; gap: 20px;">
-        <!-- Controles del Mapa -->
-        <div style="display: flex; gap: 16px; align-items: center; background: white; padding: 12px 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <div style="display: flex; gap: 12px;">
-                <select id="mapEdificio" onchange="updateMapImage()" style="padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #1e293b; background: #f8fafc; outline: none; cursor: pointer;">
-                    <option value="PIDET">Edificio PIDET</option>
-                    <option value="CIC">Edificio CIC 4.0</option>
-                </select>
-                <select id="mapPlanta" onchange="updateMapImage()" style="padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #1e293b; background: #f8fafc; outline: none; cursor: pointer;">
-                    <option value="alta">Planta Alta</option>
-                    <option value="baja">Planta Baja</option>
-                </select>
-            </div>
-            
-            <div style="position: relative; flex: 1; max-width: 300px; margin-left: auto;">
-                <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; color: #94a3b8;"></i>
-                <input type="text" id="mapSearch" oninput="highlightMapSpace(this.value)" placeholder="Buscar espacio en el mapa..." style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; outline: none; background: #f8fafc;">
-            </div>
-        </div>
-
-        <!-- Contenedor del Mapa -->
-        <div class="card" style="padding: 0; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; background: #f8fafc; position: relative; min-height: 500px; display: flex; align-items: center; justify-content: center;">
-            
-            <!-- Aquí cargamos la imagen del plano sin alteraciones -->
-            <div id="mapContainer" style="position: relative; width: 100%; height: 600px; overflow: auto; text-align: center;">
-                <img id="mapImage" src="assets/img/mapas/PIDET_p_a.png" alt="Plano" style="max-width: 100%; height: auto; display: block; margin: 0 auto; object-fit: contain;">
-                
-                <!-- Overlay SVG para zonas interactivas (se posiciona exactamente sobre la imagen) -->
-                <svg id="mapOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
-                    <!-- Las zonas se generarán aquí mediante JS -->
-                </svg>
-
-                <!-- Textos Digitales de Nombres en el mapa -->
-                <div id="mapLabelsOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
-            </div>
-
-            <!-- Tooltip del mapa (Hover) -->
-            <div id="mapTooltip" style="position: absolute; display: none; background: rgba(255, 255, 255, 0.95); color: #0f172a; padding: 12px 16px; border-radius: 8px; font-size: 12px; pointer-events: none; z-index: 50; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); transform: translate(-50%, -100%); margin-top: -10px; border: 1px solid #e2e8f0;">
-                <div id="ttName" style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Aula L1</div>
-                <div id="ttType" style="color: #64748b; margin-bottom: 8px;">Laboratorio</div>
-                <div id="ttStatusBadge" style="display: inline-block; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 10px; background: #22c55e; color: white;">DISPONIBLE</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Drawer (Panel Lateral) de Detalles del Espacio -->
-<div id="mapDrawerOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.4); z-index: 1050; opacity: 0; transition: opacity 0.3s;" onclick="closeMapDrawer()"></div>
-<div id="mapDrawer" style="position: fixed; top: 0; right: -400px; width: 400px; height: 100%; background: white; z-index: 1060; box-shadow: -4px 0 25px rgba(0,0,0,0.1); transition: right 0.3s ease; display: flex; flex-direction: column;">
-    
-    <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; background: #f8fafc;">
-        <div>
-            <div id="drawerBuildingBadge" style="background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; display: inline-block; margin-bottom: 8px;">PIDET</div>
-            <h2 id="drawerName" style="font-size: 22px; font-weight: 800; color: #1e293b; margin: 0;">Aula Magna</h2>
-            <p id="drawerType" style="font-size: 13px; color: #64748b; margin: 4px 0 0 0;">Auditorio</p>
-        </div>
-        <button onclick="closeMapDrawer()" style="background: white; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'">
-            <i class="bi bi-x"></i>
-        </button>
-    </div>
-
-    <div style="padding: 24px; flex: 1; overflow-y: auto;">
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-            <div style="background: white; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
-                <div style="color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase;">Capacidad</div>
-                <div style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-weight: 700; font-size: 16px;">
-                    <i class="bi bi-people" style="color: #3b82f6;"></i>
-                    <span id="drawerCapacity">100 personas</span>
-                </div>
-            </div>
-            <div style="background: white; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
-                <div style="color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase;">Estado Actual</div>
-                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;">
-                    <div id="drawerStatusDot" style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></div>
-                    <span id="drawerStatusText" style="color: #166534;">Disponible</span>
-                </div>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 24px;">
-            <h4 style="font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 12px;">Información de Acceso</h4>
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; font-size: 13px; color: #475569; line-height: 1.5;">
-                <strong id="drawerAccessType" style="color: #1e293b;">General</strong><br>
-                <span id="drawerAccessDesc">Espacio de uso general, aprobación automática.</span>
-            </div>
-        </div>
-
-    </div>
-
-    <div style="padding: 24px; border-top: 1px solid #e2e8f0; background: white; display: flex; flex-direction: column; gap: 12px;">
-        <button onclick="reserveFromMap()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
-            <i class="bi bi-calendar-plus"></i> Reservar este espacio
-        </button>
     </div>
 </div>
 
@@ -1902,53 +1956,79 @@ include 'header.php';
     </div>
 </div>
 
-<!-- ==================== MODAL DE RESERVACIÓN MULTI-DÍA ==================== -->
+<!-- ==================== MODAL DE RESERVACIÓN ANCHO (MAPA INTEGRADO) ==================== -->
 <div class="res-modal-overlay" id="reservationModal">
-    <div class="res-modal-card">
-        <div class="res-modal-header">
-            <h2>Nueva reserva</h2>
-            <button id="btnExitResModal" type="button"><i class="bi bi-x-lg"></i></button>
-        </div>
-        
-        <form id="reservationForm">
-            <div class="res-modal-body">
-                <!-- MODO DE RESERVACIÓN: DÍA ÚNICO O MULTI-DÍA -->
-                <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 10px; border: 1px solid var(--border-color);">
-                    <button type="button" class="btn-switch-res-mode active" id="btnResModeSingle">Día único</button>
-                    <button type="button" class="btn-switch-res-mode" id="btnResModeMultiple">Múltiples días</button>
-                </div>
+    <div class="res-modal-wide-card">
 
-                <!-- SECCIÓN 1: INFORMACIÓN DE RESERVA -->
+        <!-- HEADER DEL MODAL -->
+        <div class="res-modal-wide-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:38px;height:38px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;">
+                    <i class="bi bi-calendar-plus"></i>
+                </div>
                 <div>
-                    <div class="res-modal-section-title">
-                        <i class="bi bi-calendar-check"></i> Información de la reserva
+                    <h2 style="margin:0;font-size:18px;font-weight:800;color:#0f172a;">Nueva Reserva</h2>
+                    <p style="margin:0;font-size:12px;color:#64748b;font-weight:500;">Selecciona el espacio en el plano o usa el formulario</p>
+                </div>
+            </div>
+            <button id="btnExitResModal" type="button" style="background:#f1f5f9;border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748b;font-size:18px;transition:all .2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- CUERPO: 2 COLUMNAS -->
+        <div class="res-modal-two-col">
+
+            <!-- ── COLUMNA IZQUIERDA: FORMULARIO ── -->
+            <div class="form-pane">
+                <form id="reservationForm">
+
+                    <!-- Modo día único / múltiples días -->
+                    <div style="display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:10px;border:1px solid var(--border-color);margin-bottom:16px;">
+                        <button type="button" class="btn-switch-res-mode active" id="btnResModeSingle">Día único</button>
+                        <button type="button" class="btn-switch-res-mode" id="btnResModeMultiple">Múltiples días</button>
                     </div>
-                    
-                    <div class="modal-grid-2">
+
+                    <!-- Edificio + Planta -->
+                    <div class="res-modal-section-title"><i class="bi bi-building"></i> Ubicación del espacio</div>
+                    <div class="modal-grid-2" style="margin-bottom:10px;">
                         <div class="modal-form-group">
                             <label>Edificio</label>
                             <select class="modal-input" id="resEdificio" required>
                                 <option value="">Seleccione edificio...</option>
+                                <option value="PIDET" selected>PIDET</option>
                                 <option value="CIC">CIC</option>
-                                <option value="PIDET">PIDET</option>
                             </select>
                         </div>
                         <div class="modal-form-group">
-                            <label>Espacio / Laboratorio</label>
-                            <select class="modal-input" name="esp_id" id="resEspacio" required>
-                                <option value="">Seleccione espacio...</option>
-                                <!-- Rellenado dinámicamente -->
+                            <label>Planta</label>
+                            <select class="modal-input" id="resPlanta">
+                                <option value="alta" selected>Planta Alta</option>
+                                <option value="baja">Planta Baja</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Campos de fecha según modo -->
-                    <div id="resSingleDayFields" class="modal-form-group" style="margin-bottom: 12px;">
+                    <!-- Espacio -->
+                    <div class="modal-form-group" style="margin-bottom:16px;">
+                        <label><i class="bi bi-geo-alt" style="color:#3b82f6;margin-right:4px;"></i>Espacio seleccionado</label>
+                        <select class="modal-input" name="esp_id" id="resEspacio" required style="border:2px solid #c7d2fe;background:#eff6ff;">
+                            <option value="">← Haz clic en el plano o selecciona aquí</option>
+                        </select>
+                        <div id="resSelectedSpaceInfo" style="margin-top:6px;display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;font-size:12px;color:#166534;font-weight:600;"></div>
+                    </div>
+
+                    <!-- Info Reserva -->
+                    <div class="res-modal-section-title"><i class="bi bi-calendar-check"></i> Información de la reserva</div>
+
+                    <!-- Fecha single day -->
+                    <div id="resSingleDayFields" class="modal-form-group" style="margin-bottom:10px;">
                         <label>Fecha</label>
                         <input type="date" class="modal-input" name="fecha_uso" id="resFecha">
                     </div>
 
-                    <div id="resMultiDayFields" style="display: none; flex-direction: column; gap: 12px; margin-bottom: 12px;">
+                    <!-- Fechas multi-day -->
+                    <div id="resMultiDayFields" style="display:none;flex-direction:column;gap:10px;margin-bottom:10px;">
                         <div class="modal-grid-2">
                             <div class="modal-form-group">
                                 <label>Fecha Inicio</label>
@@ -1961,47 +2041,23 @@ include 'header.php';
                         </div>
                         <div class="modal-form-group">
                             <label>Días de la semana</label>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="1" checked> Lun
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+                                <?php foreach(['1'=>'Lun','2'=>'Mar','3'=>'Mié','4'=>'Jue','5'=>'Vie','6'=>'Sáb','0'=>'Dom'] as $v=>$d): ?>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--text-primary);cursor:pointer;">
+                                    <input type="checkbox" class="weekday-checkbox" value="<?php echo $v; ?>" <?php echo in_array($v,['1','2','3','4','5'])?'checked':''; ?>> <?php echo $d; ?>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="2" checked> Mar
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="3" checked> Mié
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="4" checked> Jue
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="5" checked> Vie
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="6"> Sáb
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-primary); text-transform: none; cursor: pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="0"> Dom
-                                </label>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-grid-2">
+                    <div class="modal-grid-2" style="margin-bottom:10px;">
                         <div class="modal-form-group">
                             <label>Hora Inicio</label>
                             <select class="modal-input" name="hora_ent" id="resHoraEnt" required>
-                                <option value="08:00">08:00 AM</option>
-                                <option value="09:00">09:00 AM</option>
-                                <option value="10:00">10:00 AM</option>
-                                <option value="11:00">11:00 AM</option>
-                                <option value="12:00">12:00 PM</option>
-                                <option value="13:00">01:00 PM</option>
-                                <option value="14:00">02:00 PM</option>
-                                <option value="15:00">03:00 PM</option>
-                                <option value="16:00">04:00 PM</option>
-                                <option value="17:00">05:00 PM</option>
-                                <option value="18:00">06:00 PM</option>
+                                <?php foreach(['08:00'=>'08:00 AM','09:00'=>'09:00 AM','10:00'=>'10:00 AM','11:00'=>'11:00 AM','12:00'=>'12:00 PM','13:00'=>'01:00 PM','14:00'=>'02:00 PM','15:00'=>'03:00 PM','16:00'=>'04:00 PM','17:00'=>'05:00 PM','18:00'=>'06:00 PM'] as $v=>$l): ?>
+                                <option value="<?php echo $v; ?>"><?php echo $l; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="modal-form-group">
@@ -2013,14 +2069,14 @@ include 'header.php';
                                 <option value="4">4 horas</option>
                                 <option value="5">5 horas</option>
                             </select>
-                            <small id="resWarningLong" style="color: #ef4444; font-size: 10px; display: none; font-weight: 700; margin-top: 4px;">Reservas > 2 horas requieren aprobación del admin.</small>
+                            <small id="resWarningLong" style="color:#ef4444;font-size:10px;display:none;font-weight:700;margin-top:4px;">Reservas &gt; 2 horas requieren aprobación del admin.</small>
                         </div>
                     </div>
 
-                    <div class="modal-grid-2">
+                    <div class="modal-grid-2" style="margin-bottom:10px;">
                         <div class="modal-form-group">
                             <label>Capacidad del espacio</label>
-                            <input type="text" class="modal-input" id="resCapacidadLabel" disabled value="30 personas">
+                            <input type="text" class="modal-input" id="resCapacidadLabel" disabled value="0 personas">
                         </div>
                         <div class="modal-form-group">
                             <label>N° alumnos/asistentes</label>
@@ -2028,59 +2084,94 @@ include 'header.php';
                         </div>
                     </div>
 
-                    <div class="modal-form-group">
-                        <label>Equipamiento disponible (Seleccionar para préstamo)</label>
-                        <div id="resEquipamientoContainer" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px; max-height: 120px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: #f8fafc;">
-                            <div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>
+                    <div class="modal-form-group" style="margin-bottom:10px;">
+                        <label>Equipamiento disponible</label>
+                        <div id="resEquipamientoContainer" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;max-height:90px;overflow-y:auto;padding:8px;border:1px solid var(--border-color);border-radius:8px;background:#f8fafc;">
+                            <div style="font-size:12px;color:var(--text-secondary);">Selecciona un espacio primero...</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- SECCIÓN 2: MOTIVO DE LA RESERVA -->
-                <div>
-                    <div class="res-modal-section-title">
-                        <i class="bi bi-chat-left-text"></i> Motivo de la reserva
-                    </div>
-                    <div class="modal-form-group">
+                    <!-- Motivo -->
+                    <div class="res-modal-section-title"><i class="bi bi-chat-left-text"></i> Motivo</div>
+                    <div class="modal-form-group" style="margin-bottom:10px;">
                         <label>Motivo / Actividad</label>
-                        <textarea class="modal-textarea" id="resMotivo" maxlength="250" placeholder="Describe el propósito de la reserva..."></textarea>
+                        <textarea class="modal-textarea" id="resMotivo" maxlength="250" placeholder="Describe el propósito de la reserva..." style="height:60px;"></textarea>
                         <div class="char-counter"><span id="charCount">0</span> / 250</div>
                     </div>
-                </div>
 
-                <!-- SECCIÓN 3: INFORMACIÓN DEL SOLICITANTE -->
-                <div>
-                    <div class="res-modal-section-title">
-                        <i class="bi bi-person"></i> Información del solicitante
-                    </div>
-                    
-                    <div class="modal-grid-2">
+                    <!-- Solicitante -->
+                    <div class="res-modal-section-title"><i class="bi bi-person"></i> Solicitante</div>
+                    <div class="modal-grid-2" style="margin-bottom:10px;">
                         <div class="modal-form-group">
-                            <label>Nombre completo</label>
+                            <label>Nombre</label>
                             <input type="text" class="modal-input" id="resNombreSolicitante" disabled value="<?php echo htmlspecialchars($currentUser['nombre']); ?>">
                         </div>
                         <div class="modal-form-group">
-                            <label>Correo institucional</label>
+                            <label>Correo</label>
                             <input type="email" class="modal-input" id="resCorreoSolicitante" disabled value="<?php echo htmlspecialchars($currentUser['correo']); ?>">
                         </div>
                     </div>
-                    
-                    <div class="modal-grid-2">
-                        <div class="modal-form-group" style="grid-column: span 2;">
-                            <label>Teléfono (Opcional)</label>
-                            <input type="text" class="modal-input" id="resTelefonoSolicitante" placeholder="+52 ..." value="<?php echo htmlspecialchars($currentUser['telefono']); ?>">
+                    <div class="modal-form-group" style="margin-bottom:16px;">
+                        <label>Teléfono (Opcional)</label>
+                        <input type="text" class="modal-input" id="resTelefonoSolicitante" placeholder="+52 ..." value="<?php echo htmlspecialchars($currentUser['telefono']); ?>">
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display:flex;gap:10px;margin-top:auto;">
+                        <button type="button" class="btn-action-outline" style="flex:1;justify-content:center;" id="btnCancelReserva">Cancelar</button>
+                        <button type="submit" class="btn-action-primary" style="flex:1;justify-content:center;" id="btnConfirmReserva">
+                            <i class="bi bi-calendar-check"></i> Confirmar reserva
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- ── COLUMNA DERECHA: MAPA INTERACTIVO ── -->
+            <div class="map-pane">
+                <!-- Barra de controles del mapa -->
+                <div class="map-pane-controls">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <i class="bi bi-map" style="color:#3b82f6;font-size:16px;"></i>
+                        <span style="font-weight:800;font-size:13px;color:#1e293b;">Plano Arquitectónico</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex:1;max-width:220px;">
+                        <div style="position:relative;flex:1;">
+                            <i class="bi bi-search" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:12px;"></i>
+                            <input type="text" id="modalMapSearch" placeholder="Buscar espacio..." oninput="modalHighlightMapSpace(this.value)"
+                                style="width:100%;padding:7px 8px 7px 28px;border-radius:8px;border:1px solid #e2e8f0;font-size:12px;outline:none;background:#f8fafc;">
                         </div>
                     </div>
+                    <!-- Controles de zoom -->
+                    <div style="display:flex;gap:4px;">
+                        <button type="button" onclick="modalMapZoomIn()" title="Acercar" style="width:30px;height:30px;border:1px solid #e2e8f0;background:white;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#475569;transition:all .2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">+</button>
+                        <button type="button" onclick="modalMapZoomOut()" title="Alejar" style="width:30px;height:30px;border:1px solid #e2e8f0;background:white;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#475569;transition:all .2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">−</button>
+                        <button type="button" onclick="modalMapZoomReset()" title="Restablecer vista" style="width:30px;height:30px;border:1px solid #e2e8f0;background:white;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:#475569;transition:all .2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">⌂</button>
+                    </div>
                 </div>
+
+                <!-- Contenedor del plano con zoom/pan -->
+                <div class="map-pane-viewport" id="modalMapViewport">
+                    <div class="map-pane-inner" id="modalMapInner">
+                        <img id="modalMapImage" src="assets/img/mapas/MAPA_PIDET_Planta_Alta.png" alt="Plano arquitectónico" style="display:block;user-select:none;" onload="onModalMapImageLoad()" draggable="false">
+                        <svg id="modalMapOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;" preserveAspectRatio="xMinYMin meet"></svg>
+                    </div>
+                </div>
+
+                <!-- Leyenda -->
+                <div class="map-pane-legend" style="flex-wrap: wrap; gap: 8px;">
+                    <div class="map-legend-item"><span style="background:rgba(34,197,94,0.35);border:2px solid #22C55E;"></span>Libre</div>
+                    <div class="map-legend-item"><span style="background:rgba(239,68,68,0.35);border:2px solid #EF4444;"></span>Ocupado</div>
+                    <div class="map-legend-item"><span style="background:rgba(37,99,235,0.4);border:2px solid #2563EB;"></span>Seleccionado</div>
+                    <div class="map-legend-item"><span style="background:rgba(55,65,81,0.35);border:2px solid #374151;"></span>Privado</div>
+                    <div class="map-legend-item"><span style="background:rgba(245,158,11,0.35);border:2px solid #F59E0B;"></span>Requiere autorización</div>
+                    <div class="map-legend-item"><span style="background:rgba(139,92,246,0.35);border:2px solid #8B5CF6;"></span>Reserva especial</div>
+                </div>
+
+                <!-- Tooltip del mapa -->
+                <div id="modalMapTooltip" class="modal-map-tooltip" style="display:none;"></div>
             </div>
-            
-            <div class="res-modal-footer">
-                <button type="button" class="btn-action-outline" style="flex:1; justify-content:center;" id="btnCancelReserva">Cancelar</button>
-                <button type="submit" class="btn-action-primary" style="flex:1; justify-content:center;" id="btnConfirmReserva">
-                    <i class="bi bi-calendar-check"></i> Confirmar reserva
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -2174,6 +2265,82 @@ include 'header.php';
         return colors[index];
     }
 
+    // LÓGICA CENTRALIZADA DE NEGOCIO PARA ESPACIOS
+    function getSpaceRules(spaceData) {
+        // Valores por defecto
+        const rules = {
+            tipo_acceso: 'General',
+            es_reservable: true,
+            mensaje_tooltip: 'Reserva directa disponible.',
+            mensaje_toast_seleccion: 'Puedes continuar con tu reservación.',
+            mensaje_toast_exito: '¡Listo! Tu espacio quedó reservado correctamente. Disfruta tu actividad.',
+            icono: 'bi-check-circle-fill',
+            color_tema: '#10b981' // Verde
+        };
+
+        if (!spaceData) return rules;
+
+        const rawRes = spaceData.es_reservable;
+        rules.es_reservable = !(rawRes === false || rawRes === 'f' || rawRes === 0 || rawRes === 'false' || rawRes === null || rawRes === '');
+        
+        const acceso = (spaceData.acceso || '').toLowerCase();
+        const tipo = (spaceData.tipo || '').toLowerCase();
+        const responsable = spaceData.responsable || '';
+        const nombre = spaceData.nombre_numero || 'Espacio';
+
+        // 1. No reservable / Privado
+        if (!rules.es_reservable) {
+            rules.tipo_acceso = 'Privado / No Reservable';
+            rules.mensaje_tooltip = 'Este espacio es de acceso privado o no admite reservaciones.';
+            rules.mensaje_toast_seleccion = `${nombre} no está disponible para reservaciones.`;
+            rules.icono = 'bi-lock-fill';
+            rules.color_tema = '#64748b'; // Gris
+            return rules;
+        }
+
+        // 2. Visita (Ej: CEPRODI)
+        if (acceso === 'visita') {
+            rules.tipo_acceso = 'Solo Visita';
+            rules.mensaje_tooltip = 'Únicamente se reserva mediante visita programada.';
+            rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Este espacio únicamente puede reservarse mediante visita programada.`;
+            rules.mensaje_toast_exito = 'Tu solicitud quedó registrada. Recuerda que este espacio únicamente puede utilizarse mediante visita autorizada.';
+            rules.icono = 'bi-eye-fill';
+            rules.color_tema = '#8b5cf6'; // Morado
+            return rules;
+        }
+
+        // 3. Restringido (Responsable específico)
+        if (acceso === 'restringido') {
+            rules.tipo_acceso = 'Requiere Autorización';
+            if (responsable) {
+                rules.mensaje_tooltip = `Únicamente reservable con autorización de ${responsable}.`;
+                rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. La solicitud será enviada para autorización de ${responsable}.`;
+            } else {
+                rules.mensaje_tooltip = `Requiere autorización especial.`;
+                rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta reservación requiere autorización.`;
+            }
+            rules.mensaje_toast_exito = 'Tu solicitud fue enviada correctamente. Recibirás una notificación cuando sea aprobada.';
+            rules.icono = 'bi-shield-lock-fill';
+            rules.color_tema = '#f59e0b'; // Naranja
+            return rules;
+        }
+
+        // 4. Administrador (Solo Administradores)
+        if (acceso === 'administrador') {
+            rules.tipo_acceso = 'Requiere Administración';
+            rules.mensaje_tooltip = 'Reserva únicamente por el equipo administrativo.';
+            rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta reservación deberá ser autorizada o gestionada por la administración.`;
+            rules.mensaje_toast_exito = 'Tu solicitud fue enviada al equipo administrativo. Recibirás una notificación pronto.';
+            rules.icono = 'bi-person-workspace';
+            rules.color_tema = '#f59e0b'; // Naranja
+            return rules;
+        }
+
+        // 5. General
+        rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Puedes continuar con tu reservación.`;
+        return rules;
+    }
+
     // ESTADO DE LA APLICACIÓN DE CALENDARIO
     const state = {
         currentView: 'month', // 'month', 'week'
@@ -2254,13 +2421,8 @@ include 'header.php';
                 // Ajustar UI según la vista
                 document.getElementById('monthViewGrid').style.display = state.currentView === 'month' ? 'grid' : 'none';
                 document.getElementById('weekViewGrid').style.display = state.currentView === 'week' ? 'block' : 'none';
-                document.getElementById('mapViewGrid').style.display = state.currentView === 'map' ? 'flex' : 'none';
 
-                if (state.currentView === 'map') {
-                    initMap();
-                } else {
-                    renderActiveCalendar();
-                }
+                renderActiveCalendar();
 
                 renderActiveCalendar();
             });
@@ -2469,8 +2631,10 @@ include 'header.php';
             document.getElementById('resFechaFin').value = dFin.toISOString().split('T')[0];
             
             // Vaciar y resetear campos
-            document.getElementById('resEdificio').value = "";
-            document.getElementById('resEspacio').innerHTML = '<option value="">Seleccione espacio...</option>';
+            document.getElementById('resEdificio').value = "PIDET";
+            document.getElementById('resEdificio').dispatchEvent(new Event('change'));
+            // La lista de espacios ya se cargó por el evento change de resEdificio en la línea anterior.
+            document.getElementById('resEspacio').value = '';
             document.getElementById('resCapacidadLabel').value = "0 personas";
             const eqCont = document.getElementById('resEquipamientoContainer');
             if (eqCont) eqCont.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
@@ -2484,6 +2648,11 @@ include 'header.php';
 
             reservationModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+
+            // Inicializar o resetear mapa
+            setTimeout(() => {
+                if (typeof initModalMap === 'function') initModalMap();
+            }, 100);
         }
 
         window.closeResModal = function() {
@@ -2523,6 +2692,8 @@ include 'header.php';
         // Al cambiar espacio en la reserva
         if(resEspacio) {
             resEspacio.addEventListener('change', (e) => {
+                if (typeof syncMapFromForm === 'function') syncMapFromForm();
+
                 const val = e.target.value;
                 const eqContainer = document.getElementById('resEquipamientoContainer');
                 const btnConfirm = document.getElementById('btnConfirmReserva');
@@ -2543,9 +2714,23 @@ include 'header.php';
                     const updateMagnaBadge = () => {
                         const count = parseInt(numInput.value) || 1;
                         const salasReq = Math.max(1, Math.min(4, Math.ceil(count / 24)));
-                        infoBox.innerHTML = `<div style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
-                            <i class="bi bi-info-circle-fill"></i> <strong>Aforo: ${count} asistente(s)</strong> — El sistema asignará automáticamente <strong>${salasReq} Sala(s) Magna</strong> (${salasReq * 24} cap. máxima).
-                        </div>`;
+                        
+                        infoBox.innerHTML = `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <div style="font-weight: 700; font-size: 15px; color: #0f172a;">Sala Magna (Modular)</div>
+                                    <div style="background: #22c55e15; color: #16a34a; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">
+                                        Acceso General
+                                    </div>
+                                </div>
+                                <div style="font-size: 13px; color: #475569; margin-bottom: 12px;">
+                                    <i class="bi bi-people-fill" style="margin-right:4px;"></i> Capacidad Dinámica: <strong>Hasta 96 pers.</strong>
+                                </div>
+                                <div style="background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; padding: 8px 12px; font-size: 12px; font-weight: 500;">
+                                    <i class="bi bi-info-circle-fill" style="margin-right: 4px;"></i> Aforo: <strong>${count} asistente(s)</strong> — El sistema asignará automáticamente <strong>${salasReq} Sala(s) Magna</strong> (${salasReq * 24} cap. máxima).
+                                </div>
+                            </div>
+                        `;
                     };
                     if (window._magnaInputHandler) {
                         numInput.removeEventListener('input', window._magnaInputHandler);
@@ -2578,20 +2763,40 @@ include 'header.php';
                 if (spObj) {
                     document.getElementById('resCapacidadLabel').value = `${spObj.capacidad} personas`;
 
-                    // Lógica para espacios reservados a Administrador
-                    const accLower = (spObj.acceso || spObj.acceso_tipo || '').toLowerCase();
-                    if (accLower === 'administrador') {
+                    const rules = getSpaceRules(spObj);
+                    
+                    // Tarjeta Elegante de Información
+                    infoBox.innerHTML = `
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div style="font-weight: 700; font-size: 15px; color: #0f172a;">${spObj.nombre_numero}</div>
+                                <div style="background: ${rules.color_tema}15; color: ${rules.color_tema}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">
+                                    ${rules.tipo_acceso}
+                                </div>
+                            </div>
+                            <div style="font-size: 13px; color: #475569; margin-bottom: 4px;">
+                                <i class="bi bi-diagram-3-fill" style="margin-right:4px;"></i> Tipo: <strong>${spObj.tipo}</strong>
+                            </div>
+                            <div style="font-size: 13px; color: #475569; margin-bottom: 12px;">
+                                <i class="bi bi-people-fill" style="margin-right:4px;"></i> Capacidad: <strong>${spObj.capacidad} pers.</strong>
+                            </div>
+                            <div style="background: ${rules.color_tema}10; color: ${rules.color_tema}; border-left: 4px solid ${rules.color_tema}; padding: 8px 12px; font-size: 12px; font-weight: 500;">
+                                <i class="bi ${rules.icono}" style="margin-right: 4px;"></i> ${rules.mensaje_tooltip}
+                            </div>
+                        </div>
+                    `;
+                    e.target.parentElement.appendChild(infoBox);
+
+                    // Deshabilitar botón si no es reservable o si es administrador (y no lo es)
+                    if (!rules.es_reservable) {
+                        btnConfirm.disabled = true;
+                    } else if (rules.tipo_acceso === 'Requiere Administración') {
                         if (!isUserAdmin) {
-                            infoBox.innerHTML = `<div style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;">
+                            btnConfirm.disabled = true;
+                            infoBox.innerHTML += `<div style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; margin-top: 8px;">
                                 <i class="bi bi-shield-lock-fill"></i> Acceso Exclusivo: Este espacio está catalogado para uso exclusivo de Administradores.
                             </div>`;
-                            e.target.parentElement.appendChild(infoBox);
-                            btnConfirm.disabled = true;
                         } else {
-                            infoBox.innerHTML = `<div style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
-                                <i class="bi bi-calendar-range"></i> Espacio de Administrador: Se requiere reserva por periodo cuatrimestral (modo multi-día recurrente).
-                            </div>`;
-                            e.target.parentElement.appendChild(infoBox);
                             btnConfirm.disabled = false;
                             const btnMulti = document.getElementById('btnResModeMultiple');
                             if (btnMulti) btnMulti.click();
@@ -2599,7 +2804,7 @@ include 'header.php';
                     } else {
                         btnConfirm.disabled = false;
                     }
-                    
+
                     // Buscar equipamiento asignado a este espacio o edificio
                     const spAssets = allAssets.filter(as => as.esp_asignado == espId || (as.edificio === spObj.edificio && !as.esp_asignado));
                     if(spAssets.length > 0) {
@@ -3658,11 +3863,14 @@ include 'header.php';
                         btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
                     }
                 } else if (data.success || data.id || data.ids) {
+                    const spObj = allSpaces.find(sp => sp.esp_id == dataToSubmit.esp_id);
+                    const rules = getSpaceRules(spObj);
+
                     Swal.fire({
                         icon: 'success',
                         title: '¡Reservación Solicitada!',
-                        text: 'Tu reservación ha sido programada con éxito. Revisa tu correo para más detalles.',
-                        confirmButtonColor: '#10b981'
+                        text: rules.mensaje_toast_exito,
+                        confirmButtonColor: rules.color_tema || '#10b981'
                     });
                     window.closeResModal();
                     window.fetchEvents();
@@ -3780,10 +3988,6 @@ include 'header.php';
         if (x + tooltipWidth > window.innerWidth) {
             x = e.clientX - tooltipWidth - 15;
         }
-        if (y + tooltipHeight > window.innerHeight) {
-            y = e.clientY - tooltipHeight - 15;
-        }
-        
         tooltip.style.left = x + 'px';
         tooltip.style.top = y + 'px';
     };
@@ -3794,255 +3998,620 @@ include 'header.php';
     };
 
     // ============================================================================
-    // MAPA INTERACTIVO - LÓGICA Y DATOS
+    // MAPA INTERACTIVO INTEGRADO EN EL MODAL DE RESERVAS
     // ============================================================================
-    
-    // Zonas del Mapa: Polígonos SVG (Arquitectura Universal)
-    const mapZones = {
-        'PIDET_alta': [
-            { db_name: 'Posgrado 2', path: 'M 140 180 L 260 270 L 300 220 L 190 120 Z' },
-            { db_name: 'Posgrado 1', path: 'M 260 270 L 350 340 L 410 290 L 310 200 Z' },
-            { db_name: 'Aula Magna', path: 'M 480 200 L 680 200 L 680 430 L 480 430 Z' },
-            { db_name: 'Salón 1', path: 'M 320 480 L 410 480 L 410 520 L 320 520 Z' },
-            { db_name: 'Aula 1', path: 'M 480 480 L 590 480 L 590 540 L 480 540 Z' },
-            { db_name: 'Aula 2', path: 'M 490 540 L 610 560 L 590 620 L 480 590 Z' },
-            { db_name: 'Aula 3', path: 'M 500 600 L 630 650 L 600 700 L 490 650 Z' },
-            { db_name: 'Aula 4', path: 'M 530 670 L 660 740 L 620 790 L 500 710 Z' },
-            { db_name: 'Aula 5 Digital', path: 'M 550 740 L 690 840 L 630 920 L 490 810 Z' },
-            { db_name: 'Cubículos', path: 'M 320 530 L 410 530 L 410 570 L 320 570 Z' },
-            { db_name: 'Oficina City', path: 'M 300 580 L 410 580 L 410 700 L 300 700 Z' }
-        ],
-        'PIDET_baja': [
-            // Placeholders listos para poblar
-        ],
-        'CIC_alta': [
-            // Placeholders listos para poblar
-        ],
-        'CIC_baja': [
-            // Placeholders listos para poblar
-        ]
-    };
 
-    // Textos digitales superpuestos (Arquitectura Universal)
-    const mapLabels = {
-        'PIDET_alta': [
-            { db_name: 'Posgrado 2', top: '18%', left: '23%' },
-            { db_name: 'Posgrado 1', top: '28%', left: '33%' },
-            { db_name: 'Aula Magna', top: '32%', left: '57%' },
-            { db_name: 'Salón 1', top: '50%', left: '36%' },
-            { db_name: 'Cubículos', top: '55%', left: '36%' },
-            { db_name: 'Oficina City', top: '64%', left: '36%' },
-            { db_name: 'Aula 1', top: '51%', left: '53%' },
-            { db_name: 'Aula 2', top: '58%', left: '54%' },
-            { db_name: 'Aula 3', top: '64%', left: '56%' },
-            { db_name: 'Aula 4', top: '70%', left: '58%' },
-            { db_name: 'Aula 5 Digital', top: '82%', left: '58%' }
-        ],
-        'PIDET_baja': [],
-        'CIC_alta': [],
-        'CIC_baja': []
-    };
+    let MAP_DATA = {};
+    let modalCurrentMapKey = 'PIDET_alta';
+    let modalSelectedPolygon = null;
 
-    let currentMapKey = 'PIDET_alta';
+    // Estado del Pan y Zoom
+    let modalZoom = 1;
+    let modalPanX = 0;
+    let modalPanY = 0;
+    let modalIsDragging = false;
+    let modalStartX = 0;
+    let modalStartY = 0;
 
-    function initMap() {
-        updateMapImage();
-    }
-
-    // Buscador auxiliar para extraer info de la DB
-    function getSpaceFromDB(matchName, matchEdificio) {
-        if (!matchName) return null;
-        return allSpaces.find(sp => {
-            const sameEdificio = sp.edificio === matchEdificio;
-            const sameName = sp.nombre_numero.toLowerCase().includes(matchName.toLowerCase()) || matchName.toLowerCase().includes(sp.nombre_numero.toLowerCase());
-            return sameEdificio && sameName;
-        });
-    }
-
-    window.updateMapImage = function() {
-        const edificio = document.getElementById('mapEdificio').value;
-        const planta = document.getElementById('mapPlanta').value;
-        
-        currentMapKey = `${edificio}_${planta}`;
-        
-        let imgSrc = '';
-        if (edificio === 'PIDET') {
-            imgSrc = planta === 'alta' ? 'assets/img/mapas/PIDET_p_a.png' : 'assets/img/mapas/PIDET_p_b.png';
+    // Inicializar Motor
+    function initModalMap() {
+        if (Object.keys(MAP_DATA).length === 0) {
+            fetch('assets/map_data.json')
+                .then(r => r.json())
+                .then(data => {
+                    MAP_DATA = data;
+                    updateModalMapImage();
+                })
+                .catch(e => console.error('Error cargando map_data.json:', e));
         } else {
-            imgSrc = planta === 'alta' ? 'assets/img/mapas/PLANTA_ALTA_CIC_4_0.png' : 'assets/img/mapas/PLANTA_BAJA_CIC_4_0.png';
+            updateModalMapImage();
         }
-        
-        document.getElementById('mapImage').src = imgSrc;
-        renderMapZones();
-        renderMapLabels();
-    };
-
-    function renderMapLabels() {
-        const labelsContainer = document.getElementById('mapLabelsOverlay');
-        labelsContainer.innerHTML = '';
-        
-        const labels = mapLabels[currentMapKey];
-        if (!labels) return;
-
-        const edificioFilter = document.getElementById('mapEdificio').value;
-
-        labels.forEach(lbl => {
-            // Extraer nombre de la DB
-            const realSpace = getSpaceFromDB(lbl.db_name, edificioFilter);
-            const finalName = realSpace ? realSpace.nombre_numero : lbl.db_name;
-
-            const el = document.createElement('div');
-            el.style.position = 'absolute';
-            el.style.top = lbl.top;
-            el.style.left = lbl.left;
-            el.style.transform = 'translate(-50%, -50%)';
-            el.style.color = '#1e293b'; // Color oscuro institucional
-            el.style.fontSize = '12px';
-            el.style.fontWeight = '800';
-            el.style.background = 'rgba(255, 255, 255, 0.7)';
-            el.style.padding = '2px 6px';
-            el.style.borderRadius = '4px';
-            el.style.border = '1px solid rgba(0,0,0,0.1)';
-            el.style.letterSpacing = '0.5px';
-            el.textContent = finalName;
-            labelsContainer.appendChild(el);
-        });
     }
 
-    function renderMapZones() {
-        const svg = document.getElementById('mapOverlay');
+    function updateModalMapImage() {
+        const edif = document.getElementById('resEdificio').value || 'PIDET';
+        const planta = document.getElementById('resPlanta').value || 'alta';
+        modalCurrentMapKey = `${edif}_${planta}`;
+
+        const config = MAP_DATA[modalCurrentMapKey];
+        if (!config) return;
+
+        modalDeselectZone();
+        const img = document.getElementById('modalMapImage');
+        img.src = config.image;
+        
+        // Reset pan & zoom al cambiar de mapa
+        modalMapZoomReset();
+    }
+
+    // Callbacks del modal selectores
+    document.getElementById('resEdificio').addEventListener('change', () => {
+        updateModalMapImage();
+    });
+    
+    document.getElementById('resPlanta').addEventListener('change', () => {
+        updateModalMapImage();
+        // Borrar selección de espacio si cambió de planta
+        document.getElementById('resEspacio').value = "";
+        document.getElementById('resEspacio').dispatchEvent(new Event('change'));
+    });
+
+    window.onModalMapImageLoad = function() {
+        const img = document.getElementById('modalMapImage');
+        if (!img.naturalWidth) return;
+
+        const svg = document.getElementById('modalMapOverlay');
+        svg.setAttribute('viewBox', `0 0 ${img.naturalWidth} ${img.naturalHeight}`);
+        renderModalMap();
+
+        // Ejecutar Fit to View inicial
+        if (typeof window.calculateFitToView === 'function') {
+            window.calculateFitToView();
+        }
+    };
+
+    function renderModalMap() {
+        const svg = document.getElementById('modalMapOverlay');
         svg.innerHTML = '';
+        const config = MAP_DATA[modalCurrentMapKey];
+        if (!config || !config.zones) return;
+
+        config.zones.forEach(zone => {
+            // Pasar esp_id cuando esté disponible en el JSON (prioritario)
+            const spaceData = findSpaceInDB(zone.db_name, config.edificio, zone.esp_id);
+            const estatus = spaceData ? spaceData.estatus : 'Disponible';
+            
+            // Etiqueta viene EXCLUSIVAMENTE de la BD. Si no hay match, mostrar db_name como fallback.
+            const label = spaceData ? spaceData.nombre_numero : (zone.db_name || 'Sin asignar');
+
+            // ─────────────────────────────────────────────────────
+            // es_reservable: PostgreSQL puede enviar true/false/"t"/"f"/1/0
+            // Usamos comparación explícita contra valores falsy
+            // ─────────────────────────────────────────────────────
+            let esReservable = true;
+            if (spaceData) {
+                const raw = spaceData.es_reservable;
+                // false / 'f' / 0 / 'false' / '' / null → NO reservable
+                esReservable = !(raw === false || raw === 'f' || raw === 0 || raw === 'false' || raw === null || raw === '');
+            }
+
+            const acceso = spaceData ? spaceData.acceso : 'general';
+            const baseStyle = getBaseStyle(estatus, esReservable, acceso, zone.db_name);
+            const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            poly.setAttribute('points', zone.points);
+            poly.dataset.dbname = zone.db_name;
+            poly.dataset.espid = spaceData ? spaceData.esp_id : '';
+            poly.dataset.estatus = estatus;
+            poly.dataset.reservable = esReservable;
+            poly.dataset.acceso = acceso;
+            
+            poly.setAttribute('fill', baseStyle.fill);
+            poly.setAttribute('stroke', baseStyle.stroke);
+            poly.setAttribute('stroke-width', '3');
+            poly.setAttribute('stroke-opacity', '0.4');
+            poly.style.pointerEvents = 'all';
+            poly.style.cursor = esReservable ? 'pointer' : 'not-allowed';
+            poly.style.transition = 'all 0.15s ease';
+
+            // Tooltip events
+            poly.addEventListener('mouseenter', (e) => {
+                if (modalIsDragging) return;
+                if (poly !== modalSelectedPolygon) {
+                    poly.setAttribute('stroke-width', '4');
+                    poly.setAttribute('stroke-opacity', '0.9');
+                    poly.setAttribute('fill', baseStyle.hoverFill);
+                }
+                showModalTooltip(e, label, spaceData, estatus, esReservable);
+            });
+
+            poly.addEventListener('mousemove', (e) => {
+                if (modalIsDragging) { hideModalTooltip(); return; }
+                moveModalTooltip(e);
+            });
+
+            poly.addEventListener('mouseleave', () => {
+                if (poly !== modalSelectedPolygon) {
+                    poly.setAttribute('stroke-width', '3');
+                    poly.setAttribute('stroke-opacity', '0.4');
+                    poly.setAttribute('fill', baseStyle.fill);
+                }
+                hideModalTooltip();
+            });
+
+            // Click event (seleccionar)
+            poly.addEventListener('click', (e) => {
+                if (modalIsDragging) return; // evitar click accidental al arrastrar
+                e.stopPropagation();
+                if (!esReservable) return;
+                modalSelectZone(poly, zone, spaceData);
+            });
+
+            svg.appendChild(poly);
+        });
         
-        const zones = mapZones[currentMapKey];
-        if (!zones) return;
+        // Renderizar textos libres
+        if (config.texts) {
+            config.texts.forEach(t => {
+                const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                textEl.setAttribute('x', t.x);
+                textEl.setAttribute('y', t.y);
+                textEl.textContent = t.content;
+                textEl.setAttribute('font-size', t.size || 16);
+                textEl.setAttribute('font-family', 'sans-serif');
+                textEl.setAttribute('font-weight', 'bold');
+                textEl.setAttribute('fill', '#1e293b');
+                textEl.setAttribute('paint-order', 'stroke fill');
+                textEl.setAttribute('stroke', 'rgba(255, 255, 255, 0.9)');
+                textEl.setAttribute('stroke-width', '4px');
+                textEl.setAttribute('text-anchor', 'middle');
+                textEl.setAttribute('dominant-baseline', 'middle');
+                textEl.style.pointerEvents = 'none'; // Para que no bloquee los clics en los polígonos
+                textEl.style.userSelect = 'none';
+                svg.appendChild(textEl);
+            });
+        }
 
-        const edificioFilter = document.getElementById('mapEdificio').value;
+        // Sincronizar selección si ya había un espacio seleccionado en el form
+        syncMapFromForm();
+    }
 
-        zones.forEach(zone => {
-            const realSpace = getSpaceFromDB(zone.db_name, edificioFilter);
-            const finalName = realSpace ? realSpace.nombre_numero : zone.db_name;
-            const finalType = realSpace ? realSpace.tipo : 'Espacio';
+    function modalSelectZone(poly, zone, spaceData) {
+        if (modalSelectedPolygon && modalSelectedPolygon !== poly) {
+            resetPolygonStyle(modalSelectedPolygon);
+        }
 
-            const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            polygon.setAttribute('d', zone.path);
-            polygon.setAttribute('fill', 'transparent'); // 100% transparente
-            polygon.setAttribute('stroke', 'transparent'); // Sin bordes
-            polygon.style.pointerEvents = 'auto';
-            polygon.style.cursor = 'pointer';
-            polygon.style.transition = 'all 0.2s ease';
+        modalSelectedPolygon = poly;
+
+        // Estilo seleccionado MUCHO más evidente (Azul fuerte, borde grueso)
+        poly.setAttribute('fill', 'rgba(37, 99, 235, 0.4)');
+        poly.setAttribute('stroke', '#1d4ed8');
+        poly.setAttribute('stroke-opacity', '1');
+        poly.setAttribute('stroke-width', '6');
+
+        // Auto-centrar en el salón seleccionado
+        centerMapOnPolygon(poly);
+
+        // Disparar toast contextual según reglas de negocio
+        if (spaceData && typeof Swal !== 'undefined') {
+            const rules = getSpaceRules(spaceData);
+            // (Toast eliminado por solicitud del usuario para limpiar la interfaz)
             
-            // Interaction purista
-            polygon.addEventListener('mouseenter', (e) => {
-                polygon.setAttribute('fill', 'rgba(37, 99, 235, 0.15)'); // Sombra azul claro
-                showMapTooltip(e, finalName, finalType);
-            });
+            // Si es no reservable, resetear el select pero dejar el polígono seleccionado visualmente
+            if (!rules.es_reservable) {
+                const resEspacio = document.getElementById('resEspacio');
+                if (resEspacio) {
+                    resEspacio.value = '';
+                    resEspacio.dispatchEvent(new Event('change'));
+                }
+                return; // Cortar el flujo hacia el formulario si no es reservable
+            }
+        }
+
+        // Sincronizar hacia el formulario
+        if (spaceData) {
+            const resEdificio = document.getElementById('resEdificio');
+            if (resEdificio && resEdificio.value !== spaceData.edificio) {
+                resEdificio.value = spaceData.edificio;
+                resEdificio.dispatchEvent(new Event('change')); // Popula el resEspacio sincrónicamente
+            }
+
+            const resEspacio = document.getElementById('resEspacio');
+            if (resEspacio) {
+                if (spaceData.nombre_numero && spaceData.nombre_numero.startsWith('Sala Magna')) {
+                    resEspacio.value = 'SALA_MAGNA_MODULAR';
+                } else {
+                    resEspacio.value = spaceData.esp_id;
+                }
+                resEspacio.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+
+    function modalDeselectZone() {
+        if (modalSelectedPolygon) {
+            resetPolygonStyle(modalSelectedPolygon);
+            modalSelectedPolygon = null;
+        }
+    }
+
+    function resetPolygonStyle(poly) {
+        const estatus = poly.dataset.estatus || 'Disponible';
+        const res = poly.dataset.reservable === 'true';
+        const acceso = poly.dataset.acceso || 'general';
+        const dbname = poly.dataset.dbname || '';
+        const style = getBaseStyle(estatus, res, acceso, dbname);
+        poly.setAttribute('fill', style.fill);
+        poly.setAttribute('stroke', style.stroke);
+        poly.setAttribute('stroke-opacity', '0.4');
+        poly.setAttribute('stroke-width', '3');
+    }
+
+    function getBaseStyle(estatus, isReservable, acceso, dbName) {
+        if (!isReservable) {
+            // Privado (Gris Oscuro #374151)
+            return { 
+                fill: 'rgba(55, 65, 81, 0.35)', 
+                stroke: '#374151',
+                hoverFill: 'rgba(55, 65, 81, 0.55)'
+            };
+        }
+        
+        if (estatus === 'Ocupado') {
+            // Ocupado (Rojo #EF4444)
+            return { 
+                fill: 'rgba(239, 68, 68, 0.35)', 
+                stroke: '#EF4444',
+                hoverFill: 'rgba(239, 68, 68, 0.55)'
+            };
+        }
+        
+        // Reserva especial / Visita (Morado #8B5CF6)
+        if (dbName === 'CEPRODI' || acceso === 'visita') {
+            return { 
+                fill: 'rgba(139, 92, 246, 0.35)',  
+                stroke: '#8B5CF6',
+                hoverFill: 'rgba(139, 92, 246, 0.55)'
+            };
+        }
+        
+        // Requiere autorización (Naranja #F59E0B)
+        if (acceso === 'restringido' || acceso === 'administrador') {
+            return { 
+                fill: 'rgba(245, 158, 11, 0.35)',  
+                stroke: '#F59E0B',
+                hoverFill: 'rgba(245, 158, 11, 0.55)'
+            };
+        }
+        
+        // Libre (Verde #22C55E)
+        return { 
+            fill: 'rgba(34, 197, 94, 0.35)',  
+            stroke: '#22C55E',
+            hoverFill: 'rgba(34, 197, 94, 0.55)'
+        };
+    }
+
+    function findSpaceInDB(dbName, edificio, espId) {
+        if (!allSpaces) return null;
+
+        // 1. Buscar por esp_id (100% confiable, no depende del nombre)
+        if (espId) {
+            const byId = allSpaces.find(sp => sp.esp_id == espId);
+            if (byId) return byId;
+        }
+
+        // 2. Fallback: exact match por nombre dentro del mismo edificio
+        if (!dbName) return null;
+        const needle = dbName.toLowerCase().trim();
+        const exact = allSpaces.find(sp => {
+            if (sp.edificio !== edificio) return false;
+            return sp.nombre_numero.toLowerCase().trim() === needle;
+        });
+        if (exact) return exact;
+
+        // 3. Fallback parcial (hay contiene needle)
+        return allSpaces.find(sp => {
+            if (sp.edificio !== edificio) return false;
+            return sp.nombre_numero.toLowerCase().trim().includes(needle);
+        }) || null;
+    }
+
+    // Sincronización Form -> Map
+    function syncMapFromForm() {
+        const espId = document.getElementById('resEspacio').value;
+        if (!espId) {
+            modalDeselectZone();
+            return;
+        }
+        const svg = document.getElementById('modalMapOverlay');
+        const polys = svg.querySelectorAll('polygon');
+        let found = false;
+        polys.forEach(p => {
+            if (p.dataset.espid == espId || (espId === 'SALA_MAGNA_MODULAR' && p.dataset.dbname.startsWith('Sala Magna'))) {
+                modalSelectZone(p, null, null); // spaceData not strictly needed here for styling
+                found = true;
+            }
+        });
+        if(!found) modalDeselectZone();
+    }
+
+
+    // Tooltip
+    const tooltip = document.getElementById('modalMapTooltip');
+    function showModalTooltip(e, label, data, estatus, isReservable) {
+        const rules = getSpaceRules(data);
+        
+        let estatusColor = '#10b981'; // default verde
+        let estatusBadge = 'Disponible';
+        if (estatus === 'Ocupado') {
+            estatusColor = '#ef4444';
+            estatusBadge = 'Ocupado';
+        } else if (!rules.es_reservable) {
+            estatusColor = '#64748b';
+            estatusBadge = 'No Disponible';
+        }
+
+        const capacidadHtml = data && data.capacidad > 0 ? 
+            `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span style="color:#64748b;">Capacidad:</span>
+                <span style="font-weight:600; color:#0f172a;">${data.capacidad} pers.</span>
+            </div>` : '';
+
+        tooltip.innerHTML = `
+            <div style="min-width: 200px;">
+                <div style="font-weight:700; font-size:14px; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; color:#0f172a;">
+                    ${label}
+                </div>
+                <div style="font-size:12px; margin-bottom:8px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:#64748b;">Tipo:</span>
+                        <span style="font-weight:600; color:#0f172a;">${data ? data.tipo : 'Espacio'}</span>
+                    </div>
+                    ${capacidadHtml}
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:#64748b;">Estado:</span>
+                        <span style="font-weight:600; color:${estatusColor};">${estatusBadge}</span>
+                    </div>
+                </div>
+                <div style="background:${rules.color_tema}15; color:${rules.color_tema}; padding:8px; border-radius:6px; font-size:11px; font-weight:600; display:flex; gap:6px; align-items:start;">
+                    <i class="bi ${rules.icono}" style="margin-top:1px;"></i>
+                    <span style="line-height:1.3;">${rules.mensaje_tooltip}</span>
+                </div>
+            </div>
+        `;
+        
+        // Estilos base para el tooltip container (asegurar que se vea elegante)
+        tooltip.style.padding = '12px';
+        tooltip.style.borderRadius = '10px';
+        tooltip.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+        tooltip.style.border = '1px solid rgba(0,0,0,0.05)';
+        tooltip.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+        tooltip.style.backdropFilter = 'blur(8px)';
+        tooltip.style.display = 'block';
+
+        moveModalTooltip(e);
+    }
+    function moveModalTooltip(e) {
+        if(tooltip.style.display === 'none') return;
+        let x = e.clientX + 15;
+        let y = e.clientY + 15;
+        if (x + tooltip.offsetWidth > window.innerWidth) x = e.clientX - tooltip.offsetWidth - 15;
+        if (y + tooltip.offsetHeight > window.innerHeight) y = e.clientY - tooltip.offsetHeight - 15;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    }
+    function hideModalTooltip() {
+        tooltip.style.display = 'none';
+    }
+
+    // Buscador local en el mapa con auto-foco
+    window.modalHighlightMapSpace = function(query) {
+        const polys = document.getElementById('modalMapOverlay').querySelectorAll('polygon');
+        const q = query.toLowerCase().trim();
+        let exactMatch = null;
+        let partialMatches = [];
+
+        polys.forEach(p => {
+            const dbname = (p.dataset.dbname || '').toLowerCase();
+            if (!q) {
+                p.style.opacity = '1';
+                if (p !== modalSelectedPolygon) { resetPolygonStyle(p); }
+            } else if (dbname.includes(q)) {
+                p.style.opacity = '1';
+                if(p !== modalSelectedPolygon) {
+                    p.setAttribute('stroke','#2563eb'); 
+                    p.setAttribute('stroke-opacity','0.8');
+                    p.setAttribute('stroke-width','4');
+                }
+                if (dbname === q) exactMatch = p;
+                partialMatches.push(p);
+            } else {
+                p.style.opacity = '0.2';
+                if (p !== modalSelectedPolygon) { resetPolygonStyle(p); }
+            }
+        });
+
+        if (q && exactMatch) {
+            centerMapOnPolygon(exactMatch);
+        } else if (q && partialMatches.length === 1) {
+            centerMapOnPolygon(partialMatches[0]);
+        }
+    };
+
+    // Zoom & Pan (Matemáticas Avanzadas)
+    const mapViewport = document.getElementById('modalMapViewport');
+    const mapInner = document.getElementById('modalMapInner');
+
+    function applyTransform(withTransition = false) {
+        if (!mapInner) return;
+        if (withTransition) {
+            mapInner.style.transition = 'transform 0.35s ease-in-out';
+        } else {
+            mapInner.style.transition = 'none';
+        }
+        mapInner.style.transform = `translate(${modalPanX}px, ${modalPanY}px) scale(${modalZoom})`;
+        
+        // Remove transition after it's done so drag remains responsive
+        if (withTransition) {
+            setTimeout(() => { mapInner.style.transition = 'none'; }, 350);
+        }
+    }
+
+    // Auto-foco inteligente: solo centra si el espacio está fuera de la pantalla
+    window.centerMapOnPolygon = function(poly) {
+        if (!mapViewport || !poly) return;
+        
+        const bbox = poly.getBBox();
+        const vW = mapViewport.clientWidth;
+        const vH = mapViewport.clientHeight;
+
+        // Coordenadas del polígono en la pantalla (pixeles reales)
+        const polyScreenX = (bbox.x * modalZoom) + modalPanX;
+        const polyScreenY = (bbox.y * modalZoom) + modalPanY;
+        const polyScreenW = bbox.width * modalZoom;
+        const polyScreenH = bbox.height * modalZoom;
+
+        // Comprobar si el polígono está al menos parcialmente visible en pantalla
+        // Le damos un pequeño margen de 20px para que no se sienta justo en el borde cortado
+        const margin = 20;
+        const isVisible = (polyScreenX + polyScreenW > margin) && 
+                          (polyScreenX < vW - margin) && 
+                          (polyScreenY + polyScreenH > margin) && 
+                          (polyScreenY < vH - margin);
+
+        if (isVisible) {
+            // El polígono ya está visible en la pantalla. 
+            // Para priorizar la experiencia de navegación (tipo Google Maps o AutoCAD),
+            // NO forzamos un movimiento brusco. Mantenemos el contexto visual del usuario.
+            return;
+        }
+
+        // Si el polígono quedó completamente fuera del área visible,
+        // realizamos un desplazamiento suave (smooth pan) para centrarlo.
+        const polyCenterX = bbox.x + (bbox.width / 2);
+        const polyCenterY = bbox.y + (bbox.height / 2);
+        
+        modalPanX = (vW / 2) - (polyCenterX * modalZoom);
+        modalPanY = (vH / 2) - (polyCenterY * modalZoom);
+        
+        applyTransform(true);
+    };
+
+    function zoomToCenter(delta) {
+        const newZoom = Math.min(Math.max(modalZoom + delta, 0.5), 4);
+        if (!mapViewport) return;
+        const rect = mapViewport.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const imgX = (centerX - modalPanX) / modalZoom;
+        const imgY = (centerY - modalPanY) / modalZoom;
+        
+        modalZoom = newZoom;
+        modalPanX = centerX - (imgX * modalZoom);
+        modalPanY = centerY - (imgY * modalZoom);
+        
+        applyTransform(true);
+    }
+
+    window.calculateFitToView = function() {
+        if (!mapViewport) return;
+        const img = document.getElementById('modalMapImage');
+        if (!img || !img.naturalWidth) return;
+
+        const vW = mapViewport.clientWidth;
+        const vH = mapViewport.clientHeight;
+        
+        // Márgenes de seguridad
+        const margin = 30;
+        const availableW = vW - (margin * 2);
+        const availableH = vH - (margin * 2);
+
+        // Calcular escalas para que quepa completo
+        const scaleX = availableW / img.naturalWidth;
+        const scaleY = availableH / img.naturalHeight;
+
+        // Tomar la escala mínima para asegurar que quepa sin recortarse
+        const fitScale = Math.min(scaleX, scaleY);
+        
+        modalZoom = Math.min(Math.max(fitScale, 0.1), 4);
+
+        // Calcular el centrado absoluto
+        const scaledW = img.naturalWidth * modalZoom;
+        const scaledH = img.naturalHeight * modalZoom;
+
+        modalPanX = (vW - scaledW) / 2;
+        modalPanY = (vH - scaledH) / 2;
+
+        applyTransform(true);
+    };
+
+    window.modalMapZoomIn = function() { zoomToCenter(0.4); };
+    window.modalMapZoomOut = function() { zoomToCenter(-0.4); };
+    window.modalMapZoomReset = function() { 
+        window.calculateFitToView();
+    };
+
+    // Recalcular Fit to View al cambiar el tamaño de ventana (debounce)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            // Solo si el modal está abierto (si no, no tiene clientWidth válido)
+            const modal = document.getElementById('reservationModalWide');
+            if (modal && modal.style.display === 'flex') {
+                window.calculateFitToView();
+            }
+        }, 150);
+    });
+
+    if (mapViewport) {
+        // Scroll wheel zoom (Centrado al puntero)
+        mapViewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.15 : 0.15;
+            const newZoom = Math.min(Math.max(modalZoom + delta, 0.5), 4);
             
-            polygon.addEventListener('mouseleave', () => {
-                polygon.setAttribute('fill', 'transparent');
-                hideMapTooltip();
-            });
+            const rect = mapViewport.getBoundingClientRect();
+            const cursorX = e.clientX - rect.left;
+            const cursorY = e.clientY - rect.top;
+            
+            const imgX = (cursorX - modalPanX) / modalZoom;
+            const imgY = (cursorY - modalPanY) / modalZoom;
+            
+            modalZoom = newZoom;
+            modalPanX = cursorX - (imgX * modalZoom);
+            modalPanY = cursorY - (imgY * modalZoom);
+            
+            applyTransform(false);
+        }, {passive: false});
 
-            polygon.addEventListener('mousemove', (e) => {
-                moveMapTooltip(e);
-            });
+        // Drag to pan
+        mapViewport.addEventListener('mousedown', (e) => {
+            if(e.button !== 0) return; // solo click izquierdo
+            modalIsDragging = true;
+            modalStartX = e.clientX - modalPanX;
+            modalStartY = e.clientY - modalPanY;
+            mapViewport.style.cursor = 'grabbing';
+        });
 
-            polygon.addEventListener('click', () => {
-                openMapDrawer(zone.db_name, finalName, finalType, realSpace);
-            });
+        window.addEventListener('mousemove', (e) => {
+            if (!modalIsDragging) return;
+            modalPanX = e.clientX - modalStartX;
+            modalPanY = e.clientY - modalStartY;
+            applyTransform(false);
+        });
 
-            svg.appendChild(polygon);
+        window.addEventListener('mouseup', () => {
+            modalIsDragging = false;
+            mapViewport.style.cursor = 'grab';
+        });
+        
+        window.addEventListener('mouseleave', () => {
+            modalIsDragging = false;
+            mapViewport.style.cursor = 'grab';
         });
     }
-
-    window.highlightMapSpace = function(query) {
-        // En un futuro se puede cambiar la opacidad de los paths en base a la busqueda
-    };
-
-    // Tooltip logic
-    const mapTooltip = document.getElementById('mapTooltip');
-    
-    function showMapTooltip(e, name, type) {
-        document.getElementById('ttName').textContent = name;
-        document.getElementById('ttType').textContent = type;
-        mapTooltip.style.display = 'block';
-        moveMapTooltip(e);
-    }
-    
-    function moveMapTooltip(e) {
-        const container = document.getElementById('mapContainer').getBoundingClientRect();
-        const x = e.clientX - container.left;
-        const y = e.clientY - container.top;
-        mapTooltip.style.left = x + 'px';
-        mapTooltip.style.top = y + 'px';
-    }
-    
-    function hideMapTooltip() {
-        mapTooltip.style.display = 'none';
-    }
-
-    // Drawer logic
-    window.openMapDrawer = function(db_name, finalName, finalType, realSpace) {
-        document.getElementById('drawerBuildingBadge').textContent = document.getElementById('mapEdificio').value;
-        document.getElementById('drawerName').textContent = finalName;
-        document.getElementById('drawerType').textContent = finalType;
-        
-        if (realSpace) {
-            document.getElementById('drawerCapacity').textContent = realSpace.capacidad + ' personas';
-            document.getElementById('mapDrawer').dataset.espid = realSpace.esp_id;
-            document.getElementById('mapDrawer').dataset.edificio = realSpace.edificio;
-        } else {
-            document.getElementById('drawerCapacity').textContent = 'No registrado';
-            document.getElementById('mapDrawer').dataset.espid = '';
-            document.getElementById('mapDrawer').dataset.edificio = '';
-        }
-
-        document.getElementById('mapDrawerOverlay').style.display = 'block';
-        setTimeout(() => {
-            document.getElementById('mapDrawerOverlay').style.opacity = '1';
-            document.getElementById('mapDrawer').style.right = '0';
-        }, 10);
-    };
-
-    window.closeMapDrawer = function() {
-        document.getElementById('mapDrawer').style.right = '-400px';
-        document.getElementById('mapDrawerOverlay').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('mapDrawerOverlay').style.display = 'none';
-        }, 300);
-    };
-
-    window.reserveFromMap = function() {
-        const espId = document.getElementById('mapDrawer').dataset.espid;
-        const edificio = document.getElementById('mapDrawer').dataset.edificio;
-        
-        closeMapDrawer();
-        
-        // Cambiar a vista mensual (o semana)
-        document.querySelector('.btn-switch-view[data-view="month"]').click();
-        
-        // Abrir modal de reserva y precargar el espacio
-        if (espId) {
-            setTimeout(() => {
-                openResModal();
-                const selEdif = document.getElementById('resEdificio');
-                if (selEdif && edificio) {
-                    selEdif.value = edificio;
-                    selEdif.dispatchEvent(new Event('change'));
-                }
-                setTimeout(() => {
-                    const selEsp = document.getElementById('resEspacio');
-                    if (selEsp) {
-                        selEsp.value = espId;
-                        selEsp.dispatchEvent(new Event('change'));
-                    }
-                }, 100);
-            }, 300);
-        } else {
-            setTimeout(() => {
-                openResModal();
-            }, 300);
-        }
-    };
 
 </script>
 
