@@ -19534,3 +19534,697 @@ Cuerpo:
 Cuerpo: 
 2026-07-14 23:09:53 - GET /backend/api/index.php/notifications/all
 Cuerpo: 
+2026-07-14 23:10:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:10:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:10:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:10:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:11:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:11:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:11:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:11:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:12:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:12:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:12:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:12:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:13:38 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:13:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:13:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:13:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:14:39 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:14:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:14:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:14:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:15:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:15:31 - GET /Estadias/SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-07-14 23:15:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:15:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:15:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:16:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:16:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:16:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:16:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:17:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:17:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:17:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:17:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:18:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:18:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:18:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:18:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:19:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:19:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:19:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:19:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:20:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:20:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:20:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:20:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:21:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:21:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:21:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:21:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:22:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:22:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:22:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:22:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:23:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:23:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:23:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:23:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:24:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:24:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:24:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:24:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:25:33 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:25:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:25:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:25:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:26:34 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:26:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:26:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:26:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:27:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:27:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:27:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:27:53 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:28:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:28:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:28:48 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:28:49 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:28:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:28:54 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:29:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:29:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:29:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:29:54 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:30:38 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:30:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:30:53 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:30:54 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:31:39 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:31:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:31:54 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:31:54 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:32:40 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:32:41 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:32:54 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:32:54 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:33:41 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:33:41 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:33:54 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:33:54 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:34:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:34:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:34:34 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:34:36 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:35:33 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:35:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:35:34 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:35:35 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:36:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:36:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:36:34 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:36:34 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:37:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:37:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:37:35 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:37:35 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:38:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:38:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:38:34 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:38:34 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:39:33 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:39:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:39:34 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:39:34 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:40:34 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:40:34 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:40:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:40:36 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:41:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:41:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:41:35 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:41:35 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:42:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:42:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:42:35 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:42:35 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:43:17 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:43:18 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:43:20 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:43:20 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:43:33 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:43:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:44:20 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:44:20 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:44:34 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:44:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:45:02 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:45:03 - GET /Estadias/SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-07-14 23:45:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:45:21 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:45:21 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:46:02 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:46:04 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:46:21 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:46:21 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:48:22 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:48:22 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-14 23:48:22 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-14 23:48:23 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:15:16 - POST /backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:15:16 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:15:17 - GET /backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:15:17 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:15:58 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:15:58 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:16:58 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:16:58 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:17:58 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:17:58 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:18:58 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:18:58 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:19:39 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:19:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:21:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:21:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:21:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:21:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:22:29 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:22:29 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:22:34 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:22:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:23:30 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:23:30 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:23:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:23:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:24:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:24:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:24:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:24:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:24:53 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:24:53 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:25:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:25:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:25:54 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:25:54 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:26:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:26:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:26:55 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:26:55 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:27:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:27:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:27:56 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:27:56 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:28:31 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:28:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:28:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:28:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:28:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:28:36 - GET /Estadias/SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-07-15 17:28:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:29:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:29:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:29:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:29:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:30:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:30:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:30:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:30:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:31:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:31:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:31:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:31:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:32:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:32:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:32:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:32:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:33:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:33:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:33:38 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:33:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:34:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:34:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:34:39 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:34:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:35:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:35:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:35:40 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:35:40 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:36:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:36:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:36:41 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:36:41 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:37:38 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:37:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:38:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:38:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:39:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:39:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:40:38 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:40:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:41:39 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:41:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:42:40 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:42:40 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:43:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:43:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:44:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:44:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:45:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:45:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:46:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:46:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:47:03 - GET /Estadias/SIGRAT/backend/api/index.php/dashboard?rango=mes
+Cuerpo: 
+2026-07-15 17:47:07 - GET /Estadias/SIGRAT/backend/api/index.php/dashboard?rango=ano
+Cuerpo: 
+2026-07-15 17:47:10 - GET /Estadias/SIGRAT/backend/api/index.php/dashboard?rango=semana
+Cuerpo: 
+2026-07-15 17:47:14 - GET /Estadias/SIGRAT/backend/api/index.php/dashboard?rango=mes
+Cuerpo: 
+2026-07-15 17:47:18 - GET /Estadias/SIGRAT/backend/api/index.php/dashboard?rango=semana
+Cuerpo: 
+2026-07-15 17:47:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:47:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:48:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:48:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:48:58 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:48:58 - GET /Estadias/SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-07-15 17:48:59 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:49:45 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:49:45 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:50:46 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:50:47 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:51:46 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:51:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:52:46 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:52:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:52:52 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:52:53 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:53:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:53:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:53:46 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:53:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:54:36 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:54:36 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:54:46 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:54:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:55:37 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:55:37 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:55:46 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:55:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:56:38 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:56:38 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:57:39 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:57:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:57:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:57:44 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:58:40 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:58:40 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:59:41 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:59:41 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 17:59:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 17:59:44 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:00:42 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:00:42 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:01:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:01:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:02:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:02:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:03:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:03:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:04:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:04:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:05:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:05:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:06:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:06:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:07:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:07:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:08:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:08:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:09:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:09:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:10:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:10:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:11:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:11:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:12:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:12:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:13:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:13:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:14:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:14:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:15:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:15:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:16:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:16:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:17:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:17:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:18:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:18:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-15 18:19:43 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-15 18:19:43 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
