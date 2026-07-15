@@ -2721,16 +2721,9 @@ include 'header.php';
                 const filtered = allSpaces.filter(sp => sp.edificio === edif);
                 
                 let opts = '<option value="">Seleccione espacio...</option>';
-                let magnaAdded = false;
                 filtered.forEach(sp => {
-                    if (sp.nombre_numero && sp.nombre_numero.startsWith('Sala Magna')) {
-                        if (!magnaAdded) {
-                            opts += `<option value="SALA_MAGNA_MODULAR">Sala Magna (Modular 1 a 4 salas - Hasta 96 pers.)</option>`;
-                            magnaAdded = true;
-                        }
-                    } else {
-                        opts += `<option value="${sp.esp_id}">${sp.nombre_numero} (${sp.tipo})</option>`;
-                    }
+                    // Mostrar las Salas Magnas individualmente (Sala Magna 1, 2, 3, 4)
+                    opts += `<option value="${sp.esp_id}">${sp.nombre_numero} (${sp.tipo})</option>`;
                 });
                 resEspacio.innerHTML = opts;
                 document.getElementById('resCapacidadLabel').value = "0 personas";
@@ -2749,7 +2742,7 @@ include 'header.php';
 
                 // ── NAVEGACIÓN INTELIGENTE ENTRE MAPAS ──
                 // Al seleccionar un espacio, detectar su edificio y planta y cambiar el mapa
-                if (val && val !== 'SALA_MAGNA_MODULAR') {
+                if (val) {
                     const espId = parseInt(val);
                     const spNav = allSpaces.find(sp => sp.esp_id === espId);
                     if (spNav) {
@@ -2786,8 +2779,6 @@ include 'header.php';
                             if (typeof syncMapFromForm === 'function') syncMapFromForm();
                         }, 300);
                     }
-                } else {
-                    if (typeof syncMapFromForm === 'function') syncMapFromForm();
                 }
 
                 // Quitar banners informativos anteriores
@@ -2806,44 +2797,40 @@ include 'header.php';
                 infoBox.id = 'resDynamicInfoBox';
                 infoBox.style.marginTop = '10px';
 
-                if (val === 'SALA_MAGNA_MODULAR') {
-                    document.getElementById('resCapacidadLabel').value = "Modular: 24 a 96 personas (1-4 salas)";
-                    btnConfirm.disabled = false;
+                // Detectar si el espacio seleccionado es una Sala Magna individual
+                const isSalaMagna = spObj2Check => spObj2Check && spObj2Check.nombre_numero && spObj2Check.nombre_numero.startsWith('Sala Magna');
+                const espIdNum = parseInt(val);
+                const spObjCheck = allSpaces.find(sp => sp.esp_id === espIdNum);
 
-                    const updateMagnaBadge = () => {
-                        const count = parseInt(numInput.value) || 1;
-                        const salasReq = Math.max(1, Math.min(4, Math.ceil(count / 24)));
-                        
-                        infoBox.innerHTML = `
-                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                    <div style="font-weight: 700; font-size: 15px; color: #0f172a;">Sala Magna (Modular)</div>
-                                    <div style="background: #22c55e15; color: #16a34a; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">
-                                        Acceso General
-                                    </div>
-                                </div>
-                                <div style="font-size: 13px; color: #475569; margin-bottom: 12px;">
-                                    <i class="bi bi-people-fill" style="margin-right:4px;"></i> Capacidad Dinámica: <strong>Hasta 96 pers.</strong>
-                                </div>
-                                <div style="background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; padding: 8px 12px; font-size: 12px; font-weight: 500;">
-                                    <i class="bi bi-info-circle-fill" style="margin-right: 4px;"></i> Aforo: <strong>${count} asistente(s)</strong> — El sistema asignará automáticamente <strong>${salasReq} Sala(s) Magna</strong> (${salasReq * 24} cap. máxima).
+                if (isSalaMagna(spObjCheck)) {
+                    // Sala Magna individual: capacidad fija de 24 personas
+                    document.getElementById('resCapacidadLabel').value = '24 personas';
+                    btnConfirm.disabled = false;
+                    if (numInput) numInput.value = 24;
+
+                    infoBox.innerHTML = `
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div style="font-weight: 700; font-size: 15px; color: #0f172a;">${spObjCheck.nombre_numero}</div>
+                                <div style="background: #22c55e15; color: #16a34a; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">
+                                    Acceso General
                                 </div>
                             </div>
-                        `;
-                    };
-                    if (window._magnaInputHandler) {
-                        numInput.removeEventListener('input', window._magnaInputHandler);
-                    }
-                    window._magnaInputHandler = updateMagnaBadge;
-                    numInput.addEventListener('input', window._magnaInputHandler);
-                    updateMagnaBadge();
+                            <div style="font-size: 13px; color: #475569; margin-bottom: 12px;">
+                                <i class="bi bi-people-fill" style="margin-right:4px;"></i> Capacidad: <strong>24 personas</strong>
+                            </div>
+                            <div style="background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; padding: 8px 12px; font-size: 12px; font-weight: 500;">
+                                <i class="bi bi-info-circle-fill" style="margin-right: 4px;"></i> Sala individual. La disponibilidad se verifica en tiempo real.
+                            </div>
+                        </div>
+                    `;
                     e.target.parentElement.appendChild(infoBox);
 
                     // Cargar equipamiento de PIDET
-                    const spAssets = allAssets.filter(as => as.edificio === 'PIDET');
-                    if(spAssets.length > 0) {
+                    const spAssetsMagna = allAssets.filter(as => as.edificio === 'PIDET');
+                    if (spAssetsMagna.length > 0) {
                         let html = '';
-                        spAssets.forEach(as => {
+                        spAssetsMagna.forEach(as => {
                             html += `<label style='display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); cursor: pointer;'>
                                 <input type='checkbox' class='equipamiento-checkbox' value='${as.act_id}'>
                                 ${as.tipo} ${as.marca} ${as.modelo || ''}
@@ -2936,7 +2923,7 @@ include 'header.php';
                     }
                     window._capacidadInputHandler = function() {
                         const espId2 = document.getElementById('resEspacio').value;
-                        if (!espId2 || espId2 === 'SALA_MAGNA_MODULAR') return;
+                        if (!espId2) return;
                         const spObj2 = allSpaces.find(sp => sp.esp_id === parseInt(espId2));
                         if (!spObj2) return;
                         const cap = parseInt(spObj2.capacidad || 0);
@@ -3021,14 +3008,24 @@ include 'header.php';
                 return;
             }
             
+            // Verificar si es una Sala Magna individual para también comprobar disponibilidad global
+            const espIdNum2 = parseInt(espId);
+            const spSelected = !isNaN(espIdNum2) ? allSpaces.find(sp => sp.esp_id === espIdNum2) : null;
+            const isSelectedSalaMagna = spSelected && spSelected.nombre_numero && spSelected.nombre_numero.startsWith('Sala Magna');
+
+            // Obtener todos los esp_ids de Salas Magnas disponibles en allSpaces
+            const salasMagnaIds = allSpaces
+                .filter(sp => sp.nombre_numero && sp.nombre_numero.startsWith('Sala Magna'))
+                .map(sp => sp.esp_id);
+
             fetch(`../backend/api/index.php/reservations?esp_id=${espId}&date=${fecha}`)
                 .then(res => res.json())
-                .then(data => {
+                .then(async data => {
+                    // Marcar horas ocupadas de la sala seleccionada
                     if (data && data.length > 0) {
                         Array.from(selectHora.options).forEach(opt => {
                             const optHour = parseInt(opt.value);
                             data.forEach(res => {
-                                // Ignorar reservaciones rechazadas o canceladas
                                 const estatus = (res.estatus || res.status || '').toLowerCase();
                                 if (estatus === 'rechazada' || estatus === 'rejected' || estatus === 'cancelada' || estatus === 'cancelled') {
                                     return;
@@ -3044,7 +3041,49 @@ include 'header.php';
                             });
                         });
                     }
-                    
+
+                    // Si es Sala Magna individual, verificar si TODAS las salas están ocupadas por cada hora
+                    if (isSelectedSalaMagna && salasMagnaIds.length > 1) {
+                        try {
+                            // Traer reservas de todas las salas magnas para esa fecha
+                            const allMagnaFetches = salasMagnaIds.map(id =>
+                                fetch(`../backend/api/index.php/reservations?esp_id=${id}&date=${fecha}`)
+                                    .then(r => r.json())
+                                    .catch(() => [])
+                            );
+                            const allMagnaData = await Promise.all(allMagnaFetches);
+
+                            // Para cada hora, comprobar si todas las salas están ocupadas
+                            Array.from(selectHora.options).forEach(opt => {
+                                if (opt.disabled) return; // ya bloqueada
+                                const optHour = parseInt(opt.value);
+                                const totalSalas = salasMagnaIds.length;
+                                let salasOcupadas = 0;
+
+                                allMagnaData.forEach(magnaReservas => {
+                                    if (!magnaReservas || magnaReservas.length === 0) return;
+                                    const ocupada = magnaReservas.some(res => {
+                                        const estatus = (res.estatus || res.status || '').toLowerCase();
+                                        if (estatus === 'rechazada' || estatus === 'rejected' || estatus === 'cancelada' || estatus === 'cancelled') return false;
+                                        const startH = parseInt(res.hora_ent);
+                                        const endH = parseInt(res.hora_sal);
+                                        return optHour >= startH && optHour < endH;
+                                    });
+                                    if (ocupada) salasOcupadas++;
+                                });
+
+                                if (salasOcupadas >= totalSalas) {
+                                    opt.disabled = true;
+                                    const h = parseInt(opt.value);
+                                    const baseText = opt.value + (h < 12 ? ' AM' : ' PM');
+                                    opt.text = baseText + ' (Sin salas disponibles)';
+                                }
+                            });
+                        } catch(e) {
+                            console.warn('No se pudo verificar disponibilidad global de Sala Magna:', e);
+                        }
+                    }
+
                     // Seleccionar automáticamente el primer horario disponible no deshabilitado
                     let firstAvailableIndex = -1;
                     for (let i = 0; i < selectHora.options.length; i++) {
@@ -3057,7 +3096,6 @@ include 'header.php';
                     if (firstAvailableIndex !== -1) {
                         selectHora.selectedIndex = firstAvailableIndex;
                     } else {
-                        // Si todos están deshabilitados
                         selectHora.value = "";
                     }
                 })
