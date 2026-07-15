@@ -2265,6 +2265,7 @@ include 'header.php';
     const allAssets = <?php echo json_encode($assets); ?>;
     const sessionUserId = <?php echo json_encode($us_id_sesion); ?>;
     const isUserAdmin = <?php echo json_encode($isAdmin); ?>;
+    let isProgrammaticMapChange = false;
 
     // SISTEMA DE COLORES POR ESPACIO
     function getColorForSpace(esp_id) {
@@ -2757,7 +2758,7 @@ include 'header.php';
                         if (!plantaNav) {
                             // Inferir por nombre si no hay campo planta
                             const nombreLower = (spNav.nombre_numero || '').toLowerCase();
-                            if (nombreLower.includes('baja') || nombreLower.includes('aula 0') || nombreLower.includes('auditorio')) {
+                            if (nombreLower.includes('baja') || nombreLower.includes('aula 0') || nombreLower.includes('auditorio') || nombreLower.includes('magna')) {
                                 plantaNav = 'baja';
                             } else {
                                 plantaNav = 'alta';
@@ -2767,17 +2768,25 @@ include 'header.php';
                         const edifSelect = document.getElementById('resEdificio');
                         const plantaSelect = document.getElementById('resPlanta');
 
-                        let mapChanged = false;
-                        if (edifSelect && edifSelect.value !== edifNav) {
-                            edifSelect.value = edifNav;
-                            edifSelect.dispatchEvent(new Event('change'));
-                            mapChanged = true;
-                        }
-                        if (plantaSelect && plantaSelect.value !== plantaNav) {
-                            plantaSelect.value = plantaNav;
-                            if (!mapChanged) {
-                                plantaSelect.dispatchEvent(new Event('change'));
+                        isProgrammaticMapChange = true;
+                        try {
+                            let mapChanged = false;
+                            if (edifSelect && edifSelect.value !== edifNav) {
+                                edifSelect.value = edifNav;
+                                edifSelect.dispatchEvent(new Event('change'));
+                                mapChanged = true;
                             }
+                            if (plantaSelect && plantaSelect.value !== plantaNav) {
+                                plantaSelect.value = plantaNav;
+                                if (!mapChanged) {
+                                    plantaSelect.dispatchEvent(new Event('change'));
+                                }
+                            }
+                            if (resEspacio && resEspacio.value !== val) {
+                                resEspacio.value = val;
+                            }
+                        } finally {
+                            isProgrammaticMapChange = false;
                         }
                         // Sincronizar el polígono en el mapa después de que cargue la imagen
                         setTimeout(() => {
@@ -4311,9 +4320,11 @@ include 'header.php';
     
     document.getElementById('resPlanta').addEventListener('change', () => {
         updateModalMapImage();
-        // Borrar selección de espacio si cambió de planta
-        document.getElementById('resEspacio').value = "";
-        document.getElementById('resEspacio').dispatchEvent(new Event('change'));
+        // Borrar selección de espacio si cambió de planta y no fue un cambio programático
+        if (!isProgrammaticMapChange) {
+            document.getElementById('resEspacio').value = "";
+            document.getElementById('resEspacio').dispatchEvent(new Event('change'));
+        }
     });
 
     window.onModalMapImageLoad = function() {
