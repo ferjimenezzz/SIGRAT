@@ -2645,12 +2645,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                         position: "center"
                     },
                     {
-                        target: ".calendar-actions",
-                        title: "Reservación y Filtros Avanzados",
-                        description: "Aquí puedes agendar una nueva reserva ingresando los datos del evento, la periodicidad o recurrencia y los activos requeridos. También puedes buscar espacios específicos o usar los filtros avanzados para ver solo tus propias reservaciones.",
-                        position: "left"
-                    },
-                    {
                         target: ".calendar-navigation-bar",
                         title: "Navegación e Intervalos de Vista",
                         description: "Te permite moverte de manera rápida a través de las fechas (ir a hoy, mes anterior o siguiente). También puedes cambiar la visualización completa entre las pestañas de vista Mensual y Semanal, o hacer clic en el selector del mes para saltar a una fecha específica.",
@@ -2666,6 +2660,26 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                         target: ".calendar-sidebar-details",
                         title: "Resumen Diario y Disponibilidad",
                         description: "Ubicado en el panel lateral derecho. Te proporciona una vista ejecutiva rápida: el conteo de reservas agendadas, espacios libres y solicitudes pendientes, seguido por la agenda detallada de próximas reservaciones y la lista de espacios disponibles del día.",
+                        position: "left"
+                    },
+                    {
+                        target: "#btnNewReservation",
+                        title: "Crear Nueva Reservación",
+                        description: "Haz clic en este botón o presiona <b>Siguiente</b> para abrir el modal interactivo con el plano del campus y el formulario detallado para agendar tu espacio.",
+                        position: "left",
+                        actionSelectorClick: "#btnExitResModal"
+                    },
+                    {
+                        target: "#reservationForm",
+                        title: "Formulario de Reservación",
+                        description: "Completa la información del evento: selecciona si es un día único o recurrente, ingresa la fecha, hora, duración, número de alumnos/asistentes, equipamiento requerido y el motivo de la actividad.",
+                        position: "right",
+                        actionSelectorClick: "#btnNewReservation"
+                    },
+                    {
+                        target: ".map-pane",
+                        title: "Plano Arquitectónico y Mapas",
+                        description: "Esta sección te muestra el mapa interactivo del edificio. Puedes hacer zoom y desplazarte por el plano para visualizar las aulas libres (en verde), ocupadas (en rojo) o que requieren autorización (en amarillo). <b>Haz clic en cualquier espacio verde del plano para seleccionarlo directamente.</b>",
                         position: "left"
                     }
                 ],

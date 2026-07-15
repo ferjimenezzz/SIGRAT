@@ -344,10 +344,9 @@ export default function TutorialGuide({ steps = [], moduleId, open, onClose, onC
     if (moduleId) {
       localStorage.setItem(`tutorialVisto_${moduleId}`, 'true');
     }
-    if (isControlled) {
-      if (onComplete) onComplete();
-      if (onClose) onClose();
-    } else {
+    if (onComplete) onComplete();
+    if (onClose) onClose();
+    if (!isControlled) {
       setInternalOpen(false);
     }
   };
