@@ -83,6 +83,20 @@ class EmailService {
      */
 
     public function sendEmail($to, $subject, $body) {
+        $bodyEncoded = base64_encode($body);
+        $scriptPath = __DIR__ . '/send_email_bg.php';
+        
+        if (strncasecmp(PHP_OS, 'WIN', 3) === 0) {
+            $cmd = "start /B php -f \"" . $scriptPath . "\" \"" . addslashes($to) . "\" \"" . addslashes($subject) . "\" \"" . $bodyEncoded . "\"";
+            pclose(popen($cmd, "r"));
+        } else {
+            $cmd = "php -f \"" . $scriptPath . "\" \"" . addslashes($to) . "\" \"" . addslashes($subject) . "\" \"" . $bodyEncoded . "\" > /dev/null 2>&1 &";
+            exec($cmd);
+        }
+        return true;
+    }
+
+    public function sendEmailDirectly($to, $subject, $body) {
         // Validar que se haya cargado el Username, de lo contrario no intentar enviar para no colgar la app
         if (empty($this->mail->Username)) {
             error_log("EmailService: No se enviará el correo porque las credenciales SMTP no están configuradas en el .env.");
