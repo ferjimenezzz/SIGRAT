@@ -2690,7 +2690,11 @@ include 'header.php';
             btnResModeSingle.click();
 
             reservationModal.style.display = 'flex';
+            
+            // Compensar la barra de scroll para que no brinque el fondo ("overflow")
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
             document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = scrollbarWidth + 'px';
 
             // Inicializar o resetear mapa e interactividad de horarios de inmediato
             setTimeout(() => {
@@ -2702,6 +2706,7 @@ include 'header.php';
         window.closeResModal = function() {
             reservationModal.style.display = 'none';
             document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
             // Restablecer siempre el botón al cerrar el modal
             const btnConfirm = document.getElementById('btnConfirmReserva');
             if (btnConfirm) {
