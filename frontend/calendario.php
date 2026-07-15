@@ -2076,13 +2076,11 @@ include 'header.php';
                             </select>
                         </div>
                         <div class="modal-form-group">
-                            <label>Duración</label>
-                            <select class="modal-input" id="resDuracion" required>
-                                <option value="1">1 hora</option>
-                                <option value="2" selected>2 horas</option>
-                                <option value="3">3 horas</option>
-                                <option value="4">4 horas</option>
-                                <option value="5">5 horas</option>
+                            <label>Hora Fin</label>
+                            <select class="modal-input" name="hora_sal" id="resHoraSal" required>
+                                <?php foreach(['09:00'=>'09:00 AM','10:00'=>'10:00 AM','11:00'=>'11:00 AM','12:00'=>'12:00 PM','13:00'=>'01:00 PM','14:00'=>'02:00 PM','15:00'=>'03:00 PM','16:00'=>'04:00 PM','17:00'=>'05:00 PM','18:00'=>'06:00 PM','19:00'=>'07:00 PM','20:00'=>'08:00 PM'] as $v=>$l): ?>
+                                <option value="<?php echo $v; ?>"><?php echo $l; ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <small id="resWarningLong" style="color:#ef4444;font-size:10px;display:none;font-weight:700;margin-top:4px;">Reservas &gt; 2 horas requieren aprobación del admin.</small>
                         </div>
@@ -2632,6 +2630,7 @@ include 'header.php';
             document.getElementById('resFecha').required = true;
             document.getElementById('resFechaInicio').required = false;
             document.getElementById('resFechaFin').required = false;
+            if (typeof checkAvailability === 'function') checkAvailability();
         });
 
         btnResModeMultiple.addEventListener('click', () => {
@@ -2645,6 +2644,7 @@ include 'header.php';
             document.getElementById('resFecha').required = false;
             document.getElementById('resFechaInicio').required = true;
             document.getElementById('resFechaFin').required = true;
+            if (typeof checkAvailability === 'function') checkAvailability();
         });
 
         function openResModal(defaultDate = null) {
@@ -2678,7 +2678,9 @@ include 'header.php';
             document.getElementById('resMotivo').value = "";
             document.getElementById('charCount').textContent = "0";
             document.getElementById('resWarningLong').style.display = 'none';
-            document.getElementById('resDuracion').value = "2";
+            if (document.getElementById('resHoraSal')) {
+                document.getElementById('resHoraSal').value = "";
+            }
 
             // Restablecer botón de confirmar (por si quedó en estado "Procesando")
             const btnConfirm = document.getElementById('btnConfirmReserva');
@@ -2968,21 +2970,99 @@ include 'header.php';
             resFecha.addEventListener('change', checkAvailability);
         }
 
-        const resDuracionSelect = document.getElementById('resDuracion');
-        const resWarningLong = document.getElementById('resWarningLong');
-        if (resDuracionSelect && resWarningLong) {
-            resDuracionSelect.addEventListener('change', (e) => {
-                if (parseInt(e.target.value) > 2) {
-                    resWarningLong.style.display = 'block';
-                } else {
-                    resWarningLong.style.display = 'none';
+        window.updateWarningLong = function() {
+            const selectHoraEnt = document.getElementById('resHoraEnt');
+            const selectHoraSal = document.getElementById('resHoraSal');
+            const resWarningLong = document.getElementById('resWarningLong');
+            if (!selectHoraEnt || !selectHoraSal || !resWarningLong) return;
+
+            const hEnt = parseInt(selectHoraEnt.value);
+            const hSal = parseInt(selectHoraSal.value);
+            if (!isNaN(hEnt) && !isNaN(hSal) && (hSal - hEnt) > 2) {
+                resWarningLong.style.display = 'block';
+            } else {
+                resWarningLong.style.display = 'none';
+            }
+        };
+
+        window.updateHoraFinOptions = function() {
+            const selectHoraEnt = document.getElementById('resHoraEnt');
+            const selectHoraSal = document.getElementById('resHoraSal');
+            if (!selectHoraEnt || !selectHoraSal) return;
+
+            const horaEntVal = selectHoraEnt.value;
+            if (!horaEntVal) {
+                selectHoraSal.innerHTML = '<option value="">Seleccione hora inicio...</option>';
+                return;
+            }
+
+            const entHour = parseInt(horaEntVal);
+            
+            // Determinar la primera hora de reserva ocupada que sea estrictamente posterior a entHour
+            let firstOcupiedHour = 24; // Por defecto medianoche o fuera de rango
+            Array.from(selectHoraEnt.options).forEach(opt => {
+                const h = parseInt(opt.value);
+                if (h > entHour && opt.disabled && (opt.text.includes('(Ocupado)') || opt.text.includes('(Sin salas disponibles)'))) {
+                    if (h < firstOcupiedHour) {
+                        firstOcupiedHour = h;
+                    }
                 }
-                checkAvailability();
+            });
+
+            // Generar las opciones de Hora de Fin (desde entHour + 1 hasta el limite o la primera ocupada)
+            let opts = '';
+            const labels = {
+                '09:00': '09:00 AM', '10:00': '10:00 AM', '11:00': '11:00 AM', '12:00': '12:00 PM',
+                '13:00': '01:00 PM', '14:00': '02:00 PM', '15:00': '03:00 PM', '16:00': '04:00 PM',
+                '17:00': '05:00 PM', '18:00': '06:00 PM', '19:00': '07:00 PM', '20:00': '08:00 PM'
+            };
+
+            for (let h = entHour + 1; h <= 20; h++) {
+                const valStr = h < 10 ? `0${h}:00` : `${h}:00`;
+                const label = labels[valStr] || `${h}:00`;
+                
+                if (h <= firstOcupiedHour) {
+                    opts += `<option value="${valStr}">${label}</option>`;
+                } else {
+                    opts += `<option value="${valStr}" disabled>${label} (Ocupado/Traslape)</option>`;
+                }
+            }
+
+            selectHoraSal.innerHTML = opts;
+
+            // Seleccionar por defecto la primera opción de hora fin (1 hora de duración) o la seleccionada anteriormente si es válida
+            const prevVal = selectHoraSal.value;
+            if (prevVal && parseInt(prevVal) > entHour && parseInt(prevVal) <= firstOcupiedHour) {
+                selectHoraSal.value = prevVal;
+            } else {
+                selectHoraSal.selectedIndex = 0;
+            }
+
+            // Disparar validación de advertencia de > 2 horas
+            updateWarningLong();
+        };
+
+        const selectHoraEnt = document.getElementById('resHoraEnt');
+        if (selectHoraEnt) {
+            selectHoraEnt.addEventListener('change', () => {
+                updateHoraFinOptions();
+            });
+        }
+
+        const selectHoraSal = document.getElementById('resHoraSal');
+        if (selectHoraSal) {
+            selectHoraSal.addEventListener('change', () => {
+                updateWarningLong();
             });
         }
 
         function checkAvailability() {
-            if (state.resMode !== 'single') return; // En multi-día es más complejo, lo dejamos al backend
+            if (state.resMode !== 'single') {
+                // En multi-día no se pueden consultar conflictos del backend,
+                // pero sí actualizamos las opciones de hora fin
+                updateHoraFinOptions();
+                return;
+            }
             const espId = resEspacio.value;
             const fecha = document.getElementById('resFecha').value;
             if (!fecha) return;
@@ -2995,12 +3075,17 @@ include 'header.php';
 
             // Habilitar todos primero y limpiar texto extra
             const selectHora = document.getElementById('resHoraEnt');
+            const horaLabels = {
+                '08:00': '08:00 AM', '09:00': '09:00 AM', '10:00': '10:00 AM', '11:00': '11:00 AM',
+                '12:00': '12:00 PM', '13:00': '01:00 PM', '14:00': '02:00 PM', '15:00': '03:00 PM',
+                '16:00': '04:00 PM', '17:00': '05:00 PM', '18:00': '06:00 PM'
+            };
             Array.from(selectHora.options).forEach(opt => {
                 opt.disabled = false;
-                const h = parseInt(opt.value);
-                const baseText = opt.value + (h < 12 ? ' AM' : ' PM');
+                const baseText = horaLabels[opt.value] || opt.value;
                 opt.text = baseText;
                 
+                const h = parseInt(opt.value);
                 if (isTodayExact && h <= currentHour) {
                     opt.disabled = true;
                     opt.text = baseText + ' (Pasada)';
@@ -3019,6 +3104,7 @@ include 'header.php';
                 if (firstAvailableIndex !== -1) {
                     selectHora.selectedIndex = firstAvailableIndex;
                 }
+                updateHoraFinOptions();
                 return;
             }
             
@@ -3048,8 +3134,7 @@ include 'header.php';
                                 const endH = parseInt(res.hora_sal);
                                 if (optHour >= startH && optHour < endH) {
                                     opt.disabled = true;
-                                    const h = parseInt(opt.value);
-                                    const baseText = opt.value + (h < 12 ? ' AM' : ' PM');
+                                    const baseText = horaLabels[opt.value] || opt.value;
                                     opt.text = baseText + ' (Ocupado)';
                                 }
                             });
@@ -3088,8 +3173,7 @@ include 'header.php';
 
                                 if (salasOcupadas >= totalSalas) {
                                     opt.disabled = true;
-                                    const h = parseInt(opt.value);
-                                    const baseText = opt.value + (h < 12 ? ' AM' : ' PM');
+                                    const baseText = horaLabels[opt.value] || opt.value;
                                     opt.text = baseText + ' (Sin salas disponibles)';
                                 }
                             });
@@ -3112,6 +3196,7 @@ include 'header.php';
                     } else {
                         selectHora.value = "";
                     }
+                    updateHoraFinOptions();
                 })
                 .catch(err => console.error("Error check availability", err));
         }
@@ -3964,12 +4049,20 @@ include 'header.php';
     function submitReservation() {
         const espId = document.getElementById('resEspacio').value;
         const horaEnt = document.getElementById('resHoraEnt').value;
-        const duracionHoras = parseInt(document.getElementById('resDuracion').value);
+        const horaSal = document.getElementById('resHoraSal').value;
         const numAlumnos = parseInt(document.getElementById('resNumAlumnos').value);
         const motivo = document.getElementById('resMotivo').value;
 
-        if (!espId || !horaEnt) {
+        if (!espId || !horaEnt || !horaSal) {
             Swal.fire('Atención', 'Por favor, complete todos los campos obligatorios.', 'warning');
+            return;
+        }
+
+        // ── VALIDACIÓN DE HORA FIN POSTERIOR A HORA INICIO ──
+        const entHour = parseInt(horaEnt.split(':')[0]);
+        const salHour = parseInt(horaSal.split(':')[0]);
+        if (salHour <= entHour) {
+            Swal.fire('Atención', 'La hora de fin debe ser posterior a la hora de inicio.', 'warning');
             return;
         }
 
@@ -4003,15 +4096,6 @@ include 'header.php';
         const selectedHour = parseInt(horaEnt.split(':')[0]);
         const tzOffset = now.getTimezoneOffset() * 60000;
         const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 10);
-
-        // Calcular hora de salida
-        const entParts = horaEnt.split(':').map(Number);
-        let salHour = entParts[0] + duracionHoras;
-        let salMin = entParts[1];
-        
-        const salHourStr = salHour < 10 ? `0${salHour}` : `${salHour}`;
-        const salMinStr = salMin < 10 ? `0${salMin}` : `${salMin}`;
-        const horaSal = `${salHourStr}:${salMinStr}`;
 
         const requestData = {
             esp_id: espId === 'SALA_MAGNA_MODULAR' ? 'SALA_MAGNA_MODULAR' : parseInt(espId),
