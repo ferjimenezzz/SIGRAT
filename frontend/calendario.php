@@ -1469,6 +1469,21 @@ include 'header.php';
         height: 100%;
     }
 
+    /* CONTENEDOR RESPONSIVO DE BOTONES DEL MODAL DE RESERVACIÓN */
+    .modal-actions-row {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .modal-btn-action {
+        flex: 1;
+        justify-content: center;
+        min-width: 120px;
+    }
+
     /* COLUMNA DERECHA: MAPA */
     .map-pane {
         display: flex;
@@ -2081,6 +2096,7 @@ include 'header.php';
                         <div class="modal-form-group">
                             <label>N° alumnos/asistentes</label>
                             <input type="number" class="modal-input" name="num_alumnos" id="resNumAlumnos" value="10" min="1" required>
+                            <small id="resCapacidadError" style="color:#ef4444;font-size:11px;font-weight:700;margin-top:4px;display:none;"></small>
                         </div>
                     </div>
 
@@ -2117,9 +2133,9 @@ include 'header.php';
                     </div>
 
                     <!-- Botones -->
-                    <div style="display:flex;gap:10px;margin-top:auto;">
-                        <button type="button" class="btn-action-outline" style="flex:1;justify-content:center;" id="btnCancelReserva">Cancelar</button>
-                        <button type="submit" class="btn-action-primary" style="flex:1;justify-content:center;" id="btnConfirmReserva">
+                    <div class="modal-actions-row">
+                        <button type="button" class="btn-action-outline modal-btn-action" id="btnCancelReserva">Cancelar</button>
+                        <button type="submit" class="btn-action-primary modal-btn-action" id="btnConfirmReserva">
                             <i class="bi bi-calendar-check"></i> Confirmar reserva
                         </button>
                     </div>
@@ -2271,9 +2287,9 @@ include 'header.php';
         const rules = {
             tipo_acceso: 'General',
             es_reservable: true,
-            mensaje_tooltip: 'Reserva directa disponible.',
+            mensaje_tooltip: 'Reserva directa disponible. Este espacio permite reserva inmediata.',
             mensaje_toast_seleccion: 'Puedes continuar con tu reservación.',
-            mensaje_toast_exito: '¡Listo! Tu espacio quedó reservado correctamente. Disfruta tu actividad.',
+            mensaje_toast_exito: '¡Reserva creada correctamente! Tu espacio ha sido reservado con éxito. Disfruta tu reserva.',
             icono: 'bi-check-circle-fill',
             color_tema: '#10b981' // Verde
         };
@@ -2287,12 +2303,14 @@ include 'header.php';
         const tipo = (spaceData.tipo || '').toLowerCase();
         const responsable = spaceData.responsable || '';
         const nombre = spaceData.nombre_numero || 'Espacio';
+        const edificio = spaceData.edificio || '';
 
         // 1. No reservable / Privado
         if (!rules.es_reservable) {
             rules.tipo_acceso = 'Privado / No Reservable';
-            rules.mensaje_tooltip = 'Este espacio es de acceso privado o no admite reservaciones.';
-            rules.mensaje_toast_seleccion = `${nombre} no está disponible para reservaciones.`;
+            rules.mensaje_tooltip = 'Este espacio es de acceso privado y no admite reservaciones.';
+            rules.mensaje_toast_seleccion = `Este espacio es de acceso privado y no admite reservaciones.`;
+            rules.es_reservable = false;
             rules.icono = 'bi-lock-fill';
             rules.color_tema = '#64748b'; // Gris
             return rules;
@@ -2301,7 +2319,7 @@ include 'header.php';
         // 2. Visita (Ej: CEPRODI)
         if (acceso === 'visita') {
             rules.tipo_acceso = 'Solo Visita';
-            rules.mensaje_tooltip = 'Únicamente se reserva mediante visita programada.';
+            rules.mensaje_tooltip = `Has seleccionado ${nombre}. Este espacio únicamente puede reservarse mediante visita presencial.`;
             rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Este espacio únicamente puede reservarse mediante visita programada.`;
             rules.mensaje_toast_exito = 'Tu solicitud quedó registrada. Recuerda que este espacio únicamente puede utilizarse mediante visita autorizada.';
             rules.icono = 'bi-eye-fill';
@@ -2309,17 +2327,17 @@ include 'header.php';
             return rules;
         }
 
-        // 3. Restringido (Responsable específico)
+        // 3. Restringido
         if (acceso === 'restringido') {
             rules.tipo_acceso = 'Requiere Autorización';
             if (responsable) {
-                rules.mensaje_tooltip = `Únicamente reservable con autorización de ${responsable}.`;
-                rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. La solicitud será enviada para autorización de ${responsable}.`;
+                rules.mensaje_tooltip = `Has seleccionado ${nombre}. Esta solicitud será enviada al administrador ${responsable} para su autorización.`;
+                rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta solicitud será enviada al administrador para su autorización.`;
             } else {
-                rules.mensaje_tooltip = `Requiere autorización especial.`;
-                rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta reservación requiere autorización.`;
+                rules.mensaje_tooltip = `Has seleccionado ${nombre}. Esta solicitud será enviada al administrador para su autorización.`;
+                rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta reservación requiere autorización de administrador.`;
             }
-            rules.mensaje_toast_exito = 'Tu solicitud fue enviada correctamente. Recibirás una notificación cuando sea aprobada.';
+            rules.mensaje_toast_exito = 'La reservación ha sido enviada para validación. Recibirás una notificación cuando sea aprobada.';
             rules.icono = 'bi-shield-lock-fill';
             rules.color_tema = '#f59e0b'; // Naranja
             return rules;
@@ -2328,16 +2346,25 @@ include 'header.php';
         // 4. Administrador (Solo Administradores)
         if (acceso === 'administrador') {
             rules.tipo_acceso = 'Requiere Administración';
-            rules.mensaje_tooltip = 'Reserva únicamente por el equipo administrativo.';
-            rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta reservación deberá ser autorizada o gestionada por la administración.`;
-            rules.mensaje_toast_exito = 'Tu solicitud fue enviada al equipo administrativo. Recibirás una notificación pronto.';
+            rules.mensaje_tooltip = `Has seleccionado ${nombre}. Esta reservación deberá ser gestionada por la administración.`;
+            rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Esta reservación deberá ser autorizada por la administración.`;
+            rules.mensaje_toast_exito = 'Tu solicitud fue registrada correctamente. El equipo administrativo recibirá una notificación.';
             rules.icono = 'bi-person-workspace';
             rules.color_tema = '#f59e0b'; // Naranja
             return rules;
         }
 
         // 5. General
-        rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Puedes continuar con tu reservación.`;
+        rules.mensaje_tooltip = `Has seleccionado ${nombre}. Este espacio permite reserva inmediata.`;
+        rules.mensaje_toast_seleccion = `Has seleccionado ${nombre}. Este espacio permite reserva inmediata. Puedes continuar con tu reservación.`;
+        // Variar el mensaje de éxito para espacios generales
+        const mensajesExito = [
+            '¡Reserva creada correctamente! Tu espacio ha sido reservado con éxito.',
+            '¡Tu solicitud fue registrada correctamente! Disfruta tu reserva.',
+            '¡Listo! Tu espacio quedó reservado. Te esperamos.',
+            '¡Perfecto! La reserva ha sido confirmada correctamente.'
+        ];
+        rules.mensaje_toast_exito = mensajesExito[Math.floor(Math.random() * mensajesExito.length)];
         return rules;
     }
 
@@ -2633,9 +2660,18 @@ include 'header.php';
             // Vaciar y resetear campos
             document.getElementById('resEdificio').value = "PIDET";
             document.getElementById('resEdificio').dispatchEvent(new Event('change'));
-            // La lista de espacios ya se cargó por el evento change de resEdificio en la línea anterior.
             document.getElementById('resEspacio').value = '';
             document.getElementById('resCapacidadLabel').value = "0 personas";
+
+            // Limpiar error de capacidad si existe
+            const numAlumnosInput = document.getElementById('resNumAlumnos');
+            if (numAlumnosInput) {
+                numAlumnosInput.style.borderColor = '';
+                numAlumnosInput.style.boxShadow = '';
+            }
+            const capError = document.getElementById('resCapacidadError');
+            if (capError) capError.style.display = 'none';
+
             const eqCont = document.getElementById('resEquipamientoContainer');
             if (eqCont) eqCont.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
             document.getElementById('resMotivo').value = "";
@@ -2643,21 +2679,35 @@ include 'header.php';
             document.getElementById('resWarningLong').style.display = 'none';
             document.getElementById('resDuracion').value = "2";
 
+            // Restablecer botón de confirmar (por si quedó en estado "Procesando")
+            const btnConfirm = document.getElementById('btnConfirmReserva');
+            if (btnConfirm) {
+                btnConfirm.disabled = false;
+                btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
+            }
+
             // Forzar volver a Día Único al abrir
             btnResModeSingle.click();
 
             reservationModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
-            // Inicializar o resetear mapa
+            // Inicializar o resetear mapa e interactividad de horarios de inmediato
             setTimeout(() => {
                 if (typeof initModalMap === 'function') initModalMap();
+                if (typeof checkAvailability === 'function') checkAvailability();
             }, 100);
         }
 
         window.closeResModal = function() {
             reservationModal.style.display = 'none';
             document.body.style.overflow = '';
+            // Restablecer siempre el botón al cerrar el modal
+            const btnConfirm = document.getElementById('btnConfirmReserva');
+            if (btnConfirm) {
+                btnConfirm.disabled = false;
+                btnConfirm.innerHTML = '<i class="bi bi-calendar-check"></i> Confirmar reserva';
+            }
         }
 
         if(btnNewReservation) btnNewReservation.addEventListener('click', () => openResModal());
@@ -2692,16 +2742,65 @@ include 'header.php';
         // Al cambiar espacio en la reserva
         if(resEspacio) {
             resEspacio.addEventListener('change', (e) => {
-                if (typeof syncMapFromForm === 'function') syncMapFromForm();
-
                 const val = e.target.value;
                 const eqContainer = document.getElementById('resEquipamientoContainer');
                 const btnConfirm = document.getElementById('btnConfirmReserva');
                 const numInput = document.getElementById('resNumAlumnos');
 
+                // ── NAVEGACIÓN INTELIGENTE ENTRE MAPAS ──
+                // Al seleccionar un espacio, detectar su edificio y planta y cambiar el mapa
+                if (val && val !== 'SALA_MAGNA_MODULAR') {
+                    const espId = parseInt(val);
+                    const spNav = allSpaces.find(sp => sp.esp_id === espId);
+                    if (spNav) {
+                        const edifNav = spNav.edificio || 'PIDET';
+                        // Determinar la planta según el campo planta del espacio o inferir del nombre
+                        let plantaNav = (spNav.planta || '').toLowerCase();
+                        if (!plantaNav) {
+                            // Inferir por nombre si no hay campo planta
+                            const nombreLower = (spNav.nombre_numero || '').toLowerCase();
+                            if (nombreLower.includes('baja') || nombreLower.includes('aula 0') || nombreLower.includes('auditorio')) {
+                                plantaNav = 'baja';
+                            } else {
+                                plantaNav = 'alta';
+                            }
+                        }
+
+                        const edifSelect = document.getElementById('resEdificio');
+                        const plantaSelect = document.getElementById('resPlanta');
+
+                        let mapChanged = false;
+                        if (edifSelect && edifSelect.value !== edifNav) {
+                            edifSelect.value = edifNav;
+                            edifSelect.dispatchEvent(new Event('change'));
+                            mapChanged = true;
+                        }
+                        if (plantaSelect && plantaSelect.value !== plantaNav) {
+                            plantaSelect.value = plantaNav;
+                            if (!mapChanged) {
+                                plantaSelect.dispatchEvent(new Event('change'));
+                            }
+                        }
+                        // Sincronizar el polígono en el mapa después de que cargue la imagen
+                        setTimeout(() => {
+                            if (typeof syncMapFromForm === 'function') syncMapFromForm();
+                        }, 300);
+                    }
+                } else {
+                    if (typeof syncMapFromForm === 'function') syncMapFromForm();
+                }
+
                 // Quitar banners informativos anteriores
                 const prevBox = document.getElementById('resDynamicInfoBox');
                 if (prevBox) prevBox.remove();
+
+                // Limpiar error de capacidad anterior
+                if (numInput) {
+                    numInput.style.borderColor = '';
+                    numInput.style.boxShadow = '';
+                }
+                const capError = document.getElementById('resCapacidadError');
+                if (capError) capError.style.display = 'none';
 
                 const infoBox = document.createElement('div');
                 infoBox.id = 'resDynamicInfoBox';
@@ -2762,6 +2861,12 @@ include 'header.php';
                 const spObj = allSpaces.find(sp => sp.esp_id === espId);
                 if (spObj) {
                     document.getElementById('resCapacidadLabel').value = `${spObj.capacidad} personas`;
+                    
+                    // Asignar el valor predeterminado del número de alumnos al máximo del espacio
+                    const numAlumnosField = document.getElementById('resNumAlumnos');
+                    if (numAlumnosField) {
+                        numAlumnosField.value = spObj.capacidad;
+                    }
 
                     const rules = getSpaceRules(spObj);
                     
@@ -2822,6 +2927,37 @@ include 'header.php';
                 } else {
                     eqContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
                 }
+
+                // ── VALIDACIÓN DE CAPACIDAD EN TIEMPO REAL ──
+                // Al cambiar espacio, se ata un listener al campo num_alumnos
+                if (numInput) {
+                    if (window._capacidadInputHandler) {
+                        numInput.removeEventListener('input', window._capacidadInputHandler);
+                    }
+                    window._capacidadInputHandler = function() {
+                        const espId2 = document.getElementById('resEspacio').value;
+                        if (!espId2 || espId2 === 'SALA_MAGNA_MODULAR') return;
+                        const spObj2 = allSpaces.find(sp => sp.esp_id === parseInt(espId2));
+                        if (!spObj2) return;
+                        const cap = parseInt(spObj2.capacidad || 0);
+                        const asistentes = parseInt(numInput.value || 0);
+                        const capError2 = document.getElementById('resCapacidadError');
+                        if (cap > 0 && asistentes > cap) {
+                            numInput.style.borderColor = '#ef4444';
+                            numInput.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+                            if (capError2) {
+                                capError2.textContent = `Este espacio admite un máximo de ${cap} personas. (Actual: ${asistentes})`;
+                                capError2.style.display = 'block';
+                            }
+                        } else {
+                            numInput.style.borderColor = '';
+                            numInput.style.boxShadow = '';
+                            if (capError2) capError2.style.display = 'none';
+                        }
+                    };
+                    numInput.addEventListener('input', window._capacidadInputHandler);
+                }
+
                 checkAvailability();
             });
         }
@@ -2848,7 +2984,7 @@ include 'header.php';
             if (state.resMode !== 'single') return; // En multi-día es más complejo, lo dejamos al backend
             const espId = resEspacio.value;
             const fecha = document.getElementById('resFecha').value;
-            if (!espId || !fecha) return;
+            if (!fecha) return;
             
             const now = new Date();
             const tzOffset = now.getTimezoneOffset() * 60000;
@@ -2856,43 +2992,73 @@ include 'header.php';
             const isTodayExact = fecha === localISOTime;
             const currentHour = now.getHours();
 
-            // Habilitar todos primero
-            Array.from(document.getElementById('resHoraEnt').options).forEach(opt => {
+            // Habilitar todos primero y limpiar texto extra
+            const selectHora = document.getElementById('resHoraEnt');
+            Array.from(selectHora.options).forEach(opt => {
                 opt.disabled = false;
                 const h = parseInt(opt.value);
-                opt.text = opt.value + (h < 12 ? ' AM' : ' PM');
+                const baseText = opt.value + (h < 12 ? ' AM' : ' PM');
+                opt.text = baseText;
                 
                 if (isTodayExact && h <= currentHour) {
                     opt.disabled = true;
-                    opt.text = opt.value + ' (Pasada)';
+                    opt.text = baseText + ' (Pasada)';
                 }
             });
+
+            if (!espId) {
+                // Si aún no se selecciona espacio, seleccionar el primer horario disponible basándonos en la hora actual
+                let firstAvailableIndex = -1;
+                for (let i = 0; i < selectHora.options.length; i++) {
+                    if (!selectHora.options[i].disabled) {
+                        firstAvailableIndex = i;
+                        break;
+                    }
+                }
+                if (firstAvailableIndex !== -1) {
+                    selectHora.selectedIndex = firstAvailableIndex;
+                }
+                return;
+            }
             
             fetch(`../backend/api/index.php/reservations?esp_id=${espId}&date=${fecha}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.length > 0) {
-                        const selectHora = document.getElementById('resHoraEnt');
                         Array.from(selectHora.options).forEach(opt => {
                             const optHour = parseInt(opt.value);
                             data.forEach(res => {
+                                // Ignorar reservaciones rechazadas o canceladas
+                                const estatus = (res.estatus || res.status || '').toLowerCase();
+                                if (estatus === 'rechazada' || estatus === 'rejected' || estatus === 'cancelada' || estatus === 'cancelled') {
+                                    return;
+                                }
                                 const startH = parseInt(res.hora_ent);
                                 const endH = parseInt(res.hora_sal);
                                 if (optHour >= startH && optHour < endH) {
                                     opt.disabled = true;
-                                    opt.text = opt.value + ' (Ocupado)';
+                                    const h = parseInt(opt.value);
+                                    const baseText = opt.value + (h < 12 ? ' AM' : ' PM');
+                                    opt.text = baseText + ' (Ocupado)';
                                 }
                             });
                         });
-                        // Si la seleccionada está ocupada, cambiar
-                        if (selectHora.options[selectHora.selectedIndex].disabled) {
-                            for (let i=0; i<selectHora.options.length; i++) {
-                                if (!selectHora.options[i].disabled) {
-                                    selectHora.selectedIndex = i;
-                                    break;
-                                }
-                            }
+                    }
+                    
+                    // Seleccionar automáticamente el primer horario disponible no deshabilitado
+                    let firstAvailableIndex = -1;
+                    for (let i = 0; i < selectHora.options.length; i++) {
+                        if (!selectHora.options[i].disabled) {
+                            firstAvailableIndex = i;
+                            break;
                         }
+                    }
+                    
+                    if (firstAvailableIndex !== -1) {
+                        selectHora.selectedIndex = firstAvailableIndex;
+                    } else {
+                        // Si todos están deshabilitados
+                        selectHora.value = "";
                     }
                 })
                 .catch(err => console.error("Error check availability", err));
@@ -3643,18 +3809,33 @@ include 'header.php';
         document.getElementById('statDisponibles').textContent = libresCount;
         document.getElementById('statPendientes').textContent = pendientesCount;
 
-        // 2. Próximas Reservaciones Sidebar (Top 3 ordenados por hora de entrada)
+        // 2. Próximas Reservaciones Sidebar — Semana completa (7 días), ordenadas cronológicamente
         const upcomingList = document.getElementById('upcomingReservationsList');
         upcomingList.innerHTML = '';
 
-        const sortedTodayEvents = [...todayEvents].sort((a,b) => a.hora_ent.localeCompare(b.hora_ent)).slice(0, 3);
+        const nowDate = new Date();
+        const tzOffset = nowDate.getTimezoneOffset() * 60000;
+        const todayStrLocal = (new Date(nowDate.getTime() - tzOffset)).toISOString().slice(0, 10);
+        const sevenDaysLater = new Date(nowDate.getTime() - tzOffset + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+        // Filtrar eventos de los próximos 7 días (incluyendo hoy)
+        const weekEvents = filteredEvents
+            .filter(ev => ev.fecha_uso >= todayStrLocal && ev.fecha_uso <= sevenDaysLater)
+            .sort((a, b) => {
+                if (a.fecha_uso !== b.fecha_uso) return a.fecha_uso.localeCompare(b.fecha_uso);
+                return (a.hora_ent || '').localeCompare(b.hora_ent || '');
+            });
         
-        if (sortedTodayEvents.length === 0) {
-            upcomingList.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); font-style:italic; text-align:center; padding: 12px 0;">Sin reservaciones agendadas hoy.</div>';
+        if (weekEvents.length === 0) {
+            upcomingList.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); font-style:italic; text-align:center; padding: 12px 0;">Sin reservaciones programadas para los próximos 7 días.</div>';
         } else {
-            sortedTodayEvents.forEach(ev => {
+            const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+            weekEvents.forEach(ev => {
                 const item = document.createElement('div');
                 item.className = 'upcoming-res-item';
+                item.style.cursor = 'pointer';
                 
                 let iconClass = 'icon-blue';
                 let iconType = 'bi-journal-check';
@@ -3667,14 +3848,25 @@ include 'header.php';
                 if(est === 'Pendiente' || est === 'pending') { badgeText = 'Pendiente'; badgeClass = 'badge-pendiente'; }
                 if(est === 'Rechazada' || est === 'rejected') { badgeText = 'Rechazada'; badgeClass = 'badge-rechazada'; }
 
+                // Formatear fecha legible
+                let fechaLabel = ev.fecha_uso;
+                try {
+                    const parts = ev.fecha_uso.split('-');
+                    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    fechaLabel = `${diasSemana[d.getDay()]} ${d.getDate()} ${mesesCortos[d.getMonth()]}`;
+                    if (ev.fecha_uso === todayStrLocal) fechaLabel = 'Hoy';
+                } catch(err) {}
+
                 item.innerHTML = `
                     <div class="res-item-icon ${iconClass}"><i class="bi ${iconType}"></i></div>
                     <div class="res-item-info">
                         <div class="res-item-name">${ev.nombre_numero}</div>
-                        <div class="res-item-time">${ev.hora_ent.substring(0,5)} - ${ev.hora_sal.substring(0,5)}</div>
+                        <div class="res-item-time" style="color:var(--active-blue);font-weight:700;">${fechaLabel}</div>
+                        <div class="res-item-time">${(ev.hora_ent||'').substring(0,5)} - ${(ev.hora_sal||'').substring(0,5)}</div>
                     </div>
                     <span class="status-badge ${badgeClass}">${badgeText}</span>
                 `;
+                item.addEventListener('click', () => openDetailsModal(ev));
                 upcomingList.appendChild(item);
             });
         }
@@ -3727,6 +3919,31 @@ include 'header.php';
         if (!espId || !horaEnt) {
             Swal.fire('Atención', 'Por favor, complete todos los campos obligatorios.', 'warning');
             return;
+        }
+
+        // ── VALIDACIÓN DE CAPACIDAD ANTES DE ENVIAR ──
+        if (espId && espId !== 'SALA_MAGNA_MODULAR') {
+            const spCheck = allSpaces.find(sp => sp.esp_id === parseInt(espId));
+            if (spCheck) {
+                const capMax = parseInt(spCheck.capacidad || 0);
+                if (capMax > 0 && numAlumnos > capMax) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Capacidad excedida',
+                        html: `El número de asistentes (<strong>${numAlumnos}</strong>) supera la capacidad máxima del espacio seleccionado.<br><br>Este espacio admite un máximo de <strong>${capMax} personas</strong>.<br><br>Por favor, reduce el número de asistentes o selecciona un espacio más grande.`,
+                        confirmButtonColor: '#ef4444',
+                        confirmButtonText: 'Entendido'
+                    });
+                    // Resaltar el campo
+                    const numInput = document.getElementById('resNumAlumnos');
+                    if (numInput) {
+                        numInput.style.borderColor = '#ef4444';
+                        numInput.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+                        numInput.focus();
+                    }
+                    return;
+                }
+            }
         }
 
         const now = new Date();

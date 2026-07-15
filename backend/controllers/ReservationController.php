@@ -141,12 +141,21 @@ class ReservationController {
             }
 
             // Revisar el tipo de acceso del espacio para determinar estatus inicial
-            $stmtEspacio = $this->db->prepare("SELECT acceso, division_restringida, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio = $this->db->prepare("SELECT acceso, division_restringida, nombre_numero, edificio, capacidad FROM ESPACIO WHERE esp_id = ?");
             $stmtEspacio->execute([$data['esp_id']]);
             $espacio = $stmtEspacio->fetch();
 
             if (!$espacio) {
                 throw new \Exception("El espacio no existe.");
+            }
+
+            // -------------------------------------------------------------------------
+            // VALIDACIÓN DE CAPACIDAD MÁXIMA
+            // -------------------------------------------------------------------------
+            $numAlumnos = intval($data['num_alumnos'] ?? 0);
+            $capacidadMaxima = intval($espacio['capacidad'] ?? 0);
+            if ($capacidadMaxima > 0 && $numAlumnos > $capacidadMaxima) {
+                throw new \Exception("El número de asistentes ({$numAlumnos}) supera la capacidad máxima del espacio \"{$espacio['nombre_numero']}\" ({$capacidadMaxima} personas). Por favor, reduce el número de asistentes o elige un espacio más grande.");
             }
 
             $acceso = strtolower(trim($espacio['acceso'] ?? 'general'));
