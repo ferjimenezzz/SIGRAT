@@ -130,7 +130,9 @@ class ReservationController {
                               AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
             $stmt = $this->db->prepare($conflictQuery);
             $stmt->execute([$data['esp_id'], $data['fecha_uso'], $data['hora_sal'], $data['hora_ent'], $data['hora_sal'], $data['hora_ent'], $data['hora_ent'], $data['hora_sal']]);
-            if ($stmt->fetch()) throw new \Exception("Conflicto de horario.");
+            if ($stmt->fetch()) {
+                throw new \Exception("Conflicto de horario: El espacio ya se encuentra reservado en ese horario.");
+            }
 
             // Obtener la carrera del usuario solicitante
             $usuario_carrera = '';
