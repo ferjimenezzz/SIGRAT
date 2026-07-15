@@ -240,13 +240,14 @@ try {
                     $db = \Config\Database::getConnection();
                     
                     $conflicts = [];
-                    // Pre-check conflicts
-                    $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND status = 'approved' AND fecha_uso = ? AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
-                    $stmtConf = $db->prepare($conflictQuery);
-                    foreach ($input['fechas_uso'] as $fecha) {
-                        $stmtConf->execute([$input['esp_id'], $fecha, $input['hora_sal'], $input['hora_ent'], $input['hora_sal'], $input['hora_ent'], $input['hora_ent'], $input['hora_sal']]);
-                        if ($stmtConf->fetch()) {
-                            $conflicts[] = $fecha;
+                    if ($input['esp_id'] !== 'SALA_MAGNA_MODULAR') {
+                        $conflictQuery = "SELECT re_id FROM RESERVA WHERE esp_id = ? AND status = 'approved' AND fecha_uso = ? AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
+                        $stmtConf = $db->prepare($conflictQuery);
+                        foreach ($input['fechas_uso'] as $fecha) {
+                            $stmtConf->execute([$input['esp_id'], $fecha, $input['hora_sal'], $input['hora_ent'], $input['hora_sal'], $input['hora_ent'], $input['hora_ent'], $input['hora_sal']]);
+                            if ($stmtConf->fetch()) {
+                                $conflicts[] = $fecha;
+                            }
                         }
                     }
                     

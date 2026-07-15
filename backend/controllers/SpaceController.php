@@ -111,9 +111,11 @@ class SpaceController {
         $espacios = $this->db->query("SELECT * FROM ESPACIO ORDER BY edificio, nombre_numero")->fetchAll();
         // Mapear 'acceso' a 'acceso_tipo' para compatibilidad con el frontend
         foreach ($espacios as &$esp) {
+            $acceso_lower = strtolower(trim($esp['acceso'] ?? 'general'));
             $esp['acceso_tipo'] = 'General';
-            if ($esp['acceso'] === 'por división') $esp['acceso_tipo'] = 'Division';
-            if ($esp['acceso'] === 'restringido') $esp['acceso_tipo'] = 'Restringido';
+            if ($acceso_lower === 'por división') $esp['acceso_tipo'] = 'Division';
+            if ($acceso_lower === 'restringido') $esp['acceso_tipo'] = 'Restringido';
+            if ($acceso_lower === 'administrador') $esp['acceso_tipo'] = 'Administrador';
         }
         return $espacios;
     }
