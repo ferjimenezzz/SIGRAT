@@ -4488,11 +4488,7 @@ include 'header.php';
 
             const resEspacio = document.getElementById('resEspacio');
             if (resEspacio) {
-                if (spaceData.nombre_numero && spaceData.nombre_numero.startsWith('Sala Magna')) {
-                    resEspacio.value = 'SALA_MAGNA_MODULAR';
-                } else {
-                    resEspacio.value = spaceData.esp_id;
-                }
+                resEspacio.value = spaceData.esp_id;
                 resEspacio.dispatchEvent(new Event('change'));
             }
         }
