@@ -2079,6 +2079,7 @@ include 'header.php';
                         <div class="modal-form-group">
                             <label>Hora Fin</label>
                             <select class="modal-input" name="hora_sal" id="resHoraSal" required>
+                                <option value="" disabled selected style="display:none;"></option>
                                 <?php foreach(['09:00'=>'09:00 AM','10:00'=>'10:00 AM','11:00'=>'11:00 AM','12:00'=>'12:00 PM','13:00'=>'01:00 PM','14:00'=>'02:00 PM','15:00'=>'03:00 PM','16:00'=>'04:00 PM','17:00'=>'05:00 PM','18:00'=>'06:00 PM','19:00'=>'07:00 PM','20:00'=>'08:00 PM'] as $v=>$l): ?>
                                 <option value="<?php echo $v; ?>"><?php echo $l; ?></option>
                                 <?php endforeach; ?>
@@ -3019,7 +3020,7 @@ include 'header.php';
 
             const horaEntVal = selectHoraEnt.value;
             if (!horaEntVal) {
-                selectHoraSal.innerHTML = '<option value="">Seleccione hora inicio...</option>';
+                selectHoraSal.innerHTML = '<option value="" disabled selected style="display:none;"></option>';
                 return;
             }
 
@@ -3242,7 +3243,7 @@ include 'header.php';
                         selectHora.value = "";
                         selectHora.disabled = true;
                         selectHoraSal.value = "";
-                        selectHoraSal.innerHTML = '<option value=""></option>';
+                        selectHoraSal.innerHTML = '<option value="" disabled selected style="display:none;"></option>';
                         selectHoraSal.disabled = true;
                         
                         if (btnConfirm) {
