@@ -751,6 +751,42 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             body.sidebar-mobile-open .sidebar-version-btn { padding: 5px 10px; margin: 0 12px 4px 12px; width: auto; border-radius: 20px; border: 1px solid rgba(255,255,255,0.10); }
         }
 
+        /* === LOGOS INSTITUCIONALES (sidebar bottom) === */
+        .sidebar-logos-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 12px;
+            margin: 0 4px 4px 4px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.2s;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+        .sidebar-logos-strip:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .sidebar-inst-logo {
+            height: 22px;
+            width: auto;
+            object-fit: contain;
+            /* Aplicar filtro blanco para que los logos se vean sobre fondo oscuro */
+            filter: brightness(0) invert(1);
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .sidebar-logos-strip:hover .sidebar-inst-logo {
+            opacity: 0.75;
+        }
+        /* En sidebar colapsado ocultar los logos */
+        body.sidebar-collapsed .sidebar-logos-strip { display: none; }
+        @media (max-width: 992px) {
+            .sidebar-logos-strip { display: none; }
+            body.sidebar-mobile-open .sidebar-logos-strip { display: flex; }
+        }
+
         /* About modal overlay */
         .about-overlay {
             position: fixed; inset: 0;
@@ -1278,7 +1314,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 24px 28px;
+            padding: 24px 28px 0;
             max-width: 100%;
         }
 
@@ -1862,11 +1898,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         <!-- Centro de Ayuda -->
         <button class="sidebar-help-btn" id="helpCenterBtn" onclick="openHelpCenter()" title="Centro de Ayuda">
             <i class="bi bi-question-circle"></i> <span>Centro de ayuda</span>
-        </button>
-        <!-- Versión / Acerca de -->
-        <button class="sidebar-version-btn" onclick="openAbout()" title="Acerca de SIGRAT">
-            <i class="bi bi-info-circle" style="font-size:11px;"></i>
-            <span>SIGRAT &nbsp;v1.0</span>
         </button>
         <a href="#" class="sidebar-logout" onclick="openLogoutConfirm(); return false;">
             <i class="bi bi-box-arrow-left"></i> <span>Cerrar sesión</span>
