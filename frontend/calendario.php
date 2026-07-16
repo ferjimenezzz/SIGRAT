@@ -3020,7 +3020,18 @@ include 'header.php';
 
             const horaEntVal = selectHoraEnt.value;
             if (!horaEntVal) {
-                selectHoraSal.innerHTML = '<option value="" disabled selected style="display:none;"></option>';
+                let opts = '<option value="" disabled selected style="display:none;"></option>';
+                const labels = {
+                    '09:00': '09:00 AM', '10:00': '10:00 AM', '11:00': '11:00 AM', '12:00': '12:00 PM',
+                    '13:00': '01:00 PM', '14:00': '02:00 PM', '15:00': '03:00 PM', '16:00': '04:00 PM',
+                    '17:00': '05:00 PM', '18:00': '06:00 PM', '19:00': '07:00 PM', '20:00': '08:00 PM'
+                };
+                for (let h = 9; h <= 20; h++) {
+                    const valStr = h < 10 ? `0${h}:00` : `${h}:00`;
+                    const label = labels[valStr] || `${h}:00`;
+                    opts += `<option value="${valStr}">${label}</option>`;
+                }
+                selectHoraSal.innerHTML = opts;
                 return;
             }
 
