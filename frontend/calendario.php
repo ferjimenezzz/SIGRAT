@@ -3026,10 +3026,30 @@ include 'header.php';
                     '13:00': '01:00 PM', '14:00': '02:00 PM', '15:00': '03:00 PM', '16:00': '04:00 PM',
                     '17:00': '05:00 PM', '18:00': '06:00 PM', '19:00': '07:00 PM', '20:00': '08:00 PM'
                 };
+                
+                const fechaEl = document.getElementById('resFecha');
+                const fecha = fechaEl ? fechaEl.value : '';
+                const now = new Date();
+                const tzOffset = now.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 10);
+                const isTodayExact = (fecha === localISOTime);
+                const currentHour = now.getHours();
+
                 for (let h = 9; h <= 20; h++) {
                     const valStr = h < 10 ? `0${h}:00` : `${h}:00`;
-                    const label = labels[valStr] || `${h}:00`;
-                    opts += `<option value="${valStr}">${label}</option>`;
+                    let label = labels[valStr] || `${h}:00`;
+                    let isDisabled = false;
+                    
+                    if (isTodayExact && h <= currentHour) {
+                        isDisabled = true;
+                        label += ' (Pasada)';
+                    }
+                    
+                    if (isDisabled) {
+                        opts += `<option value="${valStr}" disabled>${label}</option>`;
+                    } else {
+                        opts += `<option value="${valStr}">${label}</option>`;
+                    }
                 }
                 selectHoraSal.innerHTML = opts;
                 return;
