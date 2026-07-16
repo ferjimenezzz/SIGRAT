@@ -2070,6 +2070,7 @@ include 'header.php';
                         <div class="modal-form-group">
                             <label>Hora Inicio</label>
                             <select class="modal-input" name="hora_ent" id="resHoraEnt" required>
+                                <option value="" disabled selected style="display:none;"></option>
                                 <?php foreach(['08:00'=>'08:00 AM','09:00'=>'09:00 AM','10:00'=>'10:00 AM','11:00'=>'11:00 AM','12:00'=>'12:00 PM','13:00'=>'01:00 PM','14:00'=>'02:00 PM','15:00'=>'03:00 PM','16:00'=>'04:00 PM','17:00'=>'05:00 PM','18:00'=>'06:00 PM'] as $v=>$l): ?>
                                 <option value="<?php echo $v; ?>"><?php echo $l; ?></option>
                                 <?php endforeach; ?>
@@ -2264,6 +2265,31 @@ include 'header.php';
     const sessionUserId = <?php echo json_encode($us_id_sesion); ?>;
     const isUserAdmin = <?php echo json_encode($isAdmin); ?>;
     let isProgrammaticMapChange = false;
+    window.reservationsForSelectedDate = [];
+    window.lastLoadedDate = "";
+    window.isSpaceFullyOccupied = function(espId) {
+        if (!espId) return false;
+        const resList = window.reservationsForSelectedDate.filter(r => {
+            if (parseInt(r.esp_id) !== parseInt(espId)) return false;
+            const estatus = (r.estatus || r.status || '').toLowerCase();
+            if (estatus === 'rechazada' || estatus === 'rejected' || estatus === 'cancelada' || estatus === 'cancelled') {
+                return false;
+            }
+            return true;
+        });
+        if (resList.length === 0) return false;
+        const slots = Array(12).fill(false); // 8-9, 9-10, ..., 19-20
+        resList.forEach(r => {
+            const start = parseInt(r.hora_ent);
+            const end = parseInt(r.hora_sal);
+            for (let h = start; h < end; h++) {
+                if (h >= 8 && h < 20) {
+                    slots[h - 8] = true;
+                }
+            }
+        });
+        return slots.every(s => s === true);
+    };
 
     // SISTEMA DE COLORES POR ESPACIO
     function getColorForSpace(esp_id) {
@@ -2647,7 +2673,8 @@ include 'header.php';
             if (typeof checkAvailability === 'function') checkAvailability();
         });
 
-        function openResModal(defaultDate = null) {
+         function openResModal(defaultDate = null) {
+            window.lastLoadedDate = "";
             // Rellenar fecha seleccionada
             const todayStr = defaultDate || new Date().toISOString().split('T')[0];
             document.getElementById('resFecha').value = todayStr;
@@ -3057,6 +3084,17 @@ include 'header.php';
         }
 
         function checkAvailability() {
+            // Re-habilitar controles y restablecer botón de confirmación
+            const selectHoraEnt = document.getElementById('resHoraEnt');
+            const selectHoraSal = document.getElementById('resHoraSal');
+            const btnConfirm = document.getElementById('btnConfirmReserva');
+            if (selectHoraEnt) selectHoraEnt.disabled = false;
+            if (selectHoraSal) selectHoraSal.disabled = false;
+            if (btnConfirm) {
+                btnConfirm.disabled = false;
+                btnConfirm.style.opacity = '1';
+            }
+
             if (state.resMode !== 'single') {
                 // En multi-día no se pueden consultar conflictos del backend,
                 // pero sí actualizamos las opciones de hora fin
@@ -3066,6 +3104,21 @@ include 'header.php';
             const espId = resEspacio.value;
             const fecha = document.getElementById('resFecha').value;
             if (!fecha) return;
+
+            if (window.lastLoadedDate !== fecha) {
+                window.lastLoadedDate = fecha;
+                fetch(`../backend/api/index.php/reservations?date=${fecha}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        window.reservationsForSelectedDate = Array.isArray(data) ? data : [];
+                        if (typeof renderModalMap === 'function') {
+                            renderModalMap();
+                        }
+                        checkAvailability();
+                    })
+                    .catch(err => console.error("Error loading daily reservations:", err));
+                return;
+            }
             
             const now = new Date();
             const tzOffset = now.getTimezoneOffset() * 60000;
@@ -3182,21 +3235,52 @@ include 'header.php';
                         }
                     }
 
-                    // Seleccionar automáticamente el primer horario disponible no deshabilitado
-                    let firstAvailableIndex = -1;
-                    for (let i = 0; i < selectHora.options.length; i++) {
-                        if (!selectHora.options[i].disabled) {
-                            firstAvailableIndex = i;
-                            break;
-                        }
-                    }
-                    
-                    if (firstAvailableIndex !== -1) {
-                        selectHora.selectedIndex = firstAvailableIndex;
-                    } else {
+                    // Verificar si el espacio está completamente ocupado por todo el día
+                    const isFullyOccupied = typeof isSpaceFullyOccupied === 'function' && isSpaceFullyOccupied(espId);
+
+                    if (isFullyOccupied) {
                         selectHora.value = "";
+                        selectHora.disabled = true;
+                        selectHoraSal.value = "";
+                        selectHoraSal.innerHTML = '<option value=""></option>';
+                        selectHoraSal.disabled = true;
+                        
+                        if (btnConfirm) {
+                            btnConfirm.disabled = true;
+                            btnConfirm.style.opacity = '0.5';
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Espacio Ocupado',
+                            text: 'Este espacio ya está completamente ocupado por todo el día.',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    } else {
+                        // Seleccionar automáticamente el primer horario disponible no deshabilitado
+                        let firstAvailableIndex = -1;
+                        for (let i = 0; i < selectHora.options.length; i++) {
+                            if (!selectHora.options[i].disabled) {
+                                firstAvailableIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        if (firstAvailableIndex !== -1) {
+                            selectHora.selectedIndex = firstAvailableIndex;
+                            selectHora.disabled = false;
+                            selectHoraSal.disabled = false;
+                        } else {
+                            selectHora.value = "";
+                        }
+                        
+                        if (btnConfirm) {
+                            btnConfirm.disabled = false;
+                            btnConfirm.style.opacity = '1';
+                        }
+                        
+                        updateHoraFinOptions();
                     }
-                    updateHoraFinOptions();
                 })
                 .catch(err => console.error("Error check availability", err));
         }
@@ -4053,6 +4137,13 @@ include 'header.php';
         const numAlumnos = parseInt(document.getElementById('resNumAlumnos').value);
         const motivo = document.getElementById('resMotivo').value;
 
+        if (state.resMode === 'single') {
+            if (espId && typeof isSpaceFullyOccupied === 'function' && isSpaceFullyOccupied(espId)) {
+                Swal.fire('Atención', 'Este espacio ya está completamente ocupado por todo el día.', 'error');
+                return;
+            }
+        }
+
         if (!espId || !horaEnt || !horaSal) {
             Swal.fire('Atención', 'Por favor, complete todos los campos obligatorios.', 'warning');
             return;
@@ -4434,7 +4525,10 @@ include 'header.php';
         config.zones.forEach(zone => {
             // Pasar esp_id cuando esté disponible en el JSON (prioritario)
             const spaceData = findSpaceInDB(zone.db_name, config.edificio, zone.esp_id);
-            const estatus = spaceData ? spaceData.estatus : 'Disponible';
+            let estatus = spaceData ? spaceData.estatus : 'Disponible';
+            if (spaceData && typeof isSpaceFullyOccupied === 'function' && isSpaceFullyOccupied(spaceData.esp_id)) {
+                estatus = 'Ocupado';
+            }
             
             // Etiqueta viene EXCLUSIVAMENTE de la BD. Si no hay match, mostrar db_name como fallback.
             const label = spaceData ? spaceData.nombre_numero : (zone.db_name || 'Sin asignar');
