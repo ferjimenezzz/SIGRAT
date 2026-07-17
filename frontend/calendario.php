@@ -489,7 +489,7 @@ include 'header.php';
     .calendar-sidebar-details {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 16px;
     }
 
     .sidebar-section-card {
@@ -526,6 +526,26 @@ include 'header.php';
         display: flex;
         flex-direction: column;
         gap: 12px;
+        max-height: 240px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    .upcoming-res-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .upcoming-res-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .upcoming-res-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .upcoming-res-list::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
     }
 
     .upcoming-res-item {
@@ -593,7 +613,7 @@ include 'header.php';
         display: flex;
         flex-direction: column;
         gap: 10px;
-        max-height: 220px;
+        max-height: 160px;
         overflow-y: auto;
         padding-right: 6px;
     }
@@ -4705,7 +4725,7 @@ include 'header.php';
         }
     };
 
-    // Zoom & Pan (Matemáticas Avanzadas)
+    // Zoom & Pan
     const mapViewport = document.getElementById('modalMapViewport');
     const mapInner = document.getElementById('modalMapInner');
 
