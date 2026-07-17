@@ -171,7 +171,7 @@ $mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'], [
 <!-- ============================================================================ -->
 <!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
 <!-- ============================================================================ -->
-<body onload="window.print()">
+<body >
     <div class="header">
         <div>
             <div class="logo">SIGRAT<span>Control Integral</span></div>

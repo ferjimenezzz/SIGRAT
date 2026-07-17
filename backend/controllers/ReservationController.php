@@ -316,6 +316,20 @@ class ReservationController {
         }
     }
 
+    public function getAllReservationsByDate($date) {
+        try {
+            $query = "SELECT esp_id, re_id, hora_ent, hora_sal, estatus 
+                      FROM RESERVA 
+                      WHERE fecha_uso = ? AND estatus != 'Rechazada'";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$date]);
+            return $stmt->fetchAll();
+        } catch (\Exception $e) {
+            error_log("Error check all availability: " . $e->getMessage());
+            return [];
+        }
+    }
+
 
 // ============================================================================
 // SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (sendBulkEmail)
