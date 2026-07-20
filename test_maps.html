@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Test SVG Maps</title>
+<style>
+body { margin: 20px; background: #1e293b; }
+.map-wrap { background: white; border-radius: 8px; margin: 20px 0; padding: 10px; }
+h2 { color: white; }
+svg { width: 100%; border: 2px solid #334155; border-radius: 4px; display: block; }
+.map-room {
+    fill: rgba(37, 99, 235, 0.15);
+    stroke: #2563eb;
+    stroke-width: 3;
+    cursor: pointer;
+    transition: fill 0.2s;
+}
+.map-room:hover { fill: rgba(37, 99, 235, 0.35); }
+.map-label-title { 
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    fill: #1e3a8a;
+    font-size: 16px;
+    pointer-events: none;
+}
+</style>
+</head>
+<body>
+<h2>PIDET Planta Baja</h2>
+<div class="map-wrap">
+<svg id="svgMap-PIDET-pb" viewBox="0 0 792 612" style="background:#fff;">
+  <image href="frontend/img/mapas/PIDET_pb.svg" x="0" y="0" width="792" height="612" preserveAspectRatio="xMidYMid meet"/>
+  
+  <!-- Auditorio PIDET -->
+  <rect x="285" y="200" width="205" height="95" class="map-room" id="svg-room-Auditorio-PIDET"/>
+  <text x="387" y="247" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AUDITORIO</text>
+  
+  <!-- Aula 03 -->
+  <rect x="490" y="195" width="90" height="95" class="map-room" id="svg-room-Aula-03-PIDET"/>
+  <text x="535" y="242" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AULA 03</text>
+  
+  <!-- Aula 04 -->
+  <rect x="568" y="195" width="87" height="70" class="map-room" id="svg-room-Aula-04-PIDET"/>
+  <text x="611" y="230" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AULA 04</text>
+  
+  <!-- Aula 05 -->
+  <rect x="643" y="185" width="82" height="70" class="map-room" id="svg-room-Aula-05-PIDET"/>
+  <text x="684" y="220" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AULA 05</text>
+  
+  <!-- Aula 06 -->
+  <rect x="710" y="165" width="75" height="65" class="map-room" id="svg-room-Aula-06-PIDET"/>
+  <text x="747" y="197" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AULA 06</text>
+  
+  <!-- Aula 01 -->
+  <rect x="28" y="345" width="162" height="105" class="map-room" id="svg-room-Aula-01-PIDET"/>
+  <text x="109" y="397" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AULA 01</text>
+  
+  <!-- Aula 02 -->
+  <rect x="190" y="345" width="120" height="70" class="map-room" id="svg-room-Aula-02-PIDET"/>
+  <text x="250" y="380" class="map-label-title" text-anchor="middle" dominant-baseline="middle">AULA 02</text>
+</svg>
+</div>
+
+<h2>PIDET Planta Alta</h2>
+<div class="map-wrap">
+<svg id="svgMap-PIDET-pa" viewBox="0 0 792 612" style="background:#fff;">
+  <image href="frontend/img/mapas/PIDET_pa.svg" x="0" y="0" width="792" height="612" preserveAspectRatio="xMidYMid meet"/>
+  
+  <!-- Posgrados fila superior -->
+  <rect x="70" y="95" width="75" height="90" class="map-room" id="svg-room-Posgrado-3"/>
+  <text x="107" y="140" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;">POSGRADO 3</text>
+  
+  <rect x="145" y="95" width="75" height="90" class="map-room" id="svg-room-Posgrado-4"/>
+  <text x="182" y="140" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;">POSGRADO 4</text>
+  
+  <rect x="220" y="95" width="75" height="90" class="map-room" id="svg-room-Posgrado-5"/>
+  <text x="257" y="140" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;">POSGRADO 5</text>
+  
+  <rect x="295" y="95" width="75" height="90" class="map-room" id="svg-room-Posgrado-6"/>
+  <text x="332" y="140" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;">POSGRADO 6</text>
+  
+  <rect x="370" y="95" width="75" height="90" class="map-room" id="svg-room-Posgrado-7"/>
+  <text x="407" y="140" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;">POSGRADO 7</text>
+  
+  <rect x="445" y="95" width="75" height="90" class="map-room" id="svg-room-Posgrado-8"/>
+  <text x="482" y="140" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;">POSGRADO 8</text>
+  
+  <!-- Aulas magnas/digitales fila inferior -->
+  <rect x="28" y="330" width="47" height="120" class="map-room" id="svg-room-Aula-Magna-1"/>
+  <text x="51.5" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">MAGNA 1</text>
+  
+  <rect x="75" y="330" width="47" height="120" class="map-room" id="svg-room-Aula-Magna-2"/>
+  <text x="98.5" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">MAGNA 2</text>
+  
+  <rect x="122" y="330" width="47" height="120" class="map-room" id="svg-room-Aula-Magna-3"/>
+  <text x="145.5" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">MAGNA 3</text>
+  
+  <rect x="169" y="330" width="47" height="120" class="map-room" id="svg-room-Aula-Magna-4"/>
+  <text x="192.5" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">MAGNA 4</text>
+  
+  <rect x="276" y="330" width="82" height="120" class="map-room" id="svg-room-Aula-digital-1"/>
+  <text x="317" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">DIGITAL 1</text>
+  
+  <rect x="358" y="330" width="82" height="120" class="map-room" id="svg-room-Aula-digital-2"/>
+  <text x="399" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">DIGITAL 2</text>
+  
+  <rect x="440" y="330" width="82" height="120" class="map-room" id="svg-room-Aula-digital-3"/>
+  <text x="481" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">DIGITAL 3</text>
+  
+  <rect x="522" y="330" width="82" height="120" class="map-room" id="svg-room-Aula-digital-4"/>
+  <text x="563" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">DIGITAL 4</text>
+  
+  <rect x="604" y="330" width="56" height="120" class="map-room" id="svg-room-Aula-digital-5"/>
+  <text x="632" y="390" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:9px;">DIGITAL 5</text>
+</svg>
+</div>
+
+<h2>CIC Planta Baja</h2>
+<div class="map-wrap">
+<svg id="svgMap-CIC-pb" viewBox="0 0 1224 792" style="background:#fff;">
+  <image href="frontend/img/mapas/CIC_pb.svg" x="0" y="0" width="1224" height="792" preserveAspectRatio="xMidYMid meet"/>
+  
+  <!-- FAB Lab - zona central izquierda segun imagen -->
+  <rect x="580" y="590" width="180" height="110" class="map-room" id="svg-room-FAB-Lab"/>
+  <text x="670" y="645" class="map-label-title" text-anchor="middle" dominant-baseline="middle">FAB Lab</text>
+  
+  <!-- Sala Audiovisual - zona central derecha -->
+  <rect x="760" y="560" width="220" height="140" class="map-room" id="svg-room-Sala-Audiovisual"/>
+  <text x="870" y="630" class="map-label-title" text-anchor="middle" dominant-baseline="middle">SALA AUDIOVISUAL</text>
+  
+  <!-- Sala Capacitacion -->
+  <rect x="980" y="660" width="170" height="80" class="map-room" id="svg-room-Sala-Capacitacion-CIC"/>
+  <text x="1065" y="700" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;">SALA CAPACIT.</text>
+</svg>
+</div>
+
+<h2>CIC Planta Alta</h2>
+<div class="map-wrap">
+<svg id="svgMap-CIC-pa" viewBox="0 0 2592 1728" style="background:#fff;">
+  <image href="frontend/img/mapas/CIC_pa.svg" x="0" y="0" width="2592" height="1728" preserveAspectRatio="xMidYMid meet"/>
+  
+  <!-- Cubiculo 5 -->
+  <rect x="1090" y="1450" width="100" height="150" class="map-room" id="svg-room-CUBICULO-5"/>
+  <text x="1140" y="1525" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;">CUB 5</text>
+  
+  <!-- Cubiculo 6 -->
+  <rect x="1190" y="1450" width="100" height="150" class="map-room" id="svg-room-CUBICULO-6"/>
+  <text x="1240" y="1525" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;">CUB 6</text>
+  
+  <!-- Sala Video Conferencias -->
+  <rect x="900" y="1370" width="230" height="130" class="map-room" id="svg-room-Sala-Video-Conferencias"/>
+  <text x="1015" y="1435" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:20px;">VIDEO CONF.</text>
+  
+  <!-- Sala de Juntas -->
+  <rect x="780" y="1700" width="230" height="120" class="map-room" id="svg-room-Sala-de-Juntas"/>
+  <text x="895" y="1760" class="map-label-title" text-anchor="middle" dominant-baseline="middle" style="font-size:20px;">SALA JUNTAS</text>
+</svg>
+</div>
+
+</body>
+</html>
