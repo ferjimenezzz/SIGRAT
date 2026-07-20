@@ -131,18 +131,28 @@ foreach ($loans as $l) {
     .filter-btn { background: white; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
     .filter-btn.active { background: #f1f5f9; color: var(--text-primary); border-color: #cbd5e1; }
     
-    .table-container { background: white; border-radius: 12px; border: 2px solid var(--accent-blue); max-height: 450px; overflow-y: auto; overflow-x: auto; margin-bottom: 24px; -webkit-overflow-scrolling: touch; }
-    .table-custom { width: 100%; border-collapse: collapse; min-width: 700px; }
-    .table-custom th { background: #1e293b; color: white; padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
-    .table-custom td { padding: 16px 24px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
+    .table-container { background: white; border-radius: 12px; border: 2px solid var(--accent-blue); max-height: 450px; overflow-y: auto; overflow-x: hidden; margin-bottom: 24px; -webkit-overflow-scrolling: touch; }
+    .table-custom { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .table-custom th { background: #1e293b; color: white; padding: 14px 12px; text-align: left; font-size: 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .table-custom td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; overflow: hidden; }
+    /* Anchos fijos por columna para que quepan las 6 sin scroll horizontal */
+    .table-custom th:nth-child(1), .table-custom td:nth-child(1) { width: 26%; }  /* Equipo */
+    .table-custom th:nth-child(2), .table-custom td:nth-child(2) { width: 20%; }  /* Solicitante */
+    .table-custom th:nth-child(3), .table-custom td:nth-child(3) { width: 14%; }  /* Fecha Préstamo */
+    .table-custom th:nth-child(4), .table-custom td:nth-child(4) { width: 14%; }  /* Fecha Devolución */
+    .table-custom th:nth-child(5), .table-custom td:nth-child(5) { width: 14%; }  /* Estado */
+    .table-custom th:nth-child(6), .table-custom td:nth-child(6) { width: 12%; }  /* Acción */
     
-    .item-cell, .user-cell, .date-cell { display: flex; align-items: center; gap: 10px; }
-    .item-icon { font-size: 24px; color: var(--text-primary); }
-    .item-info h4 { font-size: 14px; font-weight: 700; margin: 0; color: var(--text-primary); }
-    .item-info p { font-size: 11px; color: var(--text-muted); margin: 0; font-weight: 600; }
-    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #475569; flex-shrink: 0; }
-    .user-name, .date-cell { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-    .date-cell i { font-size: 16px; }
+    .item-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .user-cell, .date-cell { display: flex; align-items: center; gap: 8px; }
+    .item-icon { font-size: 20px; color: var(--text-primary); flex-shrink: 0; }
+    .item-info { min-width: 0; }
+    .item-info h4 { font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-info p { font-size: 11px; color: var(--text-muted); margin: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #475569; flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .date-cell { font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+    .date-cell i { font-size: 14px; flex-shrink: 0; }
     .date-cell i.red { color: #ef4444; } .date-cell i.blue { color: #3b82f6; }
     
     .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
@@ -151,7 +161,7 @@ foreach ($loans as $l) {
     .status-badge.vencido { background: #fee2e2; color: #dc2626; }
     .status-badge.devuelto { background: #f3e8ff; color: #9333ea; }
 
-    .action-btns { display: flex; gap: 8px; }
+    .action-btns { display: flex; gap: 6px; flex-wrap: nowrap; align-items: center; }
     .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background: white; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .btn-icon:hover { background: #f8fafc; color: var(--text-primary); }
     .btn-icon.delete:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
