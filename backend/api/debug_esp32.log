@@ -24222,3 +24222,31 @@ Cuerpo:
 Cuerpo: 
 2026-07-20 17:25:03 - GET /Estadias/backend/api/index.php/notifications/all
 Cuerpo: 
+2026-07-20 17:26:02 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:26:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-20 17:27:02 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:27:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-20 17:28:02 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:28:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-20 17:29:02 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:29:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-20 17:30:02 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:30:03 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-20 17:31:04 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:31:05 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-07-20 17:32:04 - POST /Estadias/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-07-20 17:32:05 - GET /Estadias/backend/api/index.php/notifications/all
+Cuerpo: 
