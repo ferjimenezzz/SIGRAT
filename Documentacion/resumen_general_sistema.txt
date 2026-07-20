@@ -1,0 +1,88 @@
+================================================================================
+RESUMEN GENERAL DEL SISTEMA SIGRAT (ARQUITECTURA, LENGUAJES, BD Y SEGURIDAD)
+================================================================================
+PROPOSITO DEL ARCHIVO: Presentar de manera precisa, directa y ejecutiva los
+componentes tecnológicos, lenguajes, motor de base de datos, patrón de diseño
+arquitectónico y medidas de blindaje de seguridad implementadas en SIGRAT.
+AUTOR: Senior Omni-Stack Architect & DBA
+FECHA: 2026-07-07
+================================================================================
+
+1. LENGUAJES DE PROGRAMACIÓN UTILIZADOS
+--------------------------------------------------------------------------------
+El sistema utiliza un ecosistema Omni-Stack híbrido para cubrir desde el hardware
+hasta la interfaz de usuario:
+
+- PHP 8+: Lenguaje principal del backend. Encargado del enrutamiento RESTful,
+  lógica de negocio orientada a objetos (principios SOLID), renderizado del
+  servidor (SSR) y comunicación segura con la base de datos vía abstracción PDO.
+- SQL / PL/pgSQL: Definición de estructura (DDL), manipulación de datos (DML),
+  procedimientos almacenados (RPC), disparadores (triggers) y políticas RLS.
+- JavaScript Vanilla (ES6+): Capa de interactividad en frontend. Consume la API
+  REST mediante Fetch API/AJAX y gestiona la sincronización asíncrona (polling
+  y WebSockets) con antenas y lectores RFID en tiempo real sin recargar páginas.
+- HTML5 Semántico y CSS3: Maquetado de interfaces corporativas con Bootstrap 5,
+  estilos personalizados con Glassmorphism y sistema de iconografía Lucide.
+- C++ / Arduino (Firmware): Programación de microcontroladores (ESP32 / RC522)
+  para la lectura física de tarjetas y envío de tramas HTTP al backend.
+
+2. BASE DE DATOS Y PERSISTENCIA
+--------------------------------------------------------------------------------
+La persistencia está optimizada para garantizar la integridad transaccional (ACID):
+
+- Motores Soportados: MySQL 5.7+ / MariaDB (motor InnoDB) y PostgreSQL 12+ / Supabase.
+- Normalización: Estructura diseñada en Tercera Forma Normal (3NF) con claves
+  primarias, foráneas e índices estratégicos para optimizar tiempos de respuesta.
+- Componentes Clave:
+  * Control de Identidad: Tablas USUARIOS, ROLES y PERMISOS.
+  * Hardware IoT: Tabla TAG_RFID con mapeo de UID, estados y claves físicas.
+  * Operatividad: ACTIVOS, PRESTAMOS, DETALLE_PRESTAMO, ESPACIOS y RESERVAS.
+  * Trazabilidad: AUDITORIA_SISTEMA (bitácora inmutable con soporte JSONB).
+- Restricciones (CHECK Constraints): Control nativo en el motor para evitar
+  traslapes de horarios, stock negativo o estados de activos inconsistentes.
+
+3. ARQUITECTURA DEL SISTEMA
+--------------------------------------------------------------------------------
+Implementa el patrón MVC Modificado (Model-View-Controller) / Omni-Stack en 4 capas:
+
+1) Capa de Presentación (Frontend): Vistas PHP modulares (header/footer dinámicos
+   según rol) combinadas con JavaScript asíncrono para interfaces interactivas.
+2) Enrutador Único y API REST (Router): Interceptado por `backend/api/index.php`.
+   Gestiona cabeceras CORS, peticiones JSON, y despacha al controlador correcto.
+3) Capa de Lógica de Negocio (Controladores): Clases especializadas (RFIDController,
+   AssetController, LoanController, AuthController) bajo principios SOLID.
+4) Capa de Persistencia (Modelo/Singleton): Patrón Singleton (`Database.php`) que
+   gestiona conexiones PDO reutilizables y atómicas.
+- Integración IoT / Hardware: Los dispositivos ESP32 o antenas IP envían lecturas a
+  `/hardware/scan`. El frontend sondea periódicamente `/hardware/latest-unknown-tag`
+  para registrar tarjetas y vincular equipos al instante.
+
+4. BLINDAJE Y SEGURIDAD DEL SISTEMA
+--------------------------------------------------------------------------------
+El sistema implementa seguridad en profundidad en todas las capas operativas:
+
+- Inmunidad contra Inyección SQL (SQLi):
+  * Desactivación estricta de emulación PDO (`PDO::ATTR_EMULATE_PREPARES = false`).
+  * Consultas 100% parametrizadas vía sentencias preparadas. El motor procesa
+    la sintaxis SQL separada por completo de los datos ingresados por el usuario.
+  * Manejo estricto de errores (`PDO::ERRMODE_EXCEPTION`) sin volcado en consola.
+- Control de Acceso Basado en Roles (RBAC):
+  * Jerarquía multi-nivel: Super Administrador, Administrador, Institucional,
+    Seguridad e Invitado/Externo.
+  * Middleware de protección (`frontend/seguridad.php`) en cada módulo que valida
+    sesiones/tokens; ante cualquier anomalía destruye la sesión y bloquea el acceso.
+- Seguridad a Nivel de Fila en Motor SQL (Row Level Security - RLS):
+  * Políticas en el motor que prohíben lecturas o escrituras horizontales.
+  * Un usuario estándar solo puede consultar o modificar sus propios registros o
+    reservas a nivel nativo del motor de base de datos (Default Deny).
+- Auditoría Forense Inmutable:
+  * Registro automático de accesos denegados (403 Forbidden), inicios de sesión,
+    préstamos y modificaciones en la bitácora con IP, usuario y marca de tiempo.
+- Protección Web Complementaria:
+  * Sanitización y filtrado de entradas contra ataques Cross-Site Scripting (XSS).
+  * Validación de tokens de sesión para prevenir Cross-Site Request Forgery (CSRF).
+  * Permisos restrictivos en directorios del servidor (755 en carpetas, 644 en archivos).
+
+================================================================================
+FIN DEL RESUMEN TÉCNICO EJECUTIVO
+================================================================================

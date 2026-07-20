@@ -1,8 +1,9 @@
 import fitz  # PyMuPDF
 import os
 
-pdf_dir = r"c:\xampp\htdocs\Estadias\SIGRAT\Documentacion\Mapas"
-out_dir = r"c:\xampp\htdocs\Estadias\SIGRAT\frontend\assets\img\mapas"
+base_dir = os.path.dirname(os.path.abspath(__file__))
+pdf_dir = os.path.join(base_dir, "frontend", "assets", "Mapas")
+out_dir = os.path.join(base_dir, "frontend", "assets", "img", "mapas")
 
 os.makedirs(out_dir, exist_ok=True)
 
