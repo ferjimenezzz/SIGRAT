@@ -201,13 +201,17 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             $estadosDB = array_unique(array_filter(array_column($assets, 'estatus')));
             sort($estadosDB);
 
-            $edificiosDB = array_unique(array_filter(array_column($assets, 'edificio')));
+            // Consultar todos los edificios y espacios directamente de la tabla ESPACIO registrada en BD ($allSpaces)
+            $edificiosDB = array_unique(array_filter(array_column($allSpaces, 'edificio')));
             sort($edificiosDB);
 
+            $allUniqueSpaces = array_unique(array_filter(array_column($allSpaces, 'nombre_numero')));
+            sort($allUniqueSpaces);
+
             $spacesByBuilding = [];
-            foreach ($assets as $a) {
-                $ed = $a['edificio'];
-                $sp = $a['espacio_nombre'];
+            foreach ($allSpaces as $spRow) {
+                $ed = trim($spRow['edificio'] ?? '');
+                $sp = trim($spRow['nombre_numero'] ?? '');
                 if ($ed && $sp) {
                     if (!isset($spacesByBuilding[$ed])) $spacesByBuilding[$ed] = [];
                     if (!in_array($sp, $spacesByBuilding[$ed])) {
@@ -215,6 +219,10 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     }
                 }
             }
+            foreach ($spacesByBuilding as &$spArray) {
+                sort($spArray);
+            }
+            unset($spArray);
         ?>
         <!-- Barra de Filtros Rápidos -->
         <div class="filters-bar" style="display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; overflow-x: auto;">
@@ -247,11 +255,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
                 <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
                     <option value="">Espacio</option>
-                    <?php 
-                    $allUniqueSpaces = array_unique(array_filter(array_column($assets, 'espacio_nombre')));
-                    sort($allUniqueSpaces);
-                    foreach($allUniqueSpaces as $sp): 
-                    ?>
+                    <?php foreach($allUniqueSpaces as $sp): ?>
                         <option value="<?php echo htmlspecialchars($sp); ?>"><?php echo htmlspecialchars($sp); ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -542,14 +546,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 <div class="drawer-section">
                     <h4>Edificio</h4>
                     <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="edificio-checkbox" value="CIC" checked>
-                            CIC
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="edificio-checkbox" value="PIDET" checked>
-                            PIDET
-                        </label>
+                        <?php foreach($edificiosDB as $ed): ?>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="edificio-checkbox" value="<?php echo htmlspecialchars($ed); ?>" checked>
+                                <?php echo htmlspecialchars($ed); ?>
+                            </label>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
@@ -1685,7 +1687,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     const spacesByBuildingJS = <?php echo json_encode($spacesByBuilding ?? []); ?>;
-    const allUniqueSpacesJS = <?php echo json_encode(array_unique(array_filter(array_column($assets ?? [], 'espacio_nombre')))); ?>;
+    const allUniqueSpacesJS = <?php echo json_encode(array_values($allUniqueSpaces ?? [])); ?>;
     
     function updateSpaceFilter() {
         const edVal = document.getElementById('quickLocationFilter').value;

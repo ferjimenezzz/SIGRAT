@@ -230,7 +230,7 @@ function ReservationApprovalApp() {
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
       cancelButtonText: "No, regresar",
-      confirmButtonText: "S\\xED, cancelar"
+      confirmButtonText: "Cancelar"
     });
     if (isConfirmed && reason) {
       setActionLoading(true);
