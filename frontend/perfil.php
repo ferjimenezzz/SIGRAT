@@ -275,107 +275,101 @@ include 'header.php';
     </div>
 
     <!-- Columna Derecha -->
-    <div style="display: flex; flex-direction: column; gap: 24px;">
-        
-        <!-- Tarjeta Info Derecha (Actualizada) -->
-        <div style="background: #eff6ff; border-radius: 16px; padding: 24px; border: 1px solid #dbeafe;">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-            <i class="bi bi-info-circle" style="color: #6366f1; font-size: 20px;"></i>
-            <h4 style="font-size: 14px; font-weight: 700; color: #4338ca; margin: 0;">¿Qué puedo modificar?</h4>
-        </div>
+    <div style="display: flex; flex-direction: column; gap: 20px; align-self: start;">
 
-        <p style="font-size: 12px; color: #1e293b; font-weight: 500; line-height: 1.6; margin-bottom: 16px;">
-            Puedes actualizar los siguientes datos de tu perfil en cualquier momento:
-        </p>
-
-        <ul style="font-size: 12px; color: #1e293b; font-weight: 600; padding-left: 18px; margin-bottom: 20px; line-height: 2;">
-            <li>Nombre completo</li>
-            <li>Correo institucional</li>
-            <li>Género</li>
-            <li>Número telefónico</li>
-            <li>Organización / Área</li>
-        </ul>
-
-        <div style="background: white; border-radius: 8px; padding: 14px; border: 1px solid #dbeafe;">
-            <div style="display: flex; gap: 8px; align-items: flex-start;">
-                <i class="bi bi-shield-lock" style="color: #6366f1; font-size: 14px; margin-top: 1px;"></i>
-                <p style="font-size: 11px; color: #475569; font-weight: 500; line-height: 1.6; margin: 0;">
-                    El <strong>Rol de usuario</strong> y la <strong>Fecha de registro</strong> son datos administrados por el sistema y solo pueden ser cambiados por un administrador.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====== CAMBIAR CONTRASEÑA ====== -->
-    <div class="card password-card" style="padding:32px;">
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;">
-            <div style="width:56px;height:56px;border-radius:50%;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
-                <i class="bi bi-shield-lock"></i>
-            </div>
-            <div>
-                <h3 style="font-size:18px;font-weight:800;color:#1e293b;margin-bottom:2px;">Cambiar contraseña</h3>
-                <p style="font-size:12px;color:#64748b;font-weight:500;margin:0;">Disponible para todos los usuarios</p>
-            </div>
-        </div>
-
-        <?php if (isset($pwError)): ?>
-        <div style="background:#fef2f2;border:1px solid #f87171;color:#b91c1c;padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px;">
-            <i class="bi bi-exclamation-triangle-fill"></i> <?php echo htmlspecialchars($pwError); ?>
-        </div>
-        <?php endif; ?>
-
-        <form method="POST" id="formCambiarPassword">
-            <input type="hidden" name="action" value="change_password">
-            <div style="display:grid;grid-template-columns:1fr;gap:20px;">
-
-                <!-- Contraseña actual -->
+        <!-- ====== CAMBIAR CONTRASEÑA (primero para evitar scroll) ====== -->
+        <div class="card" style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
+                <div style="width:46px;height:46px;border-radius:50%;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Contraseña actual</label>
-                    <div style="position:relative;">
-                        <input type="password" name="contrasena_actual" id="pwActual" class="form-control" style="background:white;padding-right:42px;" placeholder="••••••••" required>
-                        <button type="button" onclick="togglePw('pwActual','eyeActual')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
-                            <i class="bi bi-eye" id="eyeActual"></i>
-                        </button>
+                    <h3 style="font-size:16px;font-weight:800;color:#1e293b;margin-bottom:2px;">Cambiar contraseña</h3>
+                    <p style="font-size:12px;color:#64748b;font-weight:500;margin:0;">Disponible para todos los usuarios</p>
+                </div>
+            </div>
+
+            <?php if (isset($pwError)): ?>
+            <div style="background:#fef2f2;border:1px solid #f87171;color:#b91c1c;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-weight:600;font-size:12px;display:flex;align-items:center;gap:8px;">
+                <i class="bi bi-exclamation-triangle-fill"></i> <?php echo htmlspecialchars($pwError); ?>
+            </div>
+            <?php endif; ?>
+
+            <form method="POST" id="formCambiarPassword">
+                <input type="hidden" name="action" value="change_password">
+                <div style="display:grid;grid-template-columns:1fr;gap:16px;">
+
+                    <!-- Contraseña actual -->
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Contraseña actual</label>
+                        <div style="position:relative;">
+                            <input type="password" name="contrasena_actual" id="pwActual" class="form-control" style="background:white;padding-right:42px;" placeholder="••••••••" required>
+                            <button type="button" onclick="togglePw('pwActual','eyeActual')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
+                                <i class="bi bi-eye" id="eyeActual"></i>
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Nueva contraseña -->
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Nueva contraseña</label>
+                        <div style="position:relative;">
+                            <input type="password" name="contrasena_nueva" id="pwNueva" class="form-control" style="background:white;padding-right:42px;" placeholder="Mín. 6 caracteres" required minlength="6" oninput="checkPwStrength(this.value)">
+                            <button type="button" onclick="togglePw('pwNueva','eyeNueva')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
+                                <i class="bi bi-eye" id="eyeNueva"></i>
+                            </button>
+                        </div>
+                        <!-- Barra de fortaleza -->
+                        <div style="margin-top:6px;height:4px;border-radius:4px;background:#e2e8f0;overflow:hidden;">
+                            <div id="pwStrengthBar" style="height:100%;width:0%;border-radius:4px;transition:width 0.3s,background 0.3s;"></div>
+                        </div>
+                        <div id="pwStrengthLabel" style="font-size:10px;color:#94a3b8;margin-top:3px;"></div>
+                    </div>
+
+                    <!-- Confirmar contraseña -->
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Confirmar contraseña</label>
+                        <div style="position:relative;">
+                            <input type="password" name="contrasena_confirm" id="pwConfirm" class="form-control" style="background:white;padding-right:42px;" placeholder="Repite la contraseña" required oninput="checkMatch()">
+                            <button type="button" onclick="togglePw('pwConfirm','eyeConfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
+                                <i class="bi bi-eye" id="eyeConfirm"></i>
+                            </button>
+                        </div>
+                        <div id="matchLabel" style="font-size:10px;margin-top:3px;"></div>
+                    </div>
+
                 </div>
 
-                <!-- Nueva contraseña -->
-                <div>
-                    <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Nueva contraseña</label>
-                    <div style="position:relative;">
-                        <input type="password" name="contrasena_nueva" id="pwNueva" class="form-control" style="background:white;padding-right:42px;" placeholder="Mín. 6 caracteres" required minlength="6" oninput="checkPwStrength(this.value)">
-                        <button type="button" onclick="togglePw('pwNueva','eyeNueva')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
-                            <i class="bi bi-eye" id="eyeNueva"></i>
-                        </button>
-                    </div>
-                    <!-- Barra de fortaleza -->
-                    <div style="margin-top:6px;height:4px;border-radius:4px;background:#e2e8f0;overflow:hidden;">
-                        <div id="pwStrengthBar" style="height:100%;width:0%;border-radius:4px;transition:width 0.3s,background 0.3s;"></div>
-                    </div>
-                    <div id="pwStrengthLabel" style="font-size:10px;color:#94a3b8;margin-top:3px;"></div>
+                <div style="margin-top:22px;">
+                    <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:11px 20px;font-size:14px;border-radius:8px;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;">
+                        <i class="bi bi-shield-check"></i> Actualizar contraseña
+                    </button>
                 </div>
+            </form>
+        </div>
 
-                <!-- Confirmar contraseña -->
-                <div>
-                    <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Confirmar contraseña</label>
-                    <div style="position:relative;">
-                        <input type="password" name="contrasena_confirm" id="pwConfirm" class="form-control" style="background:white;padding-right:42px;" placeholder="Repite la contraseña" required oninput="checkMatch()">
-                        <button type="button" onclick="togglePw('pwConfirm','eyeConfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px;padding:0;">
-                            <i class="bi bi-eye" id="eyeConfirm"></i>
-                        </button>
-                    </div>
-                    <div id="matchLabel" style="font-size:10px;margin-top:3px;"></div>
+        <!-- Tarjeta Info (segundo lugar) -->
+        <div style="background: #eff6ff; border-radius: 16px; padding: 20px; border: 1px solid #dbeafe;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                <i class="bi bi-info-circle" style="color: #6366f1; font-size: 18px;"></i>
+                <h4 style="font-size: 13px; font-weight: 700; color: #4338ca; margin: 0;">¿Qué puedo modificar?</h4>
+            </div>
+            <ul style="font-size: 12px; color: #1e293b; font-weight: 600; padding-left: 18px; margin-bottom: 14px; line-height: 1.9;">
+                <li>Nombre completo</li>
+                <li>Correo institucional</li>
+                <li>Género</li>
+                <li>Número telefónico</li>
+                <li>Organización / Área</li>
+            </ul>
+            <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #dbeafe;">
+                <div style="display: flex; gap: 8px; align-items: flex-start;">
+                    <i class="bi bi-shield-lock" style="color: #6366f1; font-size: 14px; margin-top: 1px;"></i>
+                    <p style="font-size: 11px; color: #475569; font-weight: 500; line-height: 1.6; margin: 0;">
+                        El <strong>Rol de usuario</strong> y la <strong>Fecha de registro</strong> son datos administrados por el sistema y solo pueden ser cambiados por un administrador.
+                    </p>
                 </div>
-
             </div>
-
-            <div style="margin-top:28px;display:flex;justify-content:flex-end;">
-                <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:12px 24px;font-size:14px;border-radius:8px;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;">
-                    <i class="bi bi-shield-check"></i> Actualizar contraseña
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
 
     </div> <!-- Cierra Columna Derecha -->
 </div> <!-- Cierra Grid Layout -->
