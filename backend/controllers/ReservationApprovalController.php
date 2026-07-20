@@ -50,16 +50,22 @@ class ReservationApprovalController
      */
     public function getByStatus(int $userId, bool $isAdmin, string $status = 'pending'): array
     {
-        // 1. Auto-cancel expired pending reservations
-        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE status = 'pending' AND (fecha_uso + hora_ent) < NOW()");
+        // 1. Auto-cancel expired pending reservations (sólo si ya pasó la fecha de uso o el horario final en el día de hoy)
+        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (status = 'pending' OR estatus = 'Pendiente') AND (fecha_uso < CURRENT_DATE OR (fecha_uso = CURRENT_DATE AND hora_sal < CURRENT_TIME))");
 
         // 2. Fetch based on status
         if ($status === 'cancelled') {
-            $statusCondition = "r.status IN ('cancelled', 'rejected')";
+            $statusCondition = "(r.status IN ('cancelled', 'rejected') OR r.estatus IN ('Cancelada', 'Rechazada'))";
+            $params = [];
+        } elseif ($status === 'pending') {
+            $statusCondition = "(r.status = 'pending' OR r.estatus = 'Pendiente')";
+            $params = [];
+        } elseif ($status === 'approved') {
+            $statusCondition = "(r.status = 'approved' OR r.estatus = 'Aprobada')";
             $params = [];
         } else {
-            $statusCondition = "r.status = :status";
-            $params = [':status' => $status];
+            $statusCondition = "(r.status = :status OR r.estatus = :estatus_alt)";
+            $params = [':status' => $status, ':estatus_alt' => $status];
         }
 
         $where = $isAdmin ? $statusCondition : "r.us_id = :uid AND " . $statusCondition;
@@ -80,6 +86,17 @@ class ReservationApprovalController
         ");
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Normalizar status en memoria para que el frontend React siempre reconozca el estado estándar
+        foreach ($rows as &$row) {
+            if (empty($row['status']) || $row['status'] === 'Pendiente') {
+                if ($row['estatus'] === 'Pendiente') $row['status'] = 'pending';
+                elseif ($row['estatus'] === 'Aprobada') $row['status'] = 'approved';
+                elseif ($row['estatus'] === 'Cancelada') $row['status'] = 'cancelled';
+                elseif ($row['estatus'] === 'Rechazada') $row['status'] = 'rejected';
+            }
+        }
+        unset($row);
 
         // Grouping logic in PHP
         $grouped = [];
@@ -118,7 +135,7 @@ class ReservationApprovalController
             $idCol = $isGroup ? 'group_id' : 're_id';
 
             // Verify reservation exists and is pending
-            $stmt = $this->pdo->prepare("SELECT re_id, status, esp_id, fecha_uso, hora_ent, hora_sal FROM reserva WHERE $idCol = :id FOR UPDATE");
+            $stmt = $this->pdo->prepare("SELECT re_id, status, estatus, esp_id, fecha_uso, hora_ent, hora_sal FROM reserva WHERE $idCol = :id FOR UPDATE");
             $stmt->execute([':id' => $reservationId]);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (empty($rows)) {
@@ -128,10 +145,10 @@ class ReservationApprovalController
             $targetEspId = $newEspId ? $newEspId : $rows[0]['esp_id'];
 
             foreach ($rows as $row) {
-                if ($row['status'] !== 'pending') {
+                if ($row['status'] !== 'pending' && $row['estatus'] !== 'Pendiente') {
                     throw new Exception('Solo las reservas pendientes pueden ser aprobadas.');
                 }
-                $overlapStmt = $this->pdo->prepare("SELECT COUNT(*) FROM reserva WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND status = 'approved' AND hora_ent < :hora_sal AND hora_sal > :hora_ent");
+                $overlapStmt = $this->pdo->prepare("SELECT COUNT(*) FROM reserva WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND (status = 'approved' OR estatus = 'Aprobada') AND hora_ent < :hora_sal AND hora_sal > :hora_ent");
                 $overlapStmt->execute([':esp_id' => $targetEspId, ':fecha_uso' => $row['fecha_uso'], ':hora_sal' => $row['hora_sal'], ':hora_ent' => $row['hora_ent']]);
                 if ($overlapStmt->fetchColumn() > 0) {
                     throw new Exception('El espacio seleccionado ya cuenta con una reservación aprobada para la fecha ' . $row['fecha_uso']);
@@ -148,7 +165,7 @@ class ReservationApprovalController
 
             foreach ($rows as $row) {
                 // Automatically reject overlapping pending reservations
-                $rejectStmt = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = 'Rechazo automático por empalme', approved_by = :admin, approved_at = NOW() WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND status = 'pending' AND hora_ent < :hora_sal AND hora_sal > :hora_ent AND re_id != :id");
+                $rejectStmt = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = 'Rechazo automático por empalme', approved_by = :admin, approved_at = NOW() WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND (status = 'pending' OR estatus = 'Pendiente') AND hora_ent < :hora_sal AND hora_sal > :hora_ent AND re_id != :id");
                 $rejectStmt->execute([':admin' => $adminId, ':esp_id' => $targetEspId, ':fecha_uso' => $row['fecha_uso'], ':hora_sal' => $row['hora_sal'], ':hora_ent' => $row['hora_ent'], ':id' => $row['re_id']]);
 
                 // Notify user
@@ -181,12 +198,12 @@ class ReservationApprovalController
         $isGroup = strpos($reservationId, 'grp_') === 0;
         $idCol = $isGroup ? 'group_id' : 're_id';
 
-        $stmt = $this->pdo->prepare("SELECT re_id, status FROM reserva WHERE $idCol = :id FOR UPDATE");
+        $stmt = $this->pdo->prepare("SELECT re_id, status, estatus FROM reserva WHERE $idCol = :id FOR UPDATE");
         $stmt->execute([':id' => $reservationId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($rows)) throw new Exception('Reservation not found');
         foreach ($rows as $row) {
-            if ($row['status'] !== 'pending') throw new Exception('Only pending reservations can be rejected');
+            if ($row['status'] !== 'pending' && $row['estatus'] !== 'Pendiente') throw new Exception('Only pending reservations can be rejected');
         }
 
         $update = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = :reason, approved_by = :admin, approved_at = NOW() WHERE $idCol = :id");

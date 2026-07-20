@@ -65,7 +65,8 @@ $protected_pages = [
 ];
 
 if (!$jwt_valid && in_array($currentPage, $protected_pages)) {
-    header("Location: login.php");
+    $redirectParam = !empty($_SERVER['REQUEST_URI']) ? urlencode($_SERVER['REQUEST_URI']) : '';
+    header("Location: login.php" . ($redirectParam ? "?redirect=" . $redirectParam : ""));
     exit();
 }
 
