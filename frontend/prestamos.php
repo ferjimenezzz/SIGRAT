@@ -159,6 +159,7 @@ foreach ($loans as $l) {
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 41, 0.6); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
     .modal-overlay.active { display: flex; }
     .modal-content-box { background: white; border-radius: 16px; width: 100%; max-width: 650px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-content-box form { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
     .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
     .modal-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
     .close-btn { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }

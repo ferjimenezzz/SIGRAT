@@ -436,6 +436,9 @@ $tab = $_GET['tab'] ?? 'usuarios';
 <!-- ============================================================================ -->
 <!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
 <!-- ============================================================================ -->
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     let currentActiveTab = '<?php echo $tab; ?>';
 
