@@ -2018,10 +2018,11 @@ include 'header.php';
             <div class="form-pane">
                 <form id="reservationForm">
 
-                    <!-- Modo día único / múltiples días -->
+                    <!-- Modo día único / múltiples días / por cuatrimestre -->
                     <div style="display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:10px;border:1px solid var(--border-color);margin-bottom:16px;">
                         <button type="button" class="btn-switch-res-mode active" id="btnResModeSingle">Día único</button>
                         <button type="button" class="btn-switch-res-mode" id="btnResModeMultiple">Múltiples días</button>
+                        <button type="button" class="btn-switch-res-mode" id="btnResModeCuatrimestre">Por cuatrimestre</button>
                     </div>
 
                     <!-- Edificio + Planta -->
@@ -2074,14 +2075,23 @@ include 'header.php';
                                 <input type="date" class="modal-input" id="resFechaFin">
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Fechas cuatrimestre -->
+                    <div id="resCuatrimestreFields" style="display:none;flex-direction:column;gap:10px;margin-bottom:10px;">
                         <div class="modal-form-group">
-                            <label>Días de la semana</label>
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
-                                <?php foreach(['1'=>'Lun','2'=>'Mar','3'=>'Mié','4'=>'Jue','5'=>'Vie','6'=>'Sáb','0'=>'Dom'] as $v=>$d): ?>
-                                <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--text-primary);cursor:pointer;">
-                                    <input type="checkbox" class="weekday-checkbox" value="<?php echo $v; ?>" <?php echo in_array($v,['1','2','3','4','5'])?'checked':''; ?>> <?php echo $d; ?>
-                                </label>
-                                <?php endforeach; ?>
+                            <label>Cuatrimestre</label>
+                            <select class="modal-input" id="resCuatrimestreSelect">
+                            </select>
+                        </div>
+                        <div class="modal-grid-2">
+                            <div class="modal-form-group">
+                                <label>Fecha Inicio</label>
+                                <input type="date" class="modal-input" id="resCuatFechaInicio">
+                            </div>
+                            <div class="modal-form-group">
+                                <label>Fecha Fin</label>
+                                <input type="date" class="modal-input" id="resCuatFechaFin">
                             </div>
                         </div>
                     </div>
@@ -2660,39 +2670,136 @@ include 'header.php';
         const resEdificio = document.getElementById('resEdificio');
         const resEspacio = document.getElementById('resEspacio');
         
-        // SWITCHER DE MODO EN MODAL (DÍA ÚNICO VS MULTI-DÍA)
+        // SWITCHER DE MODO EN MODAL (DÍA ÚNICO VS MULTI-DÍA VS CUATRIMESTRE)
         const btnResModeSingle = document.getElementById('btnResModeSingle');
         const btnResModeMultiple = document.getElementById('btnResModeMultiple');
+        const btnResModeCuatrimestre = document.getElementById('btnResModeCuatrimestre');
         const resSingleDayFields = document.getElementById('resSingleDayFields');
         const resMultiDayFields = document.getElementById('resMultiDayFields');
+        const resCuatrimestreFields = document.getElementById('resCuatrimestreFields');
         
-        btnResModeSingle.addEventListener('click', () => {
-            btnResModeSingle.classList.add('active');
-            btnResModeMultiple.classList.remove('active');
-            resSingleDayFields.style.display = 'block';
-            resMultiDayFields.style.display = 'none';
-            state.resMode = 'single';
+        function updateCuatrimestreDatesFromSelect() {
+            const sel = document.getElementById('resCuatrimestreSelect');
+            const startInput = document.getElementById('resCuatFechaInicio');
+            const endInput = document.getElementById('resCuatFechaFin');
+            if (!sel || !startInput || !endInput) return;
             
-            // Requiere fecha única obligatoria
-            document.getElementById('resFecha').required = true;
-            document.getElementById('resFechaInicio').required = false;
-            document.getElementById('resFechaFin').required = false;
-            if (typeof checkAvailability === 'function') checkAvailability();
-        });
+            const val = sel.value;
+            if (val && val.includes('|')) {
+                const [s, e] = val.split('|');
+                startInput.value = s;
+                endInput.value = e;
+            }
+        }
 
-        btnResModeMultiple.addEventListener('click', () => {
-            btnResModeMultiple.classList.add('active');
-            btnResModeSingle.classList.remove('active');
-            resSingleDayFields.style.display = 'none';
-            resMultiDayFields.style.display = 'flex';
-            state.resMode = 'multiple';
+        const resCuatrimestreSelectEl = document.getElementById('resCuatrimestreSelect');
+        if (resCuatrimestreSelectEl) {
+            resCuatrimestreSelectEl.addEventListener('change', updateCuatrimestreDatesFromSelect);
+        }
 
-            // Requiere fechas múltiples obligatorias
-            document.getElementById('resFecha').required = false;
-            document.getElementById('resFechaInicio').required = true;
-            document.getElementById('resFechaFin').required = true;
-            if (typeof checkAvailability === 'function') checkAvailability();
-        });
+        function populateCuatrimestreSelect() {
+            const sel = document.getElementById('resCuatrimestreSelect');
+            if (!sel) return;
+            sel.innerHTML = '';
+            
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            const cuats = [];
+            [currentYear, currentYear + 1].forEach(yr => {
+                cuats.push({
+                    name: `Enero - Abril ${yr}`,
+                    start: `${yr}-01-08`,
+                    end: `${yr}-04-30`
+                });
+                cuats.push({
+                    name: `Mayo - Agosto ${yr}`,
+                    start: `${yr}-05-02`,
+                    end: `${yr}-08-31`
+                });
+                cuats.push({
+                    name: `Septiembre - Diciembre ${yr}`,
+                    start: `${yr}-09-01`,
+                    end: `${yr}-12-20`
+                });
+            });
+            
+            const todayStr = now.toISOString().split('T')[0];
+            let selectedSet = false;
+            
+            cuats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = `${c.start}|${c.end}`;
+                opt.textContent = `${c.name} (${c.start} a ${c.end})`;
+                
+                if (!selectedSet && todayStr <= c.end) {
+                    opt.selected = true;
+                    selectedSet = true;
+                }
+                sel.appendChild(opt);
+            });
+
+            updateCuatrimestreDatesFromSelect();
+        }
+        
+        if (btnResModeSingle) {
+            btnResModeSingle.addEventListener('click', () => {
+                btnResModeSingle.classList.add('active');
+                btnResModeMultiple.classList.remove('active');
+                if (btnResModeCuatrimestre) btnResModeCuatrimestre.classList.remove('active');
+                resSingleDayFields.style.display = 'block';
+                resMultiDayFields.style.display = 'none';
+                if (resCuatrimestreFields) resCuatrimestreFields.style.display = 'none';
+                state.resMode = 'single';
+                
+                document.getElementById('resFecha').required = true;
+                document.getElementById('resFechaInicio').required = false;
+                document.getElementById('resFechaFin').required = false;
+                if (document.getElementById('resCuatFechaInicio')) document.getElementById('resCuatFechaInicio').required = false;
+                if (document.getElementById('resCuatFechaFin')) document.getElementById('resCuatFechaFin').required = false;
+                if (typeof checkAvailability === 'function') checkAvailability();
+            });
+        }
+
+        if (btnResModeMultiple) {
+            btnResModeMultiple.addEventListener('click', () => {
+                btnResModeMultiple.classList.add('active');
+                btnResModeSingle.classList.remove('active');
+                if (btnResModeCuatrimestre) btnResModeCuatrimestre.classList.remove('active');
+                resSingleDayFields.style.display = 'none';
+                resMultiDayFields.style.display = 'flex';
+                if (resCuatrimestreFields) resCuatrimestreFields.style.display = 'none';
+                state.resMode = 'multiple';
+
+                document.getElementById('resFecha').required = false;
+                document.getElementById('resFechaInicio').required = true;
+                document.getElementById('resFechaFin').required = true;
+                if (document.getElementById('resCuatFechaInicio')) document.getElementById('resCuatFechaInicio').required = false;
+                if (document.getElementById('resCuatFechaFin')) document.getElementById('resCuatFechaFin').required = false;
+                if (typeof checkAvailability === 'function') checkAvailability();
+            });
+        }
+
+        if (btnResModeCuatrimestre) {
+            btnResModeCuatrimestre.addEventListener('click', () => {
+                btnResModeCuatrimestre.classList.add('active');
+                btnResModeSingle.classList.remove('active');
+                btnResModeMultiple.classList.remove('active');
+                resSingleDayFields.style.display = 'none';
+                resMultiDayFields.style.display = 'none';
+                if (resCuatrimestreFields) resCuatrimestreFields.style.display = 'flex';
+                state.resMode = 'cuatrimestre';
+
+                populateCuatrimestreSelect();
+
+                document.getElementById('resFecha').required = false;
+                document.getElementById('resFechaInicio').required = false;
+                document.getElementById('resFechaFin').required = false;
+                if (document.getElementById('resCuatFechaInicio')) document.getElementById('resCuatFechaInicio').required = true;
+                if (document.getElementById('resCuatFechaFin')) document.getElementById('resCuatFechaFin').required = true;
+                if (typeof checkAvailability === 'function') checkAvailability();
+            });
+        }
 
          function openResModal(defaultDate = null) {
             window.lastLoadedDate = "";
@@ -4263,7 +4370,9 @@ include 'header.php';
             vis_id: null
         };
 
-        // Procesar por modo: Día Único vs. Múltiples Días
+        requestData.is_cuatrimestre = (state.resMode === 'cuatrimestre');
+
+        // Procesar por modo: Día Único vs. Múltiples Días vs. Por Cuatrimestre
         if (state.resMode === 'single') {
             const fecha = document.getElementById('resFecha').value;
             if(!fecha) {
@@ -4275,8 +4384,8 @@ include 'header.php';
                 return;
             }
             requestData.fecha_uso = fecha;
-        } else {
-            // Múltiples días
+        } else if (state.resMode === 'multiple') {
+            // Múltiples días: todas las fechas entre Inicio y Fin consecutivas
             const startStr = document.getElementById('resFechaInicio').value;
             const endStr = document.getElementById('resFechaFin').value;
             if(!startStr || !endStr) {
@@ -4295,38 +4404,57 @@ include 'header.php';
                 return;
             }
 
-            // Obtener días de la semana seleccionados
-            const checkedWeekdays = [];
-            document.querySelectorAll('.weekday-checkbox:checked').forEach(cb => {
-                checkedWeekdays.push(parseInt(cb.value));
-            });
-
-            if (checkedWeekdays.length === 0) {
-                Swal.fire('Atención', 'Por favor, selecciona al menos un día de la semana.', 'warning');
-                return;
-            }
-
-            // Generar lista de fechas hábiles dentro del rango
             const fechas = [];
             let curr = new Date(startDate);
             while (curr <= endDate) {
-                if (checkedWeekdays.includes(curr.getDay())) {
-                    const y = curr.getFullYear();
-                    const m = String(curr.getMonth() + 1).padStart(2, '0');
-                    const d = String(curr.getDate()).padStart(2, '0');
-                    fechas.push(`${y}-${m}-${d}`);
-                }
+                const y = curr.getFullYear();
+                const m = String(curr.getMonth() + 1).padStart(2, '0');
+                const d = String(curr.getDate()).padStart(2, '0');
+                fechas.push(`${y}-${m}-${d}`);
                 curr.setDate(curr.getDate() + 1);
             }
             
-            console.log("Multi-day array generated:", fechas);
-
             if (fechas.length === 0) {
-                alert("No hay días hábiles que coincidan en el rango seleccionado.");
+                Swal.fire('Atención', 'No hay fechas válidas en el rango seleccionado.', 'warning');
                 return;
             }
 
-            // Adjuntar arreglo al payload
+            requestData.fechas_uso = fechas;
+        } else if (state.resMode === 'cuatrimestre') {
+            // Por cuatrimestre: fechas obtenidas a partir de los inputs resCuatFechaInicio y resCuatFechaFin
+            const startStr = document.getElementById('resCuatFechaInicio').value;
+            const endStr = document.getElementById('resCuatFechaFin').value;
+            if (!startStr || !endStr) {
+                Swal.fire('Atención', 'Por favor, selecciona las fechas de inicio y fin del cuatrimestre.', 'warning');
+                return;
+            }
+            if (startStr === localISOTime && selectedHour <= currentHour) {
+                 Swal.fire('Atención', 'No puedes reservar en una hora que ya pasó para el día de hoy (fecha de inicio).', 'warning');
+                 return;
+            }
+
+            const startDate = new Date(startStr + 'T00:00:00');
+            const endDate = new Date(endStr + 'T00:00:00');
+            if (endDate < startDate) {
+                Swal.fire('Atención', 'La fecha de fin no puede ser menor que la de inicio.', 'warning');
+                return;
+            }
+
+            const fechas = [];
+            let curr = new Date(startDate);
+            while (curr <= endDate) {
+                const y = curr.getFullYear();
+                const m = String(curr.getMonth() + 1).padStart(2, '0');
+                const d = String(curr.getDate()).padStart(2, '0');
+                fechas.push(`${y}-${m}-${d}`);
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            if (fechas.length === 0) {
+                Swal.fire('Atención', 'No hay fechas válidas en el cuatrimestre seleccionado.', 'warning');
+                return;
+            }
+
             requestData.fechas_uso = fechas;
         }
 
