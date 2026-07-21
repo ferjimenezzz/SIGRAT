@@ -3060,7 +3060,19 @@ include 'header.php';
                     let label = labels[valStr] || `${h}:00`;
                     let isDisabled = false;
                     
-                    if (isTodayExact && h <= currentHour) {
+                    const prevStartVal = (h - 1) < 10 ? `0${h - 1}:00` : `${h - 1}:00`;
+                    const startOpt = Array.from(selectHoraEnt.options).find(o => o.value === prevStartVal);
+
+                    if (startOpt && startOpt.disabled) {
+                        isDisabled = true;
+                        if (startOpt.text.includes('(Pasada)')) {
+                            label += ' (Pasada)';
+                        } else if (startOpt.text.includes('(Ocupado)') || startOpt.text.includes('(Sin salas disponibles)')) {
+                            label += ' (Ocupado)';
+                        } else {
+                            label += ' (No disponible)';
+                        }
+                    } else if (isTodayExact && h <= currentHour) {
                         isDisabled = true;
                         label += ' (Pasada)';
                     }
