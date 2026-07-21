@@ -426,11 +426,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
         .hc-drawer.open { transform: translateX(0); }
 
-        /* Header del drawer */
         .hc-head {
             background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
             padding: 24px 24px 20px 24px;
-            flex-shrink: 0;
+            flex: none;
         }
         .hc-head-top {
             display: flex;
@@ -502,7 +501,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             padding: 14px 24px 0 24px;
             border-bottom: 1px solid #f1f5f9;
             background: #f8fafc;
-            flex-shrink: 0;
+            flex: none;
         }
         .hc-tab {
             padding: 9px 16px;
@@ -1848,7 +1847,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     }
 
     function loadHelpData() {
-        fetch('assets/data/help_center.json')
+        fetch('assets/data/help_center.json?v=' + Date.now())
             .then(r => r.json())
             .then(data => {
                 hcData = data;
@@ -1929,6 +1928,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             div.className = 'hc-faq-item';
             div.setAttribute('data-question', item.question.toLowerCase());
             div.setAttribute('data-answer', item.answer.toLowerCase());
+            if (item.keywords) div.setAttribute('data-keywords', item.keywords.toLowerCase());
             div.innerHTML = `
                 <div class="hc-faq-q" onclick="toggleFaq(this.parentElement)">
                     <span>${item.question}</span>
@@ -1946,16 +1946,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         if (!wasOpen) item.classList.add('open');
     }
 
-    function switchHcTab(btn) {
+    function switchHcTab(btn, clearSearch = true) {
         document.querySelectorAll('.hc-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.hc-panel').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(btn.getAttribute('data-panel')).classList.add('active');
-        document.getElementById('hcSearch').value = '';
-        if (hcData) {
-            renderModulesGrid(hcData.modules);
-            renderFaq(hcData.faq);
-            backToModuleList();
+        
+        if (clearSearch) {
+            document.getElementById('hcSearch').value = '';
+            if (hcData) {
+                renderModulesGrid(filterModulesByPermission(hcData.modules));
+                renderFaq(hcData.faq);
+                backToModuleList();
+            }
         }
     }
 
@@ -1964,38 +1967,61 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         const searchInput = document.getElementById('hcSearch');
         if (!searchInput) return;
         searchInput.addEventListener('input', function() {
-            const q = this.value.toLowerCase().trim();
+            const rawQ = this.value.trim();
             if (!hcData) return;
 
             // Si estamos viendo el detalle, volver al grid
             backToModuleList();
 
-            // Detectar panel activo
-            const modulesPanelActive = document.getElementById('hcPanelModules').classList.contains('active');
+            if (!rawQ) {
+                // Reset a estado original
+                renderModulesGrid(filterModulesByPermission(hcData.modules));
+                document.querySelectorAll('.hc-faq-item').forEach(el => el.style.display = '');
+                document.getElementById('hcFaqNoResults').style.display = 'none';
+                return;
+            }
 
-            if (modulesPanelActive) {
-                // Siempre partir de los módulos a los que tiene permiso el usuario
-                const allowed = filterModulesByPermission(hcData.modules);
-                if (!q) { renderModulesGrid(allowed); return; }
-                const filtered = allowed.filter(m =>
-                    m.name.toLowerCase().includes(q) ||
-                    m.description.toLowerCase().includes(q) ||
-                    m.functions.some(f => f.toLowerCase().includes(q)) ||
-                    m.tips.some(t => t.toLowerCase().includes(q))
-                );
-                renderModulesGrid(filtered);
-            } else {
-                // FAQ panel
-                const items = document.querySelectorAll('.hc-faq-item');
-                let visible = 0;
-                items.forEach(item => {
-                    const match = !q ||
-                        item.getAttribute('data-question').includes(q) ||
-                        item.getAttribute('data-answer').includes(q);
-                    item.style.display = match ? '' : 'none';
-                    if (match) visible++;
-                });
-                document.getElementById('hcFaqNoResults').style.display = visible === 0 ? 'block' : 'none';
+            // Normalización: minúsculas y sin acentos
+            const normalize = str => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const qNorm = normalize(rawQ);
+            
+            // Tokenizar: buscar cualquier coincidencia por palabra mayor a 2 letras
+            const tokens = qNorm.split(/\s+/).filter(t => t.length > 2);
+            if (tokens.length === 0) tokens.push(qNorm); // Por si escribe algo de 2 letras
+
+            // Filtrado Inteligente en Módulos
+            const allowed = filterModulesByPermission(hcData.modules);
+            const filteredMods = allowed.filter(m => {
+                const text = normalize(m.name + " " + m.description + " " + m.functions.join(" ") + " " + m.tips.join(" ") + " " + (m.keywords || ""));
+                // Si TODAS las palabras buscadas aparecen en el texto (búsqueda más precisa)
+                return tokens.every(t => text.includes(t));
+            });
+            renderModulesGrid(filteredMods);
+
+            // Filtrado Inteligente en FAQ
+            const items = document.querySelectorAll('.hc-faq-item');
+            let visibleFaqCount = 0;
+            items.forEach(item => {
+                const kws = item.getAttribute('data-keywords') || "";
+                const text = normalize(item.getAttribute('data-question') + " " + item.getAttribute('data-answer') + " " + kws);
+                const match = tokens.every(t => text.includes(t));
+                item.style.display = match ? '' : 'none';
+                if (match) visibleFaqCount++;
+            });
+            document.getElementById('hcFaqNoResults').style.display = visibleFaqCount === 0 ? 'block' : 'none';
+
+            // Auto-Switch de Pestaña Inteligente (UX Experience)
+            const modulesPanelActive = document.getElementById('hcPanelModules').classList.contains('active');
+            
+            if (modulesPanelActive && filteredMods.length === 0 && visibleFaqCount > 0) {
+                // Se buscó algo que no es un módulo pero sí una pregunta frecuente -> Cambiar a pestaña FAQ
+                switchHcTab(document.querySelector('.hc-tab[data-panel="hcPanelFaq"]'), false);
+                this.focus();
+            } 
+            else if (!modulesPanelActive && visibleFaqCount === 0 && filteredMods.length > 0) {
+                // Se buscó un módulo estando en FAQ -> Cambiar a pestaña Módulos
+                switchHcTab(document.querySelector('.hc-tab[data-panel="hcPanelModules"]'), false);
+                this.focus();
             }
         });
 

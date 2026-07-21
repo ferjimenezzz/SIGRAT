@@ -328,9 +328,6 @@ $fechaGeneracion = date('d/m/Y');
                 margin: 2cm 2.2cm;
                 size: A4 portrait;
             }
-            @page :first {
-                margin: 0;
-            }
         }
     </style>
 </head>
@@ -867,7 +864,7 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué hago si olvidé mi contraseña?</strong> — En la pantalla de inicio de sesión haz clic en «¿Olvidaste tu contraseña?», ingresa tu correo y recibirás un enlace de restablecimiento. También puedes pedirle al administrador que la restablezca.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo cambio mi contraseña estando dentro del sistema?</strong> — Ve a Mi Perfil (clic en tu nombre en el menú lateral), busca la sección «Cambiar contraseña» y sigue los pasos.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>Mi sesión se cerró sola, ¿qué pasó?</strong> — Las sesiones expiran automáticamente después de 8 horas de inactividad por seguridad. Vuelve a iniciar sesión normalmente.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Por qué no puedo ver algunos módulos?</strong> — El acceso depende del rol asignado a tu cuenta. Si necesitas un módulo específico, solicítalo al administrador del sistema.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Dónde puedo consultar el historial de mis actividades?</strong> — Todo tu historial de acciones se registra automáticamente. Si tienes permisos, puedes revisarlo en el módulo de Auditoría, o bien, consultar el estado de tus solicitudes recientes desde el Dashboard.</div></li>
                 </ul>
                 <span class="block-label">Reservas y Calendario</span>
                 <ul class="func-list">
@@ -890,7 +887,7 @@ $fechaGeneracion = date('d/m/Y');
                 <ul class="func-list">
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Los datos se guardan automáticamente?</strong> — Sí, cada acción confirmada se guarda en la base de datos de inmediato. No cierres el navegador mientras tengas formularios a medio completar.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo exporto información?</strong> — En los módulos de Préstamos, Inventario, Usuarios y Auditoría encontrarás botones de «Exportar Excel» o «Exportar PDF» en la barra de herramientas superior.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Puedo acceder al sistema desde mi celular?</strong> — Sí, SIGRAT es completamente responsivo y funciona en dispositivos móviles, tablets y escritorio con cualquier navegador moderno.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo busco información específica dentro de las tablas de datos?</strong> — En la mayoría de los módulos encontrarás una barra de búsqueda en la parte superior derecha de las tablas. Simplemente escribe una palabra clave (nombre, fecha, estado) y la tabla se filtrará automáticamente en tiempo real.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo reporto un error técnico?</strong> — Contacta al equipo de soporte de tu institución. Describe el error, proporciona una captura de pantalla y menciona los pasos que realizaste antes de que ocurriera.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué navegadores son compatibles con SIGRAT?</strong> — El sistema funciona correctamente en Google Chrome, Mozilla Firefox, Microsoft Edge y Safari en sus versiones recientes. Se recomienda Chrome para la mejor experiencia.</div></li>
                 </ul>

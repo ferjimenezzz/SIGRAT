@@ -181,16 +181,17 @@
     ],
     "faq": [
         {
-            "question": "¿Cómo recupero mi contraseña?",
-            "answer": "En la pantalla de inicio de sesión, haz clic en el enlace <strong>«¿Olvidaste tu contraseña?»</strong>. Ingresa tu correo institucional y recibirás un enlace de restablecimiento. También puedes pedirle al administrador que restablezca tu contraseña directamente desde el módulo de Usuarios."
+            "question": "¿Qué hago si olvidé mi contraseña?",
+            "answer": "En la pantalla de inicio de sesión, haz clic en «¿Olvidaste tu contraseña?», ingresa tu correo institucional y recibirás un enlace de recuperación. También puedes pedirle al administrador que la restablezca desde el módulo de Usuarios.",
+            "keywords": "olvide recuperar restablecer password clave"
         },
         {
             "question": "¿Cómo cambio mi contraseña una vez dentro del sistema?",
             "answer": "Ve a tu perfil haciendo clic en tu nombre en la parte inferior del menú lateral. En la sección <strong>«Cambiar contraseña»</strong> ingresa tu contraseña actual, la nueva y confírmala. Haz clic en <strong>«Actualizar contraseña»</strong>."
         },
         {
-            "question": "¿Por qué no puedo ver algunos módulos?",
-            "answer": "El acceso a los módulos depende del rol asignado a tu cuenta. Si necesitas acceso a un módulo específico, solicítalo a tu administrador para que actualice tus permisos."
+            "question": "¿Dónde puedo consultar el historial de mis actividades?",
+            "answer": "Todo tu historial de acciones se registra automáticamente. Si tienes permisos, puedes revisarlo en el módulo de Auditoría, o bien, consultar el estado de tus solicitudes recientes desde el Dashboard."
         },
         {
             "question": "¿Cómo reporto un problema técnico?",
@@ -201,8 +202,8 @@
             "answer": "Sí, SIGRAT guarda los datos en la base de datos al confirmar cada acción. Sin embargo, te recomendamos no cerrar el navegador mientras tengas formularios a medio completar."
         },
         {
-            "question": "¿Puedo acceder al sistema desde mi celular?",
-            "answer": "Sí, SIGRAT es completamente responsivo y funciona en dispositivos móviles, tablets y escritorio. Abre tu navegador y ve a la misma URL del sistema."
+            "question": "¿Cómo busco información específica dentro de las tablas de datos?",
+            "answer": "En la mayoría de los módulos encontrarás una barra de búsqueda en la parte superior derecha de las tablas. Simplemente escribe una palabra clave (nombre, fecha, estado) y la tabla se filtrará automáticamente en tiempo real."
         },
         {
             "question": "¿Cómo exporto un reporte?",
