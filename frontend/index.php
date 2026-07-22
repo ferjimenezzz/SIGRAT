@@ -824,7 +824,7 @@ if (isset($_SESSION['us_id'])) {
     // Función asíncrona para actualizar la gráfica de barras sin recargar
     async function updateBarChart(rango) {
         try {
-            const response = await fetch(`../backend/api/index.php/dashboard?rango=${rango}`);
+            const response = await fetch(`../backend/api/index.php/dashboard?rango=${rango}`, { credentials: 'same-origin' });
             const data = await response.json();
             
             if (data && Array.isArray(data)) {
