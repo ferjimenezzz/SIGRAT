@@ -8,7 +8,7 @@
 
 (function () {
   const { useState, useEffect, useRef } = React;
-  const { Box, Paper, Typography, Button, LinearProgress } = MaterialUI;
+  const { Box, Paper, Typography, Button, LinearProgress, IconButton } = MaterialUI;
   const h = React.createElement;
 
   function TutorialGuide({ steps = [], moduleId, open, onClose, onComplete }) {
@@ -450,6 +450,7 @@
           style: popoverStyle,
           sx: {
             p: 2.5,
+            position: 'relative',
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
@@ -463,6 +464,19 @@
             boxShadow: '0 12px 30px -5px rgba(0,0,0,0.15), 0 8px 10px -7px rgba(0,0,0,0.1)',
           }
         },
+          // Botón Cerrar (X)
+          h(IconButton, {
+            onClick: handleSkip,
+            sx: {
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: 'var(--text-secondary, #64748b)',
+              '&:hover': {
+                color: 'var(--text-primary, #1e293b)',
+              }
+            }
+          }, h('i', { className: 'bi bi-x-lg', style: { fontSize: '13px' } })),
           // Cabecera del Tooltip
           h(Box, { sx: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
             h(Typography, {
@@ -479,7 +493,8 @@
               sx: {
                 fontWeight: 700,
                 color: 'var(--text-muted, #94a3b8)',
-                fontFamily: 'Inter, sans-serif'
+                fontFamily: 'Inter, sans-serif',
+                mr: 3
               }
             }, `${activeStep + 1} de ${steps.length}`)
           ),
@@ -511,21 +526,7 @@
             dangerouslySetInnerHTML: { __html: currentStep.description }
           }),
           // Acciones / Footer
-          h(Box, { sx: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 } },
-            h(Button, {
-              size: 'small',
-              onClick: handleSkip,
-              sx: {
-                textTransform: 'none',
-                fontWeight: 700,
-                color: 'var(--text-secondary, #64748b)',
-                fontSize: '12.5px',
-                fontFamily: 'Inter, sans-serif',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                }
-              }
-            }, 'Omitir'),
+          h(Box, { sx: { display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 } },
             h(Box, { sx: { display: 'flex', gap: 1 } },
               activeStep > 0 && h(Button, {
                 size: 'small',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Paper, Typography, Button, LinearProgress } from '@mui/material';
+import { Box, Paper, Typography, Button, LinearProgress, IconButton } from '@mui/material';
 import ReactDOM from 'react-dom';
 
 /**
@@ -463,6 +463,7 @@ export default function TutorialGuide({ steps = [], moduleId, open, onClose, onC
         style={popoverStyle}
         sx={{
           p: 2.5,
+          position: 'relative',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -476,6 +477,22 @@ export default function TutorialGuide({ steps = [], moduleId, open, onClose, onC
           boxShadow: '0 12px 30px -5px rgba(0,0,0,0.15), 0 8px 10px -7px rgba(0,0,0,0.1)',
         }}
       >
+        {/* Botón Cerrar (X) */}
+        <IconButton
+          onClick={handleSkip}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: 'var(--text-secondary, #64748b)',
+            '&:hover': {
+              color: 'var(--text-primary, #1e293b)',
+            },
+          }}
+        >
+          <i className="bi bi-x-lg" style={{ fontSize: '13px' }}></i>
+        </IconButton>
+
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography
@@ -495,6 +512,7 @@ export default function TutorialGuide({ steps = [], moduleId, open, onClose, onC
               fontWeight: 700,
               color: 'var(--text-muted, #94a3b8)',
               fontFamily: 'Inter, sans-serif',
+              mr: 3,
             }}
           >
             {`${activeStep + 1} de ${steps.length}`}
@@ -531,23 +549,7 @@ export default function TutorialGuide({ steps = [], moduleId, open, onClose, onC
         />
 
         {/* Actions bar */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-          <Button
-            size="small"
-            onClick={handleSkip}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 700,
-              color: 'var(--text-secondary, #64748b)',
-              fontSize: '12.5px',
-              fontFamily: 'Inter, sans-serif',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
-              },
-            }}
-          >
-            Omitir
-          </Button>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
             {activeStep > 0 && (
               <Button

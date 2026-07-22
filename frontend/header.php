@@ -2330,8 +2330,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             <div class="topbar-right">
 
                 <!-- Botón de Recorrido Guiado (Tutorial) -->
-                <div class="topbar-icon-btn" id="topbarTourBtn" title="Ver recorrido guiado" style="display: none; align-items: center; justify-content: center;" onclick="if (window.triggerTutorialGuide) { window.triggerTutorialGuide(); }">
+                <div class="topbar-icon-btn" id="topbarTourBtn" title="Ver recorrido guiado" style="display: none; align-items: center; justify-content: center; gap: 8px; width: auto; padding: 0 14px;" onclick="if (window.triggerTutorialGuide) { window.triggerTutorialGuide(); }">
                     <i class="bi bi-compass"></i>
+                    <span style="font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; white-space: nowrap;">Guía de inicio</span>
                 </div>
 
                 <div class="topbar-icon-btn" id="notifBtn">
