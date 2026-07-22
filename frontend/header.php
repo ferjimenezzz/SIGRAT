@@ -349,6 +349,22 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             font-weight: 500;
         }
 
+        .sidebar-user:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .sidebar-user-chevron {
+            color: #64748b;
+            font-size: 12px;
+            margin-left: auto;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .sidebar-user:hover .sidebar-user-chevron {
+            color: #e2e8f0;
+            transform: translateX(2px);
+        }
+
         .sidebar-logout {
             display: flex;
             align-items: center;
@@ -808,6 +824,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         body.sidebar-collapsed .sidebar-brand,
         body.sidebar-collapsed .nav-item span,
         body.sidebar-collapsed .sidebar-user-info,
+        body.sidebar-collapsed .sidebar-user-chevron,
         body.sidebar-collapsed .sidebar-logout span {
             display: none;
         }
@@ -1426,6 +1443,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             .sidebar-brand,
             .nav-item span,
             .sidebar-user-info,
+            .sidebar-user-chevron,
             .sidebar-logout span {
                 display: none;
             }
@@ -1501,6 +1519,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             body.sidebar-mobile-open .sidebar-brand,
             body.sidebar-mobile-open .nav-item span,
             body.sidebar-mobile-open .sidebar-user-info,
+            body.sidebar-mobile-open .sidebar-user-chevron,
             body.sidebar-mobile-open .sidebar-logout span {
                 display: block;
             }
@@ -1920,6 +1939,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <div class="sidebar-user-name"><?php echo $nombreUsuario; ?></div>
                 <div class="sidebar-user-role"><?php echo ucfirst($rolUsuario); ?></div>
             </div>
+            <i class="bi bi-chevron-right sidebar-user-chevron"></i>
         </a>
         <!-- Centro de Ayuda -->
         <button class="sidebar-help-btn" id="helpCenterBtn" onclick="openHelpCenter()" title="Centro de Ayuda">
