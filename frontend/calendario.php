@@ -4626,11 +4626,21 @@ include 'header.php';
         const horaEnt = ev.hora_ent ? ev.hora_ent.substring(0, 5) : '00:00';
         const horaSal = ev.hora_sal ? ev.hora_sal.substring(0, 5) : '00:00';
         
+        let fechaFormateada = ev.fecha_uso;
+        try {
+            const dateParts = ev.fecha_uso.split('-');
+            const dateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const fDate = dateObj.toLocaleDateString('es-ES', options);
+            fechaFormateada = fDate.charAt(0).toUpperCase() + fDate.slice(1);
+        } catch(e) {}
+        
         tooltip.innerHTML = `
             <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                 <span>${ev.nombre_numero} (${ev.edificio})</span>
                 <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: ${statusColor}; color: white; text-transform: uppercase;">${est}</span>
             </div>
+            <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-calendar-event" style="margin-right: 6px;"></i><strong>Fecha:</strong> ${fechaFormateada}</div>
             <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-clock" style="margin-right: 6px;"></i><strong>Horario:</strong> ${horaEnt} - ${horaSal}</div>
             <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-person" style="margin-right: 6px;"></i><strong>Solicitante:</strong> ${ev.usuario_nombre || 'Visita'}</div>
             <div style="margin-bottom: 4px; color: #cbd5e1;"><i class="bi bi-envelope" style="margin-right: 6px;"></i><strong>Correo:</strong> ${ev.usuario_correo || 'N/A'}</div>
