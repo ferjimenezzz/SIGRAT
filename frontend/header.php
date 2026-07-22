@@ -963,31 +963,51 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         .notification-badge {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
-            background: #2563eb;
-            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            border-radius: 999px;
             border: 2px solid white;
             display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
+            animation: notifPulse 2.5s infinite ease-in-out;
         }
 
-        /* ==================== NOTIFICATIONS ==================== */
+        @keyframes notifPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==================== NOTIFICATIONS PANEL ==================== */
         .notif-panel {
             position: absolute;
-            top: 50px;
+            top: 48px;
             right: 0;
-            width: 320px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
+            width: 375px;
+            max-width: calc(100vw - 32px);
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(0,0,0,0.05);
             z-index: 1000;
             display: none;
             flex-direction: column;
             overflow: hidden;
             text-align: left;
+            animation: notifSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes notifSlide {
+            from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .notif-panel.show {
@@ -996,31 +1016,141 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         .notif-header {
             padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8fafc;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .notif-header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .notif-header h3 {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             margin: 0;
-            color: var(--text-primary);
+            color: #0f172a;
+            letter-spacing: -0.2px;
         }
 
+        .notif-unread-count {
+            font-size: 10px;
+            font-weight: 700;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .notif-mark-all-btn {
+            background: transparent;
+            border: none;
+            color: #2563eb;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .notif-mark-all-btn:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        /* Pestañas de Notificación */
+        .notif-tabs {
+            display: flex;
+            background: #f8fafc;
+            padding: 5px 12px;
+            gap: 6px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .notif-tab {
+            flex: 1;
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .notif-tab:hover {
+            color: #1e293b;
+            background: rgba(0,0,0,0.03);
+        }
+
+        .notif-tab.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .notif-tab-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .notif-tab.active .notif-tab-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* Lista de Notificaciones */
         .notif-list {
-            max-height: 300px;
+            max-height: 330px;
             overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .notif-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .notif-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .notif-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
 
         .notif-item {
             padding: 12px 16px;
             border-bottom: 1px solid #f1f5f9;
             text-decoration: none;
-            display: block;
-            transition: background 0.2s;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            transition: background 0.15s ease;
+            position: relative;
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
         }
 
         .notif-item:hover {
@@ -1028,34 +1158,140 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .notif-item.unread {
-            background: #eff6ff;
+            background: #f0f9ff;
+        }
+        .notif-item.unread:hover {
+            background: #e0f2fe;
+        }
+
+        .notif-item.read {
+            opacity: 0.75;
+        }
+
+        .notif-icon-wrap {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .notif-icon-prestamo {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+        .notif-icon-reserva {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+        .notif-icon-sistema, .notif-icon-rfid {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .notif-icon-default {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-content-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 3px;
         }
 
         .notif-title {
             font-size: 12px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notif-unread-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2563eb;
+            flex-shrink: 0;
         }
 
         .notif-text {
-            font-size: 11px;
-            color: var(--text-secondary);
-            line-height: 1.4;
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.45;
+            word-break: break-word;
         }
 
         .notif-time {
             font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 6px;
-            display: block;
+            color: #94a3b8;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
         }
-        
+
         .notif-empty {
-            padding: 20px;
+            padding: 36px 20px;
             text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notif-empty i {
+            font-size: 32px;
+            color: #cbd5e1;
+        }
+
+        .notif-empty p {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .notif-empty span {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .notif-footer {
+            padding: 10px 16px;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .notif-footer-link {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.15s;
+        }
+
+        .notif-footer-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
         }
 
         .topbar-date {
@@ -2053,17 +2289,39 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
             <div class="topbar-right">
 
-                <div class="topbar-icon-btn" id="notifBtn">
+                <div class="topbar-icon-btn" id="notifBtn" title="Centro de Notificaciones">
                     <i class="bi bi-bell"></i>
-                    <div class="notification-badge" id="notifBadge"></div>
+                    <span class="notification-badge" id="notifBadge"></span>
                     
-                    <!-- Dropdown Notificaciones -->
+                    <!-- Dropdown Notificaciones Interactivo -->
                     <div class="notif-panel" id="notifPanel">
                         <div class="notif-header">
-                            <h3>Notificaciones</h3>
+                            <div class="notif-header-title">
+                                <h3>Notificaciones</h3>
+                                <span class="notif-unread-count" id="notifUnreadPill">0 sin leer</span>
+                            </div>
+                            <button type="button" class="notif-mark-all-btn" id="notifMarkAllBtn" title="Marcar todas como leídas">
+                                <i class="bi bi-check2-all"></i> Marcar leídas
+                            </button>
                         </div>
+
+                        <div class="notif-tabs">
+                            <button type="button" class="notif-tab active" data-notif-filter="unread" id="notifTabUnread">
+                                Sin leer <span class="notif-tab-badge" id="notifTabUnreadCount">0</span>
+                            </button>
+                            <button type="button" class="notif-tab" data-notif-filter="all" id="notifTabAll">
+                                Todas <span class="notif-tab-badge" id="notifTabAllCount">0</span>
+                            </button>
+                        </div>
+
                         <div class="notif-list" id="notifList">
-                            <!-- Items insertados vía JS -->
+                            <!-- Items insertados dinámicamente vía JS -->
+                        </div>
+
+                        <div class="notif-footer">
+                            <a href="auditoria.php" class="notif-footer-link">
+                                <i class="bi bi-journal-text"></i> Ver registro de auditoría
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -2123,88 +2381,200 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             const notifPanel = document.getElementById('notifPanel');
             const notifBadge = document.getElementById('notifBadge');
             const notifList = document.getElementById('notifList');
+            const notifUnreadPill = document.getElementById('notifUnreadPill');
+            const notifTabUnread = document.getElementById('notifTabUnread');
+            const notifTabAll = document.getElementById('notifTabAll');
+            const notifTabUnreadCount = document.getElementById('notifTabUnreadCount');
+            const notifTabAllCount = document.getElementById('notifTabAllCount');
+            const notifMarkAllBtn = document.getElementById('notifMarkAllBtn');
 
-            if(notifBtn) {
-                notifBtn.addEventListener('click', function(e) {
-                    if(e.target.closest('.notif-list')) return; // No cerrar si cliquean un item
-                    notifPanel.classList.toggle('show');
+            if (!notifBtn) return;
+
+            let allNotifs = [];
+            let currentFilter = 'unread'; // 'unread' | 'all'
+
+            // Abrir y cerrar el panel
+            notifBtn.addEventListener('click', function(e) {
+                if (e.target.closest('#notifPanel') && !e.target.closest('#notifMarkAllBtn') && !e.target.closest('.notif-tab')) {
+                    return;
+                }
+                notifPanel.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!notifBtn.contains(e.target)) {
+                    notifPanel.classList.remove('show');
+                }
+            });
+
+            // Pestañas
+            if (notifTabUnread && notifTabAll) {
+                notifTabUnread.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentFilter = 'unread';
+                    notifTabUnread.classList.add('active');
+                    notifTabAll.classList.remove('active');
+                    renderNotifications();
                 });
 
-                document.addEventListener('click', function(e) {
-                    if (!notifBtn.contains(e.target)) {
-                        notifPanel.classList.remove('show');
-                    }
+                notifTabAll.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentFilter = 'all';
+                    notifTabAll.classList.add('active');
+                    notifTabUnread.classList.remove('active');
+                    renderNotifications();
                 });
+            }
 
-                function fetchNotifications() {
-                    // Primero forzar chequeo de préstamos por vencer (silenciosamente)
-                    fetch('../backend/api/index.php/notifications/check_expiring', {
+            // Marcar todas como leídas
+            if (notifMarkAllBtn) {
+                notifMarkAllBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fetch('../backend/api/index.php/notifications/read_all', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
-                    }).then(() => {
-                        return fetch('../backend/api/index.php/notifications/all');
                     })
-                    .then(res => res.json())
-                    .then(data => {
-                        if(Array.isArray(data)) {
-                            // Calcular no leídas (Postgres puede devolver booleanos como t/f, o 0/1)
-                            const unreadCount = data.filter(n => n.leido === false || n.leido === 0 || n.leido === "0" || n.leido === "f").length;
-                            
-                            if(unreadCount > 0) {
-                                notifBadge.style.display = 'block';
-                            } else {
-                                notifBadge.style.display = 'none';
-                            }
-
-                            if(data.length > 0) {
-                                notifList.innerHTML = '';
-                                data.forEach(n => {
-                                    const a = document.createElement('a');
-                                    a.href = n.enlace ? n.enlace : '#';
-                                    const isRead = n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t";
-                                    a.className = 'notif-item ' + (isRead ? 'read' : 'unread');
-                                    
-                                    // Estilo para las leídas
-                                    if(isRead) {
-                                        a.style.opacity = '0.6';
-                                        a.style.background = '#f8fafc';
-                                    }
-
-                                    a.innerHTML = `
-                                        <div class="notif-title">${n.tipo}</div>
-                                        <div class="notif-text">${n.mensaje}</div>
-                                        <span class="notif-time">${new Date(n.fecha_creacion).toLocaleString()}</span>
-                                    `;
-                                    a.addEventListener('click', function(e) {
-                                        e.preventDefault();
-                                        if(!isRead) {
-                                            // Marcar como leída y luego redirigir
-                                            fetch('../backend/api/index.php/notifications/read', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ not_id: n.not_id })
-                                            }).then(() => {
-                                                window.location.href = a.href;
-                                            });
-                                        } else {
-                                            window.location.href = a.href;
-                                        }
-                                    });
-                                    notifList.appendChild(a);
-                                });
-                            } else {
-                                notifList.innerHTML = '<div class="notif-empty">No tienes notificaciones recientes</div>';
-                            }
-                        }
+                    .then(r => r.json())
+                    .then(() => {
+                        fetchNotifications();
                     })
-                    .catch(e => console.error('Error fetching notifications', e));
+                    .catch(err => console.error('Error al marcar notificaciones leídas', err));
+                });
+            }
+
+            function isNotifRead(n) {
+                return n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t";
+            }
+
+            function getIconForTipo(tipo) {
+                const t = (tipo || '').toLowerCase();
+                if (t.includes('prestamo')) return { icon: 'bi-arrow-left-right', class: 'notif-icon-prestamo' };
+                if (t.includes('reserva')) return { icon: 'bi-calendar3', class: 'notif-icon-reserva' };
+                if (t.includes('rfid')) return { icon: 'bi-broadcast', class: 'notif-icon-rfid' };
+                if (t.includes('sistema')) return { icon: 'bi-shield-check', class: 'notif-icon-sistema' };
+                return { icon: 'bi-bell-fill', class: 'notif-icon-default' };
+            }
+
+            function renderNotifications() {
+                if (!notifList) return;
+
+                const unreadList = allNotifs.filter(n => !isNotifRead(n));
+                const unreadCount = unreadList.length;
+
+                // Actualizar badges e indicadores
+                if (unreadCount > 0) {
+                    notifBadge.style.display = 'flex';
+                    notifBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    notifUnreadPill.textContent = `${unreadCount} sin leer`;
+                    notifUnreadPill.style.display = 'inline-block';
+                } else {
+                    notifBadge.style.display = 'none';
+                    notifUnreadPill.textContent = '0 sin leer';
+                    notifUnreadPill.style.display = 'none';
                 }
 
-                // Cargar notificaciones al iniciar
-                fetchNotifications();
-                // Refrescar cada minuto
-                setInterval(fetchNotifications, 60000);
+                notifTabUnreadCount.textContent = unreadCount;
+                notifTabAllCount.textContent = allNotifs.length;
+
+                const listToRender = currentFilter === 'unread' ? unreadList : allNotifs;
+
+                if (listToRender.length === 0) {
+                    if (currentFilter === 'unread') {
+                        notifList.innerHTML = `
+                            <div class="notif-empty">
+                                <i class="bi bi-check2-circle" style="color:#10b981;"></i>
+                                <p>¡Todo al día!</p>
+                                <span>No tienes notificaciones sin leer.</span>
+                            </div>`;
+                    } else {
+                        notifList.innerHTML = `
+                            <div class="notif-empty">
+                                <i class="bi bi-bell-slash"></i>
+                                <p>Sin notificaciones</p>
+                                <span>No tienes notificaciones registradas.</span>
+                            </div>`;
+                    }
+                    return;
+                }
+
+                notifList.innerHTML = '';
+                listToRender.forEach(n => {
+                    const isRead = isNotifRead(n);
+                    const iconInfo = getIconForTipo(n.tipo);
+                    const a = document.createElement('a');
+                    a.href = (n.enlace && n.enlace !== '#') ? n.enlace : 'javascript:void(0);';
+                    a.className = 'notif-item ' + (isRead ? 'read' : 'unread');
+
+                    let dateStr = '';
+                    if (n.fecha_creacion) {
+                        try {
+                            dateStr = new Date(n.fecha_creacion).toLocaleString('es-MX', {
+                                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                            });
+                        } catch (e) {
+                            dateStr = n.fecha_creacion;
+                        }
+                    }
+
+                    a.innerHTML = `
+                        <div class="notif-icon-wrap ${iconInfo.class}">
+                            <i class="bi ${iconInfo.icon}"></i>
+                        </div>
+                        <div class="notif-content">
+                            <div class="notif-content-head">
+                                <div class="notif-title">${n.tipo || 'Notificación'}</div>
+                                ${!isRead ? '<div class="notif-unread-dot" title="Sin leer"></div>' : ''}
+                            </div>
+                            <div class="notif-text">${n.mensaje}</div>
+                            <span class="notif-time"><i class="bi bi-clock"></i> ${dateStr}</span>
+                        </div>
+                    `;
+
+                    a.addEventListener('click', function(e) {
+                        if (!isRead) {
+                            fetch('../backend/api/index.php/notifications/read', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ not_id: n.not_id })
+                            }).then(() => {
+                                if (n.enlace && n.enlace !== '#') {
+                                    window.location.href = n.enlace;
+                                } else {
+                                    fetchNotifications();
+                                }
+                            }).catch(() => {
+                                if (n.enlace && n.enlace !== '#') window.location.href = n.enlace;
+                            });
+                        } else if (n.enlace && n.enlace !== '#') {
+                            window.location.href = n.enlace;
+                        }
+                    });
+
+                    notifList.appendChild(a);
+                });
             }
+
+            function fetchNotifications() {
+                fetch('../backend/api/index.php/notifications/check_expiring', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(() => {
+                    return fetch('../backend/api/index.php/notifications/all');
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        allNotifs = data;
+                        renderNotifications();
+                    }
+                })
+                .catch(e => console.error('Error fetching notifications', e));
+            }
+
+            // Cargar notificaciones al iniciar
+            fetchNotifications();
+            // Refrescar cada minuto
+            setInterval(fetchNotifications, 60000);
 
             // AUTO-RESPONSIVE TABLES: Envolver todas las tablas automáticamente
             document.querySelectorAll("table").forEach(table => {

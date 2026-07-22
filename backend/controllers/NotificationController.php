@@ -111,6 +111,23 @@ class NotificationController {
         }
     }
 
+    /**
+     * Marcar todas las notificaciones no leídas de un usuario como leídas
+     * @param int $us_id
+     * @return bool
+     */
+    public function markAllAsRead($us_id) {
+        try {
+            $query = "UPDATE NOTIFICACION SET leido = TRUE WHERE us_id = ? AND (leido = FALSE OR leido IS NULL OR leido = 0)";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$us_id]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("Error en markAllAsRead: " . $e->getMessage());
+            return false;
+        }
+    }
+
 
 // ============================================================================
 // SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (checkExpiringLoans)
