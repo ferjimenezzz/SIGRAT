@@ -4219,9 +4219,24 @@ include 'header.php';
         const todayStrLocal = (new Date(nowDate.getTime() - tzOffset)).toISOString().slice(0, 10);
         const sevenDaysLater = new Date(nowDate.getTime() - tzOffset + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
+        const currentTimeStr = nowDate.toTimeString().substring(0, 5); // "HH:MM"
+
         // Filtrar eventos de los próximos 7 días (incluyendo hoy)
         const weekEvents = filteredEvents
-            .filter(ev => ev.fecha_uso >= todayStrLocal && ev.fecha_uso <= sevenDaysLater)
+            .filter(ev => {
+                if (ev.fecha_uso < todayStrLocal || ev.fecha_uso > sevenDaysLater) return false;
+                
+                const est = (ev.estatus || ev.status || '').toLowerCase();
+                if (est === 'cancelada' || est === 'cancelado' || est === 'cancelled' || est === 'rechazada' || est === 'rechazado' || est === 'rejected') return false;
+
+                // Ocultar si ya pasó la hora de salida hoy
+                if (ev.fecha_uso === todayStrLocal) {
+                    const hSal = (ev.hora_sal || '').substring(0, 5);
+                    if (hSal && hSal < currentTimeStr) return false;
+                }
+                
+                return true;
+            })
             .sort((a, b) => {
                 if (a.fecha_uso !== b.fecha_uso) return a.fecha_uso.localeCompare(b.fecha_uso);
                 return (a.hora_ent || '').localeCompare(b.hora_ent || '');
