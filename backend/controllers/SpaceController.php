@@ -71,6 +71,8 @@ class SpaceController {
             $acceso = 'general';
             if ($acceso_tipo === 'Division') $acceso = 'por división';
             if ($acceso_tipo === 'Restringido') $acceso = 'restringido';
+            if ($acceso_tipo === 'Administrador') $acceso = 'administrador';
+            if ($acceso_tipo === 'Privado') $acceso = 'privado';
 
             $division = null;
             if ($acceso === 'por división') {
@@ -116,6 +118,7 @@ class SpaceController {
             if ($acceso_lower === 'por división') $esp['acceso_tipo'] = 'Division';
             if ($acceso_lower === 'restringido') $esp['acceso_tipo'] = 'Restringido';
             if ($acceso_lower === 'administrador') $esp['acceso_tipo'] = 'Administrador';
+            if ($acceso_lower === 'privado') $esp['acceso_tipo'] = 'Privado';
         }
         return $espacios;
     }
@@ -190,6 +193,8 @@ class SpaceController {
             $acceso = 'general';
             if ($acceso_tipo === 'Division') $acceso = 'por división';
             if ($acceso_tipo === 'Restringido') $acceso = 'restringido';
+            if ($acceso_tipo === 'Administrador') $acceso = 'administrador';
+            if ($acceso_tipo === 'Privado') $acceso = 'privado';
 
             $division = null;
             if ($acceso === 'por división') {

@@ -343,6 +343,7 @@ $tab = $_GET['tab'] ?? 'espacios';
                     <option value="Division">Por División (Auto-aprobado para la división)</option>
                     <option value="Restringido">Restringido (Requiere aprobación del admin)</option>
                     <option value="Administrador">Administrador (Exclusivo Administradores)</option>
+                    <option value="Privado">Privado (No disponible para reservas regulares)</option>
                 </select>
             </div>
             
@@ -415,6 +416,7 @@ $tab = $_GET['tab'] ?? 'espacios';
                     <option value="Division">Por División (Auto-aprobado para la división)</option>
                     <option value="Restringido">Restringido (Requiere aprobación del admin)</option>
                     <option value="Administrador">Administrador (Exclusivo Administradores)</option>
+                    <option value="Privado">Privado (No disponible para reservas regulares)</option>
                 </select>
             </div>
             
