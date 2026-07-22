@@ -62,10 +62,9 @@ class Database {
                     // PDO::ATTR_DEFAULT_FETCH_MODE: Estandariza la obtención de datos como arreglos asociativos puros
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     
-                    // PDO::ATTR_EMULATE_PREPARES: CRÍTICO DE SEGURIDAD. Al fijar en false, obliga al motor PostgreSQL
-                    // a compilar el AST (Abstract Syntax Tree) de la consulta separadamente de los parámetros reales ($1, $2),
-                    // inmunizando el backend contra ataques de Inyección SQL (SQL Injection).
-                    PDO::ATTR_EMULATE_PREPARES => false,
+                    // PDO::ATTR_EMULATE_PREPARES: Se establece en true para compatibilidad con PgBouncer/Supabase Pooler (Transaction Mode)
+                    // que no soporta prepared statements a través de múltiples transacciones.
+                    PDO::ATTR_EMULATE_PREPARES => true,
                 ]
             );
         } catch (PDOException $e) {

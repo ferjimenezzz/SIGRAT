@@ -468,6 +468,10 @@ try {
                 $success = $controller->markAsRead($input['not_id'], $_SESSION['us_id']);
                 $response = ["success" => $success];
                 $status_code = $success ? 200 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'read_all') {
+                $success = $controller->markAllAsRead($_SESSION['us_id']);
+                $response = ["success" => $success];
+                $status_code = $success ? 200 : 400;
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'check_expiring') {
                 $controller->checkExpiringLoans();
                 $response = ["success" => true];

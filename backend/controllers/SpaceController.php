@@ -41,7 +41,7 @@ class SpaceController {
      */
 
     public function getTiposPermitidos() {
-        return ['Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas'];
+        return ['Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas', 'Sala de Reuniones', 'Oficina', 'Espacio Externo'];
     }
 
 
@@ -64,13 +64,15 @@ class SpaceController {
 
         try {
             // Preparamos la consulta de inserción para el nuevo espacio
-            $query = "INSERT INTO ESPACIO (edificio, nombre_numero, tipo, capacidad, estatus, acceso, division_restringida) VALUES (?, ?, ?, ?, 'Disponible', ?, ?)";
+            $query = "INSERT INTO ESPACIO (edificio, nombre_numero, tipo, capacidad, estatus, acceso, acceso_tipo, division_restringida) VALUES (?, ?, ?, ?, 'Disponible', ?, ?, ?)";
             $stmt = $this->db->prepare($query);
             
             $acceso_tipo = $data['acceso_tipo'] ?? 'General';
             $acceso = 'general';
             if ($acceso_tipo === 'Division') $acceso = 'por división';
             if ($acceso_tipo === 'Restringido') $acceso = 'restringido';
+            if ($acceso_tipo === 'Administrador') $acceso = 'administrador';
+            if ($acceso_tipo === 'Privado') $acceso = 'privado';
 
             $division = null;
             if ($acceso === 'por división') {
@@ -84,6 +86,7 @@ class SpaceController {
                 $data['tipo'],
                 $data['capacidad'],
                 $acceso,
+                $acceso_tipo,
                 $division
             ]);
             
@@ -116,6 +119,7 @@ class SpaceController {
             if ($acceso_lower === 'por división') $esp['acceso_tipo'] = 'Division';
             if ($acceso_lower === 'restringido') $esp['acceso_tipo'] = 'Restringido';
             if ($acceso_lower === 'administrador') $esp['acceso_tipo'] = 'Administrador';
+            if ($acceso_lower === 'privado') $esp['acceso_tipo'] = 'Privado';
         }
         return $espacios;
     }
@@ -183,13 +187,15 @@ class SpaceController {
         }
 
         try {
-            $query = "UPDATE ESPACIO SET edificio = ?, nombre_numero = ?, tipo = ?, capacidad = ?, acceso = ?, division_restringida = ? WHERE esp_id = ?";
+            $query = "UPDATE ESPACIO SET edificio = ?, nombre_numero = ?, tipo = ?, capacidad = ?, acceso = ?, acceso_tipo = ?, division_restringida = ? WHERE esp_id = ?";
             $stmt = $this->db->prepare($query);
             
             $acceso_tipo = $data['acceso_tipo'] ?? 'General';
             $acceso = 'general';
             if ($acceso_tipo === 'Division') $acceso = 'por división';
             if ($acceso_tipo === 'Restringido') $acceso = 'restringido';
+            if ($acceso_tipo === 'Administrador') $acceso = 'administrador';
+            if ($acceso_tipo === 'Privado') $acceso = 'privado';
 
             $division = null;
             if ($acceso === 'por división') {
@@ -202,6 +208,7 @@ class SpaceController {
                 $data['tipo'],
                 $data['capacidad'],
                 $acceso,
+                $acceso_tipo,
                 $division,
                 $esp_id
             ]);
