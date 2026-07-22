@@ -606,7 +606,8 @@ include 'header.php';
 
     .status-badge.badge-confirmada { background: #dcfce7; color: #166534; }
     .status-badge.badge-pendiente { background: #fef3c7; color: #b45309; }
-    .status-badge.badge-rechazada { background: #fce7f3; color: #be185d; }
+    .status-badge.badge-rechazada { background: #fee2e2; color: #ef4444; }
+    .status-badge.badge-cancelada { background: #fee2e2; color: #ef4444; }
 
     /* Espacios disponibles */
     .available-spaces-list {
@@ -4018,8 +4019,12 @@ include 'header.php';
             dayEvents.forEach(ev => {
                 const evEl = document.createElement('div');
                 
-                // Formatear color dinámico por espacio
+                // Formatear color dinámico por espacio (o rojo si está cancelada/rechazada)
                 let statClass = getColorForSpace(ev.esp_id);
+                const evEst = ev.estatus || ev.status;
+                if (evEst === 'Cancelada' || evEst === 'cancelada' || evEst === 'cancelled' || evEst === 'Cancelado' || evEst === 'Rechazada' || evEst === 'rejected' || evEst === 'rechazada') {
+                    statClass = 'event-color-red';
+                }
 
                 evEl.className = `event-capsule ${statClass}`;
                 evEl.textContent = `${ev.hora_ent.substring(0,5)} ${ev.nombre_numero}`;
@@ -4125,8 +4130,12 @@ include 'header.php';
                 resEvents.forEach(ev => {
                     const evCard = document.createElement('div');
                     
-                    // Elegir color dinámico según espacio
+                    // Elegir color dinámico según espacio (o rojo si está cancelada/rechazada)
                     let colorClass = getColorForSpace(sp.esp_id);
+                    const evEst = ev.estatus || ev.status;
+                    if (evEst === 'Cancelada' || evEst === 'cancelada' || evEst === 'cancelled' || evEst === 'Cancelado' || evEst === 'Rechazada' || evEst === 'rejected' || evEst === 'rechazada') {
+                        colorClass = 'event-color-red';
+                    }
 
                     evCard.className = `week-event-card ${colorClass}`;
                     
@@ -4238,7 +4247,8 @@ include 'header.php';
                 let badgeClass = 'badge-confirmada';
                 const est = ev.estatus || ev.status;
                 if(est === 'Pendiente' || est === 'pending') { badgeText = 'Pendiente'; badgeClass = 'badge-pendiente'; }
-                if(est === 'Rechazada' || est === 'rejected') { badgeText = 'Rechazada'; badgeClass = 'badge-rechazada'; }
+                if(est === 'Rechazada' || est === 'rejected' || est === 'rechazada') { badgeText = 'Rechazada'; badgeClass = 'badge-rechazada'; }
+                if(est === 'Cancelada' || est === 'cancelada' || est === 'cancelled' || est === 'Cancelado') { badgeText = 'Cancelada'; badgeClass = 'badge-cancelada'; }
 
                 // Formatear fecha legible
                 let fechaLabel = ev.fecha_uso;
@@ -4555,9 +4565,12 @@ include 'header.php';
         } else if (est === 'Pendiente' || est === 'pending') {
             badge.style.background = '#fef3c7';
             badge.style.color = '#b45309';
+        } else if (est === 'Cancelada' || est === 'cancelada' || est === 'cancelled' || est === 'Cancelado') {
+            badge.style.background = '#fee2e2';
+            badge.style.color = '#ef4444';
         } else {
             badge.style.background = '#fee2e2';
-            badge.style.color = '#b91c1c';
+            badge.style.color = '#ef4444';
         }
         
         // Formatear fecha
@@ -4592,7 +4605,8 @@ include 'header.php';
         const est = ev.estatus || ev.status || 'Pendiente';
         let statusColor = '#10b981';
         if (est === 'Pendiente' || est === 'pending') statusColor = '#f59e0b';
-        if (est === 'Rechazada' || est === 'rejected') statusColor = '#ef4444';
+        if (est === 'Rechazada' || est === 'rejected' || est === 'rechazada') statusColor = '#ef4444';
+        if (est === 'Cancelada' || est === 'cancelada' || est === 'cancelled' || est === 'Cancelado') statusColor = '#ef4444';
         
         const horaEnt = ev.hora_ent ? ev.hora_ent.substring(0, 5) : '00:00';
         const horaSal = ev.hora_sal ? ev.hora_sal.substring(0, 5) : '00:00';
