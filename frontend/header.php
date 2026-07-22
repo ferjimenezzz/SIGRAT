@@ -2426,19 +2426,23 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 });
             }
 
-            // Marcar todas como leídas
+            // Marcar todas como leídas (Optimista e Instantáneo)
             if (notifMarkAllBtn) {
                 notifMarkAllBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    // Actualización UI Optimista Instantánea (0ms)
+                    allNotifs.forEach(n => { n.leido = true; });
+                    renderNotifications();
+
+                    // Petición asíncrona en segundo plano
                     fetch('../backend/api/index.php/notifications/read_all', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     })
-                    .then(r => r.json())
-                    .then(() => {
-                        fetchNotifications();
-                    })
-                    .catch(err => console.error('Error al marcar notificaciones leídas', err));
+                    .catch(err => {
+                        console.error('Error al marcar notificaciones leídas', err);
+                        fetchNotificationsDirect();
+                    });
                 });
             }
 
@@ -2532,6 +2536,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
                     a.addEventListener('click', function(e) {
                         if (!isRead) {
+                            // Actualización optimista instantánea
+                            n.leido = true;
+                            renderNotifications();
+
                             fetch('../backend/api/index.php/notifications/read', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -2539,8 +2547,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                             }).then(() => {
                                 if (n.enlace && n.enlace !== '#') {
                                     window.location.href = n.enlace;
-                                } else {
-                                    fetchNotifications();
                                 }
                             }).catch(() => {
                                 if (n.enlace && n.enlace !== '#') window.location.href = n.enlace;
@@ -2554,27 +2560,32 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 });
             }
 
-            function fetchNotifications() {
+            function fetchNotificationsDirect() {
+                fetch('../backend/api/index.php/notifications/all')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            allNotifs = data;
+                            renderNotifications();
+                        }
+                    })
+                    .catch(e => console.error('Error fetching notifications', e));
+            }
+
+            function checkExpiringAndFetch() {
                 fetch('../backend/api/index.php/notifications/check_expiring', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
-                }).then(() => {
-                    return fetch('../backend/api/index.php/notifications/all');
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data)) {
-                        allNotifs = data;
-                        renderNotifications();
-                    }
-                })
-                .catch(e => console.error('Error fetching notifications', e));
+                }).then(() => fetchNotificationsDirect())
+                .catch(() => fetchNotificationsDirect());
             }
 
-            // Cargar notificaciones al iniciar
-            fetchNotifications();
-            // Refrescar cada minuto
-            setInterval(fetchNotifications, 60000);
+            // Cargar notificaciones inmediatamente (Directo y rápido)
+            fetchNotificationsDirect();
+            // Chequeo en segundo plano de vencimientos al iniciar
+            setTimeout(checkExpiringAndFetch, 1000);
+            // Refrescar directamente cada 30 segundos
+            setInterval(fetchNotificationsDirect, 30000);
 
             // AUTO-RESPONSIVE TABLES: Envolver todas las tablas automáticamente
             document.querySelectorAll("table").forEach(table => {
