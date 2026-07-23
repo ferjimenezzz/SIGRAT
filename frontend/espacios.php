@@ -547,14 +547,18 @@ $tab = $_GET['tab'] ?? 'espacios';
     const tipoFilter = document.getElementById('tipoFilter');
     const rows = document.querySelectorAll('.space-row');
 
+    function removeAccents(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
     function filterTable() {
         if(!searchInput) return;
-        const query = searchInput.value.toLowerCase();
+        const query = removeAccents(searchInput.value.toLowerCase());
         const edificio = edificioFilter ? edificioFilter.value : '';
         const tipo = tipoFilter ? tipoFilter.value : '';
 
         rows.forEach(row => {
-            const name = row.querySelector('.space-name').innerText.toLowerCase();
+            const name = removeAccents(row.querySelector('.space-name').innerText.toLowerCase());
             const rowEdificio = row.getAttribute('data-edificio');
             const rowTipo = row.querySelector('.space-tipo').innerText;
 
