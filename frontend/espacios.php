@@ -526,6 +526,8 @@ $tab = $_GET['tab'] ?? 'espacios';
 <!-- ============================================================================ -->
 <!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
 <!-- ============================================================================ -->
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function switchTab(tab) {
         document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'grid' : 'none';
