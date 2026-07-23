@@ -41,7 +41,7 @@ class SpaceController {
      */
 
     public function getTiposPermitidos() {
-        return ['Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas', 'Sala de Reuniones', 'Oficina', 'Espacio Externo', 'Pasillo', 'Recepción', 'Bodega'];
+        return ['Aula', 'Laboratorio', 'Auditorio', 'Sala de juntas', 'Sala de Reuniones', 'Oficina', 'Espacio Externo', 'Pasillo', 'Recepción', 'Bodega', 'Sala'];
     }
 
 
