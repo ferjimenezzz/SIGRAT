@@ -198,7 +198,12 @@ $tab = $_GET['tab'] ?? 'espacios';
                         </span>
                         <div>
                             <p class="space-name" style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;"><?php echo htmlspecialchars($space['nombre_numero']); ?></p>
-                            <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;"><?php echo htmlspecialchars($space['acceso_tipo']); ?></p>
+                            <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">
+                                <?php echo htmlspecialchars($space['acceso_tipo']); ?>
+                                <?php if(!empty($space['ubicacion'])): ?>
+                                <span style="color:#94a3b8; margin-left:6px;"><i data-lucide="map-pin" style="width:12px; height:12px; vertical-align:-2px;"></i> <?php echo htmlspecialchars($space['ubicacion']); ?></span>
+                                <?php endif; ?>
+                            </p>
                         </div>
                     </td>
                     <td class="space-tipo" style="padding: 16px 24px; font-size: 13px; font-weight: 600; color: #475569;">
@@ -337,6 +342,16 @@ $tab = $_GET['tab'] ?? 'espacios';
             </div>
 
             <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Ubicación (Opcional)</label>
+                <select name="ubicacion" id="ubicacion_new" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                    <option value="">Ninguna / No especificada</option>
+                    <option value="Planta Baja">Planta Baja</option>
+                    <option value="Planta Alta">Planta Alta</option>
+                    <option value="Exterior">Exterior</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Tipo de Acceso</label>
                 <select name="acceso_tipo" id="acceso_tipo_new" onchange="toggleDivisionSelect('new')" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
                     <option value="General">General (Auto-aprobado)</option>
@@ -407,6 +422,16 @@ $tab = $_GET['tab'] ?? 'espacios';
                     <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Capacidad</label>
                     <input type="number" name="capacidad" id="edit_capacidad" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
                 </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Ubicación (Opcional)</label>
+                <select name="ubicacion" id="edit_ubicacion" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                    <option value="">Ninguna / No especificada</option>
+                    <option value="Planta Baja">Planta Baja</option>
+                    <option value="Planta Alta">Planta Alta</option>
+                    <option value="Exterior">Exterior</option>
+                </select>
             </div>
 
             <div style="margin-bottom: 16px;">
@@ -642,6 +667,7 @@ $tab = $_GET['tab'] ?? 'espacios';
         document.getElementById('edit_capacidad').value = sp.capacidad;
         document.getElementById('edit_acceso_tipo').value = sp.acceso_tipo || 'General';
         document.getElementById('edit_division_restringida').value = sp.division_restringida || '';
+        document.getElementById('edit_ubicacion').value = sp.ubicacion || '';
         toggleDivisionSelect('edit');
         document.getElementById('modal-edit-espacio').style.display = 'flex';
         document.body.style.overflow = 'hidden';

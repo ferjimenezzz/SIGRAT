@@ -64,7 +64,7 @@ class SpaceController {
 
         try {
             // Preparamos la consulta de inserción para el nuevo espacio
-            $query = "INSERT INTO ESPACIO (edificio, nombre_numero, tipo, capacidad, estatus, acceso, acceso_tipo, division_restringida) VALUES (?, ?, ?, ?, 'Disponible', ?, ?, ?)";
+            $query = "INSERT INTO ESPACIO (edificio, nombre_numero, tipo, capacidad, estatus, acceso, acceso_tipo, division_restringida, ubicacion) VALUES (?, ?, ?, ?, 'Disponible', ?, ?, ?, ?)";
             $stmt = $this->db->prepare($query);
             
             $acceso_tipo = $data['acceso_tipo'] ?? 'General';
@@ -87,7 +87,8 @@ class SpaceController {
                 $data['capacidad'],
                 $acceso,
                 $acceso_tipo,
-                $division
+                $division,
+                $data['ubicacion'] ?? ''
             ]);
             
             // Registramos el evento en bitácora (hardcodeando ID de admin = 1 por el momento)
@@ -187,7 +188,7 @@ class SpaceController {
         }
 
         try {
-            $query = "UPDATE ESPACIO SET edificio = ?, nombre_numero = ?, tipo = ?, capacidad = ?, acceso = ?, acceso_tipo = ?, division_restringida = ? WHERE esp_id = ?";
+            $query = "UPDATE ESPACIO SET edificio = ?, nombre_numero = ?, tipo = ?, capacidad = ?, acceso = ?, acceso_tipo = ?, division_restringida = ?, ubicacion = ? WHERE esp_id = ?";
             $stmt = $this->db->prepare($query);
             
             $acceso_tipo = $data['acceso_tipo'] ?? 'General';
@@ -210,6 +211,7 @@ class SpaceController {
                 $acceso,
                 $acceso_tipo,
                 $division,
+                $data['ubicacion'] ?? '',
                 $esp_id
             ]);
 
