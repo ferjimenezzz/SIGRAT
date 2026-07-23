@@ -12,6 +12,7 @@ require_once 'seguridad.php';
 require_once '../backend/config/Database.php';
 require_once '../backend/controllers/SpaceController.php';
 require_once '../backend/controllers/ReservationController.php';
+require_once '../backend/controllers/LugarController.php';
 
 $db = Config\Database::getConnection();
 
@@ -37,6 +38,26 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 $spaces = $db->query("SELECT * FROM ESPACIO WHERE estatus != 'Inactivo' ORDER BY edificio, nombre_numero")->fetchAll();
+
+// --- 1.5 Lógica de Lugares ---
+$lugarController = new Controllers\LugarController();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'new_lugar') {
+    $lugarController->create($_POST);
+    header("Location: espacios.php?tab=lugares&success=created");
+    exit();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_lugar') {
+    $lugarController->update($_POST['lug_id'], $_POST);
+    header("Location: espacios.php?tab=lugares&success=edited");
+    exit();
+}
+if (isset($_GET['delete_lugar_id'])) {
+    $lugarController->delete($_GET['delete_lugar_id']);
+    header("Location: espacios.php?tab=lugares&success=deleted");
+    exit();
+}
+$lugares = $lugarController->getAll();
+
 
 // --- 2. Lógica de Reservas (Calendario) ---
 $resController = new Controllers\ReservationController();
@@ -113,6 +134,7 @@ $tab = $_GET['tab'] ?? 'espacios';
         </div>
         <div style="display: flex; gap: 12px;">
             <?php if (hasPermission('Espacios', 'create')): ?>
+            <button onclick="openNewLugarModal()" id="btn-action-lugar" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'lugares' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo lugar</button>
             <button onclick="openNewSpaceModal()" id="btn-action-space" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'espacios' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo espacio</button>
             <?php endif; ?>
             <?php if (hasPermission('Reservas', 'create')): ?>
@@ -150,6 +172,7 @@ $tab = $_GET['tab'] ?? 'espacios';
         <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 10px; border: 1px solid #e2e8f0;">
             <button onclick="switchTab('espacios')" id="btn-espacios" class="btn-tab <?php echo $tab == 'espacios' ? 'active' : ''; ?>">ESPACIOS</button>
             <button onclick="switchTab('calendario')" id="btn-calendario" class="btn-tab <?php echo $tab == 'calendario' ? 'active' : ''; ?>">CALENDARIO</button>
+            <button onclick="switchTab('lugares')" id="btn-lugares" class="btn-tab <?php echo $tab == 'lugares' ? 'active' : ''; ?>">LUGARES</button>
 
         </div>
     </div>
@@ -233,7 +256,57 @@ $tab = $_GET['tab'] ?? 'espacios';
         </table>
     </div>
 
-    <!-- 2. Pestaña Calendario -->
+    <!-- 1.5 Pestaña Lugares -->
+    <div id="tab-lugares" class="card" style="display: <?php echo $tab === 'lugares' ? 'block' : 'none'; ?>; padding: 0; overflow: auto; max-height: 500px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: white; margin-bottom: 32px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;" id="lugaresTable">
+            <thead style="background: white; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #e2e8f0;">
+                <tr>
+                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Edificio / Nombre</th>
+                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Planta / Tipo</th>
+                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Capacidad</th>
+                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($lugares as $lug): ?>
+                <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
+                    <td style="padding: 16px 24px; display: flex; align-items: center; gap: 12px;">
+                        <span style="background: <?php echo $lug['edificio'] == 'CIC' ? '#eff6ff' : '#fff7ed'; ?>; color: <?php echo $lug['edificio'] == 'CIC' ? '#2563eb' : '#ea580c'; ?>; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block;">
+                            <?php echo $lug['edificio']; ?>
+                        </span>
+                        <div>
+                            <p style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;"><?php echo htmlspecialchars($lug['nombre_numero']); ?></p>
+                        </div>
+                    </td>
+                    <td style="padding: 16px 24px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #475569;"><?php echo htmlspecialchars($lug['tipo']); ?></span><br>
+                        <span style="font-size: 11px; color: #94a3b8;">Planta <?php echo htmlspecialchars($lug['planta']); ?></span>
+                    </td>
+                    <td style="padding: 16px 24px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="users" style="width: 14px; color: #94a3b8;"></i>
+                            <span style="font-size: 13px; font-weight: 700; color: #1e293b;"><?php echo htmlspecialchars($lug['capacidad'] ?? 'N/A'); ?> pers.</span>
+                        </div>
+                    </td>
+                    <td style="padding: 16px 24px; text-align: center;">
+                        <?php if (hasPermission('Espacios', 'update')): ?>
+                        <button onclick='openEditLugar(<?php echo json_encode($lug); ?>)' style="background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #475569; cursor: pointer; transition: all 0.2s; margin-right: 8px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">
+                            <i data-lucide="edit-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <?php endif; ?>
+                        <?php if (hasPermission('Espacios', 'delete')): ?>
+                        <button onclick="confirmDeleteLugar(event, '?delete_lugar_id=<?php echo $lug['lug_id']; ?>')" style="display: inline-block; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+<!-- 2. Pestaña Calendario -->
     <div id="tab-calendario" style="display: <?php echo $tab == 'calendario' ? 'flex' : 'none'; ?>; flex-direction: column; gap: 32px;">
         <div style="display: flex; gap: 16px; justify-content: space-between;">
             <div style="background: white; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px;">
@@ -377,6 +450,125 @@ $tab = $_GET['tab'] ?? 'espacios';
             <div style="display: flex; gap: 12px; margin-top: 32px;">
                 <button type="button" onclick="closeNewSpaceModal()" style="flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Cancelar</button>
                 <button type="submit" style="flex: 1; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Guardar Espacio</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Nuevo Lugar -->
+<div id="modal-nuevo-lugar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; width: 100%; max-width: 500px; padding: 32px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 800; color: #1e293b;">Nuevo Lugar</h2>
+            <button type="button" onclick="closeNewLugarModal()" style="background: none; border: none; cursor: pointer; color: #94a3b8;"><i data-lucide="x"></i></button>
+        </div>
+        
+        <form method="POST">
+            <input type="hidden" name="action" value="new_lugar">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Edificio</label>
+                    <select name="edificio" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <option value="CIC">CIC</option>
+                        <option value="PIDET">PIDET</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Planta</label>
+                    <select name="planta" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <?php foreach ($lugarController->getPlantasPermitidas() as $planta): ?>
+                        <option value="<?php echo htmlspecialchars($planta); ?>"><?php echo htmlspecialchars($planta); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre / Número</label>
+                    <input type="text" name="nombre_numero" required placeholder="Ej: Pasillo A" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Tipo de Lugar</label>
+                    <select name="tipo" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <option value="">Seleccione...</option>
+                        <?php foreach ($lugarController->getTiposPermitidos() as $tipoEnum): ?>
+                        <option value="<?php echo htmlspecialchars($tipoEnum); ?>"><?php echo htmlspecialchars($tipoEnum); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Capacidad (Opcional)</label>
+                    <input type="number" name="capacidad" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                <button type="button" onclick="closeNewLugarModal()" style="flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Cancelar</button>
+                <button type="submit" style="flex: 1; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Guardar Lugar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Edición de Lugar -->
+<div id="modal-edit-lugar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; width: 100%; max-width: 500px; padding: 32px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 800; color: #1e293b;">Editar Lugar</h2>
+            <button type="button" onclick="closeEditLugar()" style="background: none; border: none; cursor: pointer; color: #94a3b8;"><i data-lucide="x"></i></button>
+        </div>
+        
+        <form method="POST">
+            <input type="hidden" name="action" value="edit_lugar">
+            <input type="hidden" name="lug_id" id="edit_lugar_id">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Edificio</label>
+                    <select name="edificio" id="edit_lugar_edificio" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <option value="CIC">CIC</option>
+                        <option value="PIDET">PIDET</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Planta</label>
+                    <select name="planta" id="edit_lugar_planta" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <?php foreach ($lugarController->getPlantasPermitidas() as $planta): ?>
+                        <option value="<?php echo htmlspecialchars($planta); ?>"><?php echo htmlspecialchars($planta); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre / Número</label>
+                    <input type="text" name="nombre_numero" id="edit_lugar_nombre_numero" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Tipo de Lugar</label>
+                    <select name="tipo" id="edit_lugar_tipo" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
+                        <?php foreach ($lugarController->getTiposPermitidos() as $tipoEnum): ?>
+                        <option value="<?php echo htmlspecialchars($tipoEnum); ?>"><?php echo htmlspecialchars($tipoEnum); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Capacidad</label>
+                    <input type="number" name="capacidad" id="edit_lugar_capacidad" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                <button type="button" onclick="closeEditLugar()" style="flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Cancelar</button>
+                <button type="submit" style="flex: 1; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">Guardar Cambios</button>
             </div>
         </form>
     </div>
@@ -530,6 +722,20 @@ $tab = $_GET['tab'] ?? 'espacios';
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function switchTab(tab) {
+        document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'block' : 'none';
+        document.getElementById('tab-calendario').style.display = tab === 'calendario' ? 'flex' : 'none';
+        
+        var tabLugares = document.getElementById('tab-lugares');
+        if (tabLugares) tabLugares.style.display = tab === 'lugares' ? 'block' : 'none';
+        
+        var btnSpace = document.getElementById('btn-action-space');
+        var btnLugar = document.getElementById('btn-action-lugar');
+        var btnRes = document.getElementById('btn-action-res');
+        
+        if (btnSpace) btnSpace.style.display = tab === 'espacios' ? 'flex' : 'none';
+        if (btnLugar) btnLugar.style.display = tab === 'lugares' ? 'flex' : 'none';
+        if (btnRes) btnRes.style.display = tab === 'calendario' ? 'flex' : 'none';
+
         document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'grid' : 'none';
         document.getElementById('tab-calendario').style.display = tab === 'calendario' ? 'flex' : 'none';
 
@@ -665,6 +871,30 @@ $tab = $_GET['tab'] ?? 'espacios';
         }
     }
 
+    function openNewLugarModal() { document.getElementById('modal-nuevo-lugar').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    function closeNewLugarModal() { document.getElementById('modal-nuevo-lugar').style.display = 'none'; document.body.style.overflow = ''; }
+    
+    function confirmDeleteLugar(e, url) {
+        e.preventDefault();
+        Swal.fire({
+            title: '¿Eliminar Lugar?', text: 'Esta acción inhabilitará el lugar.',
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+        }).then((result) => { if (result.isConfirmed) { window.location.href = url; } });
+    }
+
+    function openEditLugar(lg) {
+        document.getElementById('edit_lugar_id').value = lg.lug_id;
+        document.getElementById('edit_lugar_edificio').value = lg.edificio;
+        document.getElementById('edit_lugar_planta').value = lg.planta;
+        document.getElementById('edit_lugar_nombre_numero').value = lg.nombre_numero;
+        document.getElementById('edit_lugar_tipo').value = lg.tipo;
+        document.getElementById('edit_lugar_capacidad').value = lg.capacidad;
+        document.getElementById('modal-edit-lugar').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeEditLugar() { document.getElementById('modal-edit-lugar').style.display = 'none'; document.body.style.overflow = ''; }
+    
+    
     function openEditSpace(sp) {
         document.getElementById('edit_esp_id').value = sp.esp_id;
         document.getElementById('edit_edificio').value = sp.edificio;
