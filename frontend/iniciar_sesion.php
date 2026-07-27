@@ -57,7 +57,12 @@ if (isset($_POST['login'])) {
         $stmtUpdate = $db->prepare("UPDATE USUARIO SET ultima_conexion = NOW() WHERE us_id = ?");
         $stmtUpdate->execute([$user['us_id']]);
 
-        header("Location: index.php");
+        // Determinar destino seguro post-autenticación
+        $redirect = !empty($_POST['redirect']) ? trim($_POST['redirect']) : (!empty($_GET['redirect']) ? trim($_GET['redirect']) : 'index.php');
+        if (strpos($redirect, 'http://') === 0 || strpos($redirect, 'https://') === 0 || strpos($redirect, '//') === 0) {
+            $redirect = 'index.php';
+        }
+        header("Location: " . $redirect);
         exit();
     } else {
         $error = "Credenciales incorrectas o usuario inactivo.";
@@ -190,6 +195,9 @@ if (isset($_POST['login'])) {
     <?php endif; ?>
 
     <form method="POST" id="formLogin">
+        <?php if (!empty($_GET['redirect'])): ?>
+            <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($_GET['redirect']); ?>">
+        <?php endif; ?>
         <div class="mb-3">
             <label class="form-label">Correo Electrónico</label>
             <input type="email" name="correo" class="form-control" id="correo" placeholder="ejemplo@uteq.edu.mx" required>

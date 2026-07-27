@@ -107,7 +107,7 @@ if ($resource === 'invites' && $_SERVER['REQUEST_METHOD'] === 'GET' && isset($ur
 }
 
 // 2. Consultar disponibilidad es público (GET /reservations)
-if ($resource === 'reservations' && $_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['esp_id'])) {
+if ($resource === 'reservations' && $_SERVER['REQUEST_METHOD'] === 'GET' && (isset($_GET['esp_id']) || isset($_GET['date']))) {
     $is_public = true;
 }
 
@@ -317,9 +317,13 @@ try {
                     }
                     $status_code = $response['success'] ? 201 : 400;
                 }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['esp_id'])) {
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && (isset($_GET['esp_id']) || isset($_GET['date']))) {
                 // Consultar disponibilidad
-                $response = $controller->getAvailability($_GET['esp_id'], $_GET['date']);
+                if (isset($_GET['esp_id'])) {
+                    $response = $controller->getAvailability($_GET['esp_id'], $_GET['date']);
+                } else {
+                    $response = $controller->getAllReservationsByDate($_GET['date']);
+                }
                 $status_code = 200;
             }
             break;
@@ -462,6 +466,10 @@ try {
                 $status_code = 200;
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'read') {
                 $success = $controller->markAsRead($input['not_id'], $_SESSION['us_id']);
+                $response = ["success" => $success];
+                $status_code = $success ? 200 : 400;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'read_all') {
+                $success = $controller->markAllAsRead($_SESSION['us_id']);
                 $response = ["success" => $success];
                 $status_code = $success ? 200 : 400;
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'check_expiring') {

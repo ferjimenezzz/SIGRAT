@@ -130,7 +130,9 @@ class ReservationController {
                               AND ((hora_ent < ? AND hora_sal > ?) OR (hora_ent < ? AND hora_sal > ?) OR (? <= hora_ent AND ? >= hora_sal))";
             $stmt = $this->db->prepare($conflictQuery);
             $stmt->execute([$data['esp_id'], $data['fecha_uso'], $data['hora_sal'], $data['hora_ent'], $data['hora_sal'], $data['hora_ent'], $data['hora_ent'], $data['hora_sal']]);
-            if ($stmt->fetch()) throw new \Exception("Conflicto de horario.");
+            if ($stmt->fetch()) {
+                throw new \Exception("Conflicto de horario: El espacio ya se encuentra reservado en ese horario.");
+            }
 
             // Obtener la carrera del usuario solicitante
             $usuario_carrera = '';
@@ -141,12 +143,21 @@ class ReservationController {
             }
 
             // Revisar el tipo de acceso del espacio para determinar estatus inicial
-            $stmtEspacio = $this->db->prepare("SELECT acceso, division_restringida, nombre_numero, edificio FROM ESPACIO WHERE esp_id = ?");
+            $stmtEspacio = $this->db->prepare("SELECT acceso, division_restringida, nombre_numero, edificio, capacidad FROM ESPACIO WHERE esp_id = ?");
             $stmtEspacio->execute([$data['esp_id']]);
             $espacio = $stmtEspacio->fetch();
 
             if (!$espacio) {
                 throw new \Exception("El espacio no existe.");
+            }
+
+            // -------------------------------------------------------------------------
+            // VALIDACIÓN DE CAPACIDAD MÁXIMA
+            // -------------------------------------------------------------------------
+            $numAlumnos = intval($data['num_alumnos'] ?? 0);
+            $capacidadMaxima = intval($espacio['capacidad'] ?? 0);
+            if ($capacidadMaxima > 0 && $numAlumnos > $capacidadMaxima) {
+                throw new \Exception("El número de asistentes ({$numAlumnos}) supera la capacidad máxima del espacio \"{$espacio['nombre_numero']}\" ({$capacidadMaxima} personas). Por favor, reduce el número de asistentes o elige un espacio más grande.");
             }
 
             $acceso = strtolower(trim($espacio['acceso'] ?? 'general'));
@@ -205,10 +216,30 @@ class ReservationController {
             if ($estatus_inicial === 'Pendiente') {
                 try {
                     $notifCtrl = new NotificationController();
-                    $stmtAdmins = $this->db->query("SELECT us_id FROM USUARIO WHERE rol_id IN (SELECT rol_id FROM ROLES WHERE UPPER(nombre) LIKE '%ADMIN%')");
-                    $admins = $stmtAdmins->fetchAll(PDO::FETCH_COLUMN);
-                    foreach ($admins as $admin_id) {
-                        $notifCtrl->createNotification($admin_id, 'Reserva', "Nueva reserva pendiente de aprobación (ID: $new_res_id).", 'aprobacion_reservas.php');
+                    $stmtAdmins = $this->db->query("SELECT us_id, nombre, correo FROM USUARIO WHERE estatus = 'Activo' AND rol_id IN (SELECT rol_id FROM ROLES WHERE UPPER(nombre) LIKE '%ADMIN%')");
+                    $admins = $stmtAdmins->fetchAll(PDO::FETCH_ASSOC);
+
+                    // Obtener nombre del usuario solicitante
+                    $stmtUser = $this->db->prepare("SELECT nombre FROM USUARIO WHERE us_id = ?");
+                    $stmtUser->execute([$us_id]);
+                    $usuario_solicitante = $stmtUser->fetchColumn() ?: 'Usuario Institucional';
+                    $espacio_nombre_det = trim(($espacio['edificio'] ?? '') . ' - ' . ($espacio['nombre_numero'] ?? 'Espacio'), ' -');
+
+                    foreach ($admins as $admin) {
+                        $notifCtrl->createNotification($admin['us_id'], 'Reserva', "Nueva reserva pendiente de aprobación (ID: $new_res_id).", 'aprobacion_reservas.php');
+                        if (!$skip_email && !empty($admin['correo'])) {
+                            $this->emailService->sendPendingApprovalAlertToAdmin(
+                                $admin['correo'],
+                                $admin['nombre'] ?? 'Administrador',
+                                $new_res_id,
+                                $usuario_solicitante,
+                                $espacio_nombre_det,
+                                $data['fecha_uso'] ?? '',
+                                $data['hora_ent'] ?? '',
+                                $data['hora_sal'] ?? '',
+                                $data['motivo'] ?? ''
+                            );
+                        }
                     }
                 } catch (\Exception $e) {
                     error_log("Error notificando reserva pendiente: " . $e->getMessage());
@@ -305,6 +336,20 @@ class ReservationController {
         }
     }
 
+    public function getAllReservationsByDate($date) {
+        try {
+            $query = "SELECT esp_id, re_id, hora_ent, hora_sal, estatus 
+                      FROM RESERVA 
+                      WHERE fecha_uso = ? AND estatus != 'Rechazada'";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$date]);
+            return $stmt->fetchAll();
+        } catch (\Exception $e) {
+            error_log("Error check all availability: " . $e->getMessage());
+            return [];
+        }
+    }
+
 
 // ============================================================================
 // SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (sendBulkEmail)
@@ -350,6 +395,36 @@ class ReservationController {
                     if ($timeData) {
                         $hora_ent = $timeData['hora_ent'];
                         $hora_sal = $timeData['hora_sal'];
+                    }
+                }
+
+                if ($estatus_inicial === 'Pendiente') {
+                    try {
+                        $stmtAdmins = $this->db->query("SELECT us_id, nombre, correo FROM USUARIO WHERE estatus = 'Activo' AND rol_id IN (SELECT rol_id FROM ROLES WHERE UPPER(nombre) LIKE '%ADMIN%')");
+                        $admins = $stmtAdmins->fetchAll(PDO::FETCH_ASSOC);
+                        $stmtUser = $this->db->prepare("SELECT nombre FROM USUARIO WHERE us_id = ?");
+                        $stmtUser->execute([$us_id]);
+                        $usuario_solicitante = $stmtUser->fetchColumn() ?: 'Usuario Institucional';
+                        $fechas_str = implode(', ', $fechas);
+                        $ids_str = implode(', ', $re_ids);
+                        
+                        foreach ($admins as $admin) {
+                            if (!empty($admin['correo'])) {
+                                $this->emailService->sendPendingApprovalAlertToAdmin(
+                                    $admin['correo'],
+                                    $admin['nombre'] ?? 'Administrador',
+                                    $ids_str,
+                                    $usuario_solicitante,
+                                    $espacio_nombre,
+                                    $fechas_str,
+                                    $hora_ent,
+                                    $hora_sal,
+                                    'Solicitud múltiple de reserva para ' . count($fechas) . ' fecha(s).'
+                                );
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        error_log("Error notificando solicitud masiva pendiente a admins: " . $e->getMessage());
                     }
                 }
                 

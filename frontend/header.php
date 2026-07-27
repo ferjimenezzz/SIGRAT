@@ -65,7 +65,8 @@ $protected_pages = [
 ];
 
 if (!$jwt_valid && in_array($currentPage, $protected_pages)) {
-    header("Location: login.php");
+    $redirectParam = !empty($_SERVER['REQUEST_URI']) ? urlencode($_SERVER['REQUEST_URI']) : '';
+    header("Location: login.php" . ($redirectParam ? "?redirect=" . $redirectParam : ""));
     exit();
 }
 
@@ -354,6 +355,22 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             font-weight: 500;
         }
 
+        .sidebar-user:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .sidebar-user-chevron {
+            color: #64748b;
+            font-size: 12px;
+            margin-left: auto;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .sidebar-user:hover .sidebar-user-chevron {
+            color: #e2e8f0;
+            transform: translateX(2px);
+        }
+
         .sidebar-logout {
             display: flex;
             align-items: center;
@@ -431,11 +448,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
         .hc-drawer.open { transform: translateX(0); }
 
-        /* Header del drawer */
         .hc-head {
             background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
             padding: 24px 24px 20px 24px;
-            flex-shrink: 0;
+            flex: none;
         }
         .hc-head-top {
             display: flex;
@@ -507,7 +523,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             padding: 14px 24px 0 24px;
             border-bottom: 1px solid #f1f5f9;
             background: #f8fafc;
-            flex-shrink: 0;
+            flex: none;
         }
         .hc-tab {
             padding: 9px 16px;
@@ -727,180 +743,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         body.sidebar-collapsed .sidebar-help-btn span { display: none; }
         body.sidebar-collapsed .sidebar-help-btn { justify-content: center; padding: 10px 0; }
 
-        /* ==================== ABOUT SIGRAT ==================== */
-        .sidebar-version-btn {
-            display: flex; align-items: center; justify-content: center;
-            gap: 6px; margin: 0 12px 4px 12px;
-            padding: 5px 10px; border-radius: 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.10);
-            color: rgba(255,255,255,0.35);
-            font-size: 10px; font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer; font-family: inherit;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .sidebar-version-btn:hover {
-            background: rgba(255,255,255,0.10);
-            color: rgba(255,255,255,0.65);
-            border-color: rgba(255,255,255,0.20);
-        }
-        body.sidebar-collapsed .sidebar-version-btn span { display: none; }
-        body.sidebar-collapsed .sidebar-version-btn { padding: 5px 0; margin: 0 0 4px 0; width: 100%; border-radius: 0; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
-        @media (max-width: 992px) {
-            .sidebar-version-btn span { display: none; }
-            .sidebar-version-btn { padding: 5px 0; margin: 0 0 4px 0; width: 100%; border-radius: 0; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
-        }
-        @media (max-width: 768px) {
-            body.sidebar-mobile-open .sidebar-version-btn span { display: inline; }
-            body.sidebar-mobile-open .sidebar-version-btn { padding: 5px 10px; margin: 0 12px 4px 12px; width: auto; border-radius: 20px; border: 1px solid rgba(255,255,255,0.10); }
-        }
-
-        /* About modal overlay */
-        .about-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(4px);
-            z-index: 9998;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.25s;
-        }
-        .about-overlay.open { opacity: 1; pointer-events: all; }
-
-        /* About modal box */
-        .about-modal {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -48%) scale(0.97);
-            width: 520px; max-width: calc(100vw - 32px);
-            max-height: 90vh; overflow-y: auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.20);
-            z-index: 9999;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.25s, transform 0.25s;
-        }
-        .about-modal.open {
-            opacity: 1; pointer-events: all;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        /* About modal header */
-        .about-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
-            padding: 32px 28px 28px;
-            border-radius: 20px 20px 0 0;
-            text-align: center;
-            position: relative;
-        }
-        .about-close {
-            position: absolute; top: 14px; right: 14px;
-            background: rgba(255,255,255,0.12); border: none;
-            color: rgba(255,255,255,0.75);
-            width: 30px; height: 30px; border-radius: 8px;
-            font-size: 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
-        }
-        .about-close:hover { background: rgba(255,255,255,0.22); color: white; }
-        .about-logo-ring {
-            width: 72px; height: 72px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.20);
-            border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px;
-        }
-        .about-logo-ring img { width: 44px; height: 44px; object-fit: contain; filter: brightness(0) invert(1); }
-        .about-logo-ring-text { font-size: 28px; font-weight: 900; color: white; letter-spacing: -1px; }
-        .about-header h2 {
-            font-size: 22px; font-weight: 900; color: white;
-            letter-spacing: -0.5px; margin-bottom: 5px;
-        }
-        .about-header p {
-            font-size: 11px; color: rgba(255,255,255,0.55);
-            font-weight: 500; line-height: 1.5; max-width: 340px; margin: 0 auto 16px;
-        }
-        .about-version-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.20);
-            color: rgba(255,255,255,0.80);
-            padding: 4px 14px; border-radius: 20px;
-            font-size: 10px; font-weight: 800;
-            letter-spacing: 1px; text-transform: uppercase;
-        }
-
-        /* About modal body */
-        .about-body { padding: 24px 28px; }
-        .about-section-label {
-            font-size: 9px; font-weight: 800; color: #94a3b8;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            margin-bottom: 12px; display: block;
-        }
-        .about-period {
-            background: #eff6ff; border: 1px solid #bfdbfe;
-            border-left: 3px solid #2563eb;
-            border-radius: 8px; padding: 10px 14px;
-            font-size: 12px; font-weight: 600; color: #1d4ed8;
-            margin-bottom: 20px; line-height: 1.5;
-        }
-
-        /* Team groups */
-        .about-teams { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-        .about-team-group {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px; overflow: hidden;
-        }
-        .about-team-header {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 14px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .about-team-badge {
-            font-size: 9px; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 1px; padding: 3px 10px; border-radius: 20px;
-        }
-        .about-team-badge.frontend  { background: #eff6ff; color: #1d4ed8; }
-        .about-team-badge.backend   { background: #f0fdf4; color: #15803d; }
-        .about-team-badge.backend2  { background: #faf5ff; color: #7e22ce; }
-        .about-team-label {
-            font-size: 11px; font-weight: 700; color: #64748b;
-        }
-        .about-team-members { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
-        .about-team-member {
-            display: flex; align-items: center; gap: 10px;
-        }
-        .about-dev-avatar {
-            width: 28px; height: 28px; border-radius: 8px;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: white; font-size: 9px; font-weight: 800;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; letter-spacing: 0.3px;
-        }
-        .about-team-member-name {
-            font-size: 12px; font-weight: 600; color: #334155;
-        }
-        .about-collab-note {
-            font-size: 11px; color: #64748b; font-weight: 500;
-            line-height: 1.6; padding: 10px 14px;
-            background: #f8fafc; border-radius: 8px;
-            border: 1px solid #f1f5f9;
-            margin-bottom: 4px;
-        }
-
-        /* About footer */
-        .about-footer {
-            border-top: 1px solid #f1f5f9;
-            padding: 14px 28px;
-            text-align: center;
-            background: #f8fafc;
-            border-radius: 0 0 20px 20px;
-        }
-        .about-footer p { font-size: 11px; color: #94a3b8; font-weight: 500; }
-        .about-footer strong { color: #64748b; }
 
         /* ====== LOGOUT CONFIRMATION MODAL ====== */
         .logout-overlay {
@@ -988,6 +830,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         body.sidebar-collapsed .sidebar-brand,
         body.sidebar-collapsed .nav-item span,
         body.sidebar-collapsed .sidebar-user-info,
+        body.sidebar-collapsed .sidebar-user-chevron,
         body.sidebar-collapsed .sidebar-logout span {
             display: none;
         }
@@ -1143,31 +986,51 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         .notification-badge {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
-            background: #2563eb;
-            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            border-radius: 999px;
             border: 2px solid white;
             display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
+            animation: notifPulse 2.5s infinite ease-in-out;
         }
 
-        /* ==================== NOTIFICATIONS ==================== */
+        @keyframes notifPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==================== NOTIFICATIONS PANEL ==================== */
         .notif-panel {
             position: absolute;
-            top: 50px;
+            top: 48px;
             right: 0;
-            width: 320px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
+            width: 375px;
+            max-width: calc(100vw - 32px);
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(0,0,0,0.05);
             z-index: 1000;
             display: none;
             flex-direction: column;
             overflow: hidden;
             text-align: left;
+            animation: notifSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes notifSlide {
+            from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .notif-panel.show {
@@ -1176,31 +1039,141 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         .notif-header {
             padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8fafc;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .notif-header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .notif-header h3 {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             margin: 0;
-            color: var(--text-primary);
+            color: #0f172a;
+            letter-spacing: -0.2px;
         }
 
+        .notif-unread-count {
+            font-size: 10px;
+            font-weight: 700;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .notif-mark-all-btn {
+            background: transparent;
+            border: none;
+            color: #2563eb;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .notif-mark-all-btn:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        /* Pestañas de Notificación */
+        .notif-tabs {
+            display: flex;
+            background: #f8fafc;
+            padding: 5px 12px;
+            gap: 6px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .notif-tab {
+            flex: 1;
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .notif-tab:hover {
+            color: #1e293b;
+            background: rgba(0,0,0,0.03);
+        }
+
+        .notif-tab.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .notif-tab-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .notif-tab.active .notif-tab-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* Lista de Notificaciones */
         .notif-list {
-            max-height: 300px;
+            max-height: 330px;
             overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .notif-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .notif-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .notif-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
 
         .notif-item {
             padding: 12px 16px;
             border-bottom: 1px solid #f1f5f9;
             text-decoration: none;
-            display: block;
-            transition: background 0.2s;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            transition: background 0.15s ease;
+            position: relative;
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
         }
 
         .notif-item:hover {
@@ -1208,34 +1181,140 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .notif-item.unread {
-            background: #eff6ff;
+            background: #f0f9ff;
+        }
+        .notif-item.unread:hover {
+            background: #e0f2fe;
+        }
+
+        .notif-item.read {
+            opacity: 0.75;
+        }
+
+        .notif-icon-wrap {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .notif-icon-prestamo {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+        .notif-icon-reserva {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+        .notif-icon-sistema, .notif-icon-rfid {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .notif-icon-default {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-content-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 3px;
         }
 
         .notif-title {
             font-size: 12px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notif-unread-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2563eb;
+            flex-shrink: 0;
         }
 
         .notif-text {
-            font-size: 11px;
-            color: var(--text-secondary);
-            line-height: 1.4;
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.45;
+            word-break: break-word;
         }
 
         .notif-time {
             font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 6px;
-            display: block;
+            color: #94a3b8;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
         }
-        
+
         .notif-empty {
-            padding: 20px;
+            padding: 36px 20px;
             text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notif-empty i {
+            font-size: 32px;
+            color: #cbd5e1;
+        }
+
+        .notif-empty p {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .notif-empty span {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .notif-footer {
+            padding: 10px 16px;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .notif-footer-link {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.15s;
+        }
+
+        .notif-footer-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
         }
 
         .topbar-date {
@@ -1284,7 +1363,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 24px 28px;
+            padding: 24px 28px 0;
             max-width: 100%;
         }
 
@@ -1370,6 +1449,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             .sidebar-brand,
             .nav-item span,
             .sidebar-user-info,
+            .sidebar-user-chevron,
             .sidebar-logout span {
                 display: none;
             }
@@ -1445,6 +1525,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             body.sidebar-mobile-open .sidebar-brand,
             body.sidebar-mobile-open .nav-item span,
             body.sidebar-mobile-open .sidebar-user-info,
+            body.sidebar-mobile-open .sidebar-user-chevron,
             body.sidebar-mobile-open .sidebar-logout span {
                 display: block;
             }
@@ -1864,15 +1945,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <div class="sidebar-user-name"><?php echo $nombreUsuario; ?></div>
                 <div class="sidebar-user-role"><?php echo ucfirst($rolUsuario); ?></div>
             </div>
+            <i class="bi bi-chevron-right sidebar-user-chevron"></i>
         </a>
         <!-- Centro de Ayuda -->
         <button class="sidebar-help-btn" id="helpCenterBtn" onclick="openHelpCenter()" title="Centro de Ayuda">
             <i class="bi bi-question-circle"></i> <span>Centro de ayuda</span>
-        </button>
-        <!-- Versión / Acerca de -->
-        <button class="sidebar-version-btn" onclick="openAbout()" title="Acerca de SIGRAT">
-            <i class="bi bi-info-circle" style="font-size:11px;"></i>
-            <span>SIGRAT &nbsp;v1.0</span>
         </button>
         <a href="#" class="sidebar-logout" onclick="openLogoutConfirm(); return false;">
             <i class="bi bi-box-arrow-left"></i> <span>Cerrar sesión</span>
@@ -1893,109 +1970,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         <div class="logout-actions">
             <button class="logout-btn-cancel" onclick="closeLogoutConfirm()">Cancelar</button>
             <a href="logout.php" class="logout-btn-confirm"><i class="bi bi-box-arrow-left"></i> Cerrar sesión</a>
-        </div>
-    </div>
-
-    <!-- ====== ACERCA DE SIGRAT ====== -->
-    <div class="about-overlay" id="aboutOverlay" onclick="closeAbout()"></div>
-    <div class="about-modal" id="aboutModal" role="dialog" aria-modal="true" aria-label="Acerca de SIGRAT">
-        <!-- Header -->
-        <div class="about-header">
-            <button class="about-close" onclick="closeAbout()" title="Cerrar">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            <div class="about-logo-ring">
-                <?php if (file_exists(__DIR__ . '/assets/images/sigrat_logo.png')): ?>
-                    <img src="assets/images/sigrat_logo.png" alt="SIGRAT">
-                <?php else: ?>
-                    <div class="about-logo-ring-text">S</div>
-                <?php endif; ?>
-            </div>
-            <h2>SIGRAT</h2>
-            <p>Sistema Integral de Gestión de Recursos<br>y Actividades Tecnológicas</p>
-            <span class="about-version-badge">Versión 1.0 &nbsp;&middot;&nbsp; 2026</span>
-        </div>
-        <!-- Body -->
-        <div class="about-body">
-            <div class="about-period">
-                Desarrollado durante el <strong>período de Estadías Profesionales 2026</strong>,
-                como proyecto integrador del programa educativo de Técnico Superior Universitario
-                en Tecnologías de la Información e Innovación Digital dentro de la
-                <strong>Universidad Tecnológica de Querétaro (UTEQ)</strong>.
-            </div>
-            <span class="about-section-label">Distribución del equipo</span>
-            <div class="about-teams">
-
-                <!-- Frontend -->
-                <div class="about-team-group">
-                    <div class="about-team-header">
-                        <span class="about-team-badge frontend">Frontend</span>
-                        <span class="about-team-label">Interfaz de usuario y experiencia visual</span>
-                    </div>
-                    <div class="about-team-members">
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">COM</div>
-                            <span class="about-team-member-name">Cesar Oswaldo Medina Ornelas</span>
-                        </div>
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">LEB</div>
-                            <span class="about-team-member-name">Laura Michelle Escamilla Barrera</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Backend principal -->
-                <div class="about-team-group">
-                    <div class="about-team-header">
-                        <span class="about-team-badge backend">Backend</span>
-                        <span class="about-team-label">Lógica del sistema y servicios principales</span>
-                    </div>
-                    <div class="about-team-members">
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">DPM</div>
-                            <span class="about-team-member-name">Diego Pérez Mendoza</span>
-                        </div>
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">FJA</div>
-                            <span class="about-team-member-name">Fernando Jimenez Angeles</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Backend e integración -->
-                <div class="about-team-group">
-                    <div class="about-team-header">
-                        <span class="about-team-badge backend2">Backend &amp; Integración</span>
-                        <span class="about-team-label">Módulos, RFID, reportes y pruebas</span>
-                    </div>
-                    <div class="about-team-members">
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">LVS</div>
-                            <span class="about-team-member-name">Leonardo Abraham Valencia Sanchez</span>
-                        </div>
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">JNM</div>
-                            <span class="about-team-member-name">Jonathan Brandon Nava Morales</span>
-                        </div>
-                        <div class="about-team-member">
-                            <div class="about-dev-avatar">KCH</div>
-                            <span class="about-team-member-name">Kevin Cruz Hernández</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <p class="about-collab-note">
-                El proyecto se desarrolló mediante una distribución colaborativa de responsabilidades.
-                El equipo de Frontend estuvo encargado del diseño e implementación de la interfaz de usuario,
-                mientras que los equipos de Backend se enfocaron en la lógica del sistema,
-                la integración de funcionalidades, la base de datos y los servicios internos.
-            </p>
-        </div>
-        <!-- Footer -->
-        <div class="about-footer">
-            <p>&copy; 2026 <strong>SIGRAT</strong> &mdash; Todos los derechos reservados</p>
-            <p style="margin-top:3px;">Desarrollado con dedicación para la institución</p>
         </div>
     </div>
 
@@ -2085,23 +2059,12 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         document.body.style.overflow = '';
     }
 
-    // ====== ACERCA DE SIGRAT ====== //
-    function openAbout() {
-        document.getElementById('aboutOverlay').classList.add('open');
-        document.getElementById('aboutModal').classList.add('open');
-        document.body.style.overflow = 'hidden';
-    }
-    function closeAbout() {
-        document.getElementById('aboutOverlay').classList.remove('open');
-        document.getElementById('aboutModal').classList.remove('open');
-        document.body.style.overflow = '';
-    }
+
 
     // ESC cierra cualquier modal activo
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (document.getElementById('logoutModal').classList.contains('open')) closeLogoutConfirm();
-            if (document.getElementById('aboutModal').classList.contains('open')) closeAbout();
         }
     });
     </script>
@@ -2150,7 +2113,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     }
 
     function loadHelpData() {
-        fetch('assets/data/help_center.json')
+        fetch('assets/data/help_center.json?v=' + Date.now())
             .then(r => r.json())
             .then(data => {
                 hcData = data;
@@ -2231,6 +2194,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             div.className = 'hc-faq-item';
             div.setAttribute('data-question', item.question.toLowerCase());
             div.setAttribute('data-answer', item.answer.toLowerCase());
+            if (item.keywords) div.setAttribute('data-keywords', item.keywords.toLowerCase());
             div.innerHTML = `
                 <div class="hc-faq-q" onclick="toggleFaq(this.parentElement)">
                     <span>${item.question}</span>
@@ -2248,16 +2212,19 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         if (!wasOpen) item.classList.add('open');
     }
 
-    function switchHcTab(btn) {
+    function switchHcTab(btn, clearSearch = true) {
         document.querySelectorAll('.hc-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.hc-panel').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(btn.getAttribute('data-panel')).classList.add('active');
-        document.getElementById('hcSearch').value = '';
-        if (hcData) {
-            renderModulesGrid(hcData.modules);
-            renderFaq(hcData.faq);
-            backToModuleList();
+        
+        if (clearSearch) {
+            document.getElementById('hcSearch').value = '';
+            if (hcData) {
+                renderModulesGrid(filterModulesByPermission(hcData.modules));
+                renderFaq(hcData.faq);
+                backToModuleList();
+            }
         }
     }
 
@@ -2266,38 +2233,61 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         const searchInput = document.getElementById('hcSearch');
         if (!searchInput) return;
         searchInput.addEventListener('input', function() {
-            const q = this.value.toLowerCase().trim();
+            const rawQ = this.value.trim();
             if (!hcData) return;
 
             // Si estamos viendo el detalle, volver al grid
             backToModuleList();
 
-            // Detectar panel activo
-            const modulesPanelActive = document.getElementById('hcPanelModules').classList.contains('active');
+            if (!rawQ) {
+                // Reset a estado original
+                renderModulesGrid(filterModulesByPermission(hcData.modules));
+                document.querySelectorAll('.hc-faq-item').forEach(el => el.style.display = '');
+                document.getElementById('hcFaqNoResults').style.display = 'none';
+                return;
+            }
 
-            if (modulesPanelActive) {
-                // Siempre partir de los módulos a los que tiene permiso el usuario
-                const allowed = filterModulesByPermission(hcData.modules);
-                if (!q) { renderModulesGrid(allowed); return; }
-                const filtered = allowed.filter(m =>
-                    m.name.toLowerCase().includes(q) ||
-                    m.description.toLowerCase().includes(q) ||
-                    m.functions.some(f => f.toLowerCase().includes(q)) ||
-                    m.tips.some(t => t.toLowerCase().includes(q))
-                );
-                renderModulesGrid(filtered);
-            } else {
-                // FAQ panel
-                const items = document.querySelectorAll('.hc-faq-item');
-                let visible = 0;
-                items.forEach(item => {
-                    const match = !q ||
-                        item.getAttribute('data-question').includes(q) ||
-                        item.getAttribute('data-answer').includes(q);
-                    item.style.display = match ? '' : 'none';
-                    if (match) visible++;
-                });
-                document.getElementById('hcFaqNoResults').style.display = visible === 0 ? 'block' : 'none';
+            // Normalización: minúsculas y sin acentos
+            const normalize = str => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const qNorm = normalize(rawQ);
+            
+            // Tokenizar: buscar cualquier coincidencia por palabra mayor a 2 letras
+            const tokens = qNorm.split(/\s+/).filter(t => t.length > 2);
+            if (tokens.length === 0) tokens.push(qNorm); // Por si escribe algo de 2 letras
+
+            // Filtrado Inteligente en Módulos
+            const allowed = filterModulesByPermission(hcData.modules);
+            const filteredMods = allowed.filter(m => {
+                const text = normalize(m.name + " " + m.description + " " + m.functions.join(" ") + " " + m.tips.join(" ") + " " + (m.keywords || ""));
+                // Si TODAS las palabras buscadas aparecen en el texto (búsqueda más precisa)
+                return tokens.every(t => text.includes(t));
+            });
+            renderModulesGrid(filteredMods);
+
+            // Filtrado Inteligente en FAQ
+            const items = document.querySelectorAll('.hc-faq-item');
+            let visibleFaqCount = 0;
+            items.forEach(item => {
+                const kws = item.getAttribute('data-keywords') || "";
+                const text = normalize(item.getAttribute('data-question') + " " + item.getAttribute('data-answer') + " " + kws);
+                const match = tokens.every(t => text.includes(t));
+                item.style.display = match ? '' : 'none';
+                if (match) visibleFaqCount++;
+            });
+            document.getElementById('hcFaqNoResults').style.display = visibleFaqCount === 0 ? 'block' : 'none';
+
+            // Auto-Switch de Pestaña Inteligente (UX Experience)
+            const modulesPanelActive = document.getElementById('hcPanelModules').classList.contains('active');
+            
+            if (modulesPanelActive && filteredMods.length === 0 && visibleFaqCount > 0) {
+                // Se buscó algo que no es un módulo pero sí una pregunta frecuente -> Cambiar a pestaña FAQ
+                switchHcTab(document.querySelector('.hc-tab[data-panel="hcPanelFaq"]'), false);
+                this.focus();
+            } 
+            else if (!modulesPanelActive && visibleFaqCount === 0 && filteredMods.length > 0) {
+                // Se buscó un módulo estando en FAQ -> Cambiar a pestaña Módulos
+                switchHcTab(document.querySelector('.hc-tab[data-panel="hcPanelModules"]'), false);
+                this.focus();
             }
         });
 
@@ -2335,17 +2325,39 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     <span style="font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; white-space: nowrap;">Guía de inicio</span>
                 </div>
 
-                <div class="topbar-icon-btn" id="notifBtn">
+                <div class="topbar-icon-btn" id="notifBtn" title="Centro de Notificaciones">
                     <i class="bi bi-bell"></i>
-                    <div class="notification-badge" id="notifBadge"></div>
+                    <span class="notification-badge" id="notifBadge"></span>
                     
-                    <!-- Dropdown Notificaciones -->
+                    <!-- Dropdown Notificaciones Interactivo -->
                     <div class="notif-panel" id="notifPanel">
                         <div class="notif-header">
-                            <h3>Notificaciones</h3>
+                            <div class="notif-header-title">
+                                <h3>Notificaciones</h3>
+                                <span class="notif-unread-count" id="notifUnreadPill">0 sin leer</span>
+                            </div>
+                            <button type="button" class="notif-mark-all-btn" id="notifMarkAllBtn" title="Marcar todas como leídas">
+                                <i class="bi bi-check2-all"></i> Marcar leídas
+                            </button>
                         </div>
+
+                        <div class="notif-tabs">
+                            <button type="button" class="notif-tab active" data-notif-filter="unread" id="notifTabUnread">
+                                Sin leer <span class="notif-tab-badge" id="notifTabUnreadCount">0</span>
+                            </button>
+                            <button type="button" class="notif-tab" data-notif-filter="all" id="notifTabAll">
+                                Todas <span class="notif-tab-badge" id="notifTabAllCount">0</span>
+                            </button>
+                        </div>
+
                         <div class="notif-list" id="notifList">
-                            <!-- Items insertados vía JS -->
+                            <!-- Items insertados dinámicamente vía JS -->
+                        </div>
+
+                        <div class="notif-footer">
+                            <a href="auditoria.php" class="notif-footer-link">
+                                <i class="bi bi-journal-text"></i> Ver registro de auditoría
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -2405,88 +2417,211 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             const notifPanel = document.getElementById('notifPanel');
             const notifBadge = document.getElementById('notifBadge');
             const notifList = document.getElementById('notifList');
+            const notifUnreadPill = document.getElementById('notifUnreadPill');
+            const notifTabUnread = document.getElementById('notifTabUnread');
+            const notifTabAll = document.getElementById('notifTabAll');
+            const notifTabUnreadCount = document.getElementById('notifTabUnreadCount');
+            const notifTabAllCount = document.getElementById('notifTabAllCount');
+            const notifMarkAllBtn = document.getElementById('notifMarkAllBtn');
 
-            if(notifBtn) {
-                notifBtn.addEventListener('click', function(e) {
-                    if(e.target.closest('.notif-list')) return; // No cerrar si cliquean un item
-                    notifPanel.classList.toggle('show');
+            if (!notifBtn) return;
+
+            let allNotifs = [];
+            let currentFilter = 'unread'; // 'unread' | 'all'
+
+            // Abrir y cerrar el panel
+            notifBtn.addEventListener('click', function(e) {
+                if (e.target.closest('#notifPanel') && !e.target.closest('#notifMarkAllBtn') && !e.target.closest('.notif-tab')) {
+                    return;
+                }
+                notifPanel.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!notifBtn.contains(e.target)) {
+                    notifPanel.classList.remove('show');
+                }
+            });
+
+            // Pestañas
+            if (notifTabUnread && notifTabAll) {
+                notifTabUnread.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentFilter = 'unread';
+                    notifTabUnread.classList.add('active');
+                    notifTabAll.classList.remove('active');
+                    renderNotifications();
                 });
 
-                document.addEventListener('click', function(e) {
-                    if (!notifBtn.contains(e.target)) {
-                        notifPanel.classList.remove('show');
-                    }
+                notifTabAll.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentFilter = 'all';
+                    notifTabAll.classList.add('active');
+                    notifTabUnread.classList.remove('active');
+                    renderNotifications();
                 });
+            }
 
-                function fetchNotifications() {
-                    // Primero forzar chequeo de préstamos por vencer (silenciosamente)
-                    fetch('../backend/api/index.php/notifications/check_expiring', {
+            // Marcar todas como leídas (Optimista e Instantáneo)
+            if (notifMarkAllBtn) {
+                notifMarkAllBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Actualización UI Optimista Instantánea (0ms)
+                    allNotifs.forEach(n => { n.leido = true; });
+                    renderNotifications();
+
+                    // Petición asíncrona en segundo plano
+                    fetch('../backend/api/index.php/notifications/read_all', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
-                    }).then(() => {
-                        return fetch('../backend/api/index.php/notifications/all');
                     })
+                    .catch(err => {
+                        console.error('Error al marcar notificaciones leídas', err);
+                        fetchNotificationsDirect();
+                    });
+                });
+            }
+
+            function isNotifRead(n) {
+                return n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t";
+            }
+
+            function getIconForTipo(tipo) {
+                const t = (tipo || '').toLowerCase();
+                if (t.includes('prestamo')) return { icon: 'bi-arrow-left-right', class: 'notif-icon-prestamo' };
+                if (t.includes('reserva')) return { icon: 'bi-calendar3', class: 'notif-icon-reserva' };
+                if (t.includes('rfid')) return { icon: 'bi-broadcast', class: 'notif-icon-rfid' };
+                if (t.includes('sistema')) return { icon: 'bi-shield-check', class: 'notif-icon-sistema' };
+                return { icon: 'bi-bell-fill', class: 'notif-icon-default' };
+            }
+
+            function renderNotifications() {
+                if (!notifList) return;
+
+                const unreadList = allNotifs.filter(n => !isNotifRead(n));
+                const unreadCount = unreadList.length;
+
+                // Actualizar badges e indicadores
+                if (unreadCount > 0) {
+                    notifBadge.style.display = 'flex';
+                    notifBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    notifUnreadPill.textContent = `${unreadCount} sin leer`;
+                    notifUnreadPill.style.display = 'inline-block';
+                } else {
+                    notifBadge.style.display = 'none';
+                    notifUnreadPill.textContent = '0 sin leer';
+                    notifUnreadPill.style.display = 'none';
+                }
+
+                notifTabUnreadCount.textContent = unreadCount;
+                notifTabAllCount.textContent = allNotifs.length;
+
+                const listToRender = currentFilter === 'unread' ? unreadList : allNotifs;
+
+                if (listToRender.length === 0) {
+                    if (currentFilter === 'unread') {
+                        notifList.innerHTML = `
+                            <div class="notif-empty">
+                                <i class="bi bi-check2-circle" style="color:#10b981;"></i>
+                                <p>¡Todo al día!</p>
+                                <span>No tienes notificaciones sin leer.</span>
+                            </div>`;
+                    } else {
+                        notifList.innerHTML = `
+                            <div class="notif-empty">
+                                <i class="bi bi-bell-slash"></i>
+                                <p>Sin notificaciones</p>
+                                <span>No tienes notificaciones registradas.</span>
+                            </div>`;
+                    }
+                    return;
+                }
+
+                notifList.innerHTML = '';
+                listToRender.forEach(n => {
+                    const isRead = isNotifRead(n);
+                    const iconInfo = getIconForTipo(n.tipo);
+                    const a = document.createElement('a');
+                    a.href = (n.enlace && n.enlace !== '#') ? n.enlace : 'javascript:void(0);';
+                    a.className = 'notif-item ' + (isRead ? 'read' : 'unread');
+
+                    let dateStr = '';
+                    if (n.fecha_creacion) {
+                        try {
+                            dateStr = new Date(n.fecha_creacion).toLocaleString('es-MX', {
+                                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                            });
+                        } catch (e) {
+                            dateStr = n.fecha_creacion;
+                        }
+                    }
+
+                    a.innerHTML = `
+                        <div class="notif-icon-wrap ${iconInfo.class}">
+                            <i class="bi ${iconInfo.icon}"></i>
+                        </div>
+                        <div class="notif-content">
+                            <div class="notif-content-head">
+                                <div class="notif-title">${n.tipo || 'Notificación'}</div>
+                                ${!isRead ? '<div class="notif-unread-dot" title="Sin leer"></div>' : ''}
+                            </div>
+                            <div class="notif-text">${n.mensaje}</div>
+                            <span class="notif-time"><i class="bi bi-clock"></i> ${dateStr}</span>
+                        </div>
+                    `;
+
+                    a.addEventListener('click', function(e) {
+                        if (!isRead) {
+                            // Actualización optimista instantánea
+                            n.leido = true;
+                            renderNotifications();
+
+                            fetch('../backend/api/index.php/notifications/read', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ not_id: n.not_id })
+                            }).then(() => {
+                                if (n.enlace && n.enlace !== '#') {
+                                    window.location.href = n.enlace;
+                                }
+                            }).catch(() => {
+                                if (n.enlace && n.enlace !== '#') window.location.href = n.enlace;
+                            });
+                        } else if (n.enlace && n.enlace !== '#') {
+                            window.location.href = n.enlace;
+                        }
+                    });
+
+                    notifList.appendChild(a);
+                });
+            }
+
+            function fetchNotificationsDirect() {
+                fetch('../backend/api/index.php/notifications/all')
                     .then(res => res.json())
                     .then(data => {
-                        if(Array.isArray(data)) {
-                            // Calcular no leídas (Postgres puede devolver booleanos como t/f, o 0/1)
-                            const unreadCount = data.filter(n => n.leido === false || n.leido === 0 || n.leido === "0" || n.leido === "f").length;
-                            
-                            if(unreadCount > 0) {
-                                notifBadge.style.display = 'block';
-                            } else {
-                                notifBadge.style.display = 'none';
-                            }
-
-                            if(data.length > 0) {
-                                notifList.innerHTML = '';
-                                data.forEach(n => {
-                                    const a = document.createElement('a');
-                                    a.href = n.enlace ? n.enlace : '#';
-                                    const isRead = n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t";
-                                    a.className = 'notif-item ' + (isRead ? 'read' : 'unread');
-                                    
-                                    // Estilo para las leídas
-                                    if(isRead) {
-                                        a.style.opacity = '0.6';
-                                        a.style.background = '#f8fafc';
-                                    }
-
-                                    a.innerHTML = `
-                                        <div class="notif-title">${n.tipo}</div>
-                                        <div class="notif-text">${n.mensaje}</div>
-                                        <span class="notif-time">${new Date(n.fecha_creacion).toLocaleString()}</span>
-                                    `;
-                                    a.addEventListener('click', function(e) {
-                                        e.preventDefault();
-                                        if(!isRead) {
-                                            // Marcar como leída y luego redirigir
-                                            fetch('../backend/api/index.php/notifications/read', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ not_id: n.not_id })
-                                            }).then(() => {
-                                                window.location.href = a.href;
-                                            });
-                                        } else {
-                                            window.location.href = a.href;
-                                        }
-                                    });
-                                    notifList.appendChild(a);
-                                });
-                            } else {
-                                notifList.innerHTML = '<div class="notif-empty">No tienes notificaciones recientes</div>';
-                            }
+                        if (Array.isArray(data)) {
+                            allNotifs = data;
+                            renderNotifications();
                         }
                     })
                     .catch(e => console.error('Error fetching notifications', e));
-                }
-
-                // Cargar notificaciones al iniciar
-                fetchNotifications();
-                // Refrescar cada minuto
-                setInterval(fetchNotifications, 60000);
             }
+
+            function checkExpiringAndFetch() {
+                fetch('../backend/api/index.php/notifications/check_expiring', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(() => fetchNotificationsDirect())
+                .catch(() => fetchNotificationsDirect());
+            }
+
+            // Cargar notificaciones inmediatamente (Directo y rápido)
+            fetchNotificationsDirect();
+            // Chequeo en segundo plano de vencimientos al iniciar
+            setTimeout(checkExpiringAndFetch, 1000);
+            // Refrescar directamente cada 30 segundos
+            setInterval(fetchNotificationsDirect, 30000);
 
             // AUTO-RESPONSIVE TABLES: Envolver todas las tablas automáticamente
             document.querySelectorAll("table").forEach(table => {
@@ -2693,7 +2828,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                     {
                         target: ".tabs-row",
                         title: "Operaciones y Registro de Activos",
-                        description: "Agrupa las pestañas de navegación interna (Inventario / Mantenimiento) y los botones de acción rápida, como la exportación de reportes (PDF y Excel) y el botón para registrar un <b>Nuevo activo</b>.",
+                        description: "Agrupa las pestañas de navegación interna (Activos / Mobiliario) y los botones de acción rápida, como la exportación de reportes (PDF y Excel) y el botón para registrar un <b>Nuevo activo</b>.",
                         position: "bottom"
                     },
                     {
@@ -2716,18 +2851,18 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                         actionSelectorClick: "#tab-inventario"
                     },
                     {
-                        target: "#tab-mantenimiento",
-                        title: "Sección de Mantenimiento",
-                        description: "Haz clic en esta pestaña o presiona <b>Siguiente</b> para ingresar a la bitácora de mantenimiento y reparación de activos.",
+                        target: "#tab-mobiliario",
+                        title: "Sección de Mobiliario",
+                        description: "Haz clic en esta pestaña o presiona <b>Siguiente</b> para ingresar al inventario de mobiliario institucional (sillas, escritorios, mesas, etc.).",
                         position: "bottom",
                         actionSelectorClick: "#tab-inventario"
                     },
                     {
-                        target: "#section-mantenimiento",
-                        title: "Bitácora de Mantenimiento",
-                        description: "En esta sección se listan los equipos que se encuentran actualmente en reparación o revisión técnica. Podrás registrar nuevos mantenimientos, detallar fallas y registrar el retorno de equipos reparados al inventario activo.",
+                        target: "#inventoryTable",
+                        title: "Vista de Mobiliario Simplificada",
+                        description: "En esta sección se listan los recursos de infraestructura física. Al registrar o editar aquí, la interfaz ocultará los campos técnicos innecesarios como tipo, marca, modelo y serie, simplificando la captura de datos.",
                         position: "top",
-                        actionSelectorClick: "#tab-mantenimiento"
+                        actionSelectorClick: "#tab-mobiliario"
                     }
                 ],
                 "prestamos.php": [

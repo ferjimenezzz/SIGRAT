@@ -9,14 +9,14 @@
             "functions": [
                 "Visualizar estadísticas generales del sistema en tiempo real",
                 "Consultar las reservas del día y próximos eventos del calendario",
-                "Acceder a notificaciones importantes y alertas del sistema",
+                "Acceder a notificaciones importantes y alertas del sistema mediante el ícono de campana",
                 "Ver un resumen de activos en préstamo e inventario crítico",
-                "Navegar rápidamente a cualquier módulo desde los accesos directos"
+                "Navegar rápidamente a cualquier módulo desde el menú lateral izquierdo"
             ],
             "tips": [
                 "Revisa el Dashboard al iniciar tu sesión para ver el panorama general del día.",
-                "Las tarjetas de estadísticas se actualizan automáticamente cada vez que recarga la página.",
-                "Si ves una alerta roja en el ícono de notificaciones (campana), hay mensajes sin leer esperándote."
+                "Las tarjetas de estadísticas se actualizan automáticamente cada vez que recargas la página.",
+                "Si ves un indicador azul sobre el ícono de notificaciones (campana), hay mensajes sin leer esperandote."
             ]
         },
         {
@@ -24,18 +24,18 @@
             "name": "Calendario",
             "icon": "bi-calendar3",
             "color": "#7c3aed",
-            "description": "El Calendario permite gestionar, visualizar y reservar espacios físicos (aulas, laboratorios, salas de reunión). Centraliza toda la programación de uso de instalaciones para evitar conflictos y optimizar el aprovechamiento de los espacios.",
+            "description": "El Calendario permite gestionar, visualizar y reservar espacios físicos (aulas, laboratorios, salas de reunión). Al crear una nueva reserva, el formulario incluye un <strong>Plano Arquitectónico interactivo</strong> que muestra los edificios CIC y PIDET con sus plantas, donde puedes hacer clic directamente sobre un espacio disponible para seleccionarlo.",
             "functions": [
-                "Crear nuevas reservas de espacios seleccionando fecha, hora y sala",
-                "Visualizar todas las reservas activas en formato de calendario mensual/semanal",
-                "Modificar o cancelar reservas existentes desde la vista del evento",
-                "Registrar asistencia a clases y eventos programados",
-                "Consultar la disponibilidad de un espacio en tiempo real"
+                "Crear nuevas reservas seleccionando fecha, hora de inicio, hora de fin y espacio desde el Plano Arquitectónico o el menú desplegable",
+                "Visualizar en el Plano qué espacios están Libres (verde), Ocupados (rojo), Seleccionados (azul), Privados (gris) o Requieren autorización (naranja)",
+                "Cambiar entre edificios CIC y PIDET, y entre Planta Baja y Planta Alta dentro del Plano Arquitectónico",
+                "Cancelar reservas propias que aún estén en estado Pendiente",
+                "Recibir notificación por correo al ser aprobada o rechazada una solicitud"
             ],
             "tips": [
                 "Haz clic en cualquier celda del calendario para crear una reserva rápida en ese horario.",
-                "Usa la vista semanal para tener mayor detalle de los horarios de un espacio en particular.",
-                "Si tu reserva no aparece, verifica que haya sido aprobada en el módulo de Aprobaciones."
+                "Usa el Mapa Interactivo en el formulario de reserva para ver visualmente qué aulas están disponibles.",
+                "Si tu reserva no aparece confirmada, verifica que haya sido aprobada en el módulo de Aprobaciones."
             ]
         },
         {
@@ -44,18 +44,18 @@
             "icon": "bi-person",
             "color": "#059669",
             "permissionKey": "Usuarios",
-            "description": "El módulo de Usuarios centraliza la administración de todas las cuentas del sistema. Permite crear, editar, desactivar usuarios y asignar roles con permisos específicos, garantizando que cada persona acceda únicamente a lo que le corresponde.",
+            "description": "El módulo de Usuarios centraliza la administración de todas las cuentas del sistema. Permite crear, editar y desactivar usuarios, así como asignar roles con permisos específicos, garantizando que cada persona acceda únicamente a lo que le corresponde.",
             "functions": [
-                "Crear nuevos usuarios internos con nombre, correo, rol y matrícula",
+                "Crear nuevos usuarios con nombre, correo institucional, rol y área/organización",
                 "Editar información de perfil y cambiar el rol asignado a un usuario",
-                "Desactivar o dar de baja cuentas de usuarios inactivos",
-                "Gestionar invitaciones y códigos de acceso para visitantes",
+                "Desactivar o dar de baja cuentas de usuarios inactivos (conservan su historial)",
+                "Restablecer la contraseña de un usuario directamente desde el panel de administración",
                 "Exportar el listado de usuarios a Excel o PDF"
             ],
             "tips": [
-                "Al crear un usuario, la contraseña por defecto es '123456'. Pídele que la cambie al primer inicio de sesión.",
+                "Al crear un usuario, el administrador define la contraseña inicial. El usuario puede cambiarla desde su perfil en cualquier momento.",
                 "Asigna el rol más restrictivo posible que permita al usuario realizar su trabajo.",
-                "Las cuentas 'Inactivo' no pueden iniciar sesión pero conservan su historial en el sistema."
+                "Las cuentas desactivadas no pueden iniciar sesión pero conservan su historial completo en el sistema."
             ]
         },
         {
@@ -66,9 +66,9 @@
             "permissionKey": "Espacios",
             "description": "El módulo de Espacios gestiona el catálogo de todos los lugares físicos disponibles para reservas: aulas, laboratorios, oficinas y salas. Aquí se configura su capacidad, equipamiento y disponibilidad.",
             "functions": [
-                "Registrar nuevos espacios con nombre, edificio, capacidad y tipo",
+                "Registrar nuevos espacios con nombre, edificio, planta, capacidad y tipo",
                 "Modificar o eliminar espacios existentes del catálogo",
-                "Activar o desactivar espacios temporalmente (por mantenimiento, etc.)",
+                "Activar o desactivar espacios temporalmente (por mantenimiento u otras razones)",
                 "Consultar qué espacios están disponibles en un momento dado",
                 "Visualizar el historial de uso de cada espacio"
             ],
@@ -88,14 +88,14 @@
             "functions": [
                 "Revisar todas las solicitudes de reserva en estado pendiente",
                 "Aprobar una o varias reservas simultáneamente",
-                "Rechazar solicitudes con un comentario o motivo opcional",
+                "Rechazar solicitudes con un comentario o motivo",
                 "Filtrar solicitudes por fecha, espacio o usuario solicitante",
                 "Ver el historial completo de aprobaciones y rechazos"
             ],
             "tips": [
                 "Revisa las aprobaciones pendientes diariamente para no dejar solicitudes en espera.",
                 "Al rechazar una solicitud, agrega un comentario claro para que el usuario entienda el motivo.",
-                "Puedes aprobar varias reservas a la vez usando la selección múltiple de la tabla."
+                "El solicitante recibe una notificación por correo electrónico cuando su reserva es aprobada o rechazada."
             ]
         },
         {
@@ -104,18 +104,18 @@
             "icon": "bi-arrow-left-right",
             "color": "#db2777",
             "permissionKey": "Prestamos",
-            "description": "El módulo de Préstamos administra el ciclo completo de préstamo de activos tecnológicos (laptops, proyectores, cables, etc.). Desde la salida hasta la devolución, con registro de responsable y estado.",
+            "description": "El módulo de Préstamos administra el ciclo completo de préstamo de activos tecnológicos (laptops, proyectores, cables, etc.). Desde la salida hasta la devolución, con registro de responsable, fechas y estado.",
             "functions": [
                 "Registrar un nuevo préstamo seleccionando el activo y el usuario solicitante",
-                "Registrar la devolución de un activo prestado",
+                "Registrar la devolución de un activo prestado y actualizarlo como disponible",
                 "Consultar qué activos están actualmente prestados y a quién",
-                "Ver el historial completo de préstamos con fechas y estados",
-                "Exportar reportes de préstamos a PDF o Excel"
+                "Usar filtros avanzados por Edificio, Planta, Área, Estado y Tipo de préstamo",
+                "Exportar reportes de préstamos a PDF con formato institucional"
             ],
             "tips": [
                 "Verifica el estado físico del activo antes de registrar una devolución.",
-                "Si un activo no regresa en la fecha esperada, usa el filtro 'En Curso' para identificarlo rápidamente.",
-                "Puedes buscar préstamos por nombre del usuario o número de inventario del activo."
+                "Usa el panel de Filtros Avanzados (botón «Filtros») para localizar préstamos específicos por ubicación o estado.",
+                "Los préstamos vencidos aparecen marcados en rojo para facilitar su seguimiento."
             ]
         },
         {
@@ -147,9 +147,9 @@
             "description": "El módulo de Auditoría es el centro de trazabilidad del sistema. Registra automáticamente cada acción relevante realizada por los usuarios, permitiendo generar reportes detallados para análisis y cumplimiento.",
             "functions": [
                 "Consultar el registro de actividad general del sistema por usuario y módulo",
-                "Generar reportes de asistencia a aulas y espacios",
-                "Analizar los espacios más utilizados con estadísticas de uso",
-                "Revisar el historial de préstamos e incidencias",
+                "Generar reportes de asistencia a aulas y espacios por fecha y horario",
+                "Analizar los espacios más utilizados con estadísticas de uso y uso por edificio",
+                "Revisar el historial de préstamos e incidencias registradas",
                 "Exportar cualquier reporte a Excel o PDF con diseño institucional"
             ],
             "tips": [
@@ -166,14 +166,14 @@
             "permissionKey": "RFID",
             "description": "El Monitor RFID es la interfaz en tiempo real que conecta el sistema SIGRAT con los lectores de tarjetas RFID/NFC físicos. Permite monitorear accesos, registrar entradas y salidas y gestionar las tarjetas de los usuarios.",
             "functions": [
-                "Visualizar en tiempo real las lecturas del lector RFID conectado",
-                "Registrar automáticamente la asistencia al detectar una tarjeta",
-                "Asociar tarjetas RFID a usuarios específicos del sistema",
-                "Consultar el historial de accesos registrados por tarjeta",
-                "Diagnosticar el estado de conexión del hardware RFID"
+                "Visualizar en tiempo real las lecturas del lector RFID conectado al sistema",
+                "Registrar automáticamente la asistencia al detectar una tarjeta asociada a un usuario",
+                "Asociar tarjetas RFID o NFC a usuarios específicos del sistema",
+                "Consultar el historial completo de accesos registrados por tarjeta",
+                "Diagnosticar el estado de conexión del hardware RFID desde la interfaz"
             ],
             "tips": [
-                "Si el monitor no muestra lecturas, verifica que el dispositivo RFID esté encendido y conectado.",
+                "Si el monitor no muestra lecturas, verifica que el dispositivo RFID esté encendido y conectado correctamente.",
                 "Mantén actualizada la asociación tarjeta-usuario para que el registro de asistencia sea correcto.",
                 "El monitor funciona en tiempo real; no es necesario recargar la página para ver nuevas lecturas."
             ]
@@ -181,36 +181,45 @@
     ],
     "faq": [
         {
-            "question": "¿Cómo recupero mi contraseña?",
-            "answer": "Contacta a tu administrador del sistema para que restablezca tu contraseña. La contraseña inicial es '123456' y deberás cambiarla al ingresar por primera vez."
+            "question": "¿Qué hago si olvidé mi contraseña?",
+            "answer": "En la pantalla de inicio de sesión, haz clic en «¿Olvidaste tu contraseña?», ingresa tu correo institucional y recibirás un enlace de recuperación. También puedes pedirle al administrador que la restablezca desde el módulo de Usuarios.",
+            "keywords": "olvide recuperar restablecer password clave"
         },
         {
-            "question": "¿Por qué no puedo ver algunos módulos?",
-            "answer": "El acceso a los módulos depende del rol asignado a tu cuenta. Si necesitas acceso a un módulo específico, solicítalo a tu administrador."
+            "question": "¿Cómo cambio mi contraseña una vez dentro del sistema?",
+            "answer": "Ve a tu perfil haciendo clic en tu nombre en la parte inferior del menú lateral. En la sección <strong>«Cambiar contraseña»</strong> ingresa tu contraseña actual, la nueva y confírmala. Haz clic en <strong>«Actualizar contraseña»</strong>."
+        },
+        {
+            "question": "¿Dónde puedo consultar el historial de mis actividades?",
+            "answer": "Todo tu historial de acciones se registra automáticamente. Si tienes permisos, puedes revisarlo en el módulo de Auditoría, o bien, consultar el estado de tus solicitudes recientes desde el Dashboard."
         },
         {
             "question": "¿Cómo reporto un problema técnico?",
-            "answer": "Contacta al equipo de soporte técnico de tu institución o al administrador del sistema SIGRAT. Proporciona una captura de pantalla del error y describe los pasos que realizaste."
+            "answer": "Contacta al equipo de soporte técnico de tu institución o al administrador del sistema SIGRAT. Proporciona una captura de pantalla del error y describe los pasos que realizaste para reproducirlo."
         },
         {
             "question": "¿Los datos se guardan automáticamente?",
-            "answer": "Sí, SIGRAT guarda los datos en tiempo real al confirmar acciones. Sin embargo, te recomendamos no cerrar el navegador mientras tengas formularios a medio completar."
+            "answer": "Sí, SIGRAT guarda los datos en la base de datos al confirmar cada acción. Sin embargo, te recomendamos no cerrar el navegador mientras tengas formularios a medio completar."
         },
         {
-            "question": "¿Puedo acceder al sistema desde mi celular?",
-            "answer": "Sí, SIGRAT es completamente responsivo y funciona en dispositivos móviles, tablets y escritorio. Abre tu navegador y ve a la misma URL del sistema."
+            "question": "¿Cómo busco información específica dentro de las tablas de datos?",
+            "answer": "En la mayoría de los módulos encontrarás una barra de búsqueda en la parte superior derecha de las tablas. Simplemente escribe una palabra clave (nombre, fecha, estado) y la tabla se filtrará automáticamente en tiempo real."
         },
         {
             "question": "¿Cómo exporto un reporte?",
-            "answer": "En la mayoría de los módulos encontrarás botones de 'Exportar Excel' y 'Exportar PDF' en la parte superior de la tabla de resultados. Haz clic en el que prefieras para descargar el reporte."
+            "answer": "En la mayoría de los módulos encontrarás botones de <strong>«Exportar Excel»</strong> o <strong>«Exportar PDF»</strong> en la barra superior de la tabla. Haz clic en el que prefieras para descargar el reporte directamente."
         },
         {
             "question": "¿Qué significa el estado 'En Curso' en Préstamos?",
-            "answer": "Significa que el activo fue prestado y aún no ha sido devuelto. Cuando el usuario regrese el equipo, el administrador debe registrar la devolución para cambiar el estado a 'Finalizado'."
+            "answer": "Significa que el activo fue prestado y aún no ha sido devuelto. Cuando el usuario regrese el equipo, el administrador debe registrar la devolución en el sistema para cambiar el estado a 'Finalizado'."
         },
         {
             "question": "¿Cómo sé si mi reserva fue aprobada?",
-            "answer": "Recibirás una notificación en el ícono de la campana (arriba a la derecha) cuando tu reserva sea aprobada o rechazada. También puedes consultarlo directamente en el módulo de Calendario."
+            "answer": "Recibirás una notificación en el ícono de la campana (arriba a la derecha) cuando tu reserva sea aprobada o rechazada. Además, el sistema envía una notificación por correo electrónico al correo institucional registrado en tu perfil."
+        },
+        {
+            "question": "¿Cómo uso el Plano Arquitectónico para reservar un espacio?",
+            "answer": "Al crear una nueva reserva en el Calendario, el formulario incluye un Plano Arquitectónico. Selecciona el edificio y la planta, luego haz clic en el espacio que deseas reservar (los verdes están libres, rojos ocupados). El sistema completará automáticamente el campo de espacio."
         }
     ]
 }

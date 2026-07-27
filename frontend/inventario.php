@@ -18,6 +18,26 @@ require_once '../backend/controllers/BatchController.php';
 
 $db = Config\Database::getConnection();
 
+// Cargar .env si existe para Cloudinary CDN
+$env_file = dirname(__DIR__) . '/backend/.env';
+if (file_exists($env_file)) {
+    $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), ';') === 0 || strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') !== false) {
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value, " \t\n\r\0\x0B\"'");
+            if (!empty($name)) {
+                putenv("$name=$value");
+                $_ENV[$name] = $value;
+            }
+        }
+    }
+}
+$cloudinaryCloudName = getenv('CLOUDINARY_CLOUD_NAME') ?: 'nakzcjqs';
+$cloudinaryUploadPreset = getenv('CLOUDINARY_UPLOAD_PRESET') ?: 'inventario_sigrat';
+
 $assetController = new Controllers\AssetController();
 $spaceController = new Controllers\SpaceController();
 $tagController = new Controllers\TagController();
@@ -102,22 +122,30 @@ $topLocations = array_slice($locations, 0, 5, true);
 
 
 // Manejar actualización
+// Manejar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_asset') {
     $res = $assetController->update($_POST['act_id'], $_POST);
+    $targetTab = !empty($_POST['target_tab']) ? $_POST['target_tab'] : 'inventario';
     if (!$res['success']) {
-        header("Location: inventario.php?tab=inventario&error=" . urlencode($res['error']));
+        header("Location: inventario.php?tab=" . urlencode($targetTab) . "&error=" . urlencode($res['error']));
     } else {
-        header("Location: inventario.php?tab=inventario&success=edited");
+        header("Location: inventario.php?tab=" . urlencode($targetTab) . "&success=edited");
     }
     exit();
 }
 // Manejar creación rápida desde la vista
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'new_asset') {
-    $res = $assetController->create($_POST);
-    if (!$res['success']) {
-        header("Location: inventario.php?tab=inventario&error=" . urlencode($res['error']));
+    $targetTab = !empty($_POST['target_tab']) ? $_POST['target_tab'] : 'inventario';
+    if (isset($_POST['batch_mode']) && $_POST['batch_mode'] !== 'single') {
+        $res = $assetController->createBatch($_POST);
     } else {
-        header("Location: inventario.php?tab=inventario&success=created");
+        $res = $assetController->create($_POST);
+    }
+    if (!$res['success']) {
+        header("Location: inventario.php?tab=" . urlencode($targetTab) . "&error=" . urlencode($res['error']));
+    } else {
+        $msg = isset($res['count']) ? "batch_created&qty=" . $res['count'] : "created";
+        header("Location: inventario.php?tab=" . urlencode($targetTab) . "&success=" . $msg);
     }
     exit();
 }
@@ -169,8 +197,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 <!-- Barra de Pestañas y Acciones Globales -->
 <div class="tabs-row" style="display: flex; justify-content: space-between; align-items: center;">
     <div class="tabs-container">
-        <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active">INVENTARIO</button>
-        <button onclick="switchAssetTab('mantenimiento')" id="tab-mantenimiento" class="btn-tab">MANTENIMIENTO</button>
+        <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active"><i class="bi bi-laptop"></i> ACTIVOS (EQUIPOS)</button>
+        <button onclick="switchAssetTab('mobiliario')" id="tab-mobiliario" class="btn-tab"><i class="bi bi-tablet-landscape"></i> MOBILIARIO</button>
     </div>
     <div style="display: flex; gap: 8px; align-items: center;">
         <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
@@ -182,8 +210,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <button type="button" class="btn-outline" onclick="exportTableToExcel('inventoryTable', 'Inventario_SIGRAT')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border-color: #10b981; color: #10b981;">
             <i class="bi bi-file-earmark-excel"></i> Excel
         </button>
-        <button class="btn-primary" type="button" onclick="document.getElementById('newAssetModal').style.display='flex'; document.body.style.overflow='hidden';" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
-            <i class="bi bi-plus-lg"></i> Nuevo activo
+        <button class="btn-primary" type="button" onclick="openNewAssetModal()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="bi bi-plus-lg"></i> <span id="btnNewAssetText">Nuevo activo</span>
         </button>
     </div>
 </div>
@@ -201,13 +229,17 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             $estadosDB = array_unique(array_filter(array_column($assets, 'estatus')));
             sort($estadosDB);
 
-            $edificiosDB = array_unique(array_filter(array_column($assets, 'edificio')));
+            // Consultar todos los edificios y espacios directamente de la tabla ESPACIO registrada en BD ($allSpaces)
+            $edificiosDB = array_unique(array_filter(array_column($allSpaces, 'edificio')));
             sort($edificiosDB);
 
+            $allUniqueSpaces = array_unique(array_filter(array_column($allSpaces, 'nombre_numero')));
+            sort($allUniqueSpaces);
+
             $spacesByBuilding = [];
-            foreach ($assets as $a) {
-                $ed = $a['edificio'];
-                $sp = $a['espacio_nombre'];
+            foreach ($allSpaces as $spRow) {
+                $ed = trim($spRow['edificio'] ?? '');
+                $sp = trim($spRow['nombre_numero'] ?? '');
                 if ($ed && $sp) {
                     if (!isset($spacesByBuilding[$ed])) $spacesByBuilding[$ed] = [];
                     if (!in_array($sp, $spacesByBuilding[$ed])) {
@@ -215,43 +247,43 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     }
                 }
             }
+            foreach ($spacesByBuilding as &$spArray) {
+                sort($spArray);
+            }
+            unset($spArray);
         ?>
         <!-- Barra de Filtros Rápidos -->
         <div class="filters-bar" style="display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; overflow-x: auto;">
             <div class="search-input-wrapper">
                 <i class="bi bi-search" style="color: #94a3b8;"></i>
-                <input type="text" id="searchInventory" placeholder="Buscar activo o serie..." style="width: 100%;">
+                <input type="text" id="searchInventory" placeholder="Buscar activo o serie..." style="width: 100%;" oninput="applyFilters()" onchange="applyFilters()">
             </div>
             
             <div class="filters-selects-grid" style="display: contents;">
-                <select id="quickTypeFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
+                <select id="quickTypeFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
                     <option value="">Tipo de activo</option>
                     <?php foreach($tiposDB as $t): ?>
                         <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
                     <?php endforeach; ?>
                 </select>
                 
-                <select id="statusFilter" class="select-filter" style="flex: 0 1 auto; min-width: 100px;">
+                <select id="statusFilter" class="select-filter" style="flex: 0 1 auto; min-width: 100px;" onchange="applyFilters()">
                     <option value="">Estado</option>
                     <?php foreach($estadosDB as $st): ?>
                         <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
                     <?php endforeach; ?>
                 </select>
                 
-                <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter()" style="flex: 0 1 auto; min-width: 110px;">
+                <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter(); applyFilters();" style="flex: 0 1 auto; min-width: 110px;">
                     <option value="">Ubicación</option>
                     <?php foreach($edificiosDB as $ed): ?>
                         <option value="<?php echo htmlspecialchars($ed); ?>"><?php echo htmlspecialchars($ed); ?></option>
                     <?php endforeach; ?>
                 </select>
 
-                <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;">
+                <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
                     <option value="">Espacio</option>
-                    <?php 
-                    $allUniqueSpaces = array_unique(array_filter(array_column($assets, 'espacio_nombre')));
-                    sort($allUniqueSpaces);
-                    foreach($allUniqueSpaces as $sp): 
-                    ?>
+                    <?php foreach($allUniqueSpaces as $sp): ?>
                         <option value="<?php echo htmlspecialchars($sp); ?>"><?php echo htmlspecialchars($sp); ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -266,16 +298,18 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <div class="premium-table-card">
             <table id="inventoryTable" class="premium-table">
                 <colgroup>
-                    <col style="width: 22%;"><!-- Activo -->
-                    <col style="width: 11%;"><!-- Tipo -->
+                    <col style="width: 6%;"><!-- Foto -->
+                    <col style="width: 20%;"><!-- Activo -->
+                    <col style="width: 10%;"><!-- Tipo -->
                     <col style="width: 12%;"><!-- Nº Inventario -->
-                    <col style="width: 13%;"><!-- Tag RFID -->
+                    <col style="width: 12%;"><!-- Tag RFID -->
                     <col style="width: 16%;"><!-- Ubicación -->
-                    <col style="width: 14%;"><!-- Estado -->
-                    <col style="width: 12%;"><!-- Acción -->
+                    <col style="width: 13%;"><!-- Estado -->
+                    <col style="width: 11%;"><!-- Acción -->
                 </colgroup>
                 <thead>
                     <tr>
+                        <th style="text-align: center;">Foto</th>
                         <th>Activo</th>
                         <th>Tipo</th>
                         <th>Nº Inventario</th>
@@ -291,9 +325,18 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                         $isMobiliario = (strpos($tipoLower, 'silla') !== false || strpos($tipoLower, 'mesa') !== false || strpos($tipoLower, 'escritorio') !== false || strpos($tipoLower, 'pizarrón') !== false || strpos($tipoLower, 'pizarron') !== false || strpos($tipoLower, 'mobiliario') !== false || strpos($tipoLower, 'estante') !== false || strpos($tipoLower, 'archivero') !== false);
                     ?>
                     <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
+                        <td style="text-align: center; vertical-align: middle;">
+                            <?php if (!empty($asset['imagen_url'])): ?>
+                                <img src="<?php echo htmlspecialchars($asset['imagen_url'] ?? ''); ?>" alt="Foto" onclick="viewAssetImage('<?php echo htmlspecialchars(addslashes($asset['imagen_url'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes(($asset['tipo'] ?? '') . ' ' . ($asset['modelo'] ?? ''))); ?>', '<?php echo htmlspecialchars(addslashes($asset['num_inv'] ?? '')); ?>')" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+                            <?php else: ?>
+                                <div style="width: 42px; height: 42px; border-radius: 8px; background: #f1f5f9; display: inline-flex; align-items: center; justify-content: center; color: #94a3b8; border: 1px dashed #cbd5e1; margin: 0 auto;" title="Sin foto">
+                                    <i class="bi bi-camera"></i>
+                                </div>
+                            <?php endif; ?>
+                        </td>
                         <td>
-                            <div style="font-weight: 700; color: #0f172a; overflow-wrap: break-word; word-break: break-word;"><?php echo htmlspecialchars($asset['tipo'] . ' ' . $asset['modelo']); ?></div>
-                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5; white-space: normal;">Serie: <?php echo htmlspecialchars($asset['num_serie']); ?></div>
+                            <div style="font-weight: 700; color: #0f172a; overflow-wrap: break-word; word-break: break-word;"><?php echo htmlspecialchars(trim(($asset['tipo'] ?? '') . ' ' . ($asset['modelo'] ?? ''))); ?></div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.5; white-space: normal;">Serie: <?php echo htmlspecialchars($asset['num_serie'] ?? 'N/A'); ?></div>
                         </td>
                         <td style="padding-top: 12px;">
                             <?php if ($isMobiliario): ?>
@@ -518,19 +561,19 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <h4>Estado del activo</h4>
                     <div class="checkbox-group">
                         <label class="checkbox-label">
-                            <input type="checkbox" class="status-checkbox" value="Disponible" checked>
+                            <input type="checkbox" class="status-checkbox" value="Disponible">
                             Disponible
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="status-checkbox" value="En uso" checked>
+                            <input type="checkbox" class="status-checkbox" value="En uso">
                             En uso
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="status-checkbox" value="Prestado" checked>
+                            <input type="checkbox" class="status-checkbox" value="Prestado">
                             Prestado
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="status-checkbox" value="Mantenimiento" checked>
+                            <input type="checkbox" class="status-checkbox" value="Mantenimiento">
                             Mantenimiento
                         </label>
                         <label class="checkbox-label">
@@ -542,14 +585,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 <div class="drawer-section">
                     <h4>Edificio</h4>
                     <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="edificio-checkbox" value="CIC" checked>
-                            CIC
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="edificio-checkbox" value="PIDET" checked>
-                            PIDET
-                        </label>
+                        <?php foreach($edificiosDB as $ed): ?>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="edificio-checkbox" value="<?php echo htmlspecialchars($ed); ?>">
+                                <?php echo htmlspecialchars($ed); ?>
+                            </label>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
@@ -624,29 +665,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
 
     <!-- Sección: Mantenimiento -->
-    <div id="section-mantenimiento" style="display: none;">
-        <div class="card">
-            <h3 style="font-weight: 800; color: #334155; margin-bottom: 24px;">Bitácora de Mantenimiento</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background: #f8fafc; text-align: left;">
-                    <tr>
-                        <th style="padding: 16px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Activo</th>
-                        <th style="padding: 16px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Tipo</th>
-                        <th style="padding: 16px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Fecha</th>
-                        <th style="padding: 16px; font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase;">Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 16px; font-size: 14px; font-weight: 700;">Impresora 3D Ender</td>
-                        <td style="padding: 16px;"><span style="background: #eff6ff; color: #2563eb; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">PREVENTIVO</span></td>
-                        <td style="padding: 16px; font-size: 12px; color: #94a3b8;">12/05/2026</td>
-                        <td style="padding: 16px;"><span style="color: #10b981; font-weight: 800; font-size: 12px;">Completado</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <div id="section-mantenimiento" style="display: none;"></div>
 </div>
 
 <!-- Modal de Edición -->
@@ -656,26 +675,23 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <form method="POST">
             <input type="hidden" name="action" value="edit_asset">
             <input type="hidden" name="act_id" id="edit_act_id">
+            <input type="hidden" name="target_tab" id="edit_target_tab" value="inventario">
             
             <div style="display: grid; gap: 16px; grid-template-columns: 1fr 1fr;">
                 <div>
-                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Tipo de Equipo</label>
-                    <select name="tipo" id="edit_tipo" class="form-control" required>
-                        <option value="">-- Seleccionar --</option>
-                        <option value="Laptop">Laptop</option>
-                        <option value="Monitor">Monitor</option>
-                        <option value="Impresora">Impresora</option>
-                        <option value="Proyector">Proyector</option>
-                        <option value="Bocina">Bocina</option>
-                        <option value="Computadora">Computadora</option>
-                        <option value="Silla">Silla</option>
-                        <option value="Mesa">Mesa</option>
-                        <option value="Pizarrón">Pizarrón</option>
-                        <option value="Escritorio">Escritorio</option>
-                        <option value="Otro">Otro / Herramienta</option>
-                    </select>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Responsable (Opcional)</label>
+                    <input type="text" name="responsable" id="edit_responsable" class="form-control" placeholder="Ej: DR. JUAN MANUEL...">
                 </div>
                 <div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Nivel / Piso (Opcional)</label>
+                    <input type="text" name="nivel" id="edit_nivel" class="form-control" placeholder="Ej: Planta Baja">
+                </div>
+                <div style="position: relative;" id="edit_tipo_container">
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Tipo de Activo / Mobiliario</label>
+                    <input type="text" name="tipo" id="edit_tipo" autocomplete="off" class="form-control" placeholder="Escribe o selecciona..." required>
+                    <div id="edit_tipo_dropdown" class="custom-dropdown" style="top: 65px;"></div>
+                </div>
+                <div id="edit_estatus_container">
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Estado</label>
                     <select name="estatus" id="edit_estatus" class="form-control" required>
                         <option value="Disponible">Disponible</option>
@@ -684,15 +700,15 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                         <option value="Extraviado">Extraviado</option>
                     </select>
                 </div>
-                <div>
+                <div id="edit_marca_container">
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Marca</label>
                     <input type="text" name="marca" id="edit_marca" class="form-control" required>
                 </div>
-                <div>
+                <div id="edit_modelo_container">
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Modelo</label>
                     <input type="text" name="modelo" id="edit_modelo" class="form-control" required>
                 </div>
-                <div>
+                <div id="edit_num_serie_container">
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Número de Serie</label>
                     <input type="text" name="num_serie" id="edit_num_serie" class="form-control" required>
                 </div>
@@ -704,6 +720,23 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <label style="font-size: 11px; font-weight: 800; color: #3b82f6;">UID TAG (RFID) - Dejar vacío para desvincular</label>
                     <input type="text" name="tag_id" id="edit_tag_id" autocomplete="off" placeholder="Busca o Escanea el TAG..." class="form-control" style="font-family: 'JetBrains Mono', monospace; color: var(--active-blue); margin-top: 8px; width: 100%; box-sizing: border-box;">
                     <div id="edit_tag_dropdown" class="custom-dropdown" style="top: 75px;"></div>
+                </div>
+                <div style="grid-column: span 2; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label style="font-size: 11px; font-weight: 800; color: #3b82f6;"><i class="bi bi-camera"></i> Foto del Activo (Cloudinary URL o Subida)</label>
+                    <div style="display: flex; gap: 12px; align-items: center; margin-top: 8px;">
+                        <input type="text" name="imagen_url" id="edit_imagen_url" class="form-control" placeholder="https://res.cloudinary.com/..." style="flex: 1;">
+                        <label class="btn-primary" style="background: #10b981; cursor: pointer; white-space: nowrap; font-size: 12px; padding: 10px 16px; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="bi bi-cloud-upload"></i> Subir Foto
+                            <input type="file" id="edit_upload_file" accept="image/*" style="display: none;" onchange="uploadToCloudinary(this, 'edit_imagen_url', 'edit_image_preview')">
+                        </label>
+                    </div>
+                    <div id="edit_image_preview_container" style="margin-top: 10px; display: none;">
+                        <img id="edit_image_preview" src="" alt="Vista previa" style="max-height: 100px; border-radius: 8px; border: 1px solid #cbd5e1; object-fit: cover;">
+                    </div>
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Descripción / Especificaciones</label>
+                    <textarea name="descripcion" id="edit_descripcion" class="form-control" placeholder="Descripción física o técnica..." style="height: 65px; font-size: 12px;"></textarea>
                 </div>
                 <div>
                     <label style="font-size: 11px; font-weight: 800; color: #64748b;">Edificio</label>
@@ -1431,24 +1464,23 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 </style>
 
 <script>
-    // Pasar los tags disponibles desde PHP a JS
+    // Pasar los tags disponibles y espacios desde PHP a JS
     const availableTags = <?php echo json_encode($availableTags); ?>;
+    const spacesByBuildingJS = <?php echo json_encode($spacesByBuilding ?? []); ?>;
+    const allUniqueSpacesJS = <?php echo json_encode(array_values($allUniqueSpaces ?? [])); ?>;
+    const allTiposJS = <?php echo json_encode(array_values($tiposDB ?? [])); ?>;
 
-    function setupAutocomplete(inputId, dropdownId) {
+    function setupAutocomplete(inputId, dropdownId, sourceArray) {
         const input = document.getElementById(inputId);
         const dropdown = document.getElementById(dropdownId);
         if (!input || !dropdown) return;
         
-        input.addEventListener('input', function() {
-            const val = this.value.toLowerCase();
+        function renderOptions() {
+            const val = input.value.toLowerCase();
             dropdown.innerHTML = '';
             
-            if (!val) {
-                dropdown.style.display = 'none';
-                return;
-            }
-            
-            const matches = availableTags.filter(tag => tag.toLowerCase().includes(val));
+            // If empty, show all options. Otherwise, filter.
+            const matches = val === '' ? sourceArray : sourceArray.filter(item => item.toLowerCase().includes(val));
             
             if (matches.length > 0) {
                 // Limitamos a mostrar solo los primeros 15 para evitar lag en listas masivas
@@ -1456,9 +1488,13 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     const item = document.createElement('div');
                     item.className = 'custom-dropdown-item';
                     
-                    // Resaltar coincidencia en azul oscuro
-                    const regex = new RegExp(`(${val})`, "gi");
-                    item.innerHTML = tag.replace(regex, "<span style='color: #1e40af; font-weight: 900; background: #dbeafe; padding: 0 2px; border-radius: 4px;'>$1</span>");
+                    if (val === '') {
+                        item.textContent = tag;
+                    } else {
+                        // Resaltar coincidencia en azul oscuro
+                        const regex = new RegExp(`(${val})`, "gi");
+                        item.innerHTML = tag.replace(regex, "<span style='color: #1e40af; font-weight: 900; background: #dbeafe; padding: 0 2px; border-radius: 4px;'>$1</span>");
+                    }
                     
                     item.addEventListener('click', function() {
                         input.value = tag;
@@ -1466,37 +1502,23 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     });
                     dropdown.appendChild(item);
                 });
+                
+                if (val === '') {
+                    // Un pequeño mensaje extra para guiar al usuario
+                    const hint = document.createElement('div');
+                    hint.style = "padding: 8px 16px; font-size: 10px; color: #94a3b8; text-align: center; background: #f8fafc; font-weight: 700;";
+                    hint.textContent = "Escribe para filtrar...";
+                    dropdown.appendChild(hint);
+                }
+                
                 dropdown.style.display = 'block';
             } else {
                 dropdown.style.display = 'none';
             }
-        });
+        }
 
-        // Mostrar sugerencias al dar foco si está vacío
-        input.addEventListener('focus', function() {
-            if(this.value === '' && availableTags.length > 0) {
-                dropdown.innerHTML = '';
-                availableTags.slice(0, 5).forEach(tag => {
-                    const item = document.createElement('div');
-                    item.className = 'custom-dropdown-item';
-                    item.textContent = tag;
-                    item.addEventListener('click', function() {
-                        input.value = tag;
-                        dropdown.style.display = 'none';
-                    });
-                    dropdown.appendChild(item);
-                });
-                // Un pequeño mensaje extra para guiar al usuario
-                const hint = document.createElement('div');
-                hint.style = "padding: 8px 16px; font-size: 10px; color: #94a3b8; text-align: center; background: #f8fafc; font-weight: 700;";
-                hint.textContent = "Teclea para ver más resultados...";
-                dropdown.appendChild(hint);
-                
-                dropdown.style.display = 'block';
-            } else {
-                input.dispatchEvent(new Event('input'));
-            }
-        });
+        input.addEventListener('input', renderOptions);
+        input.addEventListener('focus', renderOptions);
 
         // Cerrar si hacen clic fuera
         document.addEventListener('click', function(e) {
@@ -1515,20 +1537,227 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
 
+    let activeCategoryTab = 'inventario';
+    let currentPage = 1;
+    let itemsPerPage = 8;
+    document.addEventListener("DOMContentLoaded", function() {
+        const itemsPerPageSelect = document.getElementById("itemsPerPageSelect");
+        if (itemsPerPageSelect) itemsPerPage = parseInt(itemsPerPageSelect.value) || 8;
+    });
+
+    function filterTypeDropdownOptions(tab) {
+        const quickTypeSelect = document.getElementById('quickTypeFilter');
+        if (!quickTypeSelect) return;
+        const isMobTab = (tab === 'mobiliario');
+        const furnitureKeywords = ['silla', 'mesa', 'escritorio', 'pizarrón', 'pizarron', 'mobiliario', 'estante', 'archivero', 'gabinete', 'podium', 'tarima', 'anaquel', 'banco'];
+
+        Array.from(quickTypeSelect.options).forEach((opt, idx) => {
+            if (idx === 0) return;
+            const valLower = opt.value.toLowerCase();
+            const isMobType = furnitureKeywords.some(kw => valLower.includes(kw));
+            if (isMobTab) {
+                opt.style.display = isMobType ? '' : 'none';
+            } else {
+                opt.style.display = !isMobType ? '' : 'none';
+            }
+        });
+
+        const selectedOpt = quickTypeSelect.options[quickTypeSelect.selectedIndex];
+        if (selectedOpt && selectedOpt.style.display === 'none') {
+            quickTypeSelect.value = '';
+        }
+    }
+
     function switchAssetTab(tab) {
-        document.getElementById('section-inventario').style.display = tab === 'inventario' ? 'grid' : 'none';
-        document.getElementById('section-mantenimiento').style.display = tab === 'mantenimiento' ? 'block' : 'none';
+        if (tab === 'mantenimiento') tab = 'mobiliario';
+        activeCategoryTab = tab;
+        
+        const btnNewText = document.getElementById('btnNewAssetText');
+        const modalTitle = document.getElementById('newAssetModalTitle');
+        if (tab === 'mobiliario') {
+            if (btnNewText) btnNewText.textContent = "Nuevo mobiliario";
+            if (modalTitle) modalTitle.textContent = "Nuevo mobiliario";
+        } else {
+            if (btnNewText) btnNewText.textContent = "Nuevo activo";
+            if (modalTitle) modalTitle.textContent = "Nuevo activo";
+        }
+        
+        document.getElementById('section-inventario').style.display = 'grid';
+        const secMant = document.getElementById('section-mantenimiento');
+        if (secMant) secMant.style.display = 'none';
         
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
+        const activeBtn = document.getElementById('tab-' + tab);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        const editTarget = document.getElementById('edit_target_tab');
+        if (editTarget) editTarget.value = tab;
+        const newTarget = document.getElementById('new_target_tab');
+        if (newTarget) newTarget.value = tab;
+
+        const headerTitle = document.querySelector('header h1');
+        const headerDesc = document.querySelector('header p');
+        if (headerTitle && headerDesc) {
+            if (tab === 'mobiliario') {
+                headerTitle.textContent = 'Mobiliario Institucional';
+                headerDesc.textContent = 'Control de sillas, butacas, mesas, escritorios, pizarrones y anaqueles';
+            } else {
+                headerTitle.textContent = 'Activos y Equipos Electrónicos';
+                headerDesc.textContent = 'Control de computadoras, proyectores, impresoras y herramientas tecnológicas';
+            }
+        }
+
+        filterTypeDropdownOptions(tab);
+
+        if (typeof applyFilters === 'function') {
+            applyFilters();
+        }
     }
 
     // Mantener la pestaña activa después de recargar si viene en el GET
     const urlParams = new URLSearchParams(window.location.search);
     let activeTab = urlParams.get('tab') || 'inventario';
-    if (urlParams.get('filtro') === 'alerta') activeTab = 'inventario'; // Opcional: forzar pestaña
+    if (activeTab === 'mantenimiento') activeTab = 'mobiliario';
     switchAssetTab(activeTab);
 
+
+    function toggleBatchMode(mode) {
+        document.querySelectorAll('.batch-mode-btn').forEach(l => {
+            l.style.background = 'transparent';
+            l.style.color = '#64748b';
+            l.style.boxShadow = 'none';
+        });
+        const activeRadio = document.querySelector(`input[name="batch_mode"][value="${mode}"]`);
+        if (activeRadio && activeRadio.parentElement) {
+            activeRadio.parentElement.style.background = 'white';
+            activeRadio.parentElement.style.color = '#1e293b';
+            activeRadio.parentElement.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        }
+
+        const batchCont = document.getElementById('batch_fields_container');
+        const folioSec = document.getElementById('batch_folio_section');
+        const rangeSec = document.getElementById('batch_range_section');
+        const singleInvField = document.getElementById('single_num_inv_field');
+        const rfidFieldSec = document.getElementById('rfid_field_section');
+        
+        if (mode === 'single') {
+            if (batchCont) batchCont.style.display = 'none';
+            if (singleInvField) singleInvField.style.display = 'block';
+            if (rfidFieldSec) rfidFieldSec.style.display = 'block';
+            const singleInvInput = document.querySelector('#single_num_inv_field input[name="num_inv"]');
+            if (singleInvInput) singleInvInput.required = true;
+            const newTagInput = document.getElementById('new_tag_id');
+            if (newTagInput) newTagInput.required = true;
+        } else {
+            if (batchCont) batchCont.style.display = 'block';
+            if (singleInvField) singleInvField.style.display = 'none';
+            if (rfidFieldSec) rfidFieldSec.style.display = 'none';
+            const singleInvInput = document.querySelector('#single_num_inv_field input[name="num_inv"]');
+            if (singleInvInput) singleInvInput.required = false;
+            const newTagInput = document.getElementById('new_tag_id');
+            if (newTagInput) { newTagInput.required = false; newTagInput.value = ''; }
+
+            if (mode === 'folio') {
+                if (folioSec) folioSec.style.display = 'block';
+                if (rangeSec) rangeSec.style.display = 'none';
+                const invBase = document.getElementById('batch_inv_base');
+                if (invBase) invBase.required = true;
+            } else {
+                if (folioSec) folioSec.style.display = 'none';
+                if (rangeSec) rangeSec.style.display = 'block';
+                const invBase = document.getElementById('batch_inv_base');
+                if (invBase) invBase.required = false;
+            }
+            renderBatchTags();
+        }
+    }
+
+    function renderBatchTags() {
+        const mode = document.querySelector('input[name="batch_mode"]:checked').value;
+        if (mode === 'single') return;
+
+        const container = document.getElementById('batch_tags_container');
+        let qty = 1;
+
+        if (mode === 'folio') {
+            qty = parseInt(document.getElementById('batch_quantity').value) || 1;
+        } else if (mode === 'range') {
+            const start = parseInt(document.getElementById('batch_start').value) || 1;
+            const end = parseInt(document.getElementById('batch_end').value) || 1;
+            qty = Math.max(1, end - start + 1);
+        }
+
+        if (qty > 200) qty = 200;
+
+        let html = '<h4 style="margin: 16px 0 8px 0; color: #1e40af; font-size: 13px; font-weight: 800;"><i class="bi bi-upc-scan"></i> TAGs RFID para el Lote</h4>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">';
+        
+        for (let i = 1; i <= qty; i++) {
+            html += `
+                <div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Tag RFID #${i}</label>
+                    <input type="text" name="batch_tags[]" class="form-control" placeholder="Escanear Tag..." style="font-family: 'JetBrains Mono', monospace; color: #2563eb;">
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        if (container) container.innerHTML = html;
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        const batchInputs = ['batch_quantity', 'batch_start', 'batch_end'];
+        batchInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', renderBatchTags);
+                el.addEventListener('change', renderBatchTags);
+            }
+        });
+    });
+
+    function openNewAssetModal() {
+        const modal = document.getElementById('newAssetModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            const tipoContainer = document.getElementById('new_tipo_container');
+            const marcaContainer = document.getElementById('new_marca_container');
+            const modeloContainer = document.getElementById('new_modelo_container');
+            const serieContainer = document.getElementById('new_num_serie_container');
+            const estatusContainer = document.getElementById('new_estatus_container');
+            const tipoSelect = document.querySelector('#newAssetModal input[name="tipo"]');
+            const marcaInput = document.querySelector('#newAssetModal input[name="marca"]');
+            const modeloInput = document.querySelector('#newAssetModal input[name="modelo"]');
+            const serieInput = document.querySelector('#newAssetModal input[name="num_serie"]');
+            
+            if (activeCategoryTab === 'mobiliario') {
+                if(tipoContainer) tipoContainer.style.display = 'none';
+                if(marcaContainer) marcaContainer.style.display = 'none';
+                if(modeloContainer) modeloContainer.style.display = 'none';
+                if(serieContainer) serieContainer.style.display = 'none';
+                if(estatusContainer) estatusContainer.style.display = 'none';
+                
+                if (tipoSelect) { tipoSelect.required = false; tipoSelect.value = 'Mobiliario'; }
+                if (marcaInput) { marcaInput.required = false; marcaInput.value = 'N/A'; }
+                if (modeloInput) { modeloInput.required = false; modeloInput.value = 'N/A'; }
+                if (serieInput) { serieInput.required = false; serieInput.value = 'N/A'; }
+            } else {
+                if(tipoContainer) tipoContainer.style.display = 'block';
+                if(marcaContainer) marcaContainer.style.display = 'block';
+                if(modeloContainer) modeloContainer.style.display = 'block';
+                if(serieContainer) serieContainer.style.display = 'block';
+                if(estatusContainer) estatusContainer.style.display = 'block';
+                
+                if (tipoSelect) { tipoSelect.required = true; tipoSelect.value = 'Laptop'; }
+                if (marcaInput) { marcaInput.required = true; marcaInput.value = ''; }
+                if (modeloInput) { modeloInput.required = true; modeloInput.value = ''; }
+                if (serieInput) { serieInput.required = true; serieInput.value = ''; }
+            }
+            toggleBatchMode('single');
+        }
+    }
 
     // Funciones del Modal de Edición
     function openEditModal(asset) {
@@ -1541,6 +1770,44 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.getElementById('edit_tag_id').value = asset.tag_id || '';
         document.getElementById('edit_estatus').value = asset.estatus || 'Disponible';
         document.getElementById('edit_edificio').value = asset.edificio || '';
+        
+        const editResp = document.getElementById('edit_responsable');
+        if (editResp) editResp.value = asset.responsable || '';
+        const editNivel = document.getElementById('edit_nivel');
+        if (editNivel) editNivel.value = asset.nivel || '';
+
+        const editDesc = document.getElementById('edit_descripcion');
+        if (editDesc) editDesc.value = asset.descripcion || asset.software_info || '';
+        
+        const tipoContainer = document.getElementById('edit_tipo_container');
+        const estatusContainer = document.getElementById('edit_estatus_container');
+        const marcaContainer = document.getElementById('edit_marca_container');
+        const modeloContainer = document.getElementById('edit_modelo_container');
+        const serieContainer = document.getElementById('edit_num_serie_container');
+        
+        if (activeCategoryTab === 'mobiliario') {
+            if(tipoContainer) tipoContainer.style.display = 'none';
+            if(estatusContainer) estatusContainer.style.display = 'none';
+            if(marcaContainer) marcaContainer.style.display = 'none';
+            if(modeloContainer) modeloContainer.style.display = 'none';
+            if(serieContainer) serieContainer.style.display = 'none';
+            
+            document.getElementById('edit_tipo').required = false;
+            document.getElementById('edit_marca').required = false;
+            document.getElementById('edit_modelo').required = false;
+            document.getElementById('edit_num_serie').required = false;
+        } else {
+            if(tipoContainer) tipoContainer.style.display = 'block';
+            if(estatusContainer) estatusContainer.style.display = 'block';
+            if(marcaContainer) marcaContainer.style.display = 'block';
+            if(modeloContainer) modeloContainer.style.display = 'block';
+            if(serieContainer) serieContainer.style.display = 'block';
+            
+            document.getElementById('edit_tipo').required = true;
+            document.getElementById('edit_marca').required = true;
+            document.getElementById('edit_modelo').required = true;
+            document.getElementById('edit_num_serie').required = true;
+        }
 
         // Disparar change en el edificio para poblar los espacios correctamente
         const edSelect = document.getElementById('edit_edificio');
@@ -1550,6 +1817,20 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
         document.getElementById('edit_esp_asignado').value = asset.esp_asignado || '';
         
+        const editImgInput = document.getElementById('edit_imagen_url');
+        const editImgPreview = document.getElementById('edit_image_preview');
+        const editImgCont = document.getElementById('edit_image_preview_container');
+        if (editImgInput) editImgInput.value = asset.imagen_url || '';
+        if (editImgPreview && editImgCont) {
+            if (asset.imagen_url) {
+                editImgPreview.src = asset.imagen_url;
+                editImgCont.style.display = 'block';
+            } else {
+                editImgPreview.src = '';
+                editImgCont.style.display = 'none';
+            }
+        }
+
         document.getElementById('editModal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
@@ -1557,6 +1838,94 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     function closeEditModal() {
         document.getElementById('editModal').style.display = 'none';
         document.body.style.overflow = '';
+    }
+
+    // Configuración Cloudinary JS
+    const CLOUDINARY_CLOUD_NAME = "<?php echo htmlspecialchars($cloudinaryCloudName, ENT_QUOTES, 'UTF-8'); ?>";
+    const CLOUDINARY_UPLOAD_PRESET = "<?php echo htmlspecialchars($cloudinaryUploadPreset, ENT_QUOTES, 'UTF-8'); ?>";
+
+    async function uploadToCloudinary(fileInput, targetInputId, previewImgId) {
+        if (!fileInput.files || fileInput.files.length === 0) return;
+        const file = fileInput.files[0];
+        
+        const targetInput = document.getElementById(targetInputId);
+        const previewImg = document.getElementById(previewImgId);
+        const previewContainer = previewImg ? previewImg.parentElement : null;
+        
+        if (!CLOUDINARY_CLOUD_NAME || CLOUDINARY_CLOUD_NAME === 'tu_cloud_name') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Falta configurar Cloudinary',
+                text: 'Por favor, configura CLOUDINARY_CLOUD_NAME en el archivo backend/.env antes de subir fotos.'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Subiendo imagen a Cloudinary...',
+            text: 'Por favor espera unos segundos mientras se optimiza y aloja la imagen',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error?.message || 'Error al conectar con la API de Cloudinary');
+            }
+
+            const data = await response.json();
+            const secureUrl = data.secure_url;
+
+            if (targetInput) targetInput.value = secureUrl;
+            if (previewImg && previewContainer) {
+                previewImg.src = secureUrl;
+                previewContainer.style.display = 'block';
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Imagen Subida con Éxito!',
+                text: 'La imagen ha sido optimizada y alojada en Cloudinary CDN.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error('Error Cloudinary:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Subida',
+                text: error.message || 'No se pudo subir la imagen. Verifica tu conexión o que el Preset esté en modo Unsigned.'
+            });
+        } finally {
+            fileInput.value = '';
+        }
+    }
+
+    function viewAssetImage(url, title, numInv) {
+        Swal.fire({
+            title: title,
+            text: 'Nº Inventario: ' + (numInv || 'Sin asignar'),
+            imageUrl: url,
+            imageAlt: title,
+            imageMaxHeight: 500,
+            showCloseButton: true,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl border border-slate-200'
+            }
+        });
     }
 
     // Funciones SweetAlert2
@@ -1578,8 +1947,10 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        setupAutocomplete('new_tag_id', 'new_tag_dropdown');
-        setupAutocomplete('edit_tag_id', 'edit_tag_dropdown');
+        setupAutocomplete('new_tag_id', 'new_tag_dropdown', availableTags);
+        setupAutocomplete('edit_tag_id', 'edit_tag_dropdown', availableTags);
+        setupAutocomplete('new_tipo_input', 'new_tipo_dropdown', allTiposJS);
+        setupAutocomplete('edit_tipo', 'edit_tipo_dropdown', allTiposJS);
 
         // SweetAlert2 URL Handler
         const urlParams = new URLSearchParams(window.location.search);
@@ -1592,12 +1963,18 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             if (action === 'created') msg = 'El activo se ha registrado correctamente en el inventario.';
             if (action === 'edited') msg = 'El activo ha sido actualizado con éxito.';
             if (action === 'deleted') { title = 'Eliminado'; msg = 'El activo fue dado de baja.'; icon = 'info'; }
+            if (action === 'batch_created') {
+                const qty = urlParams.get('qty') || 'múltiples';
+                title = '¡Lote Registrado con Éxito!';
+                msg = 'Se han generado ' + qty + ' activos en lote/rango heredando todas las especificaciones y fotografía.';
+            }
             
-            Swal.fire({ icon: icon, title: title, text: msg, timer: 3000, showConfirmButton: false });
+            Swal.fire({ icon: icon, title: title, text: msg, timer: 3500, showConfirmButton: false });
             
             // Limpiar la URL de los parámetros de éxito para no repetir la alerta
             const url = new URL(window.location);
             url.searchParams.delete('success');
+            url.searchParams.delete('qty');
             window.history.replaceState({}, document.title, url);
         }
         if (urlParams.has('error')) {
@@ -1620,9 +1997,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     
     // Search inventory & Filters Logic
     
-    let currentPage = 1;
-    let itemsPerPage = 8;
-
     function updateItemsPerPage() {
         const select = document.getElementById("itemsPerPageSelect");
         itemsPerPage = parseInt(select.value) || 8;
@@ -1636,20 +2010,40 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     function clearAllFilters() {
-        if(searchInventory) searchInventory.value = "";
-        if(quickTypeFilter) quickTypeFilter.value = "";
-        if(statusFilter) statusFilter.value = "";
-        if(quickLocationFilter) quickLocationFilter.value = "";
-        if(document.getElementById('quickSpaceFilter')) document.getElementById('quickSpaceFilter').value = "";
-        if(drawerTypeFilter) drawerTypeFilter.value = "";
-        if(drawerLocationFilter) drawerLocationFilter.value = "";
-        if(drawerRfidInput) drawerRfidInput.value = "";
-        if(showOnlyAvailable) showOnlyAvailable.checked = false;
-        
-        document.querySelectorAll('.status-checkbox, .edificio-checkbox').forEach(cb => cb.checked = false);
-        
-        currentPage = 1;
-        applyFilters();
+        try {
+            const searchInventory = document.getElementById("searchInventory");
+            const quickTypeFilter = document.getElementById("quickTypeFilter");
+            const statusFilter = document.getElementById("statusFilter");
+            const quickLocationFilter = document.getElementById("quickLocationFilter");
+            const quickSpaceFilter = document.getElementById("quickSpaceFilter");
+            const drawerTypeFilter = document.getElementById("drawerTypeFilter");
+            const drawerLocationFilter = document.getElementById("drawerLocationFilter");
+            const drawerRfidInput = document.getElementById("drawerRfidInput");
+            const showOnlyAvailable = document.getElementById("showOnlyAvailable");
+
+            if(searchInventory) searchInventory.value = "";
+            if(quickTypeFilter) quickTypeFilter.value = "";
+            if(statusFilter) statusFilter.value = "";
+            if(quickLocationFilter) quickLocationFilter.value = "";
+            if(quickSpaceFilter) quickSpaceFilter.value = "";
+            if(drawerTypeFilter) drawerTypeFilter.value = "";
+            if(drawerLocationFilter) drawerLocationFilter.value = "";
+            if(drawerRfidInput) drawerRfidInput.value = "";
+            if(showOnlyAvailable) showOnlyAvailable.checked = false;
+            
+            document.querySelectorAll('.status-checkbox, .edificio-checkbox').forEach(cb => cb.checked = false);
+            
+            currentPage = 1;
+            
+            if (typeof updateSpaceFilter === 'function') {
+                updateSpaceFilter();
+            } else {
+                applyFilters();
+            }
+        } catch (e) {
+            console.error("Error en clearAllFilters:", e);
+            alert("Error al limpiar filtros: " + e.message);
+        }
     }
 
     function renderPaginationControls(totalPages, totalItems, startIndex) {
@@ -1684,145 +2078,175 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         controls.innerHTML = html;
     }
 
-    const spacesByBuildingJS = <?php echo json_encode($spacesByBuilding ?? []); ?>;
-    const allUniqueSpacesJS = <?php echo json_encode(array_unique(array_filter(array_column($assets ?? [], 'espacio_nombre')))); ?>;
-    
     function updateSpaceFilter() {
-        const edVal = document.getElementById('quickLocationFilter').value;
-        const spaceSelect = document.getElementById('quickSpaceFilter');
-        if(!spaceSelect) return;
-        
-        spaceSelect.innerHTML = '<option value="">Espacio</option>';
-        
-        let spacesToShow = [];
-        if (edVal && spacesByBuildingJS[edVal]) {
-            spacesToShow = spacesByBuildingJS[edVal];
-        } else if (!edVal) {
-            spacesToShow = Object.values(allUniqueSpacesJS);
+        try {
+            const locFilter = document.getElementById('quickLocationFilter');
+            const edVal = locFilter ? locFilter.value : '';
+            const spaceSelect = document.getElementById('quickSpaceFilter');
+            if(!spaceSelect) {
+                currentPage = 1;
+                applyFilters();
+                return;
+            }
+            
+            spaceSelect.innerHTML = '<option value="">Espacio</option>';
+            
+            let spacesToShow = [];
+            if (edVal && spacesByBuildingJS[edVal]) {
+                spacesToShow = spacesByBuildingJS[edVal];
+            } else if (!edVal) {
+                spacesToShow = Object.values(allUniqueSpacesJS);
+            }
+            
+            spacesToShow.sort();
+            spacesToShow.forEach(sp => {
+                const opt = document.createElement('option');
+                opt.value = sp;
+                opt.textContent = sp;
+                spaceSelect.appendChild(opt);
+            });
+            
+            currentPage = 1;
+            applyFilters();
+        } catch (e) {
+            console.error("Error en updateSpaceFilter:", e);
+            alert("Error en espacio: " + e.message);
         }
-        
-        spacesToShow.sort();
-        spacesToShow.forEach(sp => {
-            const opt = document.createElement('option');
-            opt.value = sp;
-            opt.textContent = sp;
-            spaceSelect.appendChild(opt);
-        });
-        
-        currentPage = 1;
-        applyFilters();
     }
-
-    const searchInventory = document.getElementById("searchInventory");
-    const quickTypeFilter = document.getElementById("quickTypeFilter");
-    const statusFilter = document.getElementById("statusFilter");
-    const quickLocationFilter = document.getElementById("quickLocationFilter");
-    
-    const drawerTypeFilter = document.getElementById("drawerTypeFilter");
-    const drawerLocationFilter = document.getElementById("drawerLocationFilter");
-    const drawerRfidInput = document.getElementById("drawerRfidInput");
-    const showOnlyAvailable = document.getElementById("showOnlyAvailable");
 
     function applyFilters() {
-        const searchVal = searchInventory.value.toLowerCase();
-        
-        const statusBoxes = document.querySelectorAll('.status-checkbox:checked');
-        const selectedStatuses = Array.from(statusBoxes).map(cb => cb.value);
+        try {
+            const searchInventory = document.getElementById("searchInventory");
+            const quickTypeFilter = document.getElementById("quickTypeFilter");
+            const statusFilter = document.getElementById("statusFilter");
+            const quickLocationFilter = document.getElementById("quickLocationFilter");
+            const drawerTypeFilter = document.getElementById("drawerTypeFilter");
+            const drawerLocationFilter = document.getElementById("drawerLocationFilter");
+            const drawerRfidInput = document.getElementById("drawerRfidInput");
+            const showOnlyAvailable = document.getElementById("showOnlyAvailable");
+            const quickSpaceFilter = document.getElementById('quickSpaceFilter');
 
-        const edificioBoxes = document.querySelectorAll('.edificio-checkbox:checked');
-        const selectedEdificios = Array.from(edificioBoxes).map(cb => cb.value);
-
-        const typeVal = quickTypeFilter.value;
-        const drawerTypeVal = drawerTypeFilter.value;
-        const statusVal = statusFilter.value;
-        
-        const edifVal = quickLocationFilter.value;
-        const espVal = document.getElementById('quickSpaceFilter') ? document.getElementById('quickSpaceFilter').value : '';
-        const locValDrawer = drawerLocationFilter.value;
-        
-        const rfidVal = drawerRfidInput.value.toLowerCase();
-        const onlyAvail = showOnlyAvailable.checked;
-
-        const matchingRows = [];
-
-        document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
-            const text = (row.textContent || row.innerText || '').toLowerCase();
-            const rowStatus = row.dataset.status;
-            const rowTipoCat = row.dataset.tipoCat; // 'Equipo' or 'Mobiliario'
-            const rowTipoExacto = row.dataset.tipo;
-            const rowLoc = row.dataset.ubicacion; // Espacio
-            const rowEdificio = row.dataset.edificio; // Edificio
+            const searchVal = searchInventory ? searchInventory.value.toLowerCase() : '';
             
-            const matchesText = text.includes(searchVal);
+            const statusBoxes = document.querySelectorAll('.status-checkbox:checked');
+            const selectedStatuses = Array.from(statusBoxes).map(cb => cb.value);
+
+            const edificioBoxes = document.querySelectorAll('.edificio-checkbox:checked');
+            const selectedEdificios = Array.from(edificioBoxes).map(cb => cb.value);
+
+            const typeVal = quickTypeFilter ? quickTypeFilter.value : '';
+            const drawerTypeVal = drawerTypeFilter ? drawerTypeFilter.value : '';
+            const statusVal = statusFilter ? statusFilter.value : '';
             
-            // quickTypeFilter has exact types, drawerTypeFilter has 'Equipo'/'Mobiliario'
-            const matchesExactType = !typeVal || rowTipoExacto === typeVal;
-            const matchesCatType = !drawerTypeVal || rowTipoCat === drawerTypeVal;
-            const matchesType = matchesExactType && matchesCatType;
-
-            let matchesStatus = true;
-            if (statusVal) {
-                if (statusVal === rowStatus) matchesStatus = true;
-                else if (statusVal === 'Disponible' && rowStatus === 'Disponible') matchesStatus = true;
-                else if (statusVal === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo' || rowStatus === 'En uso')) matchesStatus = true;
-                else if (statusVal === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) matchesStatus = true;
-                else if (statusVal === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) matchesStatus = true;
-                else matchesStatus = false;
-            } else if (selectedStatuses.length > 0) {
-                matchesStatus = selectedStatuses.some(sel => {
-                    if (sel === 'Disponible' && rowStatus === 'Disponible') return true;
-                    if (sel === 'En uso' && (rowStatus === 'En uso' || rowStatus === 'Prestado' || rowStatus === 'En préstamo')) return true;
-                    if (sel === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo')) return true;
-                    if (sel === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) return true;
-                    if (sel === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) return true;
-                    return false;
-                });
-            }
-
-            const matchesEdificioTop = !edifVal || rowEdificio === edifVal;
-            const matchesEdificioDrawer = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
-            const matchesEdificio = matchesEdificioTop && matchesEdificioDrawer;
+            const edifVal = quickLocationFilter ? quickLocationFilter.value : '';
+            const espVal = quickSpaceFilter ? quickSpaceFilter.value : '';
+            const locValDrawer = drawerLocationFilter ? drawerLocationFilter.value : '';
             
-            const matchesLocTop = !espVal || rowLoc === espVal;
-            const matchesLocDrawer = !locValDrawer || rowLoc === locValDrawer;
-            const matchesLoc = matchesLocTop && matchesLocDrawer;
+            const rfidVal = drawerRfidInput ? drawerRfidInput.value.toLowerCase() : '';
+            const onlyAvail = showOnlyAvailable ? showOnlyAvailable.checked : false;
+
+            const matchingRows = [];
+
+            document.querySelectorAll("#inventoryTable tbody tr").forEach(row => {
+                const text = (row.textContent || row.innerText || '').toLowerCase();
+                const rowStatus = row.getAttribute('data-status') || '';
+                const rowTipoCat = row.getAttribute('data-tipo-cat') || '';
+                const rowTipoExacto = row.getAttribute('data-tipo') || '';
+                const rowLoc = row.getAttribute('data-ubicacion') || '';
+                const rowEdificio = row.getAttribute('data-edificio') || '';
+                
+                const matchesText = !searchVal || text.includes(searchVal);
+                
+                const matchesExactType = !typeVal || rowTipoExacto === typeVal;
+                const targetCat = (activeCategoryTab === 'mobiliario') ? 'Mobiliario' : 'Equipo';
+                const matchesCatType = (!drawerTypeVal || rowTipoCat === drawerTypeVal) && (rowTipoCat === targetCat);
+                const matchesType = matchesExactType && matchesCatType;
+
+                let matchesStatus = true;
+                if (statusVal) {
+                    if (statusVal === rowStatus) matchesStatus = true;
+                    else if (statusVal === 'Disponible' && rowStatus === 'Disponible') matchesStatus = true;
+                    else if (statusVal === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo' || rowStatus === 'En uso')) matchesStatus = true;
+                    else if (statusVal === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) matchesStatus = true;
+                    else if (statusVal === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) matchesStatus = true;
+                    else matchesStatus = false;
+                } else if (selectedStatuses.length > 0) {
+                    matchesStatus = selectedStatuses.some(sel => {
+                        if (sel === 'Disponible' && rowStatus === 'Disponible') return true;
+                        if (sel === 'En uso' && (rowStatus === 'En uso' || rowStatus === 'Prestado' || rowStatus === 'En préstamo')) return true;
+                        if (sel === 'Prestado' && (rowStatus === 'Prestado' || rowStatus === 'En préstamo')) return true;
+                        if (sel === 'Mantenimiento' && (rowStatus === 'Mantenimiento' || rowStatus === 'En mantenimiento')) return true;
+                        if (sel === 'Extraviado' && (rowStatus === 'Extraviado' || rowStatus === 'Inactivo' || rowStatus === 'Baja')) return true;
+                        return false;
+                    });
+                }
+
+                const matchesEdificioTop = !edifVal || rowEdificio === edifVal;
+                const matchesEdificioDrawer = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
+                const matchesEdificio = matchesEdificioTop && matchesEdificioDrawer;
+                
+                const matchesLocTop = !espVal || rowLoc === espVal;
+                const matchesLocDrawer = !locValDrawer || rowLoc === locValDrawer;
+                const matchesLoc = matchesLocTop && matchesLocDrawer;
+                
+                const matchesRfid = !rfidVal || text.includes(rfidVal);
+                const matchesAvail = !onlyAvail || rowStatus === 'Disponible';
+
+                if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesLoc && matchesRfid && matchesAvail) {
+                    matchingRows.push(row);
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            const totalItems = matchingRows.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             
-            const matchesRfid = !rfidVal || text.includes(rfidVal);
-            const matchesAvail = !onlyAvail || rowStatus === 'Disponible';
+            if (currentPage > totalPages) currentPage = totalPages;
 
-            if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesLoc && matchesRfid && matchesAvail) {
-                matchingRows.push(row);
-            } else {
-                row.style.display = "none";
-            }
-        });
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
 
-        // Apply pagination
-        const totalItems = matchingRows.length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-        
-        if (currentPage > totalPages) currentPage = totalPages;
+            matchingRows.forEach((row, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
 
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-
-        matchingRows.forEach((row, index) => {
-            if (index >= startIndex && index < endIndex) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-
-        renderPaginationControls(totalPages, totalItems, startIndex);
+            renderPaginationControls(totalPages, totalItems, startIndex);
+        } catch (e) {
+            console.error("Error en applyFilters:", e);
+            alert("Error al aplicar filtros: " + e.message);
+        }
     }
 
-    [searchInventory, quickTypeFilter, statusFilter, quickLocationFilter, document.getElementById('quickSpaceFilter')].forEach(el => {
-        if(el) {
+    const allFilterElements = [
+        document.getElementById("searchInventory"), 
+        document.getElementById("quickTypeFilter"), 
+        document.getElementById("statusFilter"), 
+        document.getElementById("quickLocationFilter"), 
+        document.getElementById('quickSpaceFilter'),
+        document.getElementById("drawerTypeFilter"), 
+        document.getElementById("drawerLocationFilter"), 
+        document.getElementById("drawerRfidInput"), 
+        document.getElementById("showOnlyAvailable")
+    ];
+
+    allFilterElements.forEach(el => {
+        if (el) {
             el.addEventListener('input', applyFilters);
             el.addEventListener('change', applyFilters);
         }
     });
+
+    document.querySelectorAll('.status-checkbox, .edificio-checkbox').forEach(cb => {
+        cb.addEventListener('change', applyFilters);
+    });
+
+    // Iniciar filtrado en tiempo real al cargar la página
+    applyFilters();
 
     let _filtersPanelOpen = false;
     function toggleFiltersPanel() {
@@ -1864,10 +2288,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     });
 
     // Mover el panel de notificaciones del header oculto al bell-btn personalizado
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Pre-cargar badge si hay mantenimientos
+        const mainBadge = document.getElementById('mainSidebarMantBadge');
         const mainNotifPanel = document.getElementById("notifPanel");
         const invBellBtn = document.getElementById("invCustomBellBtn");
-        const mainBadge = document.getElementById("notifBadge");
+        const mainBadgeNotif = document.getElementById("notifBadge");
         
         if (mainNotifPanel && invBellBtn) {
             // Reposicionar estilos del panel
@@ -1894,13 +2320,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     });
 
     function clearDrawerFilters() {
-        document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.edificio-checkbox').forEach(cb => cb.checked = false);
-        drawerTypeFilter.value = "";
-        drawerLocationFilter.value = "";
-        drawerRfidInput.value = "";
-        showOnlyAvailable.checked = false;
-        applyFilters();
+        clearAllFilters();
     }
 
     function exportToCSV() {
@@ -1926,187 +2346,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.body.removeChild(downloadLink);
     }
 
-    function exportToPDF() {
-        const title = "Reporte de Inventario de Activos - SIGRAT";
-        const headers = ["Activo", "Tipo", "Nº Inventario", "Tag RFID", "Ubicación", "Estado"];
-        let rowsHtml = "";
 
-        const rows = document.querySelectorAll("#inventoryTable tbody tr");
-        rows.forEach(row => {
-            if (row.style.display === "none") return;
-            
-            const cols = row.querySelectorAll("td");
-            if (cols.length < 6) return;
-            
-            const activeName = cols[0].querySelector("div:first-child")?.innerText || "";
-            const activeSerie = cols[0].querySelector("div:nth-child(2)")?.innerText || "";
-            const activeCell = `<div><strong>${activeName}</strong></div><div style="font-size: 10px; color: #64748b;">${activeSerie}</div>`;
-            
-            const tipo = cols[1].innerText.trim();
-            const invNum = cols[2].innerText.trim();
-            const rfid = cols[3].innerText.trim();
-            const location = cols[4].innerText.trim();
-            
-            const status = cols[5].innerText.trim();
-            let badgeClass = "badge-inactivo";
-            if (status.toLowerCase().includes("disponible")) {
-                badgeClass = "badge-disponible";
-            } else if (status.toLowerCase().includes("prestado")) {
-                badgeClass = "badge-prestado";
-            }
-            const statusCell = `<span class="badge ${badgeClass}">${status}</span>`;
-            
-            rowsHtml += `
-                <tr>
-                    <td>${activeCell}</td>
-                    <td>${tipo}</td>
-                    <td><code style="font-family: monospace; font-size:12px;">${invNum}</code></td>
-                    <td>${rfid}</td>
-                    <td>${location}</td>
-                    <td>${statusCell}</td>
-                </tr>
-            `;
-        });
-
-        const headersHtml = headers.map(h => `<th>${h}</th>`).join("");
-        
-        // Usar iframe oculto para evitar bloqueo de popups del navegador
-        let printFrame = document.getElementById('_pdf_print_frame');
-        if (printFrame) printFrame.remove();
-        printFrame = document.createElement('iframe');
-        printFrame.id = '_pdf_print_frame';
-        printFrame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;';
-        document.body.appendChild(printFrame);
-        const doc = printFrame.contentWindow.document;
-        doc.open();
-        doc.write(`
-            <!DOCTYPE html>
-            <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <title>\${title}</title>
-                <style>
-                    body {
-                        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-                        color: #1e293b;
-                        margin: 0;
-                        padding: 40px;
-                        background-color: #ffffff;
-                    }
-                    .header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        border-bottom: 2px solid #2563eb;
-                        padding-bottom: 20px;
-                        margin-bottom: 30px;
-                    }
-                    .logo-area h1 {
-                        font-size: 28px;
-                        font-weight: 800;
-                        color: #2563eb;
-                        margin: 0;
-                        letter-spacing: -1px;
-                    }
-                    .logo-area p {
-                        font-size: 11px;
-                        color: #64748b;
-                        margin: 4px 0 0 0;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                    }
-                    .meta-info {
-                        text-align: right;
-                        font-size: 13px;
-                        color: #475569;
-                    }
-                    .meta-info h2 {
-                        font-size: 18px;
-                        font-weight: 700;
-                        color: #1e293b;
-                        margin: 0 0 6px 0;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 10px;
-                    }
-                    th {
-                        background-color: #f8fafc;
-                        color: #475569;
-                        font-weight: 700;
-                        font-size: 11px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                        padding: 12px 14px;
-                        border: 1px solid #e2e8f0;
-                        text-align: left;
-                    }
-                    td {
-                        padding: 12px 14px;
-                        font-size: 13px;
-                        color: #334155;
-                        border: 1px solid #e2e8f0;
-                    }
-                    tr:nth-child(even) td {
-                        background-color: #f8fafc;
-                    }
-                    .footer {
-                        margin-top: 50px;
-                        font-size: 11px;
-                        color: #94a3b8;
-                        text-align: center;
-                        border-top: 1px solid #e2e8f0;
-                        padding-top: 20px;
-                    }
-                    .badge {
-                        display: inline-block;
-                        padding: 4px 8px;
-                        border-radius: 6px;
-                        font-size: 11px;
-                        font-weight: 700;
-                    }
-                    .badge-disponible { background-color: #dcfce7; color: #15803d; }
-                    .badge-prestado { background-color: #fef3c7; color: #d97706; }
-                    .badge-inactivo { background-color: #f3f4f6; color: #4b5563; }
-                    @media print {
-                        body { padding: 0; }
-                        .no-print { display: none !important; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="logo-area">
-                        <h1>SIGRAT</h1>
-                        <p>Control Integral</p>
-                    </div>
-                    <div class="meta-info">
-                        <h2>\${title}</h2>
-                        <div>Generado el: \${new Date().toLocaleString()}</div>
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>\${headersHtml}</tr>
-                    </thead>
-                    <tbody>
-                        \${rowsHtml}
-                    </tbody>
-                </table>
-                <div class="footer">
-                    Este documento es un reporte de inventario generado por el Sistema de Gestión de Reservas y Actividades Tecnológicas (SIGRAT).
-                </div>
-            </body>
-            </html>
-        `);
-        doc.close();
-        // Pequeño delay para que el iframe cargue el contenido antes de imprimir
-        setTimeout(() => {
-            printFrame.contentWindow.focus();
-            printFrame.contentWindow.print();
-        }, 400);
-    }
 
 
     // Space filtering based on Building in Modals
@@ -2139,12 +2379,72 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 <div id="newAssetModal" class="custom-modal">
     <div class="custom-modal-content">
         <div class="modal-header">
-            <h3>Nuevo activo</h3>
+            <h3 id="newAssetModalTitle">Nuevo activo</h3>
             <button type="button" onclick="document.getElementById('newAssetModal').style.display='none'; document.body.style.overflow='';">✕</button>
         </div>
 
         <form method="POST">
             <input type="hidden" name="action" value="new_asset">
+            <input type="hidden" name="target_tab" id="new_target_tab" value="inventario">
+
+            <!-- Selector de Modo de Registro Dual -->
+            <div style="background: #f1f5f9; padding: 6px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 6px;">
+                <label class="batch-mode-btn active" style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; background: white; color: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <input type="radio" name="batch_mode" value="single" checked style="display: none;" onchange="toggleBatchMode(this.value)">
+                    <i class="bi bi-file-earmark-plus"></i> 1 Activo (Individual)
+                </label>
+                <label class="batch-mode-btn" style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; color: #64748b;">
+                    <input type="radio" name="batch_mode" value="folio" style="display: none;" onchange="toggleBatchMode(this.value)">
+                    <i class="bi bi-stack"></i> Lote: Mismo Folio (Ej: 18755)
+                </label>
+                <label class="batch-mode-btn" style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; color: #64748b;">
+                    <input type="radio" name="batch_mode" value="range" style="display: none;" onchange="toggleBatchMode(this.value)">
+                    <i class="bi bi-123"></i> Lote: Rango Correlativo
+                </label>
+            </div>
+
+            <!-- Campos adicionales para Registro en Lote (ocultos en modo individual) -->
+            <div id="batch_fields_container" style="display: none; background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <div id="batch_folio_section">
+                    <h4 style="margin: 0 0 8px 0; color: #1e40af; font-size: 13px; font-weight: 800;"><i class="bi bi-info-circle-fill"></i> Registro Múltiple con el Mismo No. de Inventario</h4>
+                    <p style="margin: 0 0 12px 0; font-size: 11.5px; color: #3b82f6;">Se crearán varias copias idénticas en base de datos con el mismo folio (Ej: Butacas del Auditorio bajo el folio `18755`).</p>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">No. de Inventario Patrimonial Base</label>
+                            <input type="text" name="batch_inv_base" id="batch_inv_base" placeholder="Ej: 18755" class="form-control" style="background: white;">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">Cantidad de Activos</label>
+                            <input type="number" name="batch_quantity" id="batch_quantity" min="1" max="200" value="10" class="form-control" style="background: white; font-weight: 800;">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="batch_range_section" style="display: none;">
+                    <h4 style="margin: 0 0 8px 0; color: #1e40af; font-size: 13px; font-weight: 800;"><i class="bi bi-info-circle-fill"></i> Registro por Rango Numérico Correlativo</h4>
+                    <p style="margin: 0 0 12px 0; font-size: 11.5px; color: #3b82f6;">El sistema generará automáticamente números consecutivos en el rango especificado.</p>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">Prefijo (Opcional)</label>
+                            <input type="text" name="batch_prefix" id="batch_prefix" placeholder="Ej: INV- o UTEQ-" class="form-control" style="background: white;">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">Desde (No.)</label>
+                            <input type="number" name="batch_start" id="batch_start" min="1" value="18755" class="form-control" style="background: white; font-weight: 800;">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">Hasta (No.)</label>
+                            <input type="number" name="batch_end" id="batch_end" min="1" value="18780" class="form-control" style="background: white; font-weight: 800;">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">Dígitos Relleno</label>
+                            <input type="number" name="batch_digits" id="batch_digits" min="0" max="6" value="0" placeholder="Ej: 4 para 0001" class="form-control" style="background: white;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="batch_tags_container"></div>
+            </div>
 
             <!-- Sección 1: Información General -->
             <div class="modal-section-title">
@@ -2152,35 +2452,31 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             </div>
             <div class="modal-grid">
                 <div>
-                    <label>Tipo de activo</label>
-                    <select name="tipo" class="form-control" required>
-                        <option value="">-- Seleccionar --</option>
-                        <option value="Laptop">Laptop</option>
-                        <option value="Monitor">Monitor</option>
-                        <option value="Impresora">Impresora</option>
-                        <option value="Proyector">Proyector</option>
-                        <option value="Bocina">Bocina</option>
-                        <option value="Computadora">Computadora</option>
-                        <option value="Silla">Silla</option>
-                        <option value="Mesa">Mesa</option>
-                        <option value="Pizarrón">Pizarrón</option>
-                        <option value="Escritorio">Escritorio</option>
-                        <option value="Otro">Otro / Herramienta</option>
-                    </select>
+                    <label>Responsable (Opcional)</label>
+                    <input type="text" name="responsable" placeholder="Ej: DR. JUAN MANUEL..." class="form-control">
                 </div>
                 <div>
+                    <label>Nivel / Piso (Opcional)</label>
+                    <input type="text" name="nivel" placeholder="Ej: Planta Baja" class="form-control">
+                </div>
+                <div style="position: relative;" id="new_tipo_container">
+                    <label>Tipo de activo / Mobiliario</label>
+                    <input type="text" name="tipo" id="new_tipo_input" autocomplete="off" class="form-control" placeholder="Escribe o selecciona..." required>
+                    <div id="new_tipo_dropdown" class="custom-dropdown" style="top: 65px;"></div>
+                </div>
+                <div id="new_marca_container">
                     <label>Marca</label>
                     <input type="text" name="marca" placeholder="EPSON, Dell, etc." required class="form-control">
                 </div>
-                <div>
+                <div id="new_modelo_container">
                     <label>Modelo</label>
                     <input type="text" name="modelo" placeholder="Ej: X49, Latitude" required class="form-control">
                 </div>
-                <div>
+                <div id="new_num_serie_container">
                     <label>No. de serie</label>
                     <input type="text" name="num_serie" placeholder="Ej: EPX49B123" required class="form-control">
                 </div>
-                <div class="modal-grid full-width" style="grid-column: span 2;">
+                <div id="single_num_inv_field" class="modal-grid full-width" style="grid-column: span 2;">
                     <label>No. de inventario</label>
                     <input type="text" name="num_inv" placeholder="Ej: INV-2026-001" required class="form-control">
                 </div>
@@ -2191,12 +2487,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 <i class="bi bi-wifi"></i> RFID y ubicación
             </div>
             <div class="modal-grid">
-                <div style="position: relative;">
-                    <label>Tag RFID</label>
-                    <input type="text" name="tag_id" id="new_tag_id" autocomplete="off" placeholder="Busca o escanea el TAG..." class="form-control" style="font-family: 'JetBrains Mono', monospace; color: #2563eb;" required>
+                <div id="rfid_field_section" style="position: relative;">
+                    <label>Tag RFID (Opcional)</label>
+                    <input type="text" name="tag_id" id="new_tag_id" autocomplete="off" placeholder="Busca o escanea el TAG..." class="form-control" style="font-family: 'JetBrains Mono', monospace; color: #2563eb;">
                     <div id="new_tag_dropdown" class="custom-dropdown"></div>
                 </div>
-                <div>
+                <div id="new_estatus_container">
                     <label>Estado</label>
                     <select name="estatus" class="form-control" required>
                         <option value="Disponible" selected>Disponible</option>
@@ -2226,15 +2522,28 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </div>
             </div>
 
-            <!-- Sección 3: Información Adicional -->
+            <!-- Sección 3: Información Adicional y Foto -->
             <div class="modal-section-title">
-                <i class="bi bi-file-earmark-text-fill"></i> Información adicional
+                <i class="bi bi-file-earmark-text-fill"></i> Información adicional y foto
             </div>
-            <div class="modal-grid full-width">
+            <div class="modal-grid full-width" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                 <div>
-                    <label>Descripción</label>
-                    <textarea class="form-control" placeholder="Describe el activo..." style="height: 80px; font-weight: 500; font-size: 13.5px;" maxlength="250" oninput="document.getElementById('charCount').innerText = this.value.length + ' / 250'"></textarea>
+                    <label>Descripción / Observaciones</label>
+                    <textarea name="descripcion" class="form-control" placeholder="Describe el activo o butaca (Ej: Butaca azul con mecanismo...)" style="height: 80px; font-weight: 500; font-size: 13.5px;" maxlength="250" oninput="document.getElementById('charCount').innerText = this.value.length + ' / 250'"></textarea>
                     <small id="charCount" class="text-muted" style="float: right; margin-top: 4px; font-weight: 600;">0 / 250</small>
+                </div>
+                <div style="background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+                    <label style="font-size: 12px; font-weight: 800; color: #3b82f6;"><i class="bi bi-camera"></i> Foto del Activo (Cloudinary)</label>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+                        <input type="text" name="imagen_url" id="new_imagen_url" class="form-control" placeholder="https://res.cloudinary.com/..." style="flex: 1; font-size: 12px;">
+                        <label class="btn-primary" style="background: #10b981; cursor: pointer; white-space: nowrap; font-size: 12px; padding: 8px 14px; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="bi bi-cloud-upload"></i> Subir
+                            <input type="file" id="new_upload_file" accept="image/*" style="display: none;" onchange="uploadToCloudinary(this, 'new_imagen_url', 'new_image_preview')">
+                        </label>
+                    </div>
+                    <div id="new_image_preview_container" style="margin-top: 8px; display: none; text-align: center;">
+                        <img id="new_image_preview" src="" alt="Vista previa" style="max-height: 80px; border-radius: 8px; border: 1px solid #cbd5e1; object-fit: cover;">
+                    </div>
                 </div>
             </div>
 

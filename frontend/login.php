@@ -135,7 +135,7 @@
 
     <div class="d-grid gap-3">
         <!-- login -->
-        <a href="iniciar_sesion.php" class="btn btn-login text-center" style="text-decoration:none;">
+        <a href="iniciar_sesion.php<?php echo isset($_GET['redirect']) ? '?redirect=' . urlencode($_GET['redirect']) : ''; ?>" class="btn btn-login text-center" style="text-decoration:none;">
             INICIAR SESIÓN
         </a>
 

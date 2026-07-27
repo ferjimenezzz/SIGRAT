@@ -88,7 +88,7 @@ class LoanController {
      * Crea un préstamo a partir de datos dinámicos (creando usuario y equipo si no existen).
      */
 
-    public function createDynamicLoan($equipo, $categoria, $serie, $nombre, $correo, $area, $fecha_pres, $fecha_ent, $estatus, $obs) {
+    public function createDynamicLoan($equipo, $categoria, $serie, $nombre, $correo, $area, $fecha_pres, $fecha_ent, $estatus, $obs, $esp_id = null) {
         try {
             $this->db->beginTransaction();
 
@@ -133,9 +133,9 @@ class LoanController {
             // La BD actualmente no tiene campo para 'observaciones', se podría añadir,
             // pero si no hay, la ignoramos o la enviamos solo si se altera la BD.
             
-            $queryPres = "INSERT INTO PRESTAMO (act_id, us_id, fecha_pres, fecha_ent, estatus) VALUES (?, ?, ?, ?, ?)";
+            $queryPres = "INSERT INTO PRESTAMO (act_id, us_id, fecha_pres, fecha_ent, estatus, esp_id) VALUES (?, ?, ?, ?, ?, ?)";
             $stmtPres = $this->db->prepare($queryPres);
-            $stmtPres->execute([$act_id, $us_id, $fecha_pres, $fecha_ent_val, $estatus]);
+            $stmtPres->execute([$act_id, $us_id, $fecha_pres, $fecha_ent_val, $estatus, $esp_id]);
 
             $new_pres_id = $this->db->lastInsertId();
 
@@ -204,12 +204,14 @@ class LoanController {
 
     public function getAllLoans($us_id = null, $isAdmin = true) {
         $query = "
-            SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus,
+            SELECT p.pres_id, p.fecha_pres, p.fecha_ent, p.estatus, p.esp_id,
                    a.tipo, a.marca, a.modelo, a.num_serie, a.act_id,
-                   u.nombre as solicitante_nombre, u.correo as solicitante_correo, u.us_id
+                   u.nombre as solicitante_nombre, u.correo as solicitante_correo, u.us_id,
+                   e.edificio, e.planta, e.nombre_numero as espacio_nombre
             FROM PRESTAMO p
             JOIN ACTIVO a ON p.act_id = a.act_id
             JOIN USUARIO u ON p.us_id = u.us_id
+            LEFT JOIN ESPACIO e ON p.esp_id = e.esp_id
         ";
         
         $params = [];
@@ -271,13 +273,13 @@ class LoanController {
      * Actualiza un préstamo existente (fechas y estado).
      */
 
-    public function updateLoan($pres_id, $estatus, $fecha_pres, $fecha_ent) {
+    public function updateLoan($pres_id, $estatus, $fecha_pres, $fecha_ent, $esp_id = null) {
         try {
             // Manejar fechas vacías
             $fecha_ent = empty($fecha_ent) ? null : $fecha_ent;
             
-            $query = "UPDATE PRESTAMO SET estatus = ?, fecha_pres = ?, fecha_ent = ? WHERE pres_id = ?";
-            $this->db->prepare($query)->execute([$estatus, $fecha_pres, $fecha_ent, $pres_id]);
+            $query = "UPDATE PRESTAMO SET estatus = ?, fecha_pres = ?, fecha_ent = ?, esp_id = ? WHERE pres_id = ?";
+            $this->db->prepare($query)->execute([$estatus, $fecha_pres, $fecha_ent, $esp_id, $pres_id]);
             
             // Actualizar estatus del activo según el estado del préstamo
             $stmt = $this->db->prepare("SELECT act_id FROM PRESTAMO WHERE pres_id = ?");

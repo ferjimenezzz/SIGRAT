@@ -328,9 +328,6 @@ $fechaGeneracion = date('d/m/Y');
                 margin: 2cm 2.2cm;
                 size: A4 portrait;
             }
-            @page :first {
-                margin: 0;
-            }
         }
     </style>
 </head>
@@ -505,9 +502,9 @@ $fechaGeneracion = date('d/m/Y');
                     <li>
                         <div class="toc-row">
                             <div class="toc-left">
-                                <div class="toc-icon"><i class="bi bi-question-circle-fill"></i></div>
-                                <a class="toc-link" href="#sec-faq">
-                                    <span class="toc-name">Preguntas Frecuentes</span>
+                                <div class="toc-icon"><i class="bi bi-person-circle"></i></div>
+                                <a class="toc-link" href="#sec-perfil">
+                                    <span class="toc-name">Mi Perfil</span>
                                 </a>
                             </div>
                             <div class="toc-num-badge">12</div>
@@ -516,14 +513,15 @@ $fechaGeneracion = date('d/m/Y');
                     <li>
                         <div class="toc-row">
                             <div class="toc-left">
-                                <div class="toc-icon"><i class="bi bi-person-lines-fill"></i></div>
-                                <a class="toc-link" href="#sec-creditos">
-                                    <span class="toc-name">Equipo de Desarrollo</span>
+                                <div class="toc-icon"><i class="bi bi-question-circle-fill"></i></div>
+                                <a class="toc-link" href="#sec-faq">
+                                    <span class="toc-name">Preguntas Frecuentes</span>
                                 </a>
                             </div>
                             <div class="toc-num-badge">13</div>
                         </div>
                     </li>
+
                 </ul>
             </div>
 
@@ -540,15 +538,16 @@ $fechaGeneracion = date('d/m/Y');
                 </div>
                 <span class="block-label">Módulos del sistema</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Dashboard</strong> — Vista general con métricas, alertas y accesos rápidos.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Calendario</strong> — Gestión y reserva de espacios físicos.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Usuarios</strong> — Administración de cuentas, roles y permisos de acceso.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Espacios</strong> — Catálogo de aulas, laboratorios y salas disponibles.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Dashboard</strong> — Vista general con métricas, alertas y accesos rápidos al sistema.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Calendario</strong> — Gestión y reserva de espacios físicos con Plano Arquitectónico interactivo integrado en el formulario de reserva.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Usuarios</strong> — Administración de cuentas, roles y permisos de acceso (solo administradores).</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Espacios</strong> — Catálogo de aulas, laboratorios y salas disponibles con su configuración.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>Aprobaciones</strong> — Autorización de solicitudes de reserva por administradores.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Préstamos</strong> — Control del ciclo completo de préstamo de activos.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Inventario</strong> — Catálogo maestro de activos institucionales.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Auditoría</strong> — Trazabilidad, reportes y análisis del sistema.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Monitor RFID</strong> — Integración con lectores de tarjetas físicos.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Préstamos</strong> — Control del ciclo completo de préstamo de activos tecnológicos.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Inventario</strong> — Catálogo maestro de activos institucionales con estados y exportaciones.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Auditoría</strong> — Trazabilidad, reportes de uso y análisis estadístico del sistema.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Monitor RFID</strong> — Integración con lectores de tarjetas físicos para registro de asistencia.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Mi Perfil</strong> — Edición de datos personales y cambio de contraseña del usuario activo.</div></li>
                 </ul>
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
@@ -557,22 +556,29 @@ $fechaGeneracion = date('d/m/Y');
             <div class="section" id="sec-acceso">
                 <span class="section-label">Sección 2</span>
                 <h2 class="section-title">Acceso y Sesión</h2>
-                <p class="section-intro">Para ingresar al sistema, el administrador debe proporcionarte tus credenciales: correo electrónico y contraseña. En el primer acceso, se utiliza una contraseña temporal que deberás cambiar de inmediato.</p>
+                <p class="section-intro">Para ingresar al sistema necesitas un correo institucional (@uteq.edu.mx) y una contraseña proporcionada por el administrador. El sistema valida las credenciales en tiempo real y establece una sesión segura con duración de 8 horas.</p>
                 <span class="block-label">Pasos para iniciar sesión</span>
                 <ul class="func-list">
                     <li class="func-row"><div class="func-mark"></div><div>Abre tu navegador y navega a la dirección web del sistema SIGRAT de tu institución.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Ingresa tu <strong>correo electrónico</strong> y <strong>contraseña</strong> en el formulario de inicio de sesión.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Ingresa tu <strong>correo electrónico institucional</strong> (@uteq.edu.mx) y tu <strong>contraseña</strong> en el formulario de inicio de sesión.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Haz clic en <strong>Iniciar Sesión</strong>. El sistema te redirigirá automáticamente al Dashboard.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Si es tu primer acceso, la contraseña temporal asignada es <strong>123456</strong>. Cámbiala de inmediato desde tu perfil.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Si el sistema muestra "Credenciales incorrectas o usuario inactivo", verifica que tu correo y contraseña sean correctos o que tu cuenta esté activa.</div></li>
+                </ul>
+                <span class="block-label">Recuperación de contraseña</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div>En la pantalla de inicio de sesión, haz clic en el enlace <strong>«¿Olvidaste tu contraseña?»</strong> debajo del campo de contraseña.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Ingresa tu correo institucional y el sistema te enviará un enlace de restablecimiento a tu bandeja de entrada.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Abre el correo recibido, haz clic en el enlace y define una nueva contraseña de al menos 6 caracteres.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>También puedes solicitar al administrador que restablezca tu contraseña directamente desde el módulo de Usuarios.</div></li>
                 </ul>
                 <div class="tip-list">
                     <div class="tip-box">
-                        <span class="tip-label">Consejo</span>
-                        Si olvidaste tu contraseña, contacta al administrador del sistema para que la restablezca. No hay recuperación automática por correo.
+                        <span class="tip-label">Buena práctica</span>
+                        Usa siempre el botón «Cerrar Sesión» del menú lateral para salir de forma segura y evitar accesos no autorizados desde el mismo navegador.
                     </div>
                     <div class="tip-box">
-                        <span class="tip-label">Buena práctica</span>
-                        Usa siempre el botón "Cerrar Sesión" del menú lateral para salir de forma segura y evitar que alguien más acceda a tu cuenta.
+                        <span class="tip-label">Seguridad</span>
+                        Tu sesión expira automáticamente después de 8 horas de inactividad. Si el sistema te redirige al login inesperadamente, tu sesión venció; vuelve a ingresar tus credenciales.
                     </div>
                 </div>
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
@@ -586,7 +592,7 @@ $fechaGeneracion = date('d/m/Y');
                 <span class="block-label">Elementos principales</span>
                 <ul class="func-list">
                     <li class="func-row"><div class="func-mark"></div><div><strong>Tarjetas de estadísticas</strong> — Totales de usuarios activos, reservas del día, préstamos en curso e inventario crítico.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>Notificaciones</strong> — Icono de campana en la esquina superior derecha con alertas del sistema.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Notificaciones</strong> — Icono de campana en la esquina superior derecha. Cuando hay mensajes sin leer, aparece un indicador azul sobre el ícono.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>Menú lateral</strong> — Navegación rápida hacia todos los módulos disponibles según tu rol.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>Centro de Ayuda</strong> — Botón de signo de interrogación en la parte inferior del menú lateral, disponible en todo momento.</div></li>
                 </ul>
@@ -597,23 +603,45 @@ $fechaGeneracion = date('d/m/Y');
             <div class="section" id="sec-calendario">
                 <span class="section-label">Sección 4</span>
                 <h2 class="section-title">Módulo de Calendario</h2>
-                <p class="section-intro">Gestiona todas las reservas de espacios físicos. Visualiza la disponibilidad y crea solicitudes de uso de instalaciones en pocos pasos.</p>
-                <span class="block-label">Funciones principales</span>
+                <p class="section-intro">Gestiona todas las reservas de espacios físicos de la institución. Permite visualizar la disponibilidad de aulas y laboratorios, crear solicitudes de uso y dar seguimiento a su aprobación.</p>
+                <span class="block-label">Cómo crear una reserva</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div>Crear nuevas reservas seleccionando espacio, fecha y horario deseado.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Visualizar todas las reservas activas en vista mensual, semanal o diaria.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Modificar o cancelar reservas existentes haciendo clic sobre el evento en el calendario.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Registrar asistencia a clases y eventos programados.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Consultar la disponibilidad de cualquier espacio en tiempo real.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en el botón <strong>«+ Nueva Reserva»</strong> o en cualquier celda vacía del calendario.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>El formulario abre un <strong>Plano Arquitectónico interactivo</strong> a la derecha. Selecciona el edificio (CIC o PIDET) y la planta (Planta Baja o Planta Alta).</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic directamente sobre un espacio <strong style="color:#16a34a;">libre (verde)</strong> en el plano para seleccionarlo automáticamente, o elige el espacio desde el menú desplegable.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Completa la <strong>fecha</strong>, <strong>hora de inicio</strong>, <strong>hora de fin</strong>, número de asistentes y <strong>motivo</strong> de la reserva.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en <strong>«Guardar»</strong>. La solicitud quedará en estado <strong>Pendiente</strong> hasta que un administrador la apruebe o rechace.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Recibirás una <strong>notificación por correo</strong> cuando tu solicitud sea procesada.</div></li>
                 </ul>
+                <span class="block-label">Plano Arquitectónico — Leyenda de colores</span>
+                <table class="data-table" style="margin-bottom:24px;">
+                    <thead><tr><th>Color</th><th>Estado del espacio</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge badge-green">Verde</span></td><td><strong>Libre</strong> — Disponible para reservar.</td></tr>
+                        <tr><td><span class="badge badge-red">Rojo</span></td><td><strong>Ocupado</strong> — Ya tiene una reserva aprobada en ese horario.</td></tr>
+                        <tr><td><span class="badge badge-blue">Azul</span></td><td><strong>Seleccionado</strong> — El espacio que elegiste actualmente.</td></tr>
+                        <tr><td><span class="badge" style="background:#e2e8f0;color:#475569;">Gris</span></td><td><strong>Privado</strong> — Espacio reservado de forma permanente o fuera de servicio.</td></tr>
+                        <tr><td><span class="badge badge-orange">Amarillo/Naranja</span></td><td><strong>Requiere autorización</strong> — Espacio que necesita aprobación especial.</td></tr>
+                    </tbody>
+                </table>
+                <span class="block-label">Estados de una solicitud de reserva</span>
+                <table class="data-table" style="margin-bottom:24px;">
+                    <thead><tr><th>Estado</th><th>Descripción</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge badge-blue">Pendiente</span></td><td>La solicitud fue enviada y está esperando revisión por parte de un administrador.</td></tr>
+                        <tr><td><span class="badge badge-green">Aprobada</span></td><td>La reserva fue autorizada y aparece confirmada en el calendario.</td></tr>
+                        <tr><td><span class="badge badge-red">Rechazada</span></td><td>La solicitud fue denegada. Se notifica al usuario con el motivo del rechazo.</td></tr>
+                        <tr><td><span class="badge badge-orange">Cancelada</span></td><td>La reserva fue cancelada por el propio usuario antes de ser procesada.</td></tr>
+                    </tbody>
+                </table>
                 <div class="tip-list">
                     <div class="tip-box">
                         <span class="tip-label">Consejo</span>
-                        Haz clic en cualquier celda vacía del calendario para crear una reserva rápida en ese horario específico.
+                        Usa el Plano Arquitectónico dentro del formulario para ver de un vistazo qué espacios están disponibles sin tener que probar uno por uno desde el menú desplegable.
                     </div>
                     <div class="tip-box">
                         <span class="tip-label">Importante</span>
-                        Las reservas que aún no han sido aprobadas aparecerán en un color diferente. Consulta el módulo de Aprobaciones para seguimiento.
+                        Los espacios en rojo (Ocupado) no pueden seleccionarse. Si todos están ocupados, considera cambiar el horario o buscar en otro edificio o planta.
                     </div>
                 </div>
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
@@ -623,17 +651,18 @@ $fechaGeneracion = date('d/m/Y');
             <div class="section" id="sec-usuarios">
                 <span class="section-label">Sección 5</span>
                 <h2 class="section-title">Gestión de Usuarios</h2>
-                <p class="section-intro">Administra todas las cuentas del sistema, asigna roles con permisos diferenciados y gestiona el acceso de visitantes mediante códigos de invitación. Disponible únicamente para administradores.</p>
+                <p class="section-intro">Administra todas las cuentas del sistema, asigna roles con permisos diferenciados y controla el acceso de cada persona según su área y responsabilidades. Disponible únicamente para administradores.</p>
                 <span class="block-label">Funciones principales</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div>Crear usuarios internos con nombre, correo electrónico, rol y número de matrícula.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Editar información de perfil y reasignar el rol de cualquier usuario.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Desactivar cuentas (conservan historial pero no pueden iniciar sesión).</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Generar códigos de invitación para acceso de usuarios externos o visitantes.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Exportar el listado completo de usuarios a Excel o PDF.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Crear nuevos usuarios con nombre completo, correo institucional, rol, área y contraseña inicial.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Editar información de perfil y reasignar el rol de cualquier usuario existente.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Desactivar cuentas: el historial se conserva pero el usuario no puede iniciar sesión.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Restablecer la contraseña de un usuario directamente desde el panel de administración.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Exportar el listado completo de usuarios a Excel o PDF con formato profesional.</div></li>
                 </ul>
-                <div class="success-box">
-                    La contraseña inicial de todo usuario nuevo es <strong>123456</strong>. El usuario debe cambiarla obligatoriamente al primer inicio de sesión.
+                <div class="info-box">
+                    <span class="note-label">Gestión de contraseñas</span>
+                    El administrador define la contraseña inicial al crear un usuario. El usuario puede cambiarla en cualquier momento desde su perfil (menú lateral → su nombre → Mi Perfil). Si un usuario olvida su contraseña, puede usar la opción <strong>«¿Olvidaste tu contraseña?»</strong> en la pantalla de inicio de sesión o solicitar al administrador que la restablezca.
                 </div>
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
@@ -673,19 +702,40 @@ $fechaGeneracion = date('d/m/Y');
             <div class="section" id="sec-prestamos">
                 <span class="section-label">Sección 8</span>
                 <h2 class="section-title">Módulo de Préstamos</h2>
-                <p class="section-intro">Controla el ciclo completo de préstamo de activos tecnológicos: desde la salida hasta la devolución, con registro del responsable, fechas y estado del activo.</p>
-                <span class="block-label">Funciones principales</span>
+                <p class="section-intro">Controla el ciclo completo de préstamo de activos tecnológicos: laptops, proyectores, cables, adaptadores y cualquier equipo del inventario. Desde la salida hasta la devolución, con registro del responsable, fechas y estado.</p>
+                <span class="block-label">Cómo registrar un préstamo</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div>Registrar un nuevo préstamo seleccionando el activo y el usuario solicitante.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Registrar devoluciones y actualizar el estado del activo correspondiente.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Consultar qué activos están actualmente prestados y quién los tiene.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Ver el historial completo de préstamos con fechas, estados y usuarios.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div>Exportar reportes de préstamos a PDF o Excel con formato institucional.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en <strong>«+ Nuevo Préstamo»</strong> en la barra superior del módulo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Selecciona el <strong>activo</strong> a prestar (solo aparecen los disponibles), el <strong>usuario solicitante</strong> (CIC o PIDET) y la <strong>fecha estimada de devolución</strong>.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en <strong>«Guardar»</strong>. El estado del activo cambia automáticamente a «En Curso».</div></li>
+                </ul>
+                <span class="block-label">Cómo registrar una devolución</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div>Localiza el préstamo activo en la tabla. Usa los filtros avanzados si hay muchos registros.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en el botón de <strong>acción (Ver/Editar)</strong> del préstamo y selecciona <strong>«Registrar devolución»</strong>.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>El sistema marcará el préstamo como <strong>«Finalizado»</strong> y el activo volverá a estar disponible.</div></li>
+                </ul>
+                <span class="block-label">Estados de un préstamo</span>
+                <table class="data-table" style="margin-bottom:24px;">
+                    <thead><tr><th>Estado</th><th>Descripción</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="badge badge-green">Activo</span></td><td>El préstamo fue registrado y el activo está en posesión del solicitante.</td></tr>
+                        <tr><td><span class="badge badge-orange">En Curso</span></td><td>El préstamo sigue vigente; el activo no ha sido devuelto.</td></tr>
+                        <tr><td><span class="badge badge-red">Vencido</span></td><td>Se superó la fecha de devolución sin registrar el regreso del activo.</td></tr>
+                        <tr><td><span class="badge badge-blue">Finalizado</span></td><td>El activo fue devuelto y el ciclo de préstamo está cerrado.</td></tr>
+                    </tbody>
+                </table>
+                <span class="block-label">Filtros avanzados</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en el botón <strong>«Filtros»</strong> de la barra superior para abrir el panel lateral de filtros avanzados.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Filtra por <strong>Edificio</strong>, <strong>Planta</strong>, <strong>Área/Espacio</strong>, <strong>Estado del préstamo</strong> o <strong>Tipo</strong> de forma combinada.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Los filtros de Planta y Área se cargan dinámicamente según el Edificio seleccionado.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en <strong>«Aplicar filtros»</strong> para ver los resultados o en <strong>«Limpiar»</strong> para restablecer la tabla completa.</div></li>
                 </ul>
                 <div class="tip-list">
                     <div class="tip-box">
                         <span class="tip-label">Consejo</span>
-                        Filtra por estado "En Curso" para identificar rápidamente los activos que aún no han sido devueltos y realizar seguimiento.
+                        Usa el filtro de estado «Vencido» para identificar activos que no han sido devueltos a tiempo y dar seguimiento al responsable.
                     </div>
                 </div>
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
@@ -695,7 +745,40 @@ $fechaGeneracion = date('d/m/Y');
             <div class="section" id="sec-inventario">
                 <span class="section-label">Sección 9</span>
                 <h2 class="section-title">Inventario de Activos</h2>
-                <p class="section-intro">Catálogo maestro de todos los activos tecnológicos e institucionales. Permite su registro, actualización de estado, baja definitiva y seguimiento en tiempo real.</p>
+                <p class="section-intro">Catálogo maestro de todos los activos tecnológicos e institucionales de la universidad. Permite el control, registro individual o masivo, carga multimedia de evidencias y clasificación avanzada en tiempo real.</p>
+                
+                <span class="block-label">Estructura y Clasificación por Pestañas</span>
+                <p style="margin-bottom: 16px;">La interfaz de inventario se divide en dos categorías operativas principales para un mejor orden de los recursos:</p>
+                <ul class="func-list" style="margin-bottom: 24px;">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Activos (Equipos)</strong> — Muestra los dispositivos tecnológicos (laptops, monitores, proyectores, impresoras, etc.) que están disponibles para préstamos a alumnos y profesores. En esta pestaña se requiere llenar todos los campos técnicos (tipo específico, marca, modelo y número de serie).</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Mobiliario</strong> — Registra los recursos de infraestructura física (sillas, mesas, escritorios, pizarrones, archiveros, etc.) de las aulas y laboratorios. <strong style="color: #2563eb;">Simplificación de Interfaz:</strong> Al seleccionar esta pestaña, el formulario de registro y edición se simplifica de forma inteligente, ocultando los campos de <em>Tipo, Marca, Modelo, Nº de Serie</em> y <em>Estado</em> (se autocompletan internamente con "Mobiliario" y "N/A" respectivamente). Esto permite al operador centrarse únicamente en la ubicación física (Edificio, Espacio, Nivel/Piso), el Nº de Inventario, el Tag RFID, la foto de evidencia y las observaciones.</div></li>
+                </ul>
+
+                <span class="block-label">Campos de Información del Formulario</span>
+                <p style="margin-bottom: 16px;">Al registrar o editar un activo, se presentan campos optimizados para una mejor localización y control:</p>
+                <ul class="func-list" style="margin-bottom: 24px;">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Tipo de activo / Mobiliario</strong> — Campo de texto dinámico con autocompletado inteligente. Sugiere tipos existentes al comenzar a escribir.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Responsable (Opcional)</strong> — Permite asignar el nombre completo de la persona a cargo de la custodia del recurso.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Nivel / Piso (Opcional)</strong> — Indica el piso o planta física (Planta Baja, Planta Alta, etc.) del activo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Tag RFID (Opcional)</strong> — Permite asociar una etiqueta o tarjeta de radiofrecuencia (RFID) para el rastreo del equipo en lectores IoT. Ahora es opcional.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Foto del Activo (Cloudinary)</strong> — Permite asociar una imagen de evidencia física. Al hacer clic en el botón <strong>«Subir»</strong>, se selecciona el archivo de imagen que se cargará directamente al CDN de Cloudinary y generará una miniatura de vista previa en tiempo real.</div></li>
+                </ul>
+
+                <span class="block-label">Registro Masivo (Modo Lote)</span>
+                <div class="info-box" style="margin-bottom: 24px;">
+                    <span class="note-label">Optimización para Altas Masivas</span>
+                    Para facilitar el registro de gran cantidad de recursos idénticos (ej. 50 butacas o 20 computadoras), la interfaz cuenta con el <strong>Modo Lote</strong>. Al activarse, se ocultan los campos individuales (Nº de serie, Tag RFID) y se habilitan los siguientes parámetros:
+                    <ul style="margin-top: 8px; margin-left: 20px; list-style-type: disc;">
+                        <li><strong>Prefijo de Inventario:</strong> Ej: <code>INV-2026-</code>.</li>
+                        <li><strong>Número Inicial de la secuencia:</strong> Ej: <code>1</code>.</li>
+                        <li><strong>Dígitos de secuencia (Relleno con ceros):</strong> Ej: <code>4</code> para generar <code>0001</code>.</li>
+                        <li><strong>Cantidad de elementos:</strong> Cantidad total a insertar en una sola operación transaccional (ACID).</li>
+                    </ul>
+                </div>
+
+                <span class="block-label">Evidencia Visual e Interacción</span>
+                <p style="margin-bottom: 16px;">La tabla de inventario incluye una columna dedicada a la <strong>Foto</strong>. Si el activo tiene una URL cargada, se mostrará una miniatura de la imagen. Al hacer clic en la miniatura, se desplegará un <strong>visor modal con zoom interactivo</strong> para examinar detalladamente el estado del activo.</p>
+
                 <span class="block-label">Estados de un activo</span>
                 <table class="data-table" style="margin-bottom:24px;">
                     <thead>
@@ -713,7 +796,9 @@ $fechaGeneracion = date('d/m/Y');
                 </table>
                 <span class="block-label">Funciones principales</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div>Registrar activos con número de inventario, tipo, marca y modelo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Registrar activos de forma individual o masiva mediante secuencias automáticas.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Subir fotos de evidencia en tiempo real a Cloudinary CDN directamente desde la cámara o almacenamiento del dispositivo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Clasificar y filtrar recursos entre equipos tecnológicos y mobiliario general.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Actualizar el estado de cualquier activo registrado en el sistema.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Dar de baja activos dañados o fuera de servicio de forma definitiva.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Exportar el inventario completo a Excel con formato profesional.</div></li>
@@ -769,103 +854,83 @@ $fechaGeneracion = date('d/m/Y');
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
-            <!-- 12. FAQ -->
-            <div class="section" id="sec-faq">
+            <!-- 12. MI PERFIL -->
+            <div class="section" id="sec-perfil">
                 <span class="section-label">Sección 12</span>
-                <h2 class="section-title">Preguntas Frecuentes</h2>
-                <p class="section-intro">Respuestas a las consultas más habituales de los usuarios del sistema SIGRAT.</p>
+                <h2 class="section-title">Mi Perfil</h2>
+                <p class="section-intro">Desde Mi Perfil puedes consultar y actualizar tus datos personales registrados en el sistema, así como cambiar tu contraseña de acceso. Accede haciendo clic en tu nombre en la parte inferior del menú lateral.</p>
+                <span class="block-label">Información que puedes modificar</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo recupero mi contraseña?</strong> — Contacta a tu administrador del sistema para que la restablezca manualmente.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Por qué no veo algunos módulos?</strong> — El acceso depende del rol asignado a tu cuenta. Solicita el acceso necesario a tu administrador.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo sé si mi reserva fue aprobada?</strong> — Recibirás una notificación en la campana de la barra superior cuando sea procesada.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Puedo acceder desde el celular?</strong> — Sí, SIGRAT es completamente adaptable a dispositivos móviles y tabletas.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo exporto un reporte?</strong> — Usa los botones "Exportar Excel" o "Exportar PDF" disponibles en la barra superior de cada módulo.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué significa "En Curso" en Préstamos?</strong> — El activo fue prestado y aún no se ha registrado su devolución en el sistema.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Los datos se guardan automáticamente?</strong> — Sí, cada acción confirmada se guarda de inmediato. No dejes formularios a medio completar si vas a cerrar el navegador.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo reporto un error técnico?</strong> — Contacta al equipo de soporte de tu institución y describe el error con una captura de pantalla.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Nombre completo</strong> — Actualizable en cualquier momento.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Correo institucional</strong> — Debe ser único; el sistema valida que no esté en uso por otro usuario.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Género</strong> — Determina el saludo personalizado en el Dashboard (Bienvenido / Bienvenida).</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Número telefónico</strong> — Exactamente 10 dígitos numéricos.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Organización / Área</strong> — Selecciona tu división o área administrativa desde el menú desplegable.</div></li>
                 </ul>
+                <span class="block-label">Información de solo lectura (administrada por el sistema)</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Rol de usuario</strong> — Solo puede ser modificado por un administrador desde el módulo de Usuarios.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Fecha de registro</strong> — Generada automáticamente al crear la cuenta.</div></li>
+                </ul>
+                <span class="block-label">Cómo cambiar tu contraseña</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div>Ve a Mi Perfil y localiza la sección <strong>«Cambiar contraseña»</strong> en la columna derecha.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Ingresa tu <strong>contraseña actual</strong>, luego la <strong>nueva contraseña</strong> (mínimo 6 caracteres) y confírmala.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>El indicador de fortaleza te muestra en tiempo real qué tan segura es tu nueva contraseña.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Haz clic en <strong>«Actualizar contraseña»</strong>. La nueva contraseña tendrá efecto inmediatamente.</div></li>
+                </ul>
+                <div class="tip-list">
+                    <div class="tip-box">
+                        <span class="tip-label">Consejo de seguridad</span>
+                        Usa una contraseña de al menos 10 caracteres que combine letras mayúsculas, minúsculas, números y símbolos para una seguridad óptima.
+                    </div>
+                </div>
                 <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
-            <!-- CRÉDITOS -->
-            <div class="section" id="sec-creditos">
-                <span class="section-label">Créditos</span>
-                <h2 class="section-title">Equipo de Desarrollo</h2>
-                <p class="section-intro">
-                    SIGRAT fue desarrollado durante el <strong>período de Estadías Profesionales 2026</strong>,
-                    como proyecto integrador del programa educativo de Técnico Superior Universitario
-                    en Tecnologías de la Información e Innovación Digital dentro de la
-                    <strong>Universidad Tecnológica de Querétaro (UTEQ)</strong>.
-                </p>
-
-                <span class="block-label">Distribución de responsabilidades</span>
-
-                <!-- Frontend -->
-                <table class="data-table" style="margin-bottom: 12px;">
-                    <thead>
-                        <tr>
-                            <th colspan="2">Frontend &mdash; Interfaz de usuario y experiencia visual</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Cesar Oswaldo Medina Ornelas</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">Diseño e implementación de interfaces, UX/UI, animaciones e integración visual de módulos</td>
-                        </tr>
-                        <tr>
-                            <td>Laura Michelle Escamilla Barrera</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">Diseño responsivo, adaptación de Figma al sistema, experiencia de usuario</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Backend principal -->
-                <table class="data-table" style="margin-bottom: 12px;">
-                    <thead>
-                        <tr>
-                            <th colspan="2">Backend &mdash; Lógica del sistema y servicios principales</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Diego Pérez Mendoza</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">Lógica de negocio, autenticación, seguridad y gestión de usuarios</td>
-                        </tr>
-                        <tr>
-                            <td>Fernando Jimenez Angeles</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">API REST, conexión con base de datos y estructura de permisos</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Backend e integración -->
-                <table class="data-table" style="margin-bottom: 20px;">
-                    <thead>
-                        <tr>
-                            <th colspan="2">Backend &amp; Integración &mdash; Módulos, RFID, reportes y pruebas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Leonardo Abraham Valencia Sanchez</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">Desarrollo de módulos específicos e integración RFID</td>
-                        </tr>
-                        <tr>
-                            <td>Jonathan Brandon Nava Morales</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">Reportes, validaciones y optimización de funcionalidades</td>
-                        </tr>
-                        <tr>
-                            <td>Kevin Cruz Hernández</td>
-                            <td style="width:200px; color:#64748b; font-size:11px;">Pruebas funcionales e integración de componentes del sistema</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="info-box" style="margin-bottom:0;">
-                    <span class="note-label">Nota sobre el desarrollo colaborativo</span>
-                    El proyecto se desarrolló mediante una distribución colaborativa de responsabilidades. El equipo de Frontend estuvo encargado del diseño e implementación de la interfaz de usuario, mientras que los equipos de Backend se enfocaron en la lógica del sistema, la integración de funcionalidades, la base de datos y los servicios internos.
-                </div>
-                <a href="#toc" class="back-to-index" style="margin-top: 20px;"><i class="bi bi-arrow-up"></i> Volver al índice</a>
+            <!-- 13. FAQ -->
+            <div class="section" id="sec-faq">
+                <span class="section-label">Sección 13</span>
+                <h2 class="section-title">Preguntas Frecuentes</h2>
+                <p class="section-intro">Respuestas a las consultas más habituales de los usuarios del sistema SIGRAT, desde el acceso básico hasta las operaciones más comunes.</p>
+                <span class="block-label">Acceso y contraseña</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo inicio sesión?</strong> — Abre el sistema en tu navegador, ingresa tu correo institucional (@uteq.edu.mx) y tu contraseña, luego haz clic en «Iniciar Sesión».</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué hago si olvidé mi contraseña?</strong> — En la pantalla de inicio de sesión haz clic en «¿Olvidaste tu contraseña?», ingresa tu correo y recibirás un enlace de restablecimiento. También puedes pedirle al administrador que la restablezca.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo cambio mi contraseña estando dentro del sistema?</strong> — Ve a Mi Perfil (clic en tu nombre en el menú lateral), busca la sección «Cambiar contraseña» y sigue los pasos.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Mi sesión se cerró sola, ¿qué pasó?</strong> — Las sesiones expiran automáticamente después de 8 horas de inactividad por seguridad. Vuelve a iniciar sesión normalmente.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Dónde puedo consultar el historial de mis actividades?</strong> — Todo tu historial de acciones se registra automáticamente. Si tienes permisos, puedes revisarlo en el módulo de Auditoría, o bien, consultar el estado de tus solicitudes recientes desde el Dashboard.</div></li>
+                </ul>
+                <span class="block-label">Reservas y Calendario</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo creo una reservación?</strong> — Ve al módulo Calendario, haz clic en «+ Nueva Reserva» o en una celda vacía, selecciona espacio, fecha, hora de inicio y fin, completa el motivo y guarda.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo consulto la disponibilidad de un espacio?</strong> — Al crear una nueva reserva en el Calendario, el formulario incluye un <strong>Plano Arquitectónico</strong>. Los espacios en verde están libres; los rojos, ocupados.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo uso el Plano Arquitectónico para reservar?</strong> — En el formulario de Nueva Reserva, selecciona el edificio (CIC o PIDET) y la planta. Haz clic sobre un espacio <strong>verde (Libre)</strong> para seleccionarlo automáticamente. Los rojos ya están ocupados.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo sé si mi reserva fue aprobada?</strong> — Recibirás una notificación en el ícono de campana (barra superior) y por correo electrónico cuando tu solicitud sea aprobada o rechazada.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué significan los colores de las reservas en el calendario?</strong> — Las reservas pendientes aparecen en un tono diferente al de las aprobadas. Una vez aprobadas se confirman en el calendario con su color definitivo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Puedo cancelar una reserva ya creada?</strong> — Sí, haz clic sobre el evento en el calendario y selecciona la opción de cancelar. Solo puedes cancelar reservas propias que aún estén pendientes.</div></li>
+                </ul>
+                <span class="block-label">Préstamos e Inventario</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo solicito un préstamo de equipo?</strong> — Ve al módulo Préstamos y haz clic en «+ Nuevo Préstamo». Selecciona el activo disponible, el responsable y la fecha de devolución estimada.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué significa el estado «Vencido» en Préstamos?</strong> — El activo no fue devuelto antes de la fecha límite. Usa el filtro de estado «Vencido» para localizarlos y dar seguimiento.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué significa el estado «En Curso» en Préstamos?</strong> — El activo fue prestado y aún no se ha registrado su devolución. Cuando se devuelva, el administrador debe registrar el regreso en el sistema.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo aplico filtros en Préstamos?</strong> — Haz clic en el botón «Filtros» de la barra superior. Se abrirá un panel lateral donde puedes filtrar por Edificio, Planta, Área, Estado y Tipo. Haz clic en «Aplicar filtros» para ver los resultados.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo veo el inventario disponible para préstamo?</strong> — Ve al módulo Inventario, selecciona la pestaña «Activos (Equipos)» y filtra por estado «Disponible».</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo diferencio entre Equipos y Mobiliario en el Inventario?</strong> — Usa las pestañas de navegación superiores «ACTIVOS (EQUIPOS)» y «MOBILIARIO» para filtrar la tabla según el tipo de recurso que desees consultar.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo funciona el registro masivo o por lotes de activos?</strong> — Al dar de alta un nuevo activo en el Inventario, selecciona "Modo Lote". Define el prefijo del número de inventario (ej: INV-2026-), el número inicial, los dígitos de secuencia (relleno con ceros) y la cantidad de elementos. El sistema creará la secuencia automáticamente en una transacción ACID segura.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo puedo subir una foto de un activo al inventario?</strong> — En el formulario de alta o edición de activos, haz clic en el botón verde «Subir» en la sección de Foto (Cloudinary). Selecciona una imagen de tu dispositivo y el sistema la subirá directamente al servidor CDN de Cloudinary, guardando el enlace y mostrando una vista previa.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Es obligatorio registrar el Tag RFID para todos los activos?</strong> — No, el campo "Tag RFID" ahora es opcional. Puedes guardar el activo sin asociarle un tag electrónico inicialmente, permitiendo asociarlo en una edición posterior cuando el hardware esté disponible.</div></li>
+                </ul>
+                <span class="block-label">General</span>
+                <ul class="func-list">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Los datos se guardan automáticamente?</strong> — Sí, cada acción confirmada se guarda en la base de datos de inmediato. No cierres el navegador mientras tengas formularios a medio completar.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo exporto información?</strong> — En los módulos de Préstamos, Inventario, Usuarios y Auditoría encontrarás botones de «Exportar Excel» o «Exportar PDF» en la barra de herramientas superior.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo busco información específica dentro de las tablas de datos?</strong> — En la mayoría de los módulos encontrarás una barra de búsqueda en la parte superior derecha de las tablas. Simplemente escribe una palabra clave (nombre, fecha, estado) y la tabla se filtrará automáticamente en tiempo real.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo reporto un error técnico?</strong> — Contacta al equipo de soporte de tu institución. Describe el error, proporciona una captura de pantalla y menciona los pasos que realizaste antes de que ocurriera.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué navegadores son compatibles con SIGRAT?</strong> — El sistema funciona correctamente en Google Chrome, Mozilla Firefox, Microsoft Edge y Safari en sus versiones recientes. Se recomienda Chrome para la mejor experiencia.</div></li>
+                </ul>
+                <a href="#toc" class="back-to-index"><i class="bi bi-arrow-up"></i> Volver al índice</a>
             </div>
 
         </div><!-- /content-wrap -->

@@ -1,0 +1,126 @@
+================================================================================
+GUÍA DE ESTUDIO Y DEFENSA TÉCNICA: SISTEMA SIGRAT
+================================================================================
+PROPOSITO DEL ARCHIVO: Proporcionar una guía de estudio rápida, clara y didáctica
+para exponer el funcionamiento técnico del sistema SIGRAT en presentaciones y
+responder con precisión ejecutiva a cuestionamientos de jurados, profesores o
+auditores técnicos.
+AUTOR: Senior Omni-Stack Architect & DBA
+FECHA: 2026-07-07
+================================================================================
+
+--------------------------------------------------------------------------------
+PARTE 1: EL "ELEVATOR PITCH" (¿QUÉ ES Y PARA QUÉ SIRVE SIGRAT EN 30 SEGUNDOS?)
+--------------------------------------------------------------------------------
+"SIGRAT es un Sistema Integral de Gestión de Reservas y Administración Tecnológica
+diseñado bajo una arquitectura Omni-Stack segura. Su objetivo es controlar el
+inventario tecnológico, los préstamos de equipos y las reservas de espacios
+institucionales integrando lectores de hardware RFID (IoT) en tiempo real con
+una interfaz web protegida contra ciberataques y respaldada por auditoría forense."
+
+--------------------------------------------------------------------------------
+PARTE 2: LOS 4 PILARES DE EXPLICACIÓN (FÁCILES DE RECORDAR)
+--------------------------------------------------------------------------------
+
+1. LOS LENGUAJES UTILIZADOS (EL ECOSISTEMA HÍBRIDO):
+   - Backend (Servidor): PHP 8+ -> Maneja las reglas de negocio, la seguridad, la
+     conexión PDO a base de datos y la API REST que responde a las peticiones.
+   - Frontend (Cliente Web): HTML5, Bootstrap 5 y JavaScript Vanilla -> Diseñado
+     para ser rápido e interactivo. JavaScript se encarga de hablar con el backend
+     en segundo plano sin que la pantalla parpadee o se recargue.
+   - Hardware / IoT: C++ / Arduino -> Programado en los microcontroladores (ESP32
+     con lectores RC522) para leer las tarjetas RFID y enviar los datos vía HTTP.
+   - Base de Datos: SQL y PL/pgSQL -> Para consultar, crear reglas de integridad y
+     procedimientos almacenados (RPC).
+
+2. LA BASE DE DATOS (ORDENADA Y TRANSACCIONAL):
+   - Motor: MySQL / MariaDB (o PostgreSQL/Supabase según entorno).
+   - Estructura en 3NF (Tercera Forma Normal): Está perfectamente dividida en tablas
+     relacionadas (Usuarios, Activos, Préstamos, Reservas, Tags RFID) para no
+     repetir información y evitar datos inconsistentes.
+   - Integridad ACID: Todas las operaciones críticas (como prestar una laptop) se
+     hacen en "transacciones atómicas": o se guarda todo perfecto o se cancela todo,
+     evitando pérdidas de información si se va la luz o falla la red.
+
+3. LA ARQUITECTURA (CÓMO FUNCIONA TODO JUNTO - MVC MODIFICADO):
+   - Enrutador Único (`backend/api/index.php`): Funciona como el "guardián de
+     tráfico". Toda petición de la web o de las antenas llega ahí primero para ser
+     revisada y enviada al controlador correcto (Principios SOLID).
+   - Conexión Hardware-Web en Tiempo Real: Cuando acercas una tarjeta RFID a la
+     antena, el ESP32 envía el código (UID) a la API. Al mismo tiempo, la pantalla
+     web hace un "sondeo silencioso" (Polling vía JavaScript Fetch) y atrapa esa
+     lectura al instante para prestar un equipo o registrar la tarjeta.
+
+4. EL BLINDAJE DE SEGURIDAD (INMUNIDAD Y TRAZABILIDAD):
+   - Cero Inyección SQL: Usamos conexión PDO estrictamente parametrizada y con
+     emulación desactivada. Es imposible hackear la BD desde los formularios.
+   - Control por Roles (RBAC): Cada usuario tiene permisos estrictos (Super Admin,
+     Admin, Profesor, Seguridad, Alumno/Externo).
+   - Seguridad en la Fila (RLS - Row Level Security): A nivel nativo de base de
+     datos, un usuario común solo puede ver sus propias reservas o préstamos.
+   - Bitácora Inmutable (Auditoría Forense): Todo acceso rechazado, inicio de
+     sesión o movimiento se registra con IP, fecha y usuario. Nadie (ni un usuario
+     operativo) tiene permisos para borrar o modificar ese historial.
+
+--------------------------------------------------------------------------------
+PARTE 3: PREGUNTAS DIFÍCILES Y RESPUESTAS PARA LA DEFENSA (Q&A)
+--------------------------------------------------------------------------------
+
+PREGUNTA 1: "¿Por qué utilizaron PHP en lugar de Node.js, Python o Java?"
+RESPUESTA:
+"Elegimos PHP 8+ porque ofrece un rendimiento excepcional para renderizado en
+servidor (SSR), tipado estricto y una arquitectura orientada a objetos muy robusta.
+Además, su capa de abstracción PDO ofrece la mejor parametrización nativa contra
+Inyección SQL y es el estándar institucional e industrial para sistemas web de
+alta disponibilidad y fácil despliegue en servidores Apache/Linux."
+
+PREGUNTA 2: "¿Cómo demuestran que el sistema es invulnerable a Inyección SQL?"
+RESPUESTA:
+"En nuestra clase `Database.php` (patrón Singleton), desactivamos la emulación de
+sentencias preparadas (`PDO::ATTR_EMULATE_PREPARES = false`). Esto obliga a que el
+motor de base de datos reciba la estructura gramatical SQL por un canal y los datos
+del usuario por otro totalmente separado. Así, aunque un atacante introduzca
+comandos maliciosos en un campo de texto, el motor los trata exclusivamente como
+cadenas literales inofensivas, haciendo matemáticamente imposible la inyección."
+
+PREGUNTA 3: "¿Cómo funciona la comunicación entre las tarjetas RFID y la web si
+la web no está conectada directamente al lector físico?"
+RESPUESTA:
+"Implementamos una arquitectura IoT asíncrona desacoplada. El lector físico
+(microcontrolador ESP32/RC522) lee el UID de la tarjeta y hace un POST HTTP a la
+API (`/hardware/scan`). Si es una tarjeta nueva o en uso, la API la almacena temporalmente. En la interfaz web, JavaScript ejecuta un sondeo en segundo
+plano (*polling* con Fetch API) hacia `/hardware/latest-unknown-tag`, obteniendo el
+dato en milisegundos sin recargar la página y logrando una experiencia en tiempo
+real."
+
+PREGUNTA 4: "¿Qué sucede si dos usuarios intentan reservar el mismo auditorio o
+equipo exactamente al mismo segundo?"
+RESPUESTA:
+"El sistema está protegido a dos niveles: primero, el backend verifica la
+disponibilidad antes de procesar; y segundo, a nivel transaccional (ACID) la base
+de datos implementa restricciones de verificación (*CHECK constraints* e índices
+de exclusión) con aislamiento de transacciones que bloquean a nivel de motor
+cualquier traslape de horario o duplicidad de stock en el microsegundo exacto."
+
+PREGUNTA 5: "¿Qué pasa si un usuario malicioso intenta saltarse las pantallas web
+e interactuar directamente con la API o la base de datos para ver información de
+otros usuarios?"
+RESPUESTA:
+"Además de nuestro middleware PHP (`seguridad.php`) y la jerarquía de roles RBAC,
+implementamos Políticas de Seguridad a Nivel de Fila (Row Level Security - RLS) en el motor de base de datos bajo el principio de 'Negación por Defecto'. El motor
+evalúa la identidad del usuario y, si intenta hacer un SELECT o UPDATE sobre una
+reserva o préstamo que no le pertenece, el propio núcleo del motor le devuelve
+cero resultados, anulando cualquier intento de raspado de datos o escalada de
+privilegios horizontal."
+
+PREGUNTA 6: "¿Por qué aseguran que su módulo de auditoría es 'inmutable'?"
+RESPUESTA:
+"Porque la tabla `AUDITORIA_SISTEMA` tiene reglas de permisos unidireccionales:
+el sistema y los usuarios operativos únicamente tienen permiso de inserción (`INSERT`) para registrar eventos (IP, usuario, acción, timestamp y metadatos JSONB).
+Los permisos de modificación (`UPDATE`) y eliminación (`DELETE`) están revocados
+y bloqueados por motor. Una vez registrado un evento, ni el usuario que lo provocó
+puede borrar o alterar su rastro forense."
+
+================================================================================
+FIN DE LA GUÍA DE ESTUDIO Y DEFENSA
+================================================================================

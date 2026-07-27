@@ -824,7 +824,7 @@ if (isset($_SESSION['us_id'])) {
     // Función asíncrona para actualizar la gráfica de barras sin recargar
     async function updateBarChart(rango) {
         try {
-            const response = await fetch(`../backend/api/index.php/dashboard?rango=${rango}`);
+            const response = await fetch(`../backend/api/index.php/dashboard?rango=${rango}`, { credentials: 'same-origin' });
             const data = await response.json();
             
             if (data && Array.isArray(data)) {
@@ -952,7 +952,99 @@ if (isset($_SESSION['us_id'])) {
 
     </script>
 
-    </div>
+    <!-- ===== FOOTER INSTITUCIONAL – Solo Dashboard ===== -->
+    <style>
+    .institutional-footer {
+        background: #f0f2f5;
+        border-top: 1px solid #dde1e7;
+        padding: 36px 40px 32px;
+        text-align: center;
+        width: 100%;
+    }
+    .inst-footer-logos {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    .inst-logo-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 52px;
+        padding: 0 8px;
+    }
+    .inst-logo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        mix-blend-mode: multiply;
+        opacity: 0.75;
+        transition: opacity 0.25s ease;
+    }
+    .inst-logo:hover { opacity: 1; }
+    .inst-logo-wrap.wrap-qro { width: 180px; height: 68px; }
+    .inst-logo-divider {
+        width: 1px;
+        height: 34px;
+        background: #c8cdd6;
+        flex-shrink: 0;
+        align-self: center;
+    }
+    .inst-footer-credits { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .credits-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    .credits-names {
+        font-size: 12px;
+        font-weight: 500;
+        color: #b0b8c4;
+        line-height: 1.8;
+    }
+    @media (max-width: 900px) {
+        .institutional-footer { padding: 28px 24px 24px; }
+        .inst-logo-wrap { width: 120px; height: 40px; }
+        .inst-logo-wrap.wrap-qro { width: 140px; height: 52px; }
+        .inst-logo-divider { display: none; }
+        .inst-footer-logos { gap: 16px; }
+    }
+    @media (max-width: 480px) {
+        .inst-logo-wrap { width: 90px; height: 32px; }
+        .inst-logo-wrap.wrap-qro { width: 110px; height: 44px; }
+    }
+    </style>
+    <footer class="institutional-footer">
+        <div class="inst-footer-logos">
+            <div class="inst-logo-wrap">
+                <img src="assets/images/logo_uteq.png" alt="UTEQ" class="inst-logo">
+            </div>
+            <div class="inst-logo-divider"></div>
+            <div class="inst-logo-wrap">
+                <img src="assets/images/logo_secretaria_educacion.png" alt="Secretaría de Educación" class="inst-logo">
+            </div>
+            <div class="inst-logo-divider"></div>
+            <div class="inst-logo-wrap wrap-qro">
+                <img src="assets/images/logo_gobierno_queretaro.png" alt="Gobierno de Querétaro" class="inst-logo">
+            </div>
+            <div class="inst-logo-divider"></div>
+            <div class="inst-logo-wrap">
+                <img src="assets/images/logo_contigo.png" alt="Contigo" class="inst-logo">
+            </div>
+        </div>
+        <div class="inst-footer-credits">
+            <span class="credits-label">Development by</span>
+            <span class="credits-names">Cesar Medina &nbsp;&bull;&nbsp; Fernando Jimenez &nbsp;&bull;&nbsp; Laura Escamilla &nbsp;&bull;&nbsp; Diego Pérez &nbsp;&bull;&nbsp; Leonardo Valencia &nbsp;&bull;&nbsp; Jonathan Nava &nbsp;&bull;&nbsp; Kevin Cruz</span>
+        </div>
+    </footer>
+
     <?php include 'footer.php'; ?>
     <?php
 } else {

@@ -17,27 +17,60 @@ require_once '../config/Database.php';
 
 $auditController = new Controllers\AuditController();
 
-$fecha_inicio = $_GET['fecha_inicio'] ?? null;
-$fecha_fin = $_GET['fecha_fin'] ?? null;
-$us_id = $_GET['us_id'] ?? null;
-$modulo = $_GET['modulo'] ?? null;
-$tipo_reporte = $_GET['tipo_reporte'] ?? 'auditoria';
+$filtros = [
+    'fecha_inicio' => $_GET['fecha_inicio'] ?? null,
+    'fecha_fin' => $_GET['fecha_fin'] ?? null,
+    'edificio' => $_GET['edificio'] ?? null,
+    'modulo' => $_GET['modulo'] ?? null,
+    'estado' => $_GET['estado'] ?? null,
+    'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
+    'buscar_activo' => $_GET['buscar_activo'] ?? null,
+    'metrica' => $_GET['metrica'] ?? 'reservas',
+    'limit' => $_GET['limit'] ?? 10
+];
 
-$edificio = $_GET['edificio'] ?? null;
+$tipo_reporte = $_GET['tipo_reporte'] ?? 'actividad';
 
-if ($tipo_reporte === 'uso_espacios') {
-    $logs = $auditController->getSpaceUsageReport($fecha_inicio, $fecha_fin, $edificio);
-    $titulo_reporte = "Reporte de Asistencia y Uso de Espacios";
-} else {
-    $extra_filters = [
-        'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
-        'edificio' => $edificio,
-        'estado' => $_GET['estado'] ?? null,
-        'incluir_prestamos' => $_GET['incluir_prestamos'] ?? null,
-        'incluir_transferencias' => $_GET['incluir_transferencias'] ?? null,
-    ];
-    $logs = $auditController->getFiltered($fecha_inicio, $fecha_fin, $us_id, $modulo, $extra_filters);
-    $titulo_reporte = "Reporte de Auditoría General";
+// Nombres de reporte
+$nombres_reporte = [
+    'actividad' => 'Actividad general del sistema',
+    'asistencia' => 'Reporte de asistencia a aulas',
+    'aulas_top' => 'Reporte de aulas más utilizadas',
+    'uso_edificio' => 'Reporte de uso por edificio',
+    'asistencia_usuario' => 'Reporte de asistencia por usuario',
+    'prestamos' => 'Reporte de préstamos de activos',
+    'inventario' => 'Reporte de movimientos de inventario',
+    'incidencias' => 'Reporte de incidencias y mantenimientos'
+];
+$titulo_reporte = $nombres_reporte[$tipo_reporte] ?? 'Reporte de Auditoría';
+
+// Procesar según reporte
+switch ($tipo_reporte) {
+    case 'asistencia':
+        $logs = $auditController->getAttendanceReport($filtros);
+        break;
+    case 'aulas_top':
+        $logs = $auditController->getTopSpaces($filtros);
+        break;
+    case 'uso_edificio':
+        $logs = $auditController->getUsageByBuilding($filtros);
+        break;
+    case 'asistencia_usuario':
+        $logs = $auditController->getAttendanceByUser($filtros);
+        break;
+    case 'prestamos':
+        $logs = $auditController->getAssetLoans($filtros);
+        break;
+    case 'inventario':
+        $logs = $auditController->getInventoryMovements($filtros);
+        break;
+    case 'incidencias':
+        $logs = $auditController->getIncidents($filtros);
+        break;
+    case 'actividad':
+    default:
+        $logs = $auditController->getGeneralActivity($filtros);
+        break;
 }
 ?>
 
@@ -71,61 +104,92 @@ if ($tipo_reporte === 'uso_espacios') {
 <!-- ============================================================================ -->
 <!-- SECCIÓN 3: COMPONENTES OPERATIVOS E INTERFAZ DE USUARIO -->
 <!-- ============================================================================ -->
-<body onload="window.print()">
+<body >
     <div class="header">
         <div class="logo">SIGRAT</div>
         <div class="info">
             <h1><?php echo $titulo_reporte; ?></h1>
             <p>Generado el: <?php echo date('d/m/Y H:i:s'); ?></p>
-            <?php if ($fecha_inicio || $fecha_fin): ?>
-                <p>Periodo: <?php echo $fecha_inicio ?? 'Inicio'; ?> al <?php echo $fecha_fin ?? 'Hoy'; ?></p>
+            <?php if (!empty($filtros['fecha_inicio']) || !empty($filtros['fecha_fin'])): ?>
+                <p>Periodo: <?php echo $filtros['fecha_inicio'] ?? 'Inicio'; ?> al <?php echo $filtros['fecha_fin'] ?? 'Hoy'; ?></p>
             <?php endif; ?>
-            <?php if ($tipo_reporte === 'uso_espacios' && $edificio && $edificio !== 'Todos'): ?>
-                <p>Filtro Edificio: <?php echo htmlspecialchars($edificio); ?></p>
+            <?php if (in_array($tipo_reporte, ['aulas_top', 'uso_edificio', 'asistencia']) && !empty($filtros['edificio']) && $filtros['edificio'] !== 'Todos'): ?>
+                <p>Filtro Edificio: <?php echo htmlspecialchars($filtros['edificio']); ?></p>
             <?php endif; ?>
         </div>
     </div>
 
     <table>
-        <?php if ($tipo_reporte === 'uso_espacios'): ?>
         <thead>
-            <tr>
-                <th>Espacio</th>
-                <th>Edificio / Tipo</th>
-                <th style="text-align: center;">Total Reservas</th>
-                <th style="text-align: center;">Asistencia Total</th>
-            </tr>
+            <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
+                <tr><th>FECHA Y HORA</th><th>USUARIO</th><th>MÓDULO</th><th>ACCIÓN REALIZADA</th></tr>
+            <?php elseif ($tipo_reporte == 'asistencia'): ?>
+                <tr><th>FECHA</th><th>HORARIO</th><th>ESPACIO</th><th>RESPONSABLE</th><th>ASISTENCIA</th></tr>
+            <?php elseif ($tipo_reporte == 'aulas_top'): ?>
+                <tr><th>ESPACIO</th><th>EDIFICIO</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+            <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
+                <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+            <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
+                <tr><th>USUARIO</th><th>ROL</th><th>TOTAL RESERVAS</th><th>ASISTENCIA SUMADA</th></tr>
+            <?php elseif ($tipo_reporte == 'prestamos'): ?>
+                <tr><th>FECHA PRESTAMO</th><th>USUARIO</th><th>ACTIVO / INVENTARIO</th><th>ESTATUS</th></tr>
+            <?php endif; ?>
         </thead>
         <tbody>
-            <?php foreach ($logs as $log): ?>
-            <tr>
-                <td><strong><?php echo htmlspecialchars($log['nombre_numero']); ?></strong></td>
-                <td><?php echo htmlspecialchars($log['edificio'] . ' - ' . $log['tipo']); ?></td>
-                <td style="text-align: center; font-weight: bold;"><?php echo number_format($log['total_reservas']); ?></td>
-                <td style="text-align: center; font-weight: bold; color: #2563eb;"><?php echo number_format($log['total_asistencia']); ?></td>
-            </tr>
-            <?php endforeach; ?>
+            <?php if (empty($logs)): ?>
+                <tr><td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">No hay registros para este periodo.</td></tr>
+            <?php else: ?>
+                <?php foreach ($logs as $log): ?>
+                    <tr>
+                    <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): 
+                        $mod = $log['modulo_afectado'];
+                    ?>
+                        <td style="white-space: nowrap;">
+                            <div style="font-weight: 600; color: #0f172a;"><?php echo date('d M Y', strtotime($log['fecha_hora'])); ?></div>
+                            <div style="font-size: 11px; color: #64748b;"><?php echo date('H:i A', strtotime($log['fecha_hora'])); ?></div>
+                        </td>
+                        <td>
+                            <b><?php echo htmlspecialchars($log['usuario_nombre'] ?? 'SISTEMA'); ?></b>
+                        </td>
+                        <td><?php echo htmlspecialchars($mod); ?></td>
+                        <td style="color: #334155;"><?php echo htmlspecialchars($log['accion']); ?></td>
+                    <?php elseif ($tipo_reporte == 'asistencia'): ?>
+                        <td><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></td>
+                        <td><?php echo htmlspecialchars($log['hora_ent'] . ' a ' . $log['hora_sal']); ?></td>
+                        <td><b><?php echo htmlspecialchars($log['espacio']); ?></b> <br><small><?php echo htmlspecialchars($log['edificio']); ?></small></td>
+                        <td><?php echo htmlspecialchars($log['responsable']); ?></td>
+                        <td><b style="color: #2563eb;"><?php echo (int)$log['num_alumnos']; ?></b> alumnos</td>
+                    <?php elseif ($tipo_reporte == 'aulas_top'): ?>
+                        <td><b><?php echo htmlspecialchars($log['nombre_numero']); ?></b><br><small><?php echo htmlspecialchars($log['tipo']); ?></small></td>
+                        <td><?php echo htmlspecialchars($log['edificio']); ?></td>
+                        <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                        <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                    <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
+                        <td><b><?php echo htmlspecialchars($log['edificio'] ?: 'Sin Edificio'); ?></b></td>
+                        <td><?php echo (int)$log['total_espacios']; ?></td>
+                        <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                        <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                    <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
+                        <td><b><?php echo htmlspecialchars($log['nombre']); ?></b></td>
+                        <td><?php echo htmlspecialchars($log['rol']); ?></td>
+                        <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                        <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                    <?php elseif ($tipo_reporte == 'prestamos'): ?>
+                        <td><?php echo date('d/m/Y H:i', strtotime($log['fecha_pres'])); ?></td>
+                        <td><b><?php echo htmlspecialchars($log['usuario_nombre']); ?></b></td>
+                        <td><?php echo htmlspecialchars($log['activo_tipo'] . ' - ' . $log['activo_marca']); ?><br><small><?php echo htmlspecialchars($log['activo_inv']); ?></small></td>
+                        <td>
+                            <?php if ($log['estatus'] == 'Activo'): ?>
+                                <span style="color: #ea580c; font-weight: bold;">En Curso</span>
+                            <?php else: ?>
+                                <span style="color: #16a34a; font-weight: bold;">Finalizado</span>
+                            <?php endif; ?>
+                        </td>
+                    <?php endif; ?>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
-        <?php else: ?>
-        <thead>
-            <tr>
-                <th>Fecha/Hora</th>
-                <th>Usuario</th>
-                <th>Módulo</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($logs as $log): ?>
-            <tr>
-                <td style="white-space: nowrap;"><?php echo $log['fecha_hora']; ?></td>
-                <td><strong><?php echo $log['usuario_nombre'] ?? 'SISTEMA'; ?></strong></td>
-                <td><?php echo $log['modulo_afectado']; ?></td>
-                <td><?php echo $log['accion']; ?></td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-        <?php endif; ?>
     </table>
 
     <div class="footer">
