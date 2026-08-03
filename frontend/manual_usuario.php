@@ -745,7 +745,40 @@ $fechaGeneracion = date('d/m/Y');
             <div class="section" id="sec-inventario">
                 <span class="section-label">Sección 9</span>
                 <h2 class="section-title">Inventario de Activos</h2>
-                <p class="section-intro">Catálogo maestro de todos los activos tecnológicos e institucionales. Permite su registro, actualización de estado, baja definitiva y seguimiento en tiempo real.</p>
+                <p class="section-intro">Catálogo maestro de todos los activos tecnológicos e institucionales de la universidad. Permite el control, registro individual o masivo, carga multimedia de evidencias y clasificación avanzada en tiempo real.</p>
+                
+                <span class="block-label">Estructura y Clasificación por Pestañas</span>
+                <p style="margin-bottom: 16px;">La interfaz de inventario se divide en dos categorías operativas principales para un mejor orden de los recursos:</p>
+                <ul class="func-list" style="margin-bottom: 24px;">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Activos (Equipos)</strong> — Muestra los dispositivos tecnológicos (laptops, monitores, proyectores, impresoras, etc.) que están disponibles para préstamos a alumnos y profesores. En esta pestaña se requiere llenar todos los campos técnicos (tipo específico, marca, modelo y número de serie).</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Mobiliario</strong> — Registra los recursos de infraestructura física (sillas, mesas, escritorios, pizarrones, archiveros, etc.) de las aulas y laboratorios. <strong style="color: #2563eb;">Simplificación de Interfaz:</strong> Al seleccionar esta pestaña, el formulario de registro y edición se simplifica de forma inteligente, ocultando los campos de <em>Tipo, Marca, Modelo, Nº de Serie</em> y <em>Estado</em> (se autocompletan internamente con "Mobiliario" y "N/A" respectivamente). Esto permite al operador centrarse únicamente en la ubicación física (Edificio, Espacio, Nivel/Piso), el Nº de Inventario, el Tag RFID, la foto de evidencia y las observaciones.</div></li>
+                </ul>
+
+                <span class="block-label">Campos de Información del Formulario</span>
+                <p style="margin-bottom: 16px;">Al registrar o editar un activo, se presentan campos optimizados para una mejor localización y control:</p>
+                <ul class="func-list" style="margin-bottom: 24px;">
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Tipo de activo / Mobiliario</strong> — Campo de texto dinámico con autocompletado inteligente. Sugiere tipos existentes al comenzar a escribir.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Responsable (Opcional)</strong> — Permite asignar el nombre completo de la persona a cargo de la custodia del recurso.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Nivel / Piso (Opcional)</strong> — Indica el piso o planta física (Planta Baja, Planta Alta, etc.) del activo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Tag RFID (Opcional)</strong> — Permite asociar una etiqueta o tarjeta de radiofrecuencia (RFID) para el rastreo del equipo en lectores IoT. Ahora es opcional.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>Foto del Activo (Cloudinary)</strong> — Permite asociar una imagen de evidencia física. Al hacer clic en el botón <strong>«Subir»</strong>, se selecciona el archivo de imagen que se cargará directamente al CDN de Cloudinary y generará una miniatura de vista previa en tiempo real.</div></li>
+                </ul>
+
+                <span class="block-label">Registro Masivo (Modo Lote)</span>
+                <div class="info-box" style="margin-bottom: 24px;">
+                    <span class="note-label">Optimización para Altas Masivas</span>
+                    Para facilitar el registro de gran cantidad de recursos idénticos (ej. 50 butacas o 20 computadoras), la interfaz cuenta con el <strong>Modo Lote</strong>. Al activarse, se ocultan los campos individuales (Nº de serie, Tag RFID) y se habilitan los siguientes parámetros:
+                    <ul style="margin-top: 8px; margin-left: 20px; list-style-type: disc;">
+                        <li><strong>Prefijo de Inventario:</strong> Ej: <code>INV-2026-</code>.</li>
+                        <li><strong>Número Inicial de la secuencia:</strong> Ej: <code>1</code>.</li>
+                        <li><strong>Dígitos de secuencia (Relleno con ceros):</strong> Ej: <code>4</code> para generar <code>0001</code>.</li>
+                        <li><strong>Cantidad de elementos:</strong> Cantidad total a insertar en una sola operación transaccional (ACID).</li>
+                    </ul>
+                </div>
+
+                <span class="block-label">Evidencia Visual e Interacción</span>
+                <p style="margin-bottom: 16px;">La tabla de inventario incluye una columna dedicada a la <strong>Foto</strong>. Si el activo tiene una URL cargada, se mostrará una miniatura de la imagen. Al hacer clic en la miniatura, se desplegará un <strong>visor modal con zoom interactivo</strong> para examinar detalladamente el estado del activo.</p>
+
                 <span class="block-label">Estados de un activo</span>
                 <table class="data-table" style="margin-bottom:24px;">
                     <thead>
@@ -763,7 +796,9 @@ $fechaGeneracion = date('d/m/Y');
                 </table>
                 <span class="block-label">Funciones principales</span>
                 <ul class="func-list">
-                    <li class="func-row"><div class="func-mark"></div><div>Registrar activos con número de inventario, tipo, marca y modelo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Registrar activos de forma individual o masiva mediante secuencias automáticas.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Subir fotos de evidencia en tiempo real a Cloudinary CDN directamente desde la cámara o almacenamiento del dispositivo.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div>Clasificar y filtrar recursos entre equipos tecnológicos y mobiliario general.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Actualizar el estado de cualquier activo registrado en el sistema.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Dar de baja activos dañados o fuera de servicio de forma definitiva.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div>Exportar el inventario completo a Excel con formato profesional.</div></li>
@@ -881,7 +916,11 @@ $fechaGeneracion = date('d/m/Y');
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué significa el estado «Vencido» en Préstamos?</strong> — El activo no fue devuelto antes de la fecha límite. Usa el filtro de estado «Vencido» para localizarlos y dar seguimiento.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Qué significa el estado «En Curso» en Préstamos?</strong> — El activo fue prestado y aún no se ha registrado su devolución. Cuando se devuelva, el administrador debe registrar el regreso en el sistema.</div></li>
                     <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo aplico filtros en Préstamos?</strong> — Haz clic en el botón «Filtros» de la barra superior. Se abrirá un panel lateral donde puedes filtrar por Edificio, Planta, Área, Estado y Tipo. Haz clic en «Aplicar filtros» para ver los resultados.</div></li>
-                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo veo el inventario disponible para préstamo?</strong> — Ve al módulo Inventario y filtra por estado «Disponible» para ver todos los activos que pueden prestarse.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo veo el inventario disponible para préstamo?</strong> — Ve al módulo Inventario, selecciona la pestaña «Activos (Equipos)» y filtra por estado «Disponible».</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo diferencio entre Equipos y Mobiliario en el Inventario?</strong> — Usa las pestañas de navegación superiores «ACTIVOS (EQUIPOS)» y «MOBILIARIO» para filtrar la tabla según el tipo de recurso que desees consultar.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo funciona el registro masivo o por lotes de activos?</strong> — Al dar de alta un nuevo activo en el Inventario, selecciona "Modo Lote". Define el prefijo del número de inventario (ej: INV-2026-), el número inicial, los dígitos de secuencia (relleno con ceros) y la cantidad de elementos. El sistema creará la secuencia automáticamente en una transacción ACID segura.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Cómo puedo subir una foto de un activo al inventario?</strong> — En el formulario de alta o edición de activos, haz clic en el botón verde «Subir» en la sección de Foto (Cloudinary). Selecciona una imagen de tu dispositivo y el sistema la subirá directamente al servidor CDN de Cloudinary, guardando el enlace y mostrando una vista previa.</div></li>
+                    <li class="func-row"><div class="func-mark"></div><div><strong>¿Es obligatorio registrar el Tag RFID para todos los activos?</strong> — No, el campo "Tag RFID" ahora es opcional. Puedes guardar el activo sin asociarle un tag electrónico inicialmente, permitiendo asociarlo en una edición posterior cuando el hardware esté disponible.</div></li>
                 </ul>
                 <span class="block-label">General</span>
                 <ul class="func-list">
