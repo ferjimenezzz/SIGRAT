@@ -43,16 +43,37 @@ $spaceController = new Controllers\SpaceController();
 $tagController = new Controllers\TagController();
 $batchController = new Controllers\BatchController();
 
-$allSpaces = $spaceController->getAll();
+$allSpaces = $db->query("
+    SELECT esp_id, nombre_numero, edificio::varchar FROM ESPACIO
+    UNION ALL
+    SELECT lug_id AS esp_id, nombre_numero, edificio::varchar FROM LUGARES
+    ORDER BY edificio, nombre_numero
+")->fetchAll();
 
 $availableTagsResponse = $tagController->getAvailableTags();
 $availableTags = $availableTagsResponse['success'] ? $availableTagsResponse['data'] : [];
 
 // Capturar filtros
 $filtro = $_GET['filtro'] ?? null;
-$query = "SELECT a.*, e.nombre_numero as espacio_nombre, e.edificio FROM ACTIVO a LEFT JOIN ESPACIO e ON a.esp_asignado = e.esp_id";
+$query = "
+WITH AllSpaces AS (
+    SELECT esp_id AS space_id, nombre_numero, edificio::varchar FROM ESPACIO
+    UNION ALL
+    SELECT lug_id AS space_id, nombre_numero, edificio::varchar FROM LUGARES
+),
+AllAssets AS (
+    SELECT act_id AS act_id, tipo, marca, modelo, num_serie, num_inv, estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'activo' AS item_type 
+    FROM ACTIVO
+    UNION ALL
+    SELECT mob_id AS act_id, tipo, NULL AS marca, NULL AS modelo, NULL AS num_serie, num_inv, 'Disponible' AS estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'mobiliario' AS item_type 
+    FROM MOBILIARIO
+)
+SELECT a.*, s.nombre_numero AS espacio_nombre, s.edificio 
+FROM AllAssets a 
+LEFT JOIN AllSpaces s ON a.esp_asignado = s.space_id
+";
 if ($filtro === 'alerta') {
-    $query .= " WHERE a.estatus IN ('Mantenimiento', 'Extraviado', 'Dañado')";
+    $query .= " WHERE a.estatus IN ('Mantenimiento', 'Extraviado', 'Dañado') AND a.item_type = 'activo'";
 }
 $query .= " ORDER BY a.act_id DESC";
 $assets = $db->query($query)->fetchAll();
@@ -153,7 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Manejar eliminación
 if (isset($_GET['delete_id'])) {
-    $assetController->delete($_GET['delete_id']);
+    $itemType = $_GET['item_type'] ?? 'activo';
+    $assetController->delete($_GET['delete_id'], $itemType);
     header("Location: inventario.php?tab=inventario&success=deleted");
     exit();
 }
@@ -165,7 +187,14 @@ include 'header.php';
 // ============================================================================
 // SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API
 // ============================================================================
-echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<style>
+.select2-container .select2-selection--single { height: 40px; border-radius: 12px; border: 1px solid #e2e8f0; padding: 6px; }
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 38px; }
+</style>';
 ?>
 
 <?php
@@ -395,7 +424,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                             <button class="btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($asset), ENT_QUOTES, 'UTF-8'); ?>)" title="Editar" style="width: 32px; height: 32px; padding: 0; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
                                 <i class="bi bi-pencil-square" style="margin: 0;"></i>
                             </button>
-                            <button onclick="confirmDeleteAsset(<?php echo $asset['act_id']; ?>)" title="Eliminar" style="width: 32px; height: 32px; padding: 0; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
+                            <button onclick="confirmDeleteAsset(<?php echo $asset['act_id']; ?>, '<?php echo $asset['item_type'] ?? 'activo'; ?>')" title="Eliminar" style="width: 32px; height: 32px; padding: 0; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s;">
                                 <i class="bi bi-trash" style="margin: 0;"></i>
                             </button>
                         </td>
@@ -675,6 +704,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <form method="POST">
             <input type="hidden" name="action" value="edit_asset">
             <input type="hidden" name="act_id" id="edit_act_id">
+            <input type="hidden" name="item_type" id="edit_item_type" value="">
             <input type="hidden" name="target_tab" id="edit_target_tab" value="inventario">
             
             <div style="display: grid; gap: 16px; grid-template-columns: 1fr 1fr;">
@@ -1762,6 +1792,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     // Funciones del Modal de Edición
     function openEditModal(asset) {
         document.getElementById('edit_act_id').value = asset.act_id;
+        document.getElementById('edit_item_type').value = asset.item_type || 'activo';
         document.getElementById('edit_tipo').value = asset.tipo;
         document.getElementById('edit_marca').value = asset.marca;
         document.getElementById('edit_modelo').value = asset.modelo;
@@ -1929,9 +1960,9 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     // Funciones SweetAlert2
-    function confirmDeleteAsset(id) {
+    function confirmDeleteAsset(id, type) {
         Swal.fire({
-            title: '¿Eliminar activo?',
+            title: '¿Eliminar activo/mobiliario?',
             text: 'Esta acción dará de baja el equipo o mobiliario permanentemente.',
             icon: 'warning',
             showCancelButton: true,
@@ -1941,12 +1972,16 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `inventario.php?delete_id=${id}`;
+                window.location.href = `inventario.php?delete_id=${id}&item_type=${type}`;
             }
         });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        if(typeof $ !== 'undefined') {
+            $('#edit_esp_asignado').select2({ width: '100%' });
+            $('#new_esp_asignado').select2({ width: '100%' });
+        }
         setupAutocomplete('new_tag_id', 'new_tag_dropdown', availableTags);
         setupAutocomplete('edit_tag_id', 'edit_tag_dropdown', availableTags);
         setupAutocomplete('new_tipo_input', 'new_tipo_dropdown', allTiposJS);
@@ -2289,6 +2324,10 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
     // Mover el panel de notificaciones del header oculto al bell-btn personalizado
     document.addEventListener('DOMContentLoaded', () => {
+        if(typeof $ !== 'undefined') {
+            $('#edit_esp_asignado').select2({ width: '100%' });
+            $('#new_esp_asignado').select2({ width: '100%' });
+        }
         // Pre-cargar badge si hay mantenimientos
         const mainBadge = document.getElementById('mainSidebarMantBadge');
         const mainNotifPanel = document.getElementById("notifPanel");
@@ -2369,6 +2408,10 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        if(typeof $ !== 'undefined') {
+            $('#edit_esp_asignado').select2({ width: '100%' });
+            $('#new_esp_asignado').select2({ width: '100%' });
+        }
         setupSpaceFilter('new_edificio', 'new_esp_asignado');
         setupSpaceFilter('edit_edificio', 'edit_esp_asignado');
     });
@@ -2385,6 +2428,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 
         <form method="POST">
             <input type="hidden" name="action" value="new_asset">
+            <input type="hidden" name="item_type" id="new_item_type" value="">
             <input type="hidden" name="target_tab" id="new_target_tab" value="inventario">
 
             <!-- Selector de Modo de Registro Dual -->
