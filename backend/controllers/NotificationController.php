@@ -118,7 +118,7 @@ class NotificationController {
      */
     public function markAllAsRead($us_id) {
         try {
-            $query = "UPDATE NOTIFICACION SET leido = TRUE WHERE us_id = ? AND (leido = FALSE OR leido IS NULL OR leido = 0)";
+            $query = "UPDATE NOTIFICACION SET leido = TRUE WHERE us_id = ? AND (leido IS NOT TRUE)";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$us_id]);
             return true;

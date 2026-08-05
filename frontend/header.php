@@ -2483,7 +2483,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
 
             function isNotifRead(n) {
-                return n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t";
+                return n.leido === true || n.leido === 1 || n.leido === "1" || n.leido === "t" || n.leido === "true";
             }
 
             function getIconForTipo(tipo) {
