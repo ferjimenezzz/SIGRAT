@@ -56,7 +56,10 @@ include 'header.php';
                     <div id="selectionPanel" style="display: none;">
                         <h6 class="fw-bold mb-3 text-primary">Propiedades del Polígono</h6>
                         <label class="form-label text-muted small">Espacio asociado:</label>
-                        <input type="text" id="spaceSearch" class="form-control form-control-sm mb-2" placeholder="🔍 Buscar espacio..." onkeyup="filterSpaceDropdown()">
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="text" id="spaceSearch" class="form-control" placeholder="🔍 Buscar espacio..." onkeyup="filterSpaceDropdown()">
+                            <button class="btn btn-outline-danger" onclick="clearSelectedLabel()" title="Quitar Etiqueta"><i class="bi bi-trash"></i></button>
+                        </div>
                         <select id="spaceAssigner" class="form-select mb-3" onchange="assignSpaceToSelected(this.value)">
                             <option value="">-- Sin asignar --</option>
                         </select>

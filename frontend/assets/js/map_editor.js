@@ -57,15 +57,18 @@ function populateSpaceAssigner() {
     const config = MAP_DATA[currentMapKey];
     if (!config) return;
 
-    const mapEdificio = (config.edificio || '').toLowerCase().trim();
-    const mapPlanta = (config.planta || '').toLowerCase().trim();
+    const mapParts = currentMapKey.split('_');
+    const mapEdificio = mapParts[0].toLowerCase().trim();
+    const mapPlanta = mapParts.length > 1 ? (mapParts[1] === 'alta' ? 'planta alta' : 'planta baja') : '';
 
-    // Filtrado estricto por edificio y planta exactos
+    // Filtrado: mismo edificio + (misma planta OR planta null/vacía)
     const filteredSpaces = allSpaces.filter(sp => {
         const dbEdif = (sp.edificio || '').toLowerCase().trim();
         const dbPlan = (sp.planta || '').toLowerCase().trim();
         
-        return dbEdif === mapEdificio && dbPlan === mapPlanta;
+        if (dbEdif !== mapEdificio) return false;
+        // Incluir espacios de la planta exacta O espacios sin planta asignada (generales del edificio)
+        return dbPlan === mapPlanta || dbPlan === '';
     });
 
     filteredSpaces.forEach(sp => {
@@ -73,6 +76,7 @@ function populateSpaceAssigner() {
         opt.value = sp.nombre_numero;
         opt.textContent = `${sp.nombre_numero} (${sp.tipo})`;
         opt.dataset.search = sp.nombre_numero.toLowerCase() + ' ' + sp.tipo.toLowerCase();
+        opt.dataset.espid = sp.esp_id;
         spaceAssigner.appendChild(opt);
     });
 }
@@ -339,18 +343,37 @@ function assignSpaceToSelected(val) {
     const poly = polygons.find(p => p.id === selectedPolyId);
     if (poly) {
         poly.db_name = val;
-        // Asignar esp_id también si se selecciona un espacio
+        // Buscar esp_id desde el option seleccionado (que tiene data-espid)
         if (val) {
-            const sp = allSpaces.find(s => s.nombre_numero === val && 
-                                      (s.edificio || '').toLowerCase().trim() === (MAP_DATA[currentMapKey].edificio || '').toLowerCase().trim() && 
-                                      (s.planta || '').toLowerCase().trim() === (MAP_DATA[currentMapKey].planta || '').toLowerCase().trim());
-            poly.esp_id = sp ? sp.esp_id : null;
+            const selectedOpt = Array.from(spaceAssigner.options).find(o => o.value === val);
+            if (selectedOpt && selectedOpt.dataset.espid) {
+                poly.esp_id = parseInt(selectedOpt.dataset.espid);
+            } else {
+                // Fallback: buscar en allSpaces
+                const mapParts = currentMapKey.split('_');
+                const mapEdificio = mapParts[0].toLowerCase().trim();
+                const sp = allSpaces.find(s => s.nombre_numero === val && 
+                                          (s.edificio || '').toLowerCase().trim() === mapEdificio);
+                poly.esp_id = sp ? sp.esp_id : null;
+            }
         } else {
             poly.esp_id = null;
         }
         renderPolygons();
     }
 }
+
+window.clearSelectedLabel = function() {
+    if (!selectedPolyId) return;
+    saveStateToUndo();
+    const poly = polygons.find(p => p.id === selectedPolyId);
+    if (poly) {
+        poly.db_name = '';
+        poly.esp_id = null;
+        document.getElementById('spaceAssigner').value = '';
+        renderPolygons();
+    }
+};
 
 
 function deleteSelected() {

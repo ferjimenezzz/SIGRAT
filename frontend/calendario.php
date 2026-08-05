@@ -2911,10 +2911,23 @@ include 'header.php';
                     const spNav = allSpaces.find(sp => sp.esp_id === espId);
                     if (spNav) {
                         const edifNav = spNav.edificio || 'PIDET';
-                        // Determinar la planta según el campo planta del espacio o inferir del nombre
+                        // Determinar la planta según el campo planta del espacio
                         let plantaNav = (spNav.planta || '').toLowerCase();
+                        // 'Alta' -> 'alta', 'Baja' -> 'baja'
+                        if (plantaNav === 'planta alta') plantaNav = 'alta';
+                        if (plantaNav === 'planta baja') plantaNav = 'baja';
+                        
+                        if (!plantaNav && Object.keys(MAP_DATA).length > 0) {
+                            // Buscar el esp_id en MAP_DATA para determinar la planta correcta
+                            for (const [mapKey, mapCfg] of Object.entries(MAP_DATA)) {
+                                if (mapCfg.zones && mapCfg.zones.some(z => z.esp_id == espId)) {
+                                    plantaNav = mapKey.split('_')[1] || 'alta';
+                                    break;
+                                }
+                            }
+                        }
                         if (!plantaNav) {
-                            // Inferir por nombre si no hay campo planta
+                            // Último fallback: inferir por nombre
                             const nombreLower = (spNav.nombre_numero || '').toLowerCase();
                             if (nombreLower.includes('baja') || nombreLower.includes('aula 0') || nombreLower.includes('auditorio') || nombreLower.includes('magna')) {
                                 plantaNav = 'baja';
@@ -4689,18 +4702,18 @@ include 'header.php';
     let modalStartY = 0;
 
     // Inicializar Motor
+    // IMPORTANTE: Siempre recarga el JSON fresco desde el servidor para que el Editor de Mapas
+    // sea la única fuente de verdad. El cache-buster garantiza que los cambios guardados
+    // en el editor se reflejen de inmediato sin necesidad de Ctrl+F5.
     function initModalMap() {
-        if (Object.keys(MAP_DATA).length === 0) {
-            fetch('assets/map_data.json')
-                .then(r => r.json())
-                .then(data => {
-                    MAP_DATA = data;
-                    updateModalMapImage();
-                })
-                .catch(e => console.error('Error cargando map_data.json:', e));
-        } else {
-            updateModalMapImage();
-        }
+        const cacheBuster = Date.now();
+        fetch('assets/map_data.json?v=' + cacheBuster)
+            .then(r => r.json())
+            .then(data => {
+                MAP_DATA = data;
+                updateModalMapImage();
+            })
+            .catch(e => console.error('Error cargando map_data.json:', e));
     }
 
     function updateModalMapImage() {

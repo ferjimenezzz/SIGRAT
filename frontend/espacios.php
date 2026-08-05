@@ -269,17 +269,17 @@ $tab = $_GET['tab'] ?? 'espacios';
             </thead>
             <tbody>
                 <?php foreach ($lugares as $lug): ?>
-                <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
+                <tr class="lugar-row" data-edificio="<?php echo htmlspecialchars($lug['edificio']); ?>" style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
                     <td style="padding: 16px 24px; display: flex; align-items: center; gap: 12px;">
                         <span style="background: <?php echo $lug['edificio'] == 'CIC' ? '#eff6ff' : '#fff7ed'; ?>; color: <?php echo $lug['edificio'] == 'CIC' ? '#2563eb' : '#ea580c'; ?>; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block;">
                             <?php echo $lug['edificio']; ?>
                         </span>
                         <div>
-                            <p style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;"><?php echo htmlspecialchars($lug['nombre_numero']); ?></p>
+                            <p class="lugar-name" style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;"><?php echo htmlspecialchars($lug['nombre_numero']); ?></p>
                         </div>
                     </td>
                     <td style="padding: 16px 24px;">
-                        <span style="font-size: 13px; font-weight: 600; color: #475569;"><?php echo htmlspecialchars($lug['tipo']); ?></span><br>
+                        <span class="lugar-tipo" style="font-size: 13px; font-weight: 600; color: #475569;"><?php echo htmlspecialchars($lug['tipo']); ?></span><br>
                         <span style="font-size: 11px; color: #94a3b8;">Planta <?php echo htmlspecialchars($lug['planta']); ?></span>
                     </td>
                     <td style="padding: 16px 24px;">
@@ -721,7 +721,9 @@ $tab = $_GET['tab'] ?? 'espacios';
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    let currentTab = 'espacios';
     function switchTab(tab) {
+        currentTab = tab;
         document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'block' : 'none';
         document.getElementById('tab-calendario').style.display = tab === 'calendario' ? 'flex' : 'none';
         
@@ -752,6 +754,7 @@ $tab = $_GET['tab'] ?? 'espacios';
     const edificioFilter = document.getElementById('edificioFilter');
     const tipoFilter = document.getElementById('tipoFilter');
     const rows = document.querySelectorAll('.space-row');
+    const lugarRows = document.querySelectorAll('.lugar-row');
 
     function removeAccents(str) {
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -763,6 +766,7 @@ $tab = $_GET['tab'] ?? 'espacios';
         const edificio = edificioFilter ? edificioFilter.value : '';
         const tipo = tipoFilter ? tipoFilter.value : '';
 
+        let foundEspacios = 0;
         rows.forEach(row => {
             const name = removeAccents(row.querySelector('.space-name').innerText.toLowerCase());
             const rowEdificio = row.getAttribute('data-edificio');
@@ -774,10 +778,36 @@ $tab = $_GET['tab'] ?? 'espacios';
 
             if (matchSearch && matchEdificio && matchTipo) {
                 row.style.display = '';
+                foundEspacios++;
             } else {
                 row.style.display = 'none';
             }
         });
+
+        let foundLugares = 0;
+        lugarRows.forEach(row => {
+            const name = removeAccents(row.querySelector('.lugar-name').innerText.toLowerCase());
+            const rowEdificio = row.getAttribute('data-edificio');
+            const rowTipo = row.querySelector('.lugar-tipo').innerText;
+
+            const matchSearch = name.includes(query);
+            const matchEdificio = edificio === "" || rowEdificio === edificio;
+            const matchTipo = tipo === "" || rowTipo === tipo;
+
+            if (matchSearch && matchEdificio && matchTipo) {
+                row.style.display = '';
+                foundLugares++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Opcional: mostrar un indicador de en qué pestaña se encontraron resultados si la búsqueda es global
+        if(query !== "" && window.currentTab !== undefined) {
+             if(window.currentTab === 'lugares' && foundLugares === 0 && foundEspacios > 0) {
+                 // Si está en lugares y no hay, pero sí en espacios, podríamos avisarle o simplemente cambiar de pestaña
+             }
+        }
     }
 
     if(searchInput) searchInput.addEventListener('input', filterTable);
