@@ -171,7 +171,6 @@ $tab = $_GET['tab'] ?? 'espacios';
         
         <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 10px; border: 1px solid #e2e8f0;">
             <button onclick="switchTab('espacios')" id="btn-espacios" class="btn-tab <?php echo $tab == 'espacios' ? 'active' : ''; ?>">ESPACIOS</button>
-            <button onclick="switchTab('calendario')" id="btn-calendario" class="btn-tab <?php echo $tab == 'calendario' ? 'active' : ''; ?>">CALENDARIO</button>
             <button onclick="switchTab('lugares')" id="btn-lugares" class="btn-tab <?php echo $tab == 'lugares' ? 'active' : ''; ?>">LUGARES</button>
 
         </div>
