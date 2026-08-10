@@ -2466,6 +2466,12 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             if (notifMarkAllBtn) {
                 notifMarkAllBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    
+                    // Cambiar automáticamente a la pestaña "Todas" para que no desaparezcan de la vista
+                    currentFilter = 'all';
+                    if(notifTabUnread) notifTabUnread.classList.remove('active');
+                    if(notifTabAll) notifTabAll.classList.add('active');
+
                     // Actualización UI Optimista Instantánea (0ms)
                     allNotifs.forEach(n => { n.leido = true; });
                     renderNotifications();
@@ -2597,7 +2603,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             }
 
             function fetchNotificationsDirect() {
-                fetch('../backend/api/index.php/notifications/all')
+                // Agregamos cacheBuster para forzar al navegador a siempre pedir los datos más frescos al servidor
+                const cacheBuster = Date.now();
+                fetch('../backend/api/index.php/notifications/all?_cb=' + cacheBuster)
                     .then(res => res.json())
                     .then(data => {
                         if (Array.isArray(data)) {
