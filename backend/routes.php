@@ -79,7 +79,8 @@ function handleReservationApproval(string $method, string $path)
         strpos($userRol, 'DOCENTE') !== false || 
         strpos($userRol, 'PROFESOR') !== false
     );
-    $isAdmin = strpos($userRol, 'ADMIN') !== false || $userRol === 'SUPER ADMINISTRADOR';
+    // Para el Maestro, $isAdmin es false para que getByStatus y cancel filtren únicamente SUS propias reservas (us_id)
+    $isAdmin = (strpos($userRol, 'ADMIN') !== false || $userRol === 'SUPER ADMINISTRADOR') && !$isMaestro;
     $canManageApprovals = $isAdmin || $isMaestro;
 
     // Permitir acceso a administradores, maestros/docentes y personal autorizado.
@@ -97,8 +98,8 @@ function handleReservationApproval(string $method, string $path)
 
     try {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($action, ['pending', 'approved', 'cancelled'])) {
-            // 4.1. Consultar listado por estado
-            $data = $controller->getByStatus((int)$adminId, $canManageApprovals, $action);
+            // 4.1. Consultar listado por estado ($isAdmin en false para Maestro filtra solo sus reservas)
+            $data = $controller->getByStatus((int)$adminId, $isAdmin, $action);
             http_response_code(200);
             echo json_encode($data);
         } elseif ($action === 'approve') {
@@ -116,7 +117,7 @@ function handleReservationApproval(string $method, string $path)
         } elseif ($action === 'cancel') {
             // 4.4. Cancelar reserva por parte del usuario o directivo
             $reason = $input['reason'] ?? 'Cancelada por el usuario';
-            $controller->cancel($reservationId, (int)$adminId, $canManageApprovals, $reason);
+            $controller->cancel($reservationId, (int)$adminId, $isAdmin, $reason);
             http_response_code(200);
             echo json_encode(['message' => 'Reserva cancelada exitosamente']);
         } else {
