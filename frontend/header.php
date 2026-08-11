@@ -53,6 +53,23 @@ if (isset($_COOKIE['auth_token'])) {
 }
 
 $currentPage = basename($_SERVER['PHP_SELF']);
+
+// Restricción de navegación para el rol Maestro / Docente / Profesor
+$userRolCurrent = isset($_SESSION['rol']) ? strtoupper(trim($_SESSION['rol'])) : '';
+$isMaestroUser = (
+    strpos($userRolCurrent, 'MAESTRO') !== false || 
+    strpos($userRolCurrent, 'DOCENTE') !== false || 
+    strpos($userRolCurrent, 'PROFESOR') !== false
+);
+
+if ($isMaestroUser) {
+    $allowedMaestroPages = ['calendario.php', 'aprobacion_reservas.php', 'perfil.php', 'manual_usuario.php'];
+    if (!in_array($currentPage, $allowedMaestroPages)) {
+        header("Location: calendario.php");
+        exit();
+    }
+}
+
 // Lista completa de páginas protegidas (incluyendo aprobacion_reservas.php)
 $protected_pages = [
     'usuarios.php', 
@@ -75,12 +92,31 @@ if (!function_exists('hasPermission')) {
         if (!isset($_SESSION['rol'])) return false;
         $userRol = strtoupper(trim($_SESSION['rol']));
         
-        // 2. Privilegios de SuperUsuario
-        if (strtoupper($userRol) === 'SUPER ADMINISTRADOR') return true;
+        // Identificar si el usuario es Maestro / Docente / Profesor
+        $isMaestro = (
+            strpos($userRol, 'MAESTRO') !== false || 
+            strpos($userRol, 'DOCENTE') !== false || 
+            strpos($userRol, 'PROFESOR') !== false
+        );
+
+        if ($isMaestro) {
+            // El Maestro SOLO tiene permiso para Calendario y Aprobaciones
+            if ($modulo === 'Calendario' || $modulo === 'Aprobaciones') {
+                return true;
+            }
+            return false;
+        }
+
+        // Privilegios de SuperUsuario
+        if ($userRol === 'SUPER ADMINISTRADOR') return true;
         
-        if (!isset($_SESSION['permisos'])) return false;
+        if (!isset($_SESSION['permisos'])) {
+            if (strpos($userRol, 'ADMIN') !== false) return true;
+            if ($modulo === 'Dashboard' || $modulo === 'Calendario') return true;
+            return false;
+        }
         
-        // 3. Permisos heredados del Rol Base
+        // Permisos heredados del Rol Base
         $permisos = $_SESSION['permisos'];
         if (is_string($permisos)) {
             $permisos = json_decode($permisos, true) ?: [];
@@ -92,6 +128,9 @@ if (!function_exists('hasPermission')) {
                 return $permisos[$modulo][$accion] === true;
             }
         }
+
+        if ($modulo === 'Dashboard' || $modulo === 'Calendario') return true;
+
         return false;
     }
 }
@@ -1887,12 +1926,17 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         </div>
 
         <nav class="nav-menu">
+            <?php if (hasPermission('Dashboard')): ?>
             <a href="index.php" class="nav-item <?php echo $currentPage == 'index.php' ? 'active' : ''; ?>">
                 <i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (hasPermission('Calendario')): ?>
             <a href="calendario.php" class="nav-item <?php echo $currentPage == 'calendario.php' ? 'active' : ''; ?>">
                 <i class="bi bi-calendar3"></i> <span>Calendario</span>
             </a>
+            <?php endif; ?>
             
             <?php if (hasPermission('Usuarios')): ?>
             <a href="usuarios.php" class="nav-item <?php echo $currentPage == 'usuarios.php' ? 'active' : ''; ?>">
@@ -1935,7 +1979,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 <i class="bi bi-broadcast"></i> <span>Monitor RFID</span>
             </a>
             <?php endif; ?>
-
         </nav>
 
         <!-- User section -->
