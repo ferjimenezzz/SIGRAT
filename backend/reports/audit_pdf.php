@@ -39,8 +39,7 @@ $nombres_reporte = [
     'uso_edificio' => 'Reporte de uso por edificio',
     'asistencia_usuario' => 'Reporte de asistencia por usuario',
     'prestamos' => 'Reporte de préstamos de activos',
-    'inventario' => 'Reporte de movimientos de inventario',
-    'incidencias' => 'Reporte de incidencias y mantenimientos'
+    'inventario' => 'Reporte de movimientos de inventario'
 ];
 $titulo_reporte = $nombres_reporte[$tipo_reporte] ?? 'Reporte de Auditoría';
 
@@ -63,9 +62,6 @@ switch ($tipo_reporte) {
         break;
     case 'inventario':
         $logs = $auditController->getInventoryMovements($filtros);
-        break;
-    case 'incidencias':
-        $logs = $auditController->getIncidents($filtros);
         break;
     case 'actividad':
     default:
@@ -121,7 +117,7 @@ switch ($tipo_reporte) {
 
     <table>
         <thead>
-            <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
+            <?php if (in_array($tipo_reporte, ['actividad', 'inventario'])): ?>
                 <tr><th>FECHA Y HORA</th><th>USUARIO</th><th>MÓDULO</th><th>ACCIÓN REALIZADA</th></tr>
             <?php elseif ($tipo_reporte == 'asistencia'): ?>
                 <tr><th>FECHA</th><th>HORARIO</th><th>ESPACIO</th><th>RESPONSABLE</th><th>ASISTENCIA</th></tr>
@@ -130,7 +126,7 @@ switch ($tipo_reporte) {
             <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
                 <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
             <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
-                <tr><th>USUARIO</th><th>ROL</th><th>TOTAL RESERVAS</th><th>ASISTENCIA SUMADA</th></tr>
+                <tr><th>FECHA DE USO</th><th>HORARIO</th><th>ESPACIO / EDIFICIO</th><th>ASISTENCIA</th><th>ESTADO / ASISTENCIA</th></tr>
             <?php elseif ($tipo_reporte == 'prestamos'): ?>
                 <tr><th>FECHA PRESTAMO</th><th>USUARIO</th><th>ACTIVO / INVENTARIO</th><th>ESTATUS</th></tr>
             <?php endif; ?>
@@ -141,7 +137,7 @@ switch ($tipo_reporte) {
             <?php else: ?>
                 <?php foreach ($logs as $log): ?>
                     <tr>
-                    <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): 
+                    <?php if (in_array($tipo_reporte, ['actividad', 'inventario'])): 
                         $mod = $log['modulo_afectado'];
                     ?>
                         <td style="white-space: nowrap;">
@@ -170,10 +166,22 @@ switch ($tipo_reporte) {
                         <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
                         <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
                     <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
-                        <td><b><?php echo htmlspecialchars($log['nombre']); ?></b></td>
-                        <td><?php echo htmlspecialchars($log['rol']); ?></td>
-                        <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
-                        <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                        <td><b><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></b></td>
+                        <td><?php echo htmlspecialchars(date('H:i', strtotime($log['hora_ent'])) . ' - ' . date('H:i', strtotime($log['hora_sal']))); ?></td>
+                        <td><b><?php echo htmlspecialchars($log['espacio']); ?></b><br><small><?php echo htmlspecialchars($log['edificio']); ?></small></td>
+                        <td><b style="color: #2563eb;"><?php echo (int)($log['num_alumnos'] ?? 0); ?></b> personas</td>
+                        <td>
+                            <?php 
+                                $numAsis = (int)($log['num_alumnos'] ?? 0);
+                                $estatus = strtolower($log['estatus'] ?? '');
+                                $asistio = ($numAsis > 0 || in_array($estatus, ['aprobada', 'completada', 'finalizada', 'asistio']));
+                            ?>
+                            <?php if ($asistio): ?>
+                                <span style="color: #16a34a; font-weight: bold;">Asistió (<?php echo $numAsis; ?> personas)</span>
+                            <?php else: ?>
+                                <span style="color: #dc2626; font-weight: bold;">Sin Asistencia</span>
+                            <?php endif; ?>
+                        </td>
                     <?php elseif ($tipo_reporte == 'prestamos'): ?>
                         <td><?php echo date('d/m/Y H:i', strtotime($log['fecha_pres'])); ?></td>
                         <td><b><?php echo htmlspecialchars($log['usuario_nombre']); ?></b></td>

@@ -26,11 +26,13 @@ $filtros = [
     'estado' => $_GET['estado'] ?? null,
     'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
     'buscar_activo' => $_GET['buscar_activo'] ?? null,
+    'usuario_id' => $_GET['usuario_id'] ?? null,
     'metrica' => $_GET['metrica'] ?? 'reservas',
     'limit' => $_GET['limit'] ?? 10
 ];
 
 $logs = [];
+$validation_warning = null;
 $stats = $auditController->getAuditStats();
 
 // Procesar según reporte
@@ -45,7 +47,12 @@ switch ($tipo_reporte) {
         $logs = $auditController->getUsageByBuilding($filtros);
         break;
     case 'asistencia_usuario':
-        $logs = $auditController->getAttendanceByUser($filtros);
+        if (empty($filtros['usuario_id']) && empty($filtros['buscar_usuario'])) {
+            $validation_warning = 'Por favor selecciona un usuario de la lista desplegable para generar el reporte de asistencia por usuario.';
+            $logs = [];
+        } else {
+            $logs = $auditController->getAttendanceByUser($filtros);
+        }
         break;
     case 'prestamos':
         $logs = $auditController->getAssetLoans($filtros);
@@ -53,16 +60,13 @@ switch ($tipo_reporte) {
     case 'inventario':
         $logs = $auditController->getInventoryMovements($filtros);
         break;
-    case 'incidencias':
-        $logs = $auditController->getIncidents($filtros);
-        break;
     case 'actividad':
     default:
         $logs = $auditController->getGeneralActivity($filtros);
         break;
 }
 
-$usuarios = $db->query("SELECT us_id, nombre FROM usuario ORDER BY nombre")->fetchAll();
+$usuarios = $db->query("SELECT us_id, nombre, COALESCE(apellido, '') as apellido FROM usuario ORDER BY nombre, apellido")->fetchAll();
 $edificios_db = $db->query("SELECT DISTINCT edificio FROM ESPACIO WHERE edificio IS NOT NULL ORDER BY edificio")->fetchAll(PDO::FETCH_COLUMN);
 
 include 'header.php';
@@ -215,7 +219,6 @@ include 'header.php';
                         <option value="asistencia_usuario" <?php echo $tipo_reporte == 'asistencia_usuario' ? 'selected' : ''; ?>>Reporte de asistencia por usuario</option>
                         <option value="prestamos" <?php echo $tipo_reporte == 'prestamos' ? 'selected' : ''; ?>>Reporte de préstamos de activos</option>
                         <option value="inventario" <?php echo $tipo_reporte == 'inventario' ? 'selected' : ''; ?>>Reporte de movimientos de inventario</option>
-                        <option value="incidencias" <?php echo $tipo_reporte == 'incidencias' ? 'selected' : ''; ?>>Reporte de incidencias y mantenimientos</option>
                     </select>
                 </div>
                 
@@ -261,9 +264,17 @@ include 'header.php';
                     </select>
                 </div>
 
-                <div class="filter-group fg-usuario" style="display:none;">
-                    <label>Buscar Usuario</label>
-                    <input type="text" name="buscar_usuario" placeholder="Nombre de profesor o alumno..." value="<?php echo htmlspecialchars($filtros['buscar_usuario'] ?? ''); ?>">
+                <div class="filter-group fg-usuario-select" style="display:none;">
+                    <label id="lblUsuarioSelect">Usuario</label>
+                    <select name="usuario_id" id="usuarioSelect">
+                        <option value="">-- Selecciona un usuario --</option>
+                        <?php foreach($usuarios as $u): ?>
+                            <?php $nombreCompleto = trim($u['nombre'] . ' ' . ($u['apellido'] ?? '')); ?>
+                            <option value="<?php echo $u['us_id']; ?>" <?php echo (isset($filtros['usuario_id']) && $filtros['usuario_id'] == $u['us_id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($nombreCompleto); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="filter-group fg-modulo" style="display:none;">
@@ -307,6 +318,13 @@ include 'header.php';
         </form>
     </div>
 
+    <?php if (!empty($validation_warning)): ?>
+        <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: var(--radius); padding: 16px 20px; color: #991b1b; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px;">
+            <i class="bi bi-exclamation-triangle-fill" style="font-size: 22px; color: #dc2626;"></i>
+            <span><?php echo htmlspecialchars($validation_warning); ?></span>
+        </div>
+    <?php endif; ?>
+
     <!-- Resultados -->
     <div class="card" style="padding: 0;">
         <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
@@ -320,7 +338,7 @@ include 'header.php';
         <div class="table-container">
             <table id="auditTable">
                 <thead>
-                    <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): ?>
+                    <?php if (in_array($tipo_reporte, ['actividad', 'inventario'])): ?>
                         <tr><th>FECHA Y HORA</th><th>USUARIO</th><th>MÓDULO</th><th>ACCIÓN REALIZADA</th></tr>
                     <?php elseif ($tipo_reporte == 'asistencia'): ?>
                         <tr><th>FECHA</th><th>HORARIO</th><th>ESPACIO</th><th>RESPONSABLE</th><th>ASISTENCIA</th></tr>
@@ -329,7 +347,7 @@ include 'header.php';
                     <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
                         <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
                     <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
-                        <tr><th>USUARIO</th><th>ROL</th><th>TOTAL RESERVAS</th><th>ASISTENCIA SUMADA</th></tr>
+                        <tr><th>FECHA DE USO</th><th>HORARIO</th><th>ESPACIO / EDIFICIO</th><th>ASISTENCIA REGISTRADA</th><th>ESTADO / ASISTENCIA</th></tr>
                     <?php elseif ($tipo_reporte == 'prestamos'): ?>
                         <tr><th>FECHA PRESTAMO</th><th>USUARIO</th><th>ACTIVO / INVENTARIO</th><th>ESTATUS</th></tr>
                     <?php endif; ?>
@@ -340,7 +358,7 @@ include 'header.php';
                     <?php else: ?>
                         <?php foreach ($logs as $log): ?>
                             <tr>
-                            <?php if (in_array($tipo_reporte, ['actividad', 'inventario', 'incidencias'])): 
+                            <?php if (in_array($tipo_reporte, ['actividad', 'inventario'])): 
                                 $mod = $log['modulo_afectado'];
                                 $badgeBg = '#eff6ff'; $badgeColor = '#2563eb';
                                 if($mod == 'ACTIVOS' || $mod == 'INVENTARIO') { $badgeBg = '#fff7ed'; $badgeColor = '#ea580c'; }
@@ -379,10 +397,31 @@ include 'header.php';
                                 <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
                                 <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
                             <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
-                                <td><b><?php echo htmlspecialchars($log['nombre']); ?></b></td>
-                                <td><?php echo htmlspecialchars($log['rol']); ?></td>
-                                <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
-                                <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
+                                 <td><b><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></b></td>
+                                 <td><?php echo htmlspecialchars(date('H:i', strtotime($log['hora_ent'])) . ' - ' . date('H:i', strtotime($log['hora_sal']))); ?></td>
+                                 <td>
+                                     <b><?php echo htmlspecialchars($log['espacio']); ?></b><br>
+                                     <small style="color: #64748b;"><?php echo htmlspecialchars($log['edificio']); ?></small>
+                                 </td>
+                                 <td>
+                                     <b style="color: var(--primary);"><?php echo (int)($log['num_alumnos'] ?? 0); ?></b> personas
+                                 </td>
+                                 <td>
+                                     <?php 
+                                         $numAsis = (int)($log['num_alumnos'] ?? 0);
+                                         $estatus = strtolower($log['estatus'] ?? '');
+                                         $asistio = ($numAsis > 0 || in_array($estatus, ['aprobada', 'completada', 'finalizada', 'asistio']));
+                                     ?>
+                                     <?php if ($asistio): ?>
+                                         <span style="color: #16a34a; background: #dcfce7; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                             <i class="bi bi-check-circle-fill"></i> Asistió (<?php echo $numAsis; ?> personas)
+                                         </span>
+                                     <?php else: ?>
+                                         <span style="color: #dc2626; background: #fef2f2; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                             <i class="bi bi-x-circle-fill"></i> No Asistió / Sin Registro
+                                         </span>
+                                     <?php endif; ?>
+                                 </td>
                             <?php elseif ($tipo_reporte == 'prestamos'): ?>
                                 <td><?php echo date('d/m/Y H:i', strtotime($log['fecha_pres'])); ?></td>
                                 <td><b><?php echo htmlspecialchars($log['usuario_nombre']); ?></b></td>
@@ -419,22 +458,57 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.filter-group[class*="fg-"]').forEach(el => el.style.display = 'none');
         
         const val = reportType.value;
+        const lblUser = document.getElementById('lblUsuarioSelect');
+        const optDefault = document.querySelector('#usuarioSelect option[value=""]');
+
         if(val === 'actividad') {
-            document.querySelector('.fg-usuario').style.display = 'flex';
-            document.querySelector('.fg-modulo').style.display = 'flex';
+            const uSel = document.querySelector('.fg-usuario-select');
+            if(uSel) uSel.style.display = 'flex';
+            const mod = document.querySelector('.fg-modulo');
+            if(mod) mod.style.display = 'flex';
+            if(lblUser) lblUser.innerHTML = 'Usuario';
+            if(optDefault) optDefault.textContent = '-- Todos los usuarios --';
         } else if(val === 'asistencia') {
-            document.querySelector('.fg-edificio').style.display = 'flex';
+            const ed = document.querySelector('.fg-edificio');
+            if(ed) ed.style.display = 'flex';
         } else if(val === 'aulas_top') {
-            document.querySelector('.fg-edificio').style.display = 'flex';
-            document.querySelector('.fg-metrica').style.display = 'flex';
-            document.querySelector('.fg-limit').style.display = 'flex';
+            const ed = document.querySelector('.fg-edificio');
+            if(ed) ed.style.display = 'flex';
+            const met = document.querySelector('.fg-metrica');
+            if(met) met.style.display = 'flex';
+            const lim = document.querySelector('.fg-limit');
+            if(lim) lim.style.display = 'flex';
         } else if(val === 'asistencia_usuario') {
-            document.querySelector('.fg-usuario').style.display = 'flex';
+            const uSel = document.querySelector('.fg-usuario-select');
+            if(uSel) uSel.style.display = 'flex';
+            if(lblUser) lblUser.innerHTML = 'Seleccionar Usuario <span style="color: #dc2626;">*</span>';
+            if(optDefault) optDefault.textContent = '-- Selecciona un usuario --';
         } else if(val === 'prestamos') {
-            document.querySelector('.fg-usuario').style.display = 'flex';
-            document.querySelector('.fg-activo').style.display = 'flex';
+            const uSel = document.querySelector('.fg-usuario-select');
+            if(uSel) uSel.style.display = 'flex';
+            const act = document.querySelector('.fg-activo');
+            if(act) act.style.display = 'flex';
+            if(lblUser) lblUser.innerHTML = 'Usuario';
+            if(optDefault) optDefault.textContent = '-- Todos los usuarios --';
         }
     };
+
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', (e) => {
+            if (reportType.value === 'asistencia_usuario') {
+                const uSel = document.getElementById('usuarioSelect');
+                if (!uSel || !uSel.value) {
+                    e.preventDefault();
+                    alert('Por favor, selecciona un usuario de la lista desplegable antes de generar el reporte de asistencia.');
+                    if (uSel) {
+                        uSel.focus();
+                        uSel.style.borderColor = '#dc2626';
+                    }
+                }
+            }
+        });
+    }
 
     const reportDescriptions = {
         'actividad': {
@@ -464,10 +538,6 @@ document.addEventListener('DOMContentLoaded', () => {
         'inventario': {
             title: 'Reporte de movimientos de inventario',
             text: 'Registra altas, bajas, cambios de estado y reubicaciones físicas de los activos de equipo y mobiliario.'
-        },
-        'incidencias': {
-            title: 'Reporte de incidencias y mantenimientos',
-            text: 'Muestra las incidencias reportadas en equipos, las solicitudes de mantenimiento técnico y el histórico de reparaciones.'
         }
     };
 

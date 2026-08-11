@@ -73,7 +73,10 @@ class AuditController {
             $query .= " AND b.modulo_afectado = ?";
             $params[] = $filters['modulo'];
         }
-        if (!empty($filters['buscar_usuario'])) {
+        if (!empty($filters['usuario_id'])) {
+            $query .= " AND u.us_id = ?";
+            $params[] = $filters['usuario_id'];
+        } elseif (!empty($filters['buscar_usuario'])) {
             $query .= " AND u.nombre LIKE ?";
             $params[] = "%" . $filters['buscar_usuario'] . "%";
         }
@@ -218,27 +221,36 @@ class AuditController {
      */
 
     public function getAttendanceByUser($filters) {
-        $query = "SELECT u.us_id, u.nombre, u.rol,
-                         COUNT(r.re_id) as total_reservas, 
-                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
-                  FROM usuario u
-                  JOIN reserva r ON u.us_id = r.us_id AND r.estatus = 'Aprobada'";
+        $query = "SELECT res.re_id, res.fecha_uso, res.hora_ent, res.hora_sal, res.num_alumnos, res.estatus,
+                         e.nombre_numero as espacio, e.edificio,
+                         CONCAT(u.nombre, ' ', COALESCE(u.apellido, '')) as usuario_nombre,
+                         COALESCE(r.nombre, 'Usuario') as rol
+                  FROM reserva res
+                  JOIN usuario u ON res.us_id = u.us_id
+                  LEFT JOIN roles r ON u.rol_id = r.rol_id
+                  JOIN espacio e ON res.esp_id = e.esp_id
+                  WHERE 1=1";
         $params = [];
 
-        if (!empty($filters['fecha_inicio'])) {
-            $query .= " AND r.fecha_uso >= ?";
-            $params[] = $filters['fecha_inicio'];
-        }
-        if (!empty($filters['fecha_fin'])) {
-            $query .= " AND r.fecha_uso <= ?";
-            $params[] = $filters['fecha_fin'];
-        }
-        if (!empty($filters['buscar_usuario'])) {
-            $query .= " AND u.nombre LIKE ?";
+        if (!empty($filters['usuario_id'])) {
+            $query .= " AND u.us_id = ?";
+            $params[] = $filters['usuario_id'];
+        } elseif (!empty($filters['buscar_usuario'])) {
+            $query .= " AND (u.nombre LIKE ? OR u.apellido LIKE ?)";
+            $params[] = "%" . $filters['buscar_usuario'] . "%";
             $params[] = "%" . $filters['buscar_usuario'] . "%";
         }
 
-        $query .= " GROUP BY u.us_id, u.nombre, u.rol ORDER BY total_asistencia DESC";
+        if (!empty($filters['fecha_inicio'])) {
+            $query .= " AND res.fecha_uso >= ?";
+            $params[] = $filters['fecha_inicio'];
+        }
+        if (!empty($filters['fecha_fin'])) {
+            $query .= " AND res.fecha_uso <= ?";
+            $params[] = $filters['fecha_fin'];
+        }
+
+        $query .= " ORDER BY res.fecha_uso DESC, res.hora_ent DESC";
         
         $stmt = $this->db->prepare($query);
         $stmt->execute($params);
@@ -271,7 +283,10 @@ class AuditController {
             $query .= " AND DATE(p.fecha_pres) <= ?";
             $params[] = $filters['fecha_fin'];
         }
-        if (!empty($filters['buscar_usuario'])) {
+        if (!empty($filters['usuario_id'])) {
+            $query .= " AND u.us_id = ?";
+            $params[] = $filters['usuario_id'];
+        } elseif (!empty($filters['buscar_usuario'])) {
             $query .= " AND u.nombre LIKE ?";
             $params[] = "%" . $filters['buscar_usuario'] . "%";
         }
@@ -300,18 +315,6 @@ class AuditController {
         return $this->getGeneralActivity($filters);
     }
 
-
-// ============================================================================
-// SECCIÓN 11: LÓGICA DE NEGOCIO Y OPERACIÓN (getIncidents)
-// ============================================================================
-    /**
-     * Reporte: Incidencias, alertas y mantenimientos
-     */
-
-    public function getIncidents($filters) {
-        $filters['modulo'] = 'MANTENIMIENTO'; // O buscar por LIKE %incidencia%
-        return $this->getGeneralActivity($filters);
-    }
 
 
 // ============================================================================
