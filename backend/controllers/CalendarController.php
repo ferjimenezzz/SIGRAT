@@ -68,8 +68,8 @@ class CalendarController {
      */
 
     public function getEventsFiltered($edificio = null, $esp_id = null, $tipo = null, $fecha_inicio = null, $fecha_fin = null, $us_id = null, $status = null) {
-        // Auto-cancelar reservas pendientes que ya pasaron de tiempo y no fueron aceptadas
-        $this->db->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (status = 'pending' OR estatus = 'Pendiente') AND (fecha_uso < CURRENT_DATE OR (fecha_uso = CURRENT_DATE AND hora_sal < CURRENT_TIME))");
+        // 1. Auto-cancel expired pending reservations, ajustado a hora de México
+        $this->db->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (status = 'pending' OR estatus = 'Pendiente') AND (fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date OR (fecha_uso = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date AND hora_sal < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::time))");
 
         $query = "SELECT r.*, e.nombre_numero, e.tipo as espacio_tipo, e.edificio, e.capacidad as espacio_capacidad, u.nombre as usuario_nombre, u.correo as usuario_correo
                   FROM reserva r
