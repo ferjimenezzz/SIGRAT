@@ -33,22 +33,40 @@ class Database {
     private $conn;
 
     /**
-     * Credenciales de conexión cloud (Supabase Pooler).
+     * Credenciales de conexión
      */
-    private $host = 'aws-1-us-east-1.pooler.supabase.com';
-    private $port = '6543';
-    private $user = 'postgres.ewxidsyynsvbhvodxowg';
-    private $pass = 'Fjamnr050.1';
-    private $db   = 'postgres';
+    private $host;
+    private $port;
+    private $user;
+    private $pass;
+    private $db;
 
     /**
      * Constructor privado para evitar instanciación directa externa (Patrón Singleton).
      * Configura el Data Source Name (DSN) y establece las opciones de seguridad del protocolo PDO.
      */
     private function __construct() {
+        // Cargar credenciales desde el archivo .env
+        $envFile = __DIR__ . '/../../.env';
+        if (file_exists($envFile)) {
+            $env = parse_ini_file($envFile);
+            $this->host = $env['DB_HOST'] ?? '127.0.0.1';
+            $this->port = $env['DB_PORT'] ?? '5432';
+            $this->user = $env['DB_USERNAME'] ?? 'postgres';
+            $this->pass = $env['DB_PASSWORD'] ?? '';
+            $this->db   = $env['DB_DATABASE'] ?? 'postgres';
+        } else {
+            // Fallback si no existe .env
+            $this->host = '127.0.0.1';
+            $this->port = '5432';
+            $this->user = 'postgres';
+            $this->pass = '';
+            $this->db   = 'postgres';
+        }
+
         try {
-            // Construcción del DSN para PostgreSQL requiriendo canal cifrado SSL/TLS de forma obligatoria
-            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db};sslmode=require";
+            // Construcción del DSN para PostgreSQL. NOTA: Se remueve sslmode=require si la bd local no tiene SSL.
+            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db}";
             
             // Instanciación del objeto PDO con opciones de blindaje arquitectónico
             $this->conn = new PDO(

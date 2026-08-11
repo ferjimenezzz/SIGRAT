@@ -34,8 +34,8 @@ class EmailService {
         $this->mail = new PHPMailer(true);
 
         try {
-            // Cargar archivo .env manualmente
-            $env_file = dirname(__DIR__) . '/.env';
+            // Cargar archivo .env desde la raíz del proyecto
+            $env_file = dirname(__DIR__, 2) . '/.env';
             $env = [];
             if (file_exists($env_file)) {
                 $env = parse_ini_file($env_file);
