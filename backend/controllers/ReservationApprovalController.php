@@ -51,7 +51,7 @@ class ReservationApprovalController
     public function getByStatus(int $userId, bool $isAdmin, string $status = 'pending'): array
     {
         // 1. Auto-cancel expired pending reservations (sólo si ya pasó la fecha de uso o el horario final en el día de hoy, ajustado a hora de México)
-        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (status = 'pending' OR estatus = 'Pendiente') AND (fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date OR (fecha_uso = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date AND hora_sal < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::time))");
+        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (status = 'pending' OR estatus = 'Pendiente') AND fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date");
 
         // 2. Fetch based on status
         if ($status === 'cancelled') {
