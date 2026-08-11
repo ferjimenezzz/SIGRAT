@@ -1,6 +1,11 @@
 <?php
-// backend/reports/excel_export.php
-require_once __DIR__ . '/../vendor/autoload.php';
+// Cargar autoloader de vendor (soporta vendor en raíz del proyecto y vendor en backend)
+if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+    require_once __DIR__ . '/../../vendor/autoload.php';
+}
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
