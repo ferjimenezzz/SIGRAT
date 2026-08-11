@@ -74,11 +74,17 @@ function handleReservationApproval(string $method, string $path)
     // SECCIÓN 3: VERIFICACIÓN DE PRIVILEGIOS DE ACCESO (RBAC)
     // ============================================================================
     $userRol = strtoupper(trim((string)$role));
-    $isAdmin = strpos($userRol, 'ADMIN') !== false;
+    $isMaestro = (
+        strpos($userRol, 'MAESTRO') !== false || 
+        strpos($userRol, 'DOCENTE') !== false || 
+        strpos($userRol, 'PROFESOR') !== false
+    );
+    $isAdmin = strpos($userRol, 'ADMIN') !== false || $userRol === 'SUPER ADMINISTRADOR';
+    $canManageApprovals = $isAdmin || $isMaestro;
 
-    // Permitir acceso a administradores o personal institucional autorizado.
-    // Nota: La cancelación ('cancel') puede ser invocada por el dueño de la reserva o directivos.
-    if (!$isAdmin && $role !== 'Personal Académico' && !in_array($action, ['cancel', 'pending', 'approved'])) {
+    // Permitir acceso a administradores, maestros/docentes y personal autorizado.
+    $allowedActions = ['cancel', 'pending', 'approved', 'cancelled', 'approve', 'reject'];
+    if (!$canManageApprovals && $role !== 'Personal Académico' && !in_array($action, $allowedActions)) {
         http_response_code(403);
         echo json_encode(['error' => "Acceso denegado: rol insuficiente o sesión expirada. Rol actual: " . ($role ?: 'Ninguno')]);
         exit;
@@ -92,7 +98,7 @@ function handleReservationApproval(string $method, string $path)
     try {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($action, ['pending', 'approved', 'cancelled'])) {
             // 4.1. Consultar listado por estado
-            $data = $controller->getByStatus((int)$adminId, $isAdmin, $action);
+            $data = $controller->getByStatus((int)$adminId, $canManageApprovals, $action);
             http_response_code(200);
             echo json_encode($data);
         } elseif ($action === 'approve') {
@@ -110,7 +116,7 @@ function handleReservationApproval(string $method, string $path)
         } elseif ($action === 'cancel') {
             // 4.4. Cancelar reserva por parte del usuario o directivo
             $reason = $input['reason'] ?? 'Cancelada por el usuario';
-            $controller->cancel($reservationId, (int)$adminId, $isAdmin, $reason);
+            $controller->cancel($reservationId, (int)$adminId, $canManageApprovals, $reason);
             http_response_code(200);
             echo json_encode(['message' => 'Reserva cancelada exitosamente']);
         } else {
