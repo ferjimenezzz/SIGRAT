@@ -204,18 +204,28 @@ include 'header.php';
     <div class="card">
         <form method="GET" action="auditoria.php" id="filterForm">
             <!-- Selector Principal -->
-            <div class="filter-group" style="margin-bottom: 24px; max-width: 400px;">
-                <label>Selecciona el tipo de reporte</label>
-                <select name="tipo_reporte" id="tipoReporte" style="font-size: 15px; font-weight: 600; padding: 12px;">
-                    <option value="actividad" <?php echo $tipo_reporte == 'actividad' ? 'selected' : ''; ?>>Actividad general del sistema</option>
-                    <option value="asistencia" <?php echo $tipo_reporte == 'asistencia' ? 'selected' : ''; ?>>Reporte de asistencia a aulas</option>
-                    <option value="aulas_top" <?php echo $tipo_reporte == 'aulas_top' ? 'selected' : ''; ?>>Reporte de aulas más utilizadas</option>
-                    <option value="uso_edificio" <?php echo $tipo_reporte == 'uso_edificio' ? 'selected' : ''; ?>>Reporte de uso por edificio</option>
-                    <option value="asistencia_usuario" <?php echo $tipo_reporte == 'asistencia_usuario' ? 'selected' : ''; ?>>Reporte de asistencia por usuario</option>
-                    <option value="prestamos" <?php echo $tipo_reporte == 'prestamos' ? 'selected' : ''; ?>>Reporte de préstamos de activos</option>
-                    <option value="inventario" <?php echo $tipo_reporte == 'inventario' ? 'selected' : ''; ?>>Reporte de movimientos de inventario</option>
-                    <option value="incidencias" <?php echo $tipo_reporte == 'incidencias' ? 'selected' : ''; ?>>Reporte de incidencias y mantenimientos</option>
-                </select>
+            <div style="display: flex; gap: 24px; align-items: stretch; margin-bottom: 24px; flex-wrap: wrap;">
+                <div class="filter-group" style="flex: 1; min-width: 300px; max-width: 450px; margin-bottom: 0;">
+                    <label>Selecciona el tipo de reporte</label>
+                    <select name="tipo_reporte" id="tipoReporte" style="font-size: 15px; font-weight: 600; padding: 12px;">
+                        <option value="actividad" <?php echo $tipo_reporte == 'actividad' ? 'selected' : ''; ?>>Actividad general del sistema</option>
+                        <option value="asistencia" <?php echo $tipo_reporte == 'asistencia' ? 'selected' : ''; ?>>Reporte de asistencia a aulas</option>
+                        <option value="aulas_top" <?php echo $tipo_reporte == 'aulas_top' ? 'selected' : ''; ?>>Reporte de aulas más utilizadas</option>
+                        <option value="uso_edificio" <?php echo $tipo_reporte == 'uso_edificio' ? 'selected' : ''; ?>>Reporte de uso por edificio</option>
+                        <option value="asistencia_usuario" <?php echo $tipo_reporte == 'asistencia_usuario' ? 'selected' : ''; ?>>Reporte de asistencia por usuario</option>
+                        <option value="prestamos" <?php echo $tipo_reporte == 'prestamos' ? 'selected' : ''; ?>>Reporte de préstamos de activos</option>
+                        <option value="inventario" <?php echo $tipo_reporte == 'inventario' ? 'selected' : ''; ?>>Reporte de movimientos de inventario</option>
+                        <option value="incidencias" <?php echo $tipo_reporte == 'incidencias' ? 'selected' : ''; ?>>Reporte de incidencias y mantenimientos</option>
+                    </select>
+                </div>
+                
+                <div id="reportDescriptionBox" style="flex: 2; min-width: 300px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                    <div style="font-size: 24px; color: #2563eb; display: flex; align-items: center; justify-content: center;"><i class="bi bi-info-circle-fill"></i></div>
+                    <div>
+                        <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 800; color: #1e293b;" id="reportDescTitle">Actividad general del sistema</h4>
+                        <p style="margin: 0; font-size: 12.5px; color: #64748b; line-height: 1.4;" id="reportDescText">Muestra el registro cronológico de todas las acciones del sistema, como inicios de sesión, inserciones, modificaciones y eliminaciones realizadas por los usuarios.</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Rango de Fechas (Siempre visible) -->
@@ -425,8 +435,58 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.fg-activo').style.display = 'flex';
         }
     };
-    reportType.addEventListener('change', updateFilters);
+
+    const reportDescriptions = {
+        'actividad': {
+            title: 'Actividad general del sistema',
+            text: 'Muestra el registro detallado y cronológico de todas las acciones operativas realizadas por los usuarios en el sistema (inicios de sesión, modificaciones y eliminaciones).'
+        },
+        'asistencia': {
+            title: 'Reporte de asistencia a aulas',
+            text: 'Permite visualizar el registro de asistencia estimado y real de alumnos y docentes en las aulas y laboratorios reservados del campus.'
+        },
+        'aulas_top': {
+            title: 'Reporte de aulas más utilizadas',
+            text: 'Genera estadísticas y rankings de los espacios con mayor frecuencia de reservación y horas de uso acumuladas.'
+        },
+        'uso_edificio': {
+            title: 'Reporte de uso por edificio',
+            text: 'Muestra la distribución porcentual y cantidad de reservaciones realizadas en cada uno de los edificios del campus (CIC, PIDET, etc.).'
+        },
+        'asistencia_usuario': {
+            title: 'Reporte de asistencia por usuario',
+            text: 'Filtra y exporta la bitácora de asistencia acumulada por un docente o alumno en específico dentro del rango de fechas.'
+        },
+        'prestamos': {
+            title: 'Reporte de préstamos de activos',
+            text: 'Muestra el historial y estado actual de los préstamos de equipos tecnológicos (laptops, proyectores, etc.) entregados a los usuarios.'
+        },
+        'inventario': {
+            title: 'Reporte de movimientos de inventario',
+            text: 'Registra altas, bajas, cambios de estado y reubicaciones físicas de los activos de equipo y mobiliario.'
+        },
+        'incidencias': {
+            title: 'Reporte de incidencias y mantenimientos',
+            text: 'Muestra las incidencias reportadas en equipos, las solicitudes de mantenimiento técnico y el histórico de reparaciones.'
+        }
+    };
+
+    const descTitle = document.getElementById('reportDescTitle');
+    const descText = document.getElementById('reportDescText');
+    const updateDescription = () => {
+        const val = reportType.value;
+        if (reportDescriptions[val]) {
+            descTitle.textContent = reportDescriptions[val].title;
+            descText.textContent = reportDescriptions[val].text;
+        }
+    };
+
+    reportType.addEventListener('change', () => {
+        updateFilters();
+        updateDescription();
+    });
     updateFilters(); // Run on load
+    updateDescription(); // Run on load
 });
 
 // Preset Dates
