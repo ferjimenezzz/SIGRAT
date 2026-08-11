@@ -485,6 +485,59 @@ include 'header.php';
     .event-capsule.event-color-teal { background: #f0fdfa; color: #0d9488; border-left-color: #0d9488; }
     .event-capsule.event-color-red { background: #fef2f2; color: #e11d48; border-left-color: #e11d48; }
 
+    /* SISTEMA DE 40 COLORES FIJOS Y ÚNICOS POR AULA/ESPACIO */
+    .event-color-sp-1 { --sp-bg: #eff6ff; --sp-border: #2563eb; --sp-text: #1d4ed8; --sp-dark: #1e3a8a; } /* Sala Magna 1 */
+    .event-color-sp-2 { --sp-bg: #f5f3ff; --sp-border: #6366f1; --sp-text: #4338ca; --sp-dark: #312e81; } /* Sala Magna 2 */
+    .event-color-sp-3 { --sp-bg: #ecfeff; --sp-border: #06b6d4; --sp-text: #0e7490; --sp-dark: #164e63; } /* Sala Magna 3 */
+    .event-color-sp-4 { --sp-bg: #fffbeb; --sp-border: #f59e0b; --sp-text: #b45309; --sp-dark: #78350f; } /* Sala Magna 4 */
+    .event-color-sp-5 { --sp-bg: #f8fafc; --sp-border: #8b5cf6; --sp-text: #6d28d9; --sp-dark: #4c1d95; } /* Posgrado 1 */
+    .event-color-sp-6 { --sp-bg: #f7fee7; --sp-border: #84cc16; --sp-text: #4d7c0f; --sp-dark: #365314; } /* Posgrado 2 */
+    .event-color-sp-7 { --sp-bg: #fff1f2; --sp-border: #f43f5e; --sp-text: #be123c; --sp-dark: #881337; } /* Salón 1 */
+    .event-color-sp-8 { --sp-bg: #f8fafc; --sp-border: #64748b; --sp-text: #334155; --sp-dark: #0f172a; } /* Cubículos */
+    .event-color-sp-9 { --sp-bg: #fdf4ff; --sp-border: #d946ef; --sp-text: #a21caf; --sp-dark: #701a75; } /* Oficina Lety */
+    .event-color-sp-10 { --sp-bg: #fff7ed; --sp-border: #ea580c; --sp-text: #c2410c; --sp-dark: #7c2d12; } /* Aula Digital 1 */
+    .event-color-sp-11 { --sp-bg: #ecfdf5; --sp-border: #10b981; --sp-text: #047857; --sp-dark: #064e3b; } /* Aula Digital 2 */
+    .event-color-sp-12 { --sp-bg: #f0f9ff; --sp-border: #0ea5e9; --sp-text: #0369a1; --sp-dark: #0c4a6e; } /* Aula Digital 3 */
+    .event-color-sp-13 { --sp-bg: #fdf2f8; --sp-border: #ec4899; --sp-text: #be185d; --sp-dark: #831843; } /* Aula Digital 4 */
+    .event-color-sp-14 { --sp-bg: #faf5ff; --sp-border: #9333ea; --sp-text: #7e22ce; --sp-dark: #581c87; } /* Aula 5 Digital */
+    .event-color-sp-15 { --sp-bg: #fef2f2; --sp-border: #dc2626; --sp-text: #b91c1c; --sp-dark: #7f1d1d; } /* Auditorio PIDET Baja */
+    .event-color-sp-16 { --sp-bg: #fcfcf8; --sp-border: #65a30d; --sp-text: #4d7c0f; --sp-dark: #365314; } /* Maker Space */
+    .event-color-sp-17 { --sp-bg: #fefce8; --sp-border: #eab308; --sp-text: #a16207; --sp-dark: #713f12; } /* Talentos */
+    .event-color-sp-18 { --sp-bg: #f0fdfa; --sp-border: #14b8a6; --sp-text: #0f766e; --sp-dark: #134e4a; } /* Aula 03 */
+    .event-color-sp-19 { --sp-bg: #eef2ff; --sp-border: #4f46e5; --sp-text: #3730a3; --sp-dark: #312e81; } /* Aula 04 */
+    .event-color-sp-20 { --sp-bg: #fff0f5; --sp-border: #e11d48; --sp-text: #9f1239; --sp-dark: #881337; } /* Aula 05 */
+    .event-color-sp-21 { --sp-bg: #fef5ec; --sp-border: #d97706; --sp-text: #92400e; --sp-dark: #78350f; } /* Aula 06 */
+    .event-color-sp-22 { --sp-bg: #f0fdf4; --sp-border: #15803d; --sp-text: #166534; --sp-dark: #14532d; } /* Posgrado 1 Baja */
+    .event-color-sp-23 { --sp-bg: #f1f5f9; --sp-border: #475569; --sp-text: #1e293b; --sp-dark: #0f172a; } /* Posgrado 2 Baja */
+    .event-color-sp-24 { --sp-bg: #eff6ff; --sp-border: #1e3a8a; --sp-text: #1e3a8a; --sp-dark: #172554; } /* UNAM */
+    .event-color-sp-25 { --sp-bg: #e6fffa; --sp-border: #00a88f; --sp-text: #007a67; --sp-dark: #004d40; } /* Lab. Siemens */
+    .event-color-sp-26 { --sp-bg: #ebf8ff; --sp-border: #0077b6; --sp-text: #023e8a; --sp-dark: #03045e; } /* Aula Siemens */
+    .event-color-sp-27 { --sp-bg: #e6f0fa; --sp-border: #0068b5; --sp-text: #004880; --sp-dark: #002d50; } /* Laboratorio Intel */
+    .event-color-sp-28 { --sp-bg: #e8f4fd; --sp-border: #0f62fe; --sp-text: #0043ce; --sp-dark: #001d6c; } /* Sala IBM */
+    .event-color-sp-29 { --sp-bg: #e8fcf8; --sp-border: #00bceb; --sp-text: #0080a0; --sp-dark: #005a70; } /* Laboratorio CISCO */
+    .event-color-sp-30 { --sp-bg: #f3e8ff; --sp-border: #a855f7; --sp-text: #7e22ce; --sp-dark: #581c87; } /* Aula CIC Alta */
+    .event-color-sp-31 { --sp-bg: #fff0f3; --sp-border: #800f2f; --sp-text: #590d22; --sp-dark: #3f0817; } /* Sala Videoconferencias */
+    .event-color-sp-32 { --sp-bg: #fbf7f4; --sp-border: #8c6b5d; --sp-text: #5c4033; --sp-dark: #3b2820; } /* Sala de Juntas */
+    .event-color-sp-33 { --sp-bg: #edf7ed; --sp-border: #2e7d32; --sp-text: #1b5e20; --sp-dark: #0d3810; } /* Embebidos */
+    .event-color-sp-34 { --sp-bg: #ffebee; --sp-border: #cf0a2c; --sp-text: #9f001c; --sp-dark: #6e0012; } /* Aula Huawei */
+    .event-color-sp-35 { --sp-bg: #e8f8f5; --sp-border: #16a085; --sp-text: #0e6655; --sp-dark: #0b4a3e; } /* GE Vernova */
+    .event-color-sp-36 { --sp-bg: #e3f2fd; --sp-border: #1565c0; --sp-text: #0d47a1; --sp-dark: #0a3577; } /* Auditorio CIC Baja */
+    .event-color-sp-37 { --sp-bg: #ede7f6; --sp-border: #673ab7; --sp-text: #4527a0; --sp-dark: #311b92; } /* CEPRODI */
+    .event-color-sp-38 { --sp-bg: #fff3e0; --sp-border: #e65100; --sp-text: #bf360c; --sp-dark: #8c2608; } /* Sala Capacitación */
+    .event-color-sp-39 { --sp-bg: #e0f2f1; --sp-border: #00897b; --sp-text: #00695c; --sp-dark: #004d40; } /* Centro Innovación Siemens */
+    .event-color-sp-40 { --sp-bg: #fce4ec; --sp-border: #880e4f; --sp-text: #560027; --sp-dark: #3c001b; } /* Aula Proyectos */
+
+    .event-capsule[class*="event-color-sp-"] {
+        background: var(--sp-bg);
+        color: var(--sp-text);
+        border-left-color: var(--sp-border);
+    }
+    .week-event-card[class*="event-color-sp-"] {
+        background: var(--sp-bg);
+        color: var(--sp-dark, var(--sp-text));
+        border-left-color: var(--sp-border);
+    }
+
     /* DETALLES LATERALES DERECHOS */
     .calendar-sidebar-details {
         display: flex;
@@ -2324,18 +2377,15 @@ include 'header.php';
     };
 
     // SISTEMA DE COLORES POR ESPACIO
+    // SISTEMA DE COLORES ÚNICOS FIJOS POR AULA/ESPACIO
     function getColorForSpace(esp_id) {
-        const colors = [
-            'event-color-blue', 'event-color-purple', 'event-color-orange', 
-            'event-color-pink', 'event-color-green', 'event-color-teal', 'event-color-red'
-        ];
-        let hash = 0;
-        const str = String(esp_id);
-        for (let i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const id = parseInt(esp_id, 10);
+        if (!isNaN(id) && id >= 1 && id <= 40) {
+            return `event-color-sp-${id}`;
         }
-        const index = Math.abs(hash) % colors.length;
-        return colors[index];
+        // Fallback si en el futuro se agregan más salones (> 40)
+        const num = !isNaN(id) && id > 0 ? ((Math.abs(id) - 1) % 40) + 1 : 1;
+        return `event-color-sp-${num}`;
     }
 
     // LÓGICA CENTRALIZADA DE NEGOCIO PARA ESPACIOS
