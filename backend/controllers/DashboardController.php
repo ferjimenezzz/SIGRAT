@@ -258,7 +258,15 @@ class DashboardController {
      */
 
     public function getInventoryStatus() {
-        $query = "SELECT estatus, COUNT(*) as total FROM ACTIVO GROUP BY estatus";
+        $query = "
+            SELECT estatus, COUNT(*) as total 
+            FROM (
+                SELECT estatus FROM ACTIVO
+                UNION ALL
+                SELECT 'Disponible' AS estatus FROM MOBILIARIO
+            ) as AllAssets
+            GROUP BY estatus
+        ";
         try {
             return $this->db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
