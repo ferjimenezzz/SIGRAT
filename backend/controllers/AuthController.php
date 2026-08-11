@@ -127,7 +127,7 @@ class AuthController {
      * @return array Arreglo asociativo con success (booleano) y message (string).
      */
 
-    public function register($nombre, $correo, $telefono, $carrera, $password) {
+    public function register($nombre, $correo, $telefono, $carrera, $password, $genero = 'Masculino') {
         try {
             // 1. Verificar si el correo ya está en uso
             $stmt = $this->db->prepare("SELECT us_id FROM USUARIO WHERE correo = ?");
@@ -149,8 +149,8 @@ class AuthController {
             $hashedPassword = self::hashPassword($password);
 
             // 4. Insertar el nuevo registro
-            $stmtInsert = $this->db->prepare("INSERT INTO USUARIO (nombre, correo, telefono, carrera, contrasena, rol_id, estatus) VALUES (?, ?, ?, ?, ?, ?, 'Activo')");
-            $success = $stmtInsert->execute([$nombre, $correo, $telefono, $carrera, $hashedPassword, $rol_id]);
+            $stmtInsert = $this->db->prepare("INSERT INTO USUARIO (nombre, correo, telefono, carrera, contrasena, rol_id, estatus, genero) VALUES (?, ?, ?, ?, ?, ?, 'Activo', ?)");
+            $success = $stmtInsert->execute([$nombre, $correo, $telefono, $carrera, $hashedPassword, $rol_id, $genero]);
 
             if ($success) {
                 return ['success' => true, 'message' => 'Usuario registrado exitosamente.'];

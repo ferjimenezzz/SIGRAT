@@ -165,14 +165,21 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nombre Completo</label>
-                            <input type="text" id="nombreRegistro" class="form-control" required minlength="3">
+                            <input type="text" id="nombreRegistro" class="form-control" required>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Género</label>
+                            <select id="generoRegistro" class="form-select" required>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Correo Institucional</label>
                             <input type="email" id="correoRegistro" class="form-control" placeholder="ejemplo@uteq.edu.mx" required>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Número Telefónico</label>
                             <input type="tel" id="telefonoRegistro" class="form-control" pattern="[0-9]{10}" maxlength="10" required>
@@ -265,13 +272,14 @@
 <script>
 function registrarUsuario(){
     let nombre = document.getElementById("nombreRegistro").value;
+    let genero = document.getElementById("generoRegistro").value;
     let correo = document.getElementById("correoRegistro").value;
     let telefono = document.getElementById("telefonoRegistro").value;
     let carrera = document.getElementById("carreraRegistro").value;
     let password = document.getElementById("passwordRegistro").value;
     let confirmPassword = document.getElementById("confirmPassword").value;
 
-    if(!nombre || !correo || !telefono || !carrera || !password) {
+    if(!nombre || !genero || !correo || !telefono || !carrera || !password) {
         alert("Por favor, completa todos los campos.");
         return;
     }
@@ -299,6 +307,7 @@ function registrarUsuario(){
         },
         body: JSON.stringify({
             nombre: nombre,
+            genero: genero,
             correo: correo,
             telefono: telefono,
             carrera: carrera,

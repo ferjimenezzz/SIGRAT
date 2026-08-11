@@ -205,7 +205,8 @@ try {
                         $input['correo'] ?? '', 
                         $input['telefono'] ?? '', 
                         $input['carrera'] ?? '', 
-                        $input['password'] ?? ''
+                        $input['password'] ?? '',
+                        $input['genero'] ?? 'Masculino'
                     );
                     $status_code = $response['success'] ? 201 : 400;
                 } elseif ($action === 'forgot-password') {
