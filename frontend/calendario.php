@@ -13,6 +13,12 @@ require_once '../backend/config/Database.php';
 $db = Config\Database::getConnection();
 $us_id_sesion = $_SESSION['us_id'] ?? null;
 $isAdmin = isset($_SESSION['rol']) && strpos(strtoupper(trim($_SESSION['rol'])), 'ADMIN') !== false;
+$userRolCurrent = isset($_SESSION['rol']) ? strtoupper(trim($_SESSION['rol'])) : '';
+$isMaestro = (
+    strpos($userRolCurrent, 'MAESTRO') !== false || 
+    strpos($userRolCurrent, 'DOCENTE') !== false || 
+    strpos($userRolCurrent, 'PROFESOR') !== false
+);
 
 // 1. Obtener detalles del usuario autenticado para prellenar la reserva
 $stmtUser = $db->prepare("SELECT nombre, correo, telefono, carrera FROM usuario WHERE us_id = ?");
@@ -344,6 +350,10 @@ include 'header.php';
         grid-template-columns: 1fr 300px;
         gap: 24px;
         align-items: start;
+    }
+
+    .calendar-grid-layout.full-width-calendar {
+        grid-template-columns: 1fr !important;
     }
 
     @media (max-width: 1024px) {
@@ -1808,7 +1818,7 @@ include 'header.php';
     </div>
 
     <!-- CUADRO PRINCIPAL (MENSUAL) -->
-    <div class="calendar-grid-layout" id="monthViewGrid">
+    <div class="calendar-grid-layout <?php echo $isMaestro ? 'full-width-calendar' : ''; ?>" id="monthViewGrid">
         <!-- Calendario Mensual -->
         <div class="month-calendar-card">
             <div class="month-days-header">
@@ -1825,6 +1835,7 @@ include 'header.php';
             </div>
         </div>
 
+        <?php if (!$isMaestro): ?>
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
             <!-- Resumen del Día -->
@@ -1874,6 +1885,7 @@ include 'header.php';
                 </div>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 
     <!-- TIMETABLE SEMANAL (SEMANA) -->
@@ -4278,122 +4290,126 @@ include 'header.php';
         const uniqueOccupied = [...new Set(occupiedSpaceIds)];
         const libresCount = Math.max(0, filteredSpaces.length - uniqueOccupied.length);
 
-        document.getElementById('statReservasHoy').textContent = totalHoyCount;
-        document.getElementById('statDisponibles').textContent = libresCount;
-        document.getElementById('statPendientes').textContent = pendientesCount;
+        if (document.getElementById('statReservasHoy')) document.getElementById('statReservasHoy').textContent = totalHoyCount;
+        if (document.getElementById('statDisponibles')) document.getElementById('statDisponibles').textContent = libresCount;
+        if (document.getElementById('statPendientes')) document.getElementById('statPendientes').textContent = pendientesCount;
 
         // 2. Próximas Reservaciones Sidebar — Semana completa (7 días), ordenadas cronológicamente
         const upcomingList = document.getElementById('upcomingReservationsList');
-        upcomingList.innerHTML = '';
+        if (upcomingList) {
+            upcomingList.innerHTML = '';
 
-        const nowDate = new Date();
-        const tzOffset = nowDate.getTimezoneOffset() * 60000;
-        const todayStrLocal = (new Date(nowDate.getTime() - tzOffset)).toISOString().slice(0, 10);
-        const sevenDaysLater = new Date(nowDate.getTime() - tzOffset + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+            const nowDate = new Date();
+            const tzOffset = nowDate.getTimezoneOffset() * 60000;
+            const todayStrLocal = (new Date(nowDate.getTime() - tzOffset)).toISOString().slice(0, 10);
+            const sevenDaysLater = new Date(nowDate.getTime() - tzOffset + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-        const currentTimeStr = nowDate.toTimeString().substring(0, 5); // "HH:MM"
+            const currentTimeStr = nowDate.toTimeString().substring(0, 5); // "HH:MM"
 
-        // Filtrar eventos de los próximos 7 días (incluyendo hoy)
-        const weekEvents = filteredEvents
-            .filter(ev => {
-                if (ev.fecha_uso < todayStrLocal || ev.fecha_uso > sevenDaysLater) return false;
-                
-                const est = (ev.estatus || ev.status || '').toLowerCase();
-                if (est === 'cancelada' || est === 'cancelado' || est === 'cancelled' || est === 'rechazada' || est === 'rechazado' || est === 'rejected') return false;
+            // Filtrar eventos de los próximos 7 días (incluyendo hoy)
+            const weekEvents = filteredEvents
+                .filter(ev => {
+                    if (ev.fecha_uso < todayStrLocal || ev.fecha_uso > sevenDaysLater) return false;
+                    
+                    const est = (ev.estatus || ev.status || '').toLowerCase();
+                    if (est === 'cancelada' || est === 'cancelado' || est === 'cancelled' || est === 'rechazada' || est === 'rechazado' || est === 'rejected') return false;
 
-                // Ocultar si ya pasó la hora de salida hoy
-                if (ev.fecha_uso === todayStrLocal) {
-                    const hSal = (ev.hora_sal || '').substring(0, 5);
-                    if (hSal && hSal < currentTimeStr) return false;
-                }
-                
-                return true;
-            })
-            .sort((a, b) => {
-                if (a.fecha_uso !== b.fecha_uso) return a.fecha_uso.localeCompare(b.fecha_uso);
-                return (a.hora_ent || '').localeCompare(b.hora_ent || '');
-            });
-        
-        if (weekEvents.length === 0) {
-            upcomingList.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); font-style:italic; text-align:center; padding: 12px 0;">Sin reservaciones programadas para los próximos 7 días.</div>';
-        } else {
-            const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-            const mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                    // Ocultar si ya pasó la hora de salida hoy
+                    if (ev.fecha_uso === todayStrLocal) {
+                        const hSal = (ev.hora_sal || '').substring(0, 5);
+                        if (hSal && hSal < currentTimeStr) return false;
+                    }
+                    
+                    return true;
+                })
+                .sort((a, b) => {
+                    if (a.fecha_uso !== b.fecha_uso) return a.fecha_uso.localeCompare(b.fecha_uso);
+                    return (a.hora_ent || '').localeCompare(b.hora_ent || '');
+                });
+            
+            if (weekEvents.length === 0) {
+                upcomingList.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); font-style:italic; text-align:center; padding: 12px 0;">Sin reservaciones programadas para los próximos 7 días.</div>';
+            } else {
+                const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                const mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
-            weekEvents.forEach(ev => {
-                const item = document.createElement('div');
-                item.className = 'upcoming-res-item';
-                item.style.cursor = 'pointer';
-                
-                let iconClass = 'icon-blue';
-                let iconType = 'bi-journal-check';
-                if(ev.espacio_tipo === 'Laboratorio') { iconClass = 'icon-orange'; iconType = 'bi-laptop'; }
-                if(ev.espacio_tipo === 'Auditorio') { iconClass = 'icon-green'; iconType = 'bi-megaphone'; }
+                weekEvents.forEach(ev => {
+                    const item = document.createElement('div');
+                    item.className = 'upcoming-res-item';
+                    item.style.cursor = 'pointer';
+                    
+                    let iconClass = 'icon-blue';
+                    let iconType = 'bi-journal-check';
+                    if(ev.espacio_tipo === 'Laboratorio') { iconClass = 'icon-orange'; iconType = 'bi-laptop'; }
+                    if(ev.espacio_tipo === 'Auditorio') { iconClass = 'icon-green'; iconType = 'bi-megaphone'; }
 
-                let badgeText = 'Confirmada';
-                let badgeClass = 'badge-confirmada';
-                const est = ev.estatus || ev.status;
-                if(est === 'Pendiente' || est === 'pending') { badgeText = 'Pendiente'; badgeClass = 'badge-pendiente'; }
-                if(est === 'Rechazada' || est === 'rejected' || est === 'rechazada') { badgeText = 'Rechazada'; badgeClass = 'badge-rechazada'; }
-                if(est === 'Cancelada' || est === 'cancelada' || est === 'cancelled' || est === 'Cancelado') { badgeText = 'Cancelada'; badgeClass = 'badge-cancelada'; }
+                    let badgeText = 'Confirmada';
+                    let badgeClass = 'badge-confirmada';
+                    const est = ev.estatus || ev.status;
+                    if(est === 'Pendiente' || est === 'pending') { badgeText = 'Pendiente'; badgeClass = 'badge-pendiente'; }
+                    if(est === 'Rechazada' || est === 'rejected' || est === 'rechazada') { badgeText = 'Rechazada'; badgeClass = 'badge-rechazada'; }
+                    if(est === 'Cancelada' || est === 'cancelada' || est === 'cancelled' || est === 'Cancelado') { badgeText = 'Cancelada'; badgeClass = 'badge-cancelada'; }
 
-                // Formatear fecha legible
-                let fechaLabel = ev.fecha_uso;
-                try {
-                    const parts = ev.fecha_uso.split('-');
-                    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    fechaLabel = `${diasSemana[d.getDay()]} ${d.getDate()} ${mesesCortos[d.getMonth()]}`;
-                    if (ev.fecha_uso === todayStrLocal) fechaLabel = 'Hoy';
-                } catch(err) {}
+                    // Formatear fecha legible
+                    let fechaLabel = ev.fecha_uso;
+                    try {
+                        const parts = ev.fecha_uso.split('-');
+                        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        fechaLabel = `${diasSemana[d.getDay()]} ${d.getDate()} ${mesesCortos[d.getMonth()]}`;
+                        if (ev.fecha_uso === todayStrLocal) fechaLabel = 'Hoy';
+                    } catch(err) {}
 
-                item.innerHTML = `
-                    <div class="res-item-icon ${iconClass}"><i class="bi ${iconType}"></i></div>
-                    <div class="res-item-info">
-                        <div class="res-item-name">${ev.nombre_numero}</div>
-                        <div class="res-item-time" style="color:var(--active-blue);font-weight:700;">${fechaLabel}</div>
-                        <div class="res-item-time">${(ev.hora_ent||'').substring(0,5)} - ${(ev.hora_sal||'').substring(0,5)}</div>
-                    </div>
-                    <span class="status-badge ${badgeClass}">${badgeText}</span>
-                `;
-                item.addEventListener('click', () => openDetailsModal(ev));
-                upcomingList.appendChild(item);
-            });
+                    item.innerHTML = `
+                        <div class="res-item-icon ${iconClass}"><i class="bi ${iconType}"></i></div>
+                        <div class="res-item-info">
+                            <div class="res-item-name">${ev.nombre_numero}</div>
+                            <div class="res-item-time" style="color:var(--active-blue);font-weight:700;">${fechaLabel}</div>
+                            <div class="res-item-time">${(ev.hora_ent||'').substring(0,5)} - ${(ev.hora_sal||'').substring(0,5)}</div>
+                        </div>
+                        <span class="status-badge ${badgeClass}">${badgeText}</span>
+                    `;
+                    item.addEventListener('click', () => openDetailsModal(ev));
+                    upcomingList.appendChild(item);
+                });
+            }
         }
 
         // 3. Espacios Disponibles Sidebar (Top 5 listado)
         const spacesList = document.getElementById('availableSpacesList');
-        spacesList.innerHTML = '';
+        if (spacesList) {
+            spacesList.innerHTML = '';
 
-        const topSpaces = filteredSpaces.slice(0, 5);
-        if (topSpaces.length === 0) {
-            spacesList.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); font-style:italic; text-align:center; padding: 12px 0;">No hay espacios registrados.</div>';
-        } else {
-            topSpaces.forEach(sp => {
-                const isOccupiedToday = uniqueOccupied.includes(sp.esp_id);
-                const stateText = isOccupiedToday ? 'Ocupado hoy' : 'Disponible';
-                const stateClass = isOccupiedToday ? 'state-ocupado' : 'state-libre';
-                const stateIcon = isOccupiedToday ? 'bi-lock' : 'bi-check-circle';
+            const topSpaces = filteredSpaces.slice(0, 5);
+            if (topSpaces.length === 0) {
+                spacesList.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); font-style:italic; text-align:center; padding: 12px 0;">No hay espacios registrados.</div>';
+            } else {
+                topSpaces.forEach(sp => {
+                    const isOccupiedToday = uniqueOccupied.includes(sp.esp_id);
+                    const stateText = isOccupiedToday ? 'Ocupado hoy' : 'Disponible';
+                    const stateClass = isOccupiedToday ? 'state-ocupado' : 'state-libre';
+                    const stateIcon = isOccupiedToday ? 'bi-lock' : 'bi-check-circle';
 
-                const sEl = document.createElement('div');
-                sEl.className = 'space-status-item';
-                sEl.innerHTML = `
-                    <div class="space-status-left">
-                        <i class="bi ${stateIcon} space-status-icon"></i>
-                        <span class="space-status-name">${sp.nombre_numero}</span>
-                    </div>
-                    <span class="space-status-state ${stateClass}">${stateText}</span>
-                `;
-                
-                sEl.addEventListener('click', () => {
-                    openResModal(dateStr);
-                    document.getElementById('resEdificio').value = sp.edificio;
-                    document.getElementById('resEdificio').dispatchEvent(new Event('change'));
-                    document.getElementById('resEspacio').value = sp.esp_id;
-                    document.getElementById('resEspacio').dispatchEvent(new Event('change'));
+                    const sEl = document.createElement('div');
+                    sEl.className = 'space-status-item';
+                    sEl.innerHTML = `
+                        <div class="space-status-left">
+                            <i class="bi ${stateIcon} space-status-icon"></i>
+                            <span class="space-status-name">${sp.nombre_numero}</span>
+                        </div>
+                        <span class="space-status-state ${stateClass}">${stateText}</span>
+                    `;
+                    
+                    sEl.addEventListener('click', () => {
+                        openResModal(dateStr);
+                        document.getElementById('resEdificio').value = sp.edificio;
+                        document.getElementById('resEdificio').dispatchEvent(new Event('change'));
+                        document.getElementById('resEspacio').value = sp.esp_id;
+                        document.getElementById('resEspacio').dispatchEvent(new Event('change'));
+                    });
+
+                    spacesList.appendChild(sEl);
                 });
-
-                spacesList.appendChild(sEl);
-            });
+            }
         }
     }
     // ENVIAR SOLICITUD DE RESERVACIÓN (DÍA ÚNICO O RECURRENTE)
