@@ -340,6 +340,9 @@
                     let text = th.innerText.trim().toUpperCase();
                     if (text === 'ACCIONES' || text === 'ACCIÓN' || text === 'OPCIONES') {
                         ignoreCols.push(index);
+                    } else if (th.hasAttribute('data-excel-split')) {
+                        const splitHeaders = th.getAttribute('data-excel-split').split('|');
+                        splitHeaders.forEach(h => headers.push(h.trim()));
                     } else {
                         headers.push(th.innerText.trim());
                     }
@@ -351,6 +354,9 @@
                         let text = cell.innerText.trim().toUpperCase();
                         if (text === 'ACCIONES' || text === 'ACCIÓN' || text === 'OPCIONES') {
                             ignoreCols.push(index);
+                        } else if (cell.hasAttribute('data-excel-split')) {
+                            const splitHeaders = cell.getAttribute('data-excel-split').split('|');
+                            splitHeaders.forEach(h => headers.push(h.trim()));
                         } else {
                             headers.push(cell.innerText.trim());
                         }
@@ -373,12 +379,17 @@
                     
                     tds.forEach((td, index) => {
                         if (!ignoreCols.includes(index)) {
-                            let text = td.innerText.trim().replace(/\n\s*\n/g, ' ').replace(/\n/g, ' - ');
-                            let img = td.querySelector('img');
-                            if (!text && img && img.src) {
-                                text = img.src;
+                            if (td.hasAttribute('data-excel-col1') && td.hasAttribute('data-excel-col2')) {
+                                rowData.push(td.getAttribute('data-excel-col1'));
+                                rowData.push(td.getAttribute('data-excel-col2'));
+                            } else {
+                                let text = td.innerText.trim().replace(/\n\s*\n/g, ' ').replace(/\n/g, ' - ');
+                                let img = td.querySelector('img');
+                                if (!text && img && img.src) {
+                                    text = img.src;
+                                }
+                                rowData.push(text);
                             }
-                            rowData.push(text);
                         }
                     });
                     if (rowData.length > 0) rows.push(rowData);
