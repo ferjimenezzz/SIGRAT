@@ -1522,6 +1522,17 @@ include 'header.php';
         overflow: hidden;
     }
 
+    @media (max-width: 1024px) {
+        .res-modal-two-col {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+        }
+        .res-modal-wide-card {
+            width: 95vw;
+            height: 95vh;
+        }
+    }
+
     /* COLUMNA IZQUIERDA: FORMULARIO */
     .form-pane {
         border-right: 1px solid #f1f5f9;
