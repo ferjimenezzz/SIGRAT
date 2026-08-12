@@ -933,7 +933,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
             <i class="bi bi-funnel"></i> Filtros
         </button>
-        <button type="button" class="btn-outline" onclick="window.open('../backend/reports/inventory_pdf.php', '_blank')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border-color: #ef4444; color: #ef4444;">
+        <button type="button" class="btn-outline" onclick="exportInventoryPDF()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border-color: #ef4444; color: #ef4444;">
             <i class="bi bi-file-earmark-pdf"></i> PDF
         </button>
         <button type="button" class="btn-outline" onclick="exportTableToExcel('inventoryTable', 'Inventario_SIGRAT')" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; border-color: #10b981; color: #10b981;">
@@ -2155,6 +2155,18 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         }
     }
 
+    function exportInventoryPDF() {
+        const searchVal = encodeURIComponent(document.getElementById("searchInventory")?.value || '');
+        const typeVal = encodeURIComponent(document.getElementById("quickTypeFilter")?.value || '');
+        const statusVal = encodeURIComponent(document.getElementById("statusFilter")?.value || '');
+        const edifVal = encodeURIComponent(document.getElementById("quickLocationFilter")?.value || '');
+        const espVal = encodeURIComponent(document.getElementById("quickSpaceFilter")?.value || '');
+        const tabVal = encodeURIComponent(typeof activeCategoryTab !== 'undefined' ? activeCategoryTab : 'inventario');
+
+        const url = `../backend/reports/inventory_pdf.php?search=${searchVal}&tipo=${typeVal}&estado=${statusVal}&edificio=${edifVal}&espacio=${espVal}&tab=${tabVal}`;
+        window.open(url, '_blank');
+    }
+
     function applyFilters() {
         try {
             const searchInventory = document.getElementById("searchInventory");
@@ -2234,8 +2246,10 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const matchesAvail = !onlyAvail || rowStatus === 'Disponible';
 
                 if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesLoc && matchesRfid && matchesAvail) {
+                    row.setAttribute('data-filtered-out', 'false');
                     matchingRows.push(row);
                 } else {
+                    row.setAttribute('data-filtered-out', 'true');
                     row.style.display = "none";
                 }
             });

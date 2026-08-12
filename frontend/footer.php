@@ -371,7 +371,8 @@
                 
                 trs.forEach((tr, trIndex) => {
                     if (isFirst && trIndex === 0) return;
-                    if (tr.style.display === 'none') return;
+                    if (tr.getAttribute('data-filtered-out') === 'true') return;
+                    if (tr.style.display === 'none' && tr.getAttribute('data-filtered-out') !== 'false') return;
                     
                     let rowData = [];
                     let tds = tr.querySelectorAll('td');

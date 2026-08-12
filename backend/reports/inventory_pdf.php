@@ -16,17 +16,74 @@ require_once __DIR__ . '/../config/Database.php';
 $db = Config\Database::getConnection();
 
 // Filtros opcionales por GET
-$tipo   = $_GET['tipo']   ?? null;
-$estado = $_GET['estado'] ?? null;
+$search   = isset($_GET['search'])   ? trim($_GET['search'])   : '';
+$tipo     = isset($_GET['tipo'])     ? trim($_GET['tipo'])     : '';
+$estado   = isset($_GET['estado'])   ? trim($_GET['estado'])   : '';
+$edificio = isset($_GET['edificio']) ? trim($_GET['edificio']) : '';
+$espacio  = isset($_GET['espacio'])  ? trim($_GET['espacio'])  : '';
+$tab      = isset($_GET['tab'])      ? trim($_GET['tab'])      : 'inventario';
 
-$sql = "SELECT a.*, e.nombre_numero as espacio_nombre, e.edificio
-        FROM ACTIVO a
-        LEFT JOIN ESPACIO e ON a.esp_asignado = e.esp_id";
-$conditions = [];
+$sql = "
+WITH AllSpaces AS (
+    SELECT esp_id AS space_id, nombre_numero, edificio::varchar FROM ESPACIO
+    UNION ALL
+    SELECT lug_id AS space_id, nombre_numero, edificio::varchar FROM LUGARES
+),
+AllAssets AS (
+    SELECT act_id AS act_id, tipo, marca, modelo, num_serie, num_inv, estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'activo' AS item_type 
+    FROM ACTIVO
+    UNION ALL
+    SELECT mob_id AS act_id, tipo, NULL AS marca, NULL AS modelo, NULL AS num_serie, num_inv, 'Disponible' AS estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'mobiliario' AS item_type 
+    FROM MOBILIARIO
+)
+SELECT a.*, s.nombre_numero AS espacio_nombre, s.edificio 
+FROM AllAssets a 
+LEFT JOIN AllSpaces s ON a.esp_asignado = s.space_id
+WHERE 1=1
+";
+
 $params = [];
-if ($tipo)   { $conditions[] = "a.tipo = ?";    $params[] = $tipo; }
-if ($estado) { $conditions[] = "a.estatus = ?"; $params[] = $estado; }
-if ($conditions) $sql .= " WHERE " . implode(" AND ", $conditions);
+
+if ($tab === 'mobiliario') {
+    $sql .= " AND a.item_type = 'mobiliario'";
+} else {
+    $sql .= " AND a.item_type = 'activo'";
+}
+
+if ($search !== '') {
+    $sql .= " AND (a.tipo ILIKE ? OR a.marca ILIKE ? OR a.modelo ILIKE ? OR a.num_serie ILIKE ? OR a.num_inv ILIKE ? OR a.tag_id ILIKE ? OR s.nombre_numero ILIKE ?)";
+    $term = '%' . $search . '%';
+    $params = array_merge($params, [$term, $term, $term, $term, $term, $term, $term]);
+}
+
+if ($tipo !== '') {
+    $sql .= " AND a.tipo = ?";
+    $params[] = $tipo;
+}
+
+if ($estado !== '') {
+    if ($estado === 'Prestado') {
+        $sql .= " AND a.estatus IN ('Prestado', 'En préstamo', 'En uso')";
+    } elseif ($estado === 'Mantenimiento') {
+        $sql .= " AND a.estatus IN ('Mantenimiento', 'En mantenimiento')";
+    } elseif ($estado === 'Extraviado') {
+        $sql .= " AND a.estatus IN ('Extraviado', 'Inactivo', 'Baja')";
+    } else {
+        $sql .= " AND a.estatus = ?";
+        $params[] = $estado;
+    }
+}
+
+if ($edificio !== '') {
+    $sql .= " AND s.edificio = ?";
+    $params[] = $edificio;
+}
+
+if ($espacio !== '') {
+    $sql .= " AND s.nombre_numero = ?";
+    $params[] = $espacio;
+}
+
 $sql .= " ORDER BY a.act_id DESC";
 
 $stmt = $db->prepare($sql);
@@ -36,9 +93,9 @@ $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $total = count($assets);
 
 // Conteos por estado
-$disponibles   = count(array_filter($assets, fn($a) => $a['estatus'] === 'Disponible'));
-$prestados     = count(array_filter($assets, fn($a) => $a['estatus'] === 'Prestado'));
-$mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'], ['Mantenimiento', 'Dañado', 'Extraviado'])));
+$disponibles   = count(array_filter($assets, fn($a) => ($a['estatus'] ?? '') === 'Disponible'));
+$prestados     = count(array_filter($assets, fn($a) => in_array($a['estatus'] ?? '', ['Prestado', 'En préstamo', 'En uso'])));
+$mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'] ?? '', ['Mantenimiento', 'Dañado', 'Extraviado', 'En mantenimiento'])));
 ?>
 
 
@@ -229,7 +286,13 @@ $mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'], [
             <tr>
                 <td style="color:#94a3b8; font-size:11px;"><?php echo $i++; ?></td>
                 <td>
-                    <div class="asset-name"><?php echo htmlspecialchars(trim($a['marca'] . ' ' . $a['modelo'])); ?></div>
+                    <?php 
+                    $nameText = trim(($a['marca'] ?? '') . ' ' . ($a['modelo'] ?? ''));
+                    if (empty($nameText)) {
+                        $nameText = !empty($a['tipo']) ? $a['tipo'] : ('Item #' . $a['act_id']);
+                    }
+                    ?>
+                    <div class="asset-name"><?php echo htmlspecialchars($nameText); ?></div>
                     <?php 
                     $numSerie = trim($a['num_serie'] ?? '');
                     if ($numSerie !== '' && strcasecmp($numSerie, 'N/A') !== 0): 
