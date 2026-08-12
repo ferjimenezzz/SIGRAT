@@ -110,15 +110,17 @@ foreach ($assets as $asset) {
         }
     }
 
-    $t = strtolower($asset['tipo'] ?? '');
-    if (strpos($t, 'laptop') !== false || strpos($t, 'computer') !== false || strpos($t, 'computadora') !== false || strpos($t, 'proyector') !== false || strpos($t, 'bocina') !== false || strpos($t, 'monitor') !== false || strpos($t, 'impresora') !== false || strpos($t, 'cámara') !== false || strpos($t, 'pc') !== false || strpos($t, 'tv') !== false || strpos($t, 'pantalla') !== false || strpos($t, 'router') !== false || strpos($t, 'switch') !== false || strpos($t, 'equipo') !== false) {
-        $categories['Equipos electrónicos']++;
-    } elseif (strpos($t, 'silla') !== false || strpos($t, 'mesa') !== false || strpos($t, 'escritorio') !== false || strpos($t, 'pizarrón') !== false || strpos($t, 'pizarron') !== false || strpos($t, 'mobiliario') !== false || strpos($t, 'estante') !== false || strpos($t, 'archivero') !== false) {
+    if (isset($asset['item_type']) && $asset['item_type'] === 'mobiliario') {
         $categories['Mobiliario']++;
-    } elseif (strpos($t, 'herramienta') !== false || strpos($t, 'taladro') !== false || strpos($t, 'multímetro') !== false || strpos($t, 'cautín') !== false || strpos($t, 'osciloscopio') !== false || strpos($t, 'pinzas') !== false || strpos($t, 'kit') !== false) {
-        $categories['Herramientas']++;
     } else {
-        $categories['Otros']++;
+        $t = strtolower($asset['tipo'] ?? '');
+        if (strpos($t, 'laptop') !== false || strpos($t, 'computer') !== false || strpos($t, 'computadora') !== false || strpos($t, 'proyector') !== false || strpos($t, 'bocina') !== false || strpos($t, 'monitor') !== false || strpos($t, 'impresora') !== false || strpos($t, 'cámara') !== false || strpos($t, 'pc') !== false || strpos($t, 'tv') !== false || strpos($t, 'pantalla') !== false || strpos($t, 'router') !== false || strpos($t, 'switch') !== false || strpos($t, 'equipo') !== false) {
+            $categories['Equipos electrónicos']++;
+        } elseif (strpos($t, 'herramienta') !== false || strpos($t, 'taladro') !== false || strpos($t, 'multímetro') !== false || strpos($t, 'cautín') !== false || strpos($t, 'osciloscopio') !== false || strpos($t, 'pinzas') !== false || strpos($t, 'kit') !== false) {
+            $categories['Herramientas']++;
+        } else {
+            $categories['Otros']++;
+        }
     }
 
     $locName = $asset['espacio_nombre'] ?? 'Sin asignar';
@@ -351,7 +353,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 <tbody>
                     <?php foreach ($assets as $asset): 
                         $tipoLower = strtolower($asset['tipo'] ?? '');
-                        $isMobiliario = (strpos($tipoLower, 'silla') !== false || strpos($tipoLower, 'mesa') !== false || strpos($tipoLower, 'escritorio') !== false || strpos($tipoLower, 'pizarrón') !== false || strpos($tipoLower, 'pizarron') !== false || strpos($tipoLower, 'mobiliario') !== false || strpos($tipoLower, 'estante') !== false || strpos($tipoLower, 'archivero') !== false);
+                        $isMobiliario = (($asset['item_type'] ?? '') === 'mobiliario');
                     ?>
                     <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
                         <td style="text-align: center; vertical-align: middle;">
