@@ -289,14 +289,14 @@ $tab = $_GET['tab'] ?? 'usuarios';
     <!-- Pestaña Usuarios -->
     <div id="tab-usuarios" class="card" style="display: <?php echo $tab === 'usuarios' ? 'block' : 'none'; ?>; padding: 0; overflow: auto; max-height: 450px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: white;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;" id="usersTable">
-            <thead style="border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; background: #f8fafc;">
+            <thead>
                 <tr>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Nombre</th>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Correo Electrónico</th>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Rol</th>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Estado</th>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Última Conexión</th>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: center;">Acciones</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Nombre</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Correo Electrónico</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Rol</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Estado</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Última Conexión</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: center;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -352,13 +352,13 @@ $tab = $_GET['tab'] ?? 'usuarios';
     <div id="tab-invitaciones" style="display: <?php echo $tab === 'invitaciones' ? 'grid' : 'none'; ?>; grid-template-columns: 2fr 1fr; gap: 32px;">
         <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); max-height: 350px; overflow: auto; align-self: start;">
             <table style="width: 100%; border-collapse: collapse;" id="invitesTable">
-                <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
+                <thead>
                     <tr>
-                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Invitado</th>
-                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Correo Electrónico</th>
-                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Código</th>
-                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Anfitrión</th>
-                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Estado</th>
+                        <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Invitado</th>
+                        <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Correo Electrónico</th>
+                        <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Código</th>
+                        <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Anfitrión</th>
+                        <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
