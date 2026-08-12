@@ -267,37 +267,58 @@
 
 <!-- ============================================================================ -->
 <!-- SECCIÓN 4: CONTROLADORES JAVASCRIPT, EVENTOS Y FETCH API -->
-<!-- ============================================================================ -->
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 function registrarUsuario(){
-    let nombre = document.getElementById("nombreRegistro").value;
+    let nombre = document.getElementById("nombreRegistro").value.trim();
     let genero = document.getElementById("generoRegistro").value;
-    let correo = document.getElementById("correoRegistro").value;
-    let telefono = document.getElementById("telefonoRegistro").value;
+    let correo = document.getElementById("correoRegistro").value.trim();
+    let telefono = document.getElementById("telefonoRegistro").value.trim();
     let carrera = document.getElementById("carreraRegistro").value;
     let password = document.getElementById("passwordRegistro").value;
     let confirmPassword = document.getElementById("confirmPassword").value;
 
     if(!nombre || !genero || !correo || !telefono || !carrera || !password) {
-        alert("Por favor, completa todos los campos.");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos Incompletos',
+            text: 'Por favor, completa todos los campos del formulario.',
+            confirmButtonColor: '#1E335F'
+        });
         return;
     }
 
     if(!correo.endsWith("@uteq.edu.mx")){
-        alert("Debes utilizar un correo institucional @uteq.edu.mx");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Correo Institucional Requerido',
+            text: 'Debes utilizar un correo institucional con el dominio @uteq.edu.mx',
+            confirmButtonColor: '#1E335F'
+        });
         return;
     }
 
     const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}$/;
     if(!regex.test(password)){
-        alert("La contraseña debe tener mínimo 8 caracteres, una mayúscula, un número y un carácter especial.");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Contraseña Poco Segura',
+            text: 'La contraseña debe tener un mínimo de 8 caracteres, al menos una letra mayúscula, un número y un carácter especial.',
+            confirmButtonColor: '#1E335F'
+        });
         return;
     }
 
     if(password !== confirmPassword){
-        alert("Las contraseñas no coinciden.");
+        Swal.fire({
+            icon: 'error',
+            title: 'Contraseñas No Coinciden',
+            text: 'Las contraseñas ingresadas no coinciden. Verifícalas nuevamente.',
+            confirmButtonColor: '#ef4444'
+        });
         return;
     }
 
@@ -318,19 +339,36 @@ function registrarUsuario(){
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert(data.message);
+            Swal.fire({
+                icon: 'success',
+                title: '¡Registro Exitoso!',
+                text: data.message || 'Tu usuario se ha registrado correctamente.',
+                confirmButtonColor: '#10b981',
+                timer: 2500,
+                showConfirmButton: false
+            });
             document.getElementById("formRegistro").reset();
             var modal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
             if(modal) {
                 modal.hide();
             }
         } else {
-            alert("Error: " + data.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo completar el registro',
+                text: data.message || 'Ocurrió un error al procesar tu solicitud.',
+                confirmButtonColor: '#ef4444'
+            });
         }
     })
     .catch(error => {
         console.error("Error al registrar:", error);
-        alert("Hubo un error al intentar registrar el usuario.");
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Conexión',
+            text: 'Hubo un error al intentar registrar el usuario. Por favor intenta de nuevo.',
+            confirmButtonColor: '#ef4444'
+        });
     });
 
 }
