@@ -5177,31 +5177,34 @@ include 'header.php';
         tooltip.style.backdropFilter = 'blur(8px)';
         tooltip.style.display = 'block';
 
-        moveModalTooltip(e);
+        // Render off-screen first so browser calculates its real size,
+        // then reposition correctly in the next frame.
+        tooltip.style.left = '-9999px';
+        tooltip.style.top  = '-9999px';
+        requestAnimationFrame(() => moveModalTooltip(e));
     }
     function moveModalTooltip(e) {
         if(tooltip.style.display === 'none') return;
-        const tw = tooltip.offsetWidth  || 220;
-        const th = tooltip.offsetHeight || 150;
         const margin = 12;
 
-        // Use modal container bounds as clipping boundary
-        const mapModal = document.querySelector('.res-modal-overlay') || document.body;
-        const bounds = mapModal.getBoundingClientRect();
-        const maxX = bounds.right  || window.innerWidth;
-        const maxY = bounds.bottom || window.innerHeight;
-        const minX = bounds.left   || 0;
+        // Now the tooltip is rendered, read its real size
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+
+        // Safe bounds: use viewport edges
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
         let x = e.clientX + 15;
         let y = e.clientY + 15;
 
-        // Flip to left if tooltip overflows right edge
-        if (x + tw + margin > maxX) x = e.clientX - tw - 15;
-        // Clamp to minimum left bound
-        if (x < minX + margin) x = minX + margin;
-        // Flip to above cursor if tooltip overflows bottom
-        if (y + th + margin > maxY) y = e.clientY - th - 15;
-        // Clamp to top
+        // Flip left if not enough space on the right
+        if (x + tw + margin > vw) x = e.clientX - tw - 15;
+        // Clamp so it never goes past the left edge
+        if (x < margin) x = margin;
+        // Flip above if not enough space below
+        if (y + th + margin > vh) y = e.clientY - th - 15;
+        // Clamp so it never goes above the top
         if (y < margin) y = margin;
 
         tooltip.style.left = x + 'px';
