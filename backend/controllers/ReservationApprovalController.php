@@ -51,20 +51,24 @@ class ReservationApprovalController
     public function getByStatus(int $userId, bool $isAdmin, string $status = 'pending'): array
     {
         // 1. Auto-cancel expired pending reservations (sólo si ya pasó la fecha de uso o el horario final en el día de hoy, ajustado a hora de México)
-        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (status = 'pending' OR estatus = 'Pendiente') AND fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date");
+        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente') AND (fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date OR (fecha_uso = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date AND hora_sal <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::time))");
 
         // 2. Fetch based on status
         if ($status === 'cancelled') {
-            $statusCondition = "(r.status IN ('cancelled', 'rejected') OR r.estatus IN ('Cancelada', 'Rechazada'))";
+            $statusCondition = "(
+                LOWER(r.status) IN ('cancelled', 'rejected', 'expired', 'no_show') 
+                OR LOWER(r.estatus) IN ('cancelada', 'cancelado', 'rechazada', 'rechazado', 'inasistencia', 'no asistió', 'sin asistencia', 'expirada', 'vencida')
+                OR (r.cancel_reason IS NOT NULL AND TRIM(r.cancel_reason) != '' AND LOWER(r.status) NOT IN ('approved', 'pending') AND LOWER(r.estatus) NOT IN ('aprobada', 'pendiente'))
+            )";
             $params = [];
         } elseif ($status === 'pending') {
-            $statusCondition = "(r.status = 'pending' OR r.estatus = 'Pendiente')";
+            $statusCondition = "(LOWER(r.status) = 'pending' OR LOWER(r.estatus) = 'pendiente')";
             $params = [];
         } elseif ($status === 'approved') {
-            $statusCondition = "(r.status = 'approved' OR r.estatus = 'Aprobada')";
+            $statusCondition = "(LOWER(r.status) = 'approved' OR LOWER(r.estatus) = 'aprobada')";
             $params = [];
         } else {
-            $statusCondition = "(r.status = :status OR r.estatus = :estatus_alt)";
+            $statusCondition = "(LOWER(r.status) = LOWER(:status) OR LOWER(r.estatus) = LOWER(:estatus_alt))";
             $params = [':status' => $status, ':estatus_alt' => $status];
         }
 
@@ -89,11 +93,17 @@ class ReservationApprovalController
 
         // Normalizar status en memoria para que el frontend React siempre reconozca el estado estándar
         foreach ($rows as &$row) {
-            if (empty($row['status']) || $row['status'] === 'Pendiente') {
-                if ($row['estatus'] === 'Pendiente') $row['status'] = 'pending';
-                elseif ($row['estatus'] === 'Aprobada') $row['status'] = 'approved';
-                elseif ($row['estatus'] === 'Cancelada') $row['status'] = 'cancelled';
-                elseif ($row['estatus'] === 'Rechazada') $row['status'] = 'rejected';
+            $st = strtolower($row['status'] ?? '');
+            $est = strtolower($row['estatus'] ?? '');
+
+            if (in_array($st, ['rejected']) || in_array($est, ['rechazada', 'rechazado'])) {
+                $row['status'] = 'rejected';
+            } elseif (in_array($st, ['cancelled', 'expired', 'no_show']) || in_array($est, ['cancelada', 'cancelado', 'inasistencia', 'no asistió', 'sin asistencia', 'expirada', 'vencida'])) {
+                $row['status'] = 'cancelled';
+            } elseif ($st === 'approved' || $est === 'aprobada') {
+                $row['status'] = 'approved';
+            } elseif ($st === 'pending' || $est === 'pendiente') {
+                $row['status'] = 'pending';
             }
         }
         unset($row);

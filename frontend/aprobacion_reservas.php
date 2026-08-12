@@ -152,20 +152,21 @@ function ReservationApprovalApp() {
     }
   };
 
-  const fetchReservations = async (status = "pending") => {
-    setLoading(true);
+  const fetchReservations = async (status = "pending", isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
-      const response = await fetch(`../backend/api/index.php/reservations/${status}`, {
-        credentials: "same-origin"
+      const response = await fetch(`../backend/api/index.php/reservations/${status}?t=${Date.now()}`, {
+        credentials: "same-origin",
+        headers: { "Cache-Control": "no-cache" }
       });
       if (!response.ok) throw new Error(`Error del servidor (${response.status})`);
       const data = await response.json();
       setReservations(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      if (!isSilent) setError(err.message);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
@@ -173,8 +174,26 @@ function ReservationApprovalApp() {
     let status = "pending";
     if (currentTab === 1) status = "approved";
     if (currentTab === 2) status = "cancelled";
+    
+    // Carga inicial
     fetchReservations(status);
     fetchSpaces();
+
+    // Auto-actualización periódica en segundo plano cada 6 segundos
+    const intervalId = setInterval(() => {
+      fetchReservations(status, true);
+    }, 6000);
+
+    // Recargar al enfocar la ventana del navegador
+    const handleFocus = () => {
+      fetchReservations(status, true);
+    };
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [currentTab]);
 
   const handleDirectApprove = async (reservation) => {
@@ -380,16 +399,24 @@ function ReservationApprovalApp() {
   return React.createElement("div", { style: { marginTop: 10, fontFamily: "Inter, sans-serif", display: "flex", flexDirection: "column", alignItems: "flex-end" } }, 
     error && React.createElement(Alert, { severity: "error", sx: { mb: 3, width: "100%" } }, error), 
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "16px" } }, 
-      React.createElement(TextField, { 
-        id: "tutorial-search", 
-        placeholder: isMaestro ? "Buscar espacio..." : "Buscar ID, usuario o espacio...", 
-        variant: "outlined", 
-        size: "small", 
-        value: searchTerm, 
-        onChange: (e) => setSearchTerm(e.target.value), 
-        InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
-        sx: { width: "300px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
-      }), 
+      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "10px" } },
+        React.createElement(TextField, { 
+          id: "tutorial-search", 
+          placeholder: isMaestro ? "Buscar espacio..." : "Buscar ID, usuario o espacio...", 
+          variant: "outlined", 
+          size: "small", 
+          value: searchTerm, 
+          onChange: (e) => setSearchTerm(e.target.value), 
+          InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
+          sx: { width: "300px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
+        }),
+        React.createElement(Button, {
+          variant: "outlined",
+          size: "small",
+          onClick: () => fetchReservations(currentTab === 0 ? "pending" : currentTab === 1 ? "approved" : "cancelled"),
+          sx: { borderRadius: "10px", height: "40px", borderColor: "#e2e8f0", color: "#475569", fontWeight: 700, textTransform: "none", '&:hover': { borderColor: "#cbd5e1", backgroundColor: "#f8fafc" } }
+        }, React.createElement("i", { className: "bi bi-arrow-clockwise", style: { marginRight: "6px", fontSize: "14px" } }), "Actualizar")
+      ), 
       React.createElement(Tabs, { id: "tutorial-tabs", value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, 
         React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px" } }), 
         React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px" } }), 
