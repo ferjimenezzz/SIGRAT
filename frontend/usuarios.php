@@ -112,12 +112,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// 2. Eliminar Usuario o Rol
+// 2. Eliminar Usuario o Rol (Eliminación física permanente)
 if (isset($_GET['delete_user'])) {
-    $stmt = $db->prepare("UPDATE usuario SET estatus = 'Inactivo' WHERE us_id = ?");
-    $stmt->execute([$_GET['delete_user']]);
-    header("Location: usuarios.php?tab=usuarios&deleted=1");
-    exit();
+    $deleteId = $_GET['delete_user'];
+    try {
+        // Aseguramos respaldar el nombre en bitácora antes de eliminar físicamente si existe alguna referencia
+        $stmtName = $db->prepare("SELECT TRIM(CONCAT(nombre, ' ', COALESCE(apellido, ''))) FROM usuario WHERE us_id = ?");
+        $stmtName->execute([$deleteId]);
+        $userName = $stmtName->fetchColumn();
+        if ($userName) {
+            $stmtBit = $db->prepare("UPDATE bitacora SET usuario_nombre = ? WHERE us_id = ? AND (usuario_nombre IS NULL OR usuario_nombre = '')");
+            $stmtBit->execute([$userName, $deleteId]);
+        }
+
+        $stmt = $db->prepare("DELETE FROM usuario WHERE us_id = ?");
+        $stmt->execute([$deleteId]);
+        header("Location: usuarios.php?tab=usuarios&deleted=1");
+        exit();
+    } catch (\PDOException $e) {
+        // Manejo si existen restricciones de clave foránea no resueltas (ej. reservas activas/préstamos sin ON DELETE SET NULL)
+        $errorMsg = "No se pudo eliminar el usuario físicamente debido a registros vinculados obligatorios en otras tablas: " . $e->getMessage();
+        header("Location: usuarios.php?tab=usuarios&error=" . urlencode($errorMsg));
+        exit();
+    }
 }
 
 // NUEVAS CONSULTAS PARA ESTADÍSTICAS REALES

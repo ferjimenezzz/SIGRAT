@@ -37,9 +37,18 @@ class AuditController {
 
     public function log($us_id, $accion, $modulo) {
         try {
-            $query = "INSERT INTO bitacora (us_id, accion, modulo_afectado) VALUES (?, ?, ?)";
+            $usuarioNombre = null;
+            if ($us_id) {
+                $stmtUser = $this->db->prepare("SELECT TRIM(CONCAT(nombre, ' ', COALESCE(apellido, ''))) FROM usuario WHERE us_id = ?");
+                $stmtUser->execute([$us_id]);
+                $fetchedName = $stmtUser->fetchColumn();
+                if ($fetchedName) {
+                    $usuarioNombre = $fetchedName;
+                }
+            }
+            $query = "INSERT INTO bitacora (us_id, accion, modulo_afectado, usuario_nombre) VALUES (?, ?, ?, ?)";
             $stmt = $this->db->prepare($query);
-            return $stmt->execute([$us_id, $accion, $modulo]);
+            return $stmt->execute([$us_id, $accion, $modulo, $usuarioNombre]);
         } catch (\Exception $e) {
             error_log("Audit Log Error: " . $e->getMessage());
             return false;
@@ -55,7 +64,7 @@ class AuditController {
      */
 
     public function getGeneralActivity($filters) {
-        $query = "SELECT b.*, u.nombre as usuario_nombre 
+        $query = "SELECT b.*, COALESCE(NULLIF(TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido, ''))), ''), b.usuario_nombre, 'SISTEMA') as usuario_nombre 
                   FROM bitacora b 
                   LEFT JOIN usuario u ON b.us_id = u.us_id 
                   WHERE 1=1";
@@ -74,10 +83,11 @@ class AuditController {
             $params[] = $filters['modulo'];
         }
         if (!empty($filters['usuario_id'])) {
-            $query .= " AND u.us_id = ?";
+            $query .= " AND b.us_id = ?";
             $params[] = $filters['usuario_id'];
         } elseif (!empty($filters['buscar_usuario'])) {
-            $query .= " AND u.nombre LIKE ?";
+            $query .= " AND (u.nombre ILIKE ? OR b.usuario_nombre ILIKE ?)";
+            $params[] = "%" . $filters['buscar_usuario'] . "%";
             $params[] = "%" . $filters['buscar_usuario'] . "%";
         }
         if (!empty($filters['estado']) && $filters['estado'] !== 'Todos') {
