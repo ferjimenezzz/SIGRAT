@@ -130,7 +130,7 @@
 
 <div class="card-sigrat">
     <div class="logos">
-        <img src="assets/images/sigrat_logo.png" alt="UTEQ">
+        <img src="assets/images/logo_uteq.png" alt="UTEQ">
         <img src="assets/images/sigrat_logo.png" alt="SIGRAT">
     </div>
 
