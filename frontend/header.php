@@ -290,8 +290,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .sidebar-logo {
-            width: 42px;
-            height: 42px;
+            width: 48px;
+            height: 48px;
             object-fit: contain;
         }
 
@@ -1575,9 +1575,9 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 gap: 10px;
             }
             body.sidebar-mobile-open .sidebar-logo {
-                width: 42px;
-                height: 42px;
-            }
+            width: 48px;
+            height: 48px;
+        }
             body.sidebar-mobile-open .nav-item {
                 justify-content: flex-start;
                 padding: 11px 14px;
@@ -1916,7 +1916,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     </script>
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="assets/images/sigrat_logo.png" alt="SIGRAT" class="sidebar-logo" style="filter: brightness(0) invert(1); drop-shadow(0 0 2px rgba(0,0,0,0.5));">
+            <img src="assets/images/sigrat_icon.png" alt="SIGRAT" class="sidebar-logo" style="filter: brightness(0) invert(1); drop-shadow(0 0 2px rgba(0,0,0,0.5));">
             <div class="sidebar-brand">
                 <h2>SIGRAT</h2>
                 <p>Control Integral</p>
