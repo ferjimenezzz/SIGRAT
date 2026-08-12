@@ -5157,12 +5157,31 @@ include 'header.php';
     }
     function moveModalTooltip(e) {
         if(tooltip.style.display === 'none') return;
+        const tw = tooltip.offsetWidth  || 220;
+        const th = tooltip.offsetHeight || 150;
+        const margin = 12;
+
+        // Use modal container bounds as clipping boundary
+        const mapModal = document.querySelector('.res-modal-overlay') || document.body;
+        const bounds = mapModal.getBoundingClientRect();
+        const maxX = bounds.right  || window.innerWidth;
+        const maxY = bounds.bottom || window.innerHeight;
+        const minX = bounds.left   || 0;
+
         let x = e.clientX + 15;
         let y = e.clientY + 15;
-        if (x + tooltip.offsetWidth > window.innerWidth) x = e.clientX - tooltip.offsetWidth - 15;
-        if (y + tooltip.offsetHeight > window.innerHeight) y = e.clientY - tooltip.offsetHeight - 15;
+
+        // Flip to left if tooltip overflows right edge
+        if (x + tw + margin > maxX) x = e.clientX - tw - 15;
+        // Clamp to minimum left bound
+        if (x < minX + margin) x = minX + margin;
+        // Flip to above cursor if tooltip overflows bottom
+        if (y + th + margin > maxY) y = e.clientY - th - 15;
+        // Clamp to top
+        if (y < margin) y = margin;
+
         tooltip.style.left = x + 'px';
-        tooltip.style.top = y + 'px';
+        tooltip.style.top  = y + 'px';
     }
     function hideModalTooltip() {
         tooltip.style.display = 'none';
