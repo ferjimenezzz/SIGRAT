@@ -295,7 +295,8 @@ $tab = $_GET['tab'] ?? 'usuarios';
                     <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Correo Electrónico</th>
                     <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Rol</th>
                     <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Estado</th>
-                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Última Conexión</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Día Última Conexión</th>
+                    <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Hora Última Conexión</th>
                     <th style="position: sticky; top: 0; z-index: 10; background: #f8fafc; box-shadow: inset 0 -1px 0 #e2e8f0; padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: center;">Acciones</th>
                 </tr>
             </thead>
@@ -331,8 +332,21 @@ $tab = $_GET['tab'] ?? 'usuarios';
                             <span style="font-size: 13px; font-weight: 700; color: #1e293b;"><?php echo $estatus; ?></span>
                         </div>
                     </td>
+                    <?php 
+                    $lastConn = $u['ultima_conexion'] ?? null;
+                    $fechaConn = 'Nunca';
+                    $horaConn = '—';
+                    if (!empty($lastConn)) {
+                        $parts = explode(' ', $lastConn);
+                        $fechaConn = $parts[0] ?? 'Nunca';
+                        $horaConn = $parts[1] ?? '—';
+                    }
+                    ?>
                     <td style="padding: 16px 24px;">
-                        <span style="font-size: 13px; font-weight: 700; color: #1e293b;"><?php echo getRelativeTime($u['ultima_conexion'] ?? null); ?></span>
+                        <span style="font-size: 13px; font-weight: 700; color: #1e293b;"><?php echo htmlspecialchars($fechaConn); ?></span>
+                    </td>
+                    <td style="padding: 16px 24px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #475569;"><?php echo htmlspecialchars($horaConn); ?></span>
                     </td>
                     <td style="padding: 16px 24px; text-align: center;">
                         <button onclick='editUser(<?php echo htmlspecialchars(json_encode($u), ENT_QUOTES, "UTF-8"); ?>)' style="background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; color: #475569; cursor: pointer; transition: all 0.2s; margin-right: 8px;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">

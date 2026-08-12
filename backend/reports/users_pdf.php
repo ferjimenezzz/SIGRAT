@@ -216,13 +216,14 @@ $totalRoles   = count($roles);
                 <th>Usuario</th>
                 <th>Rol</th>
                 <th>Estado</th>
-                <th>Última Conexión</th>
+                <th>Día Última Conexión</th>
+                <th>Hora Última Conexión</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($users)): ?>
             <tr>
-                <td colspan="5" style="text-align:center; padding: 30px; color: #94a3b8;">No hay usuarios registrados.</td>
+                <td colspan="6" style="text-align:center; padding: 30px; color: #94a3b8;">No hay usuarios registrados.</td>
             </tr>
             <?php else: ?>
             <?php $i = 1; foreach ($users as $u): ?>
@@ -231,9 +232,6 @@ $totalRoles   = count($roles);
                 <td>
                     <div class="user-name"><?php echo htmlspecialchars(trim($u['nombre'] . ' ' . $u['apellido'])); ?></div>
                     <div class="user-email"><?php echo htmlspecialchars($u['correo']); ?></div>
-                    <?php $org = $u['empresa'] ?: $u['rfc_matricula']; if ($org): ?>
-                        <div class="user-org"><?php echo htmlspecialchars($org); ?></div>
-                    <?php endif; ?>
                 </td>
                 <td>
                     <span class="badge badge-rol"><?php echo htmlspecialchars($u['rol_nombre'] ?? 'Sin rol'); ?></span>
@@ -243,8 +241,21 @@ $totalRoles   = count($roles);
                         <?php echo htmlspecialchars($u['estatus']); ?>
                     </span>
                 </td>
+                <?php 
+                $lastConn = $u['ultima_conexion'] ?? null;
+                $fechaConn = 'Nunca';
+                $horaConn = '—';
+                if (!empty($lastConn)) {
+                    $parts = explode(' ', $lastConn);
+                    $fechaConn = $parts[0] ?? 'Nunca';
+                    $horaConn = $parts[1] ?? '—';
+                }
+                ?>
+                <td style="color: #1e293b; font-weight: 700; font-size: 11px;">
+                    <?php echo htmlspecialchars($fechaConn); ?>
+                </td>
                 <td style="color: #64748b; font-size: 11px;">
-                    <?php echo $u['ultima_conexion'] ? htmlspecialchars($u['ultima_conexion']) : '<span style="color:#94a3b8;">Nunca</span>'; ?>
+                    <?php echo htmlspecialchars($horaConn); ?>
                 </td>
             </tr>
             <?php endforeach; ?>
