@@ -19,6 +19,8 @@ $isMaestro = (
     strpos($userRolCurrent, 'DOCENTE') !== false || 
     strpos($userRolCurrent, 'PROFESOR') !== false
 );
+$isInvitado = ($userRolCurrent === 'INVITADO');
+$hideSidebar = ($isMaestro || $isInvitado);
 
 // 1. Obtener detalles del usuario autenticado para prellenar la reserva
 $currentUser = [
@@ -1841,7 +1843,7 @@ include 'header.php';
     </div>
 
     <!-- CUADRO PRINCIPAL (MENSUAL) -->
-    <div class="calendar-grid-layout <?php echo $isMaestro ? 'full-width-calendar' : ''; ?>" id="monthViewGrid">
+    <div class="calendar-grid-layout <?php echo $hideSidebar ? 'full-width-calendar' : ''; ?>" id="monthViewGrid">
         <!-- Calendario Mensual -->
         <div class="month-calendar-card">
             <div class="month-days-header">
@@ -1858,7 +1860,7 @@ include 'header.php';
             </div>
         </div>
 
-        <?php if (!$isMaestro): ?>
+        <?php if (!$hideSidebar): ?>
         <!-- Sidebar Derecha -->
         <div class="calendar-sidebar-details">
             <!-- Resumen del Día -->
