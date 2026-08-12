@@ -19,17 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['filters'])) {
     die("Petición inválida.");
 }
 
+// Aumentar límites para exportaciones grandes (sin límite de filas)
+set_time_limit(0);
+ini_set('memory_limit', '512M');
+
 // Decodificar filtros enviados desde el frontend
 $filters = json_decode($_POST['filters'], true);
 
+// Reutilizar la conexión Singleton del proyecto (PostgreSQL / Supabase)
+require_once __DIR__ . '/../config/Database.php';
+$pdo = Config\Database::getConnection();
+
 // Construir la consulta SQL basada en los filtros usando el helper reutilizable
-require_once __DIR__ . '/../../helpers/InventoryQueryBuilder.php';
+require_once __DIR__ . '/../helpers/InventoryQueryBuilder.php';
 $params = [];
 $sql = InventoryQueryBuilder::build($filters, $params);
 
-// Conexión PDO (ajustar credenciales según el entorno)
-$pdo = new PDO('mysql:host=localhost;dbname=SIGRAT;charset=utf8', 'db_user', 'db_pass');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Ejecutar la consulta y obtener todos los registros
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
