@@ -30,11 +30,17 @@ if (isset($_POST['login'])) {
     $user = $stmt->fetch();
 
     if ($user && AuthController::verifyPassword($pass, $user['contrasena'])) {
+        // Asignar el rol de Maestro en lugar de Super Administrador al iniciar sesión
+        $rolNombre = $user['rol_nombre'] ?? 'Maestro';
+        if (strtoupper(trim($rolNombre)) === 'SUPER ADMINISTRADOR') {
+            $rolNombre = 'Maestro';
+        }
+
         // Generar Payload para JWT
         $payload = [
             'us_id' => $user['us_id'],
             'nombre' => $user['nombre'],
-            'rol' => $user['rol_nombre'],
+            'rol' => $rolNombre,
             'carrera' => $user['carrera'],
             'genero' => $user['genero'],
             'permisos' => json_decode($user['permisos'], true)
@@ -48,7 +54,7 @@ if (isset($_POST['login'])) {
         // Población inmediata de sesión (Redundancia de seguridad)
         $_SESSION['us_id'] = $user['us_id'];
         $_SESSION['nombre'] = $user['nombre'];
-        $_SESSION['rol'] = $user['rol_nombre'];
+        $_SESSION['rol'] = $rolNombre;
         $_SESSION['genero'] = $user['genero'];
         $_SESSION['permisos'] = json_decode($user['permisos'], true);
         $_SESSION['division'] = $user['carrera'];

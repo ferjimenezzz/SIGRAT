@@ -46,8 +46,12 @@ if (!$userData) {
 // 3. Si el token es válido, vinculamos los datos a la variable superglobal $_SESSION
 // Esto asegura que $_SESSION['us_id'] y $_SESSION['rol'] estén siempre disponibles en las vistas
 if (!isset($_SESSION['us_id']) && isset($userData['us_id'])) {
+    $assignedRol = $userData['rol'] ?? 'Maestro';
+    if (strtoupper(trim($assignedRol)) === 'SUPER ADMINISTRADOR') {
+        $assignedRol = 'Maestro';
+    }
     $_SESSION['us_id'] = $userData['us_id'];
-    $_SESSION['rol'] = $userData['rol'] ?? '';
+    $_SESSION['rol'] = $assignedRol;
     $_SESSION['permisos'] = $userData['permisos'] ?? [];
 }
 ?>
