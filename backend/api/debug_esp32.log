@@ -39516,111 +39516,269 @@ Cuerpo:
 2026-08-11 23:25:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786483546906
 >>>>>>> Stashed changes
 Cuerpo: 
-2026-08-11 22:42:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786480924762
+2026-08-11 23:26:10 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 22:43:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786480984752
+2026-08-11 23:26:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786483576898
 Cuerpo: 
-2026-08-11 22:58:01 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786481881504
+2026-08-11 23:27:11 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 22:58:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786481884756
+2026-08-11 23:28:12 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 22:59:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786481944753
+2026-08-11 23:29:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:00:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482004755
+2026-08-11 23:30:14 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:01:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482064752
+2026-08-11 23:31:15 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:02:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482124753
+2026-08-11 23:32:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:03:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482184757
+2026-08-11 23:33:17 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:04:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482244760
+2026-08-11 23:34:18 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:05:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482304764
+2026-08-11 23:35:19 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:06:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482364768
+2026-08-11 23:36:19 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:07:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482424764
+2026-08-11 23:37:19 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:08:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482484754
+2026-08-11 23:38:02 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484282013
 Cuerpo: 
-2026-08-11 23:09:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482544761
+2026-08-11 23:38:03 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-08-11 23:10:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482604760
+2026-08-11 23:38:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484283101
 Cuerpo: 
-2026-08-11 23:11:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482664762
+2026-08-11 23:38:07 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484287543
 Cuerpo: 
-2026-08-11 23:12:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482724759
+2026-08-11 23:38:08 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-08-11 23:13:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482784750
+2026-08-11 23:38:08 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484288670
 Cuerpo: 
-2026-08-11 23:14:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482844759
+2026-08-11 23:38:19 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:15:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482904754
+2026-08-11 23:39:15 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484355465
 Cuerpo: 
-2026-08-11 23:16:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786482964757
+2026-08-11 23:39:16 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-08-11 23:17:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483024765
+2026-08-11 23:39:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484356580
 Cuerpo: 
-2026-08-11 23:18:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483084759
+2026-08-11 23:39:17 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:19:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483144757
+2026-08-11 23:39:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:20:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483204758
+2026-08-11 23:39:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484385904
 Cuerpo: 
-2026-08-11 23:21:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483264761
+2026-08-11 23:40:09 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:22:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483324753
+2026-08-11 23:40:15 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484415899
 Cuerpo: 
-2026-08-11 23:23:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483384758
+2026-08-11 23:40:23 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484423890
 Cuerpo: 
-2026-08-11 23:24:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483444759
+2026-08-11 23:40:24 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-08-11 23:25:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483504753
+2026-08-11 23:40:25 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484425003
 Cuerpo: 
-2026-08-11 23:26:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483564764
+2026-08-11 23:40:39 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:27:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483624758
+2026-08-11 23:40:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484446013
 Cuerpo: 
-2026-08-11 23:28:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483684760
+2026-08-11 23:40:47 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
 Cuerpo: 
-2026-08-11 23:29:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483744756
+2026-08-11 23:40:47 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484447112
 Cuerpo: 
-2026-08-11 23:30:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483804764
+2026-08-11 23:41:09 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:31:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483864751
+2026-08-11 23:41:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484476016
 Cuerpo: 
-2026-08-11 23:32:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483924755
+2026-08-11 23:41:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484506021
 Cuerpo: 
-2026-08-11 23:33:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786483984759
+2026-08-11 23:42:10 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:34:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484044763
+2026-08-11 23:42:17 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484536913
 Cuerpo: 
-2026-08-11 23:35:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484104761
+2026-08-11 23:42:47 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484566904
 Cuerpo: 
-2026-08-11 23:36:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484164759
+2026-08-11 23:43:11 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:37:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484224762
+2026-08-11 23:43:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484596025
 Cuerpo: 
-2026-08-11 23:38:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484284762
+2026-08-11 23:43:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484626014
 Cuerpo: 
-2026-08-11 23:39:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484344764
+2026-08-11 23:44:12 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:40:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484404760
+2026-08-11 23:44:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484656017
 Cuerpo: 
-2026-08-11 23:41:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484464759
+2026-08-11 23:44:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484686019
 Cuerpo: 
-2026-08-11 23:42:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484524750
+2026-08-11 23:45:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:43:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484584761
+2026-08-11 23:45:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484716022
 Cuerpo: 
-2026-08-11 23:44:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484644762
+2026-08-11 23:45:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484746015
 Cuerpo: 
-2026-08-11 23:45:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484704764
+2026-08-11 23:46:14 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
 Cuerpo: 
-2026-08-11 23:46:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484764766
+2026-08-11 23:46:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484776018
 Cuerpo: 
-2026-08-11 23:47:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484824759
+2026-08-11 23:46:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484806014
 Cuerpo: 
-2026-08-11 23:48:04 - GET /Estadias/backend/api/index.php/notifications/all?_cb=1786484884762
+2026-08-11 23:47:15 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-11 23:47:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484836014
+Cuerpo: 
+2026-08-11 23:47:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484866018
+Cuerpo: 
+2026-08-11 23:48:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786484896016
+Cuerpo: 
+2026-08-11 23:48:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 01:06:58 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 01:06:58 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786489617321
+Cuerpo: 
+2026-08-12 17:15:57 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:15:57 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547754466
+Cuerpo: 
+2026-08-12 17:16:10 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547772351
+Cuerpo: 
+2026-08-12 17:16:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:16:17 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547779290
+Cuerpo: 
+2026-08-12 17:16:18 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-08-12 17:16:18 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547780363
+Cuerpo: 
+2026-08-12 17:16:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547796219
+Cuerpo: 
+2026-08-12 17:16:35 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-08-12 17:16:35 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547797308
+Cuerpo: 
+2026-08-12 17:17:04 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547824416
+Cuerpo: 
+2026-08-12 17:17:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:17:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547854535
+Cuerpo: 
+2026-08-12 17:18:04 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547884404
+Cuerpo: 
+2026-08-12 17:18:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:18:31 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547910999
+Cuerpo: 
+2026-08-12 17:18:31 - GET /Estadias/SIGRAT/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-08-12 17:18:32 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-08-12 17:18:32 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547912111
+Cuerpo: 
+2026-08-12 17:18:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547913307
+Cuerpo: 
+2026-08-12 17:18:34 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-08-12 17:18:34 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547914411
+Cuerpo: 
+2026-08-12 17:19:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547943525
+Cuerpo: 
+2026-08-12 17:19:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:19:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786547973521
+Cuerpo: 
+2026-08-12 17:20:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548003535
+Cuerpo: 
+2026-08-12 17:20:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:20:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548033530
+Cuerpo: 
+2026-08-12 17:21:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548063520
+Cuerpo: 
+2026-08-12 17:21:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:21:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548093533
+Cuerpo: 
+2026-08-12 17:22:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548123520
+Cuerpo: 
+2026-08-12 17:22:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:22:46 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548166857
+Cuerpo: 
+2026-08-12 17:23:03 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548183532
+Cuerpo: 
+2026-08-12 17:23:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:23:33 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548213530
+Cuerpo: 
+2026-08-12 17:24:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548253536
+Cuerpo: 
+2026-08-12 17:24:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:25:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:25:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548313528
+Cuerpo: 
+2026-08-12 17:26:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:26:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548373522
+Cuerpo: 
+2026-08-12 17:27:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:27:16 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548433526
+Cuerpo: 
+2026-08-12 17:28:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548493524
+Cuerpo: 
+2026-08-12 17:28:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:29:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548553533
+Cuerpo: 
+2026-08-12 17:29:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:30:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:30:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548613536
+Cuerpo: 
+2026-08-12 17:31:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:31:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548673521
+Cuerpo: 
+2026-08-12 17:32:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:32:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548733528
+Cuerpo: 
+2026-08-12 17:33:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:33:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548793528
+Cuerpo: 
+2026-08-12 17:34:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:34:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548853531
+Cuerpo: 
+2026-08-12 17:35:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:35:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548913535
+Cuerpo: 
+2026-08-12 17:36:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:36:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786548973536
+Cuerpo: 
+2026-08-12 17:37:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:37:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786549033528
+Cuerpo: 
+2026-08-12 17:38:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786549093533
+Cuerpo: 
+2026-08-12 17:38:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:39:08 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786549148071
+Cuerpo: 
+2026-08-12 17:39:10 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786549150078
+Cuerpo: 
+2026-08-12 17:39:11 - POST /Estadias/SIGRAT/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-08-12 17:39:11 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786549151235
+Cuerpo: 
+2026-08-12 17:39:13 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all
+Cuerpo: 
+2026-08-12 17:39:40 - GET /Estadias/SIGRAT/backend/api/index.php/notifications/all?_cb=1786549180525
 Cuerpo: 
