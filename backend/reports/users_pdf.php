@@ -15,14 +15,41 @@ require_once __DIR__ . '/../config/Database.php';
 
 $db = Config\Database::getConnection();
 
-// Consulta principal: usuarios con rol
-$usersStmt = $db->query("
+// Obtener filtros desde la URL
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$role   = isset($_GET['role'])   ? trim($_GET['role'])   : '';
+$status = isset($_GET['status']) ? trim($_GET['status']) : '';
+
+// Consulta principal: usuarios con rol y filtros aplicados
+$sql = "
     SELECT u.us_id, u.nombre, u.apellido, u.correo, u.empresa, u.rfc_matricula,
            u.estatus, u.ultima_conexion, r.nombre as rol_nombre
     FROM USUARIO u
     LEFT JOIN ROLES r ON u.rol_id = r.rol_id
-    ORDER BY u.estatus ASC, u.nombre ASC
-");
+    WHERE 1=1
+";
+$params = [];
+
+if ($search !== '') {
+    $sql .= " AND (u.nombre ILIKE ? OR u.apellido ILIKE ? OR u.correo ILIKE ? OR u.empresa ILIKE ? OR u.rfc_matricula ILIKE ? OR r.nombre ILIKE ?)";
+    $term = '%' . $search . '%';
+    $params = array_merge($params, [$term, $term, $term, $term, $term, $term]);
+}
+
+if ($role !== '') {
+    $sql .= " AND r.nombre = ?";
+    $params[] = $role;
+}
+
+if ($status !== '') {
+    $sql .= " AND u.estatus = ?";
+    $params[] = $status;
+}
+
+$sql .= " ORDER BY u.estatus ASC, u.nombre ASC";
+
+$usersStmt = $db->prepare($sql);
+$usersStmt->execute($params);
 $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Roles

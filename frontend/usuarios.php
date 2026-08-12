@@ -553,9 +553,14 @@ $tab = $_GET['tab'] ?? 'usuarios';
 
     function handleExportPDF() {
         if (currentActiveTab === 'invitaciones') {
-            window.open('../backend/reports/invitations_pdf.php', '_blank');
+            const query = encodeURIComponent(searchInput ? searchInput.value : '');
+            window.open('../backend/reports/invitations_pdf.php?search=' + query, '_blank');
         } else {
-            window.open('../backend/reports/users_pdf.php', '_blank');
+            const query = encodeURIComponent(searchInput ? searchInput.value : '');
+            const role = encodeURIComponent(roleFilter ? roleFilter.value : '');
+            const status = encodeURIComponent(statusFilter ? statusFilter.value : '');
+            const url = `../backend/reports/users_pdf.php?search=${query}&role=${role}&status=${status}`;
+            window.open(url, '_blank');
         }
     }
 
