@@ -49,13 +49,39 @@ if (isset($_GET['action'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'save_user') {
-        $nombre = $_POST['nombre'];
-        $apellido = $_POST['apellido'] ?? '';
-        $correo = $_POST['correo'];
+        $nombre = trim($_POST['nombre'] ?? '');
+        $apellido = trim($_POST['apellido'] ?? '');
+        $correo = trim($_POST['correo'] ?? '');
         $empresa = $_POST['empresa'] ?? '';
-        $rol_id = $_POST['rol_id'];
+        $rol_id = $_POST['rol_id'] ?? null;
         $genero = $_POST['genero'] ?? 'Masculino';
-        $us_id = $_POST['us_id'] ?? null;
+        $us_id = !empty($_POST['us_id']) ? $_POST['us_id'] : null;
+
+        // Validar si es petición AJAX
+        $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') || isset($_POST['ajax']);
+
+        // Validar correo duplicado
+        if ($us_id) {
+            $stmtCheck = $db->prepare("SELECT COUNT(*) FROM usuario WHERE LOWER(correo) = LOWER(?) AND us_id != ?");
+            $stmtCheck->execute([$correo, $us_id]);
+        } else {
+            $stmtCheck = $db->prepare("SELECT COUNT(*) FROM usuario WHERE LOWER(correo) = LOWER(?)");
+            $stmtCheck->execute([$correo]);
+        }
+        
+        $alreadyExists = $stmtCheck->fetchColumn() > 0;
+
+        if ($alreadyExists) {
+            $errorMsg = "El correo electrónico '$correo' ya se encuentra registrado en el sistema. Por favor coloque uno diferente.";
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => $errorMsg]);
+                exit();
+            } else {
+                header("Location: usuarios.php?tab=usuarios&error=" . urlencode($errorMsg));
+                exit();
+            }
+        }
 
         if ($us_id) {
             $stmt = $db->prepare("UPDATE usuario SET nombre=?, apellido=?, correo=?, empresa=?, rol_id=?, genero=? WHERE us_id=?");
@@ -65,8 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt = $db->prepare("INSERT INTO usuario (nombre, apellido, correo, empresa, rol_id, genero, contrasena, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, 'Activo')");
             $stmt->execute([$nombre, $apellido, $correo, $empresa, $rol_id, $genero, $pass]);
         }
-        header("Location: usuarios.php?tab=usuarios&success=1");
-        exit();
+
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            exit();
+        } else {
+            header("Location: usuarios.php?tab=usuarios&success=1");
+            exit();
+        }
     } elseif ($_POST['action'] === 'generate_code') {
         header('Content-Type: application/json');
         try {
@@ -681,9 +714,51 @@ $tab = $_GET['tab'] ?? 'usuarios';
         });
     }
 
+    // Interceptar envío del formulario de Usuario para validar correo duplicado dinámicamente
+    const modalUserForm = document.querySelector('#modal-usuario form');
+    if (modalUserForm) {
+        modalUserForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(modalUserForm);
+            formData.append('ajax', '1');
+
+            try {
+                const response = await fetch('', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = 'usuarios.php?tab=usuarios&success=1';
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Correo Electrónico Ya Existe',
+                        html: `<p style="color: #475569; font-size: 14px;">${data.error || 'El correo electrónico ya se encuentra registrado. Por favor ingrese uno diferente.'}</p>`,
+                        confirmButtonColor: '#2563eb',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            } catch (error) {
+                modalUserForm.submit();
+            }
+        });
+    }
+
     // Notificaciones de URL
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Correo Electrónico Ya Existe',
+                text: urlParams.get('error'),
+                confirmButtonColor: '#2563eb'
+            });
+            window.history.replaceState({}, document.title, window.location.pathname + '?tab=' + (urlParams.get('tab') || 'usuarios'));
+        }
         if (urlParams.has('success')) {
             Swal.fire({
                 icon: 'success',
