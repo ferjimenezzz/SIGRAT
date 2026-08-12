@@ -69,7 +69,7 @@ $spaces = $spaceController->getAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserva Sin Cuenta - SIGRAT</title>
-        <link rel="icon" type="image/jpeg" href="assets/images/logo 1.3.jpeg">
+        <link rel="icon" type="image/jpeg" href="assets/images/logo_1_3.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
