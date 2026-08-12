@@ -281,17 +281,17 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .sidebar-header {
-            padding: 24px 16px 20px 20px;
+            padding: 24px 20px 20px 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
             margin-bottom: 8px;
         }
 
         .sidebar-logo {
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
         }
 
@@ -1575,13 +1575,13 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 display: block;
             }
             body.sidebar-mobile-open .sidebar-header {
-                padding: 24px 16px 20px 20px;
-                flex-direction: row;
-                gap: 10px;
-            }
+            padding: 24px 20px 20px 20px;
+            flex-direction: row;
+            gap: 14px;
+        }
             body.sidebar-mobile-open .sidebar-logo {
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
         }
             body.sidebar-mobile-open .nav-item {
                 justify-content: flex-start;
