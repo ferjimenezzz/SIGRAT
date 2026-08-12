@@ -2649,24 +2649,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
             let lastUnreadCount = 0;
             let initialLoadComplete = false;
 
-            // Función para generar un sonido "Ding" sintético sin archivos externos
-            function playNotificationSound() {
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Nota A5
-                    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-                    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-                    oscillator.start(audioCtx.currentTime);
-                    oscillator.stop(audioCtx.currentTime + 0.5);
-                } catch(e) { console.log('Audio contextual no soportado', e); }
-            }
-
             function fetchNotificationsDirect() {
                 // Agregamos cacheBuster para forzar al navegador a siempre pedir los datos más frescos al servidor
                 const cacheBuster = Date.now();
@@ -2687,8 +2669,6 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                                     if (typeof showToast === 'function') {
                                         showToast(newNotif.mensaje, 'info');
                                     }
-                                    // 2. Reproducir sonido
-                                    playNotificationSound();
                                 }
                             }
                             
