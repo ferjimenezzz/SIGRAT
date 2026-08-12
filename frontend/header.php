@@ -165,7 +165,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGRAT - Sistema Universitario</title>
-        <link rel="icon" type="image/jpeg" href="assets/images/logo_1_3.jpeg?v=1786552519">
+        <link rel="icon" type="image/png" href="assets/images/sigrat_icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -1916,7 +1916,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
     </script>
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="assets/images/sigrat_icon.png" alt="SIGRAT" class="sidebar-logo" style="filter: brightness(0) invert(1); drop-shadow(0 0 2px rgba(0,0,0,0.5));">
+            <img src="assets/images/sigrat_logo.png" alt="SIGRAT" class="sidebar-logo" style="filter: brightness(0) invert(1); drop-shadow(0 0 2px rgba(0,0,0,0.5));">
             <div class="sidebar-brand">
                 <h2>SIGRAT</h2>
                 <p>Control Integral</p>
