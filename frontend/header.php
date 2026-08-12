@@ -781,7 +781,11 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         /* Colapsar help btn en sidebar colapsado */
         body.sidebar-collapsed .sidebar-help-btn span { display: none; }
-        body.sidebar-collapsed .sidebar-help-btn { justify-content: center; padding: 10px 0; }
+        body.sidebar-collapsed .sidebar-help-btn {
+            justify-content: center;
+            padding: 6px 0;
+            margin-bottom: 4px;
+        }
 
 
         /* ====== LOGOUT CONFIRMATION MODAL ====== */
@@ -876,15 +880,15 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         body.sidebar-collapsed .sidebar-header {
-            padding: 20px 0 16px 0;
+            padding: 12px 0 8px 0;
             flex-direction: column;
-            gap: 16px;
+            gap: 8px;
         }
 
         body.sidebar-collapsed .sidebar-logo {
             margin: 0;
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
         }
 
         body.sidebar-collapsed .sidebar-toggle-btn {
@@ -904,13 +908,14 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
         body.sidebar-collapsed .sidebar-user {
             justify-content: center;
-            padding: 16px 0;
-            margin: 8px 12px 12px 12px;
+            padding: 8px 0;
+            margin: 4px 8px;
         }
 
         body.sidebar-collapsed .sidebar-logout {
             justify-content: center;
-            padding: 10px 0;
+            padding: 6px 0;
+            margin-bottom: 8px;
         }
 
         body.sidebar-collapsed .sidebar-logout i {
