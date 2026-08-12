@@ -520,4 +520,41 @@ class EmailService {
         $body = $this->wrapEmailTemplate($subject, $contentHtml);
         return $this->sendEmail($to, $subject, $body);
     }
+
+
+// ============================================================================
+// SECCIÓN 12: NOTIFICACIÓN DE INVITACIONES
+// ============================================================================
+    /**
+     * @summary Envía un correo electrónico de invitación con el código de acceso y vigencia.
+     */
+    public function sendInvitationEmail($to, $guestName, $codigo, $anfitrionNombre = '', $expirationHours = 24) {
+        $subject = "🎟️ Tu Código de Acceso e Invitación - SIGRAT";
+        $anfitrionHtml = !empty($anfitrionNombre) ? "<p style='margin: 4px 0; color: #475569;'><strong>Anfitrión:</strong> " . htmlspecialchars($anfitrionNombre) . "</p>" : "";
+        
+        $contentHtml = "
+            <h2 style='color: #1E335F; margin-top: 0; font-size: 20px;'>Invitación de Acceso al Campus</h2>
+            <p>Hola <strong>" . htmlspecialchars($guestName) . "</strong>,</p>
+            <p>Se ha generado un código de acceso e invitación para tus visitas o trámites en la institución.</p>
+            
+            <div style='background-color: #eff6ff; border: 2px dashed #2563eb; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;'>
+                <div style='font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 1px;'>Código de Acceso</div>
+                <div style='font-size: 32px; font-weight: 900; color: #2563eb; letter-spacing: 6px; margin: 12px 0;'>" . htmlspecialchars($codigo) . "</div>
+                <div style='font-size: 13px; font-weight: bold; color: #dc2626; background: #fef2f2; display: inline-block; padding: 6px 14px; border-radius: 20px; border: 1px solid #fca5a5;'>
+                    ⏰ Tiempo de caducidad: " . (int)$expirationHours . " horas a partir de la emisión
+                </div>
+            </div>
+
+            $anfitrionHtml
+
+            <p style='font-size: 13px; color: #475569; line-height: 1.6;'>
+                Por favor, conserva este código y compártelo o preséntalo al ingresar a los puntos de acceso asignados.
+            </p>
+            <br>
+            <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
+        ";
+
+        $body = $this->wrapEmailTemplate($subject, $contentHtml);
+        return $this->sendEmail($to, $subject, $body);
+    }
 }
