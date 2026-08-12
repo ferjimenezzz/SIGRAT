@@ -136,12 +136,21 @@ class AuthController {
                 return ['success' => false, 'message' => 'El correo ya está registrado.'];
             }
 
-            // 2. Determinar el rol_id por defecto (Usuario)
+            // 2. Determinar el rol_id por defecto (Maestro)
             $rol_id = 1; // Fallback
-            $stmtRole = $this->db->prepare("SELECT rol_id FROM ROLES WHERE nombre = 'Usuario' LIMIT 1");
+            $stmtRole = $this->db->prepare("SELECT rol_id FROM ROLES WHERE LOWER(nombre) LIKE '%maestro%' OR LOWER(nombre) LIKE '%docente%' OR LOWER(nombre) LIKE '%profesor%' LIMIT 1");
             $stmtRole->execute();
             if ($rol = $stmtRole->fetch()) {
                 $rol_id = $rol['rol_id'];
+            } else {
+                // Si no existe el rol Maestro, buscar por nombre exacto o insertar
+                $stmtInsRole = $this->db->prepare("INSERT INTO ROLES (nombre, descripcion) VALUES ('Maestro', 'Rol docente reservante') ON CONFLICT DO NOTHING");
+                $stmtInsRole->execute();
+                $stmtFind = $this->db->prepare("SELECT rol_id FROM ROLES WHERE LOWER(nombre) = 'maestro' LIMIT 1");
+                $stmtFind->execute();
+                if ($r = $stmtFind->fetch()) {
+                    $rol_id = $r['rol_id'];
+                }
             }
 
 

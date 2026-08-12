@@ -74,13 +74,9 @@ $userPayload = null;
 if ($token) {
     $userPayload = $auth->validateJWT($token);
     if ($userPayload) {
-        $assignedRol = $userPayload['rol'] ?? 'Maestro';
-        if (strtoupper(trim($assignedRol)) === 'SUPER ADMINISTRADOR') {
-            $assignedRol = 'Maestro';
-        }
         // Sincronizar payload del token con la sesión PHP para los controladores y rutas
         $_SESSION['us_id'] = $userPayload['us_id'];
-        $_SESSION['rol'] = $assignedRol;
+        $_SESSION['rol'] = $userPayload['rol'];
         $_SESSION['nombre'] = $userPayload['nombre'];
         $_SESSION['permisos'] = $userPayload['permisos'];
         $_SESSION['division'] = $userPayload['carrera'] ?? null;

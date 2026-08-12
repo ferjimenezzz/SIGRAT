@@ -30,13 +30,9 @@ $jwt_valid = false;
 if (isset($_COOKIE['auth_token'])) {
     $payload = $auth->validateJWT($_COOKIE['auth_token']);
     if ($payload) {
-        $userRolVal = $payload['rol'] ?? 'Maestro';
-        if (strtoupper(trim($userRolVal)) === 'SUPER ADMINISTRADOR') {
-            $userRolVal = 'Maestro';
-        }
         $_SESSION['us_id'] = $payload['us_id'];
         $_SESSION['nombre'] = $payload['nombre'];
-        $_SESSION['rol'] = $userRolVal;
+        $_SESSION['rol'] = $payload['rol'];
         $_SESSION['permisos'] = $payload['permisos'];
         $_SESSION['genero'] = $payload['genero'] ?? 'Masculino';
         $jwt_valid = true;
