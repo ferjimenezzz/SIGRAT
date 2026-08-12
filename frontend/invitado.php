@@ -21,7 +21,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGRAT - Reservación de Invitados</title>
-        <link rel="icon" type="image/png" href="assets/images/logo_1_3.png">
+        <link rel="icon" type="image/jpeg" href="assets/images/logo_1_3.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 
