@@ -217,7 +217,7 @@ include 'header.php';
                                 'TI',
                                 'Biblioteca',
                                 'Administración',
-                                'Otro',
+                               
                             ],
                         ];
                         foreach ($areas as $grupo => $opciones):

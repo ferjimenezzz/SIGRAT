@@ -692,7 +692,7 @@ if (isset($_SESSION['us_id'])) {
     <div class="reservations-card" style="width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px;">
         <div class="reservations-header">
             <h3 class="reservations-title">Reservaciones de hoy</h3>
-            <a href="calendario.php" class="reservations-link">Ver todas</a>
+        
         </div>
 
         <?php if (empty($todayReservations)): ?>
