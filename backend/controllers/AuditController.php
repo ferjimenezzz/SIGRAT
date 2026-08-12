@@ -142,7 +142,8 @@ class AuditController {
     public function getTopSpaces($filters) {
         $query = "SELECT e.esp_id, e.nombre_numero, e.edificio, e.tipo, 
                          COUNT(r.re_id) as total_reservas, 
-                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
+                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia,
+                         COALESCE(ROUND(CAST(SUM(EXTRACT(EPOCH FROM (r.hora_sal::time - r.hora_ent::time))/3600.0) AS numeric), 1), 0) as total_horas
                   FROM espacio e
                   LEFT JOIN reserva r ON e.esp_id = r.esp_id AND r.estatus = 'Aprobada'";
         
@@ -165,12 +166,10 @@ class AuditController {
         
         if (!empty($filters['metrica']) && $filters['metrica'] === 'asistencia') {
             $query .= " ORDER BY total_asistencia DESC, total_reservas DESC";
+        } elseif (!empty($filters['metrica']) && $filters['metrica'] === 'horas') {
+            $query .= " ORDER BY total_horas DESC, total_reservas DESC";
         } else {
             $query .= " ORDER BY total_reservas DESC, total_asistencia DESC";
-        }
-
-        if (!empty($filters['limit'])) {
-            $query .= " LIMIT " . (int)$filters['limit'];
         }
 
         $stmt = $this->db->prepare($query);
@@ -190,7 +189,8 @@ class AuditController {
         $query = "SELECT e.edificio,
                          COUNT(DISTINCT e.esp_id) as total_espacios,
                          COUNT(r.re_id) as total_reservas, 
-                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia
+                         SUM(COALESCE(r.num_alumnos, 0)) as total_asistencia,
+                         COALESCE(ROUND(CAST(SUM(EXTRACT(EPOCH FROM (r.hora_sal::time - r.hora_ent::time))/3600.0) AS numeric), 1), 0) as total_horas
                   FROM espacio e
                   LEFT JOIN reserva r ON e.esp_id = r.esp_id AND r.estatus = 'Aprobada'";
         
@@ -290,8 +290,13 @@ class AuditController {
             $query .= " AND u.nombre LIKE ?";
             $params[] = "%" . $filters['buscar_usuario'] . "%";
         }
+        if (!empty($filters['tipo_activo']) && $filters['tipo_activo'] !== 'Todos') {
+            $query .= " AND a.tipo = ?";
+            $params[] = $filters['tipo_activo'];
+        }
         if (!empty($filters['buscar_activo'])) {
-            $query .= " AND (a.tipo LIKE ? OR a.num_inv LIKE ?)";
+            $query .= " AND (a.tipo LIKE ? OR a.num_inv LIKE ? OR a.marca LIKE ?)";
+            $params[] = "%" . $filters['buscar_activo'] . "%";
             $params[] = "%" . $filters['buscar_activo'] . "%";
             $params[] = "%" . $filters['buscar_activo'] . "%";
         }

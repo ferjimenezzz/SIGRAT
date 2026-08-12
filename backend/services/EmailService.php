@@ -425,13 +425,19 @@ class EmailService {
     public function sendLoanCreated($to, $pres_id, $equipo, $serie, $fecha_pres, $fecha_ent = '') {
         $subject = "Confirmación de Préstamo de Equipo #$pres_id";
         
+        $serieLi = '';
+        $numSerie = trim($serie ?? '');
+        if ($numSerie !== '' && strcasecmp($numSerie, 'N/A') !== 0) {
+            $serieLi = "<li><strong>No. Serie:</strong> " . htmlspecialchars($numSerie) . "</li>";
+        }
+        
         $detallesHtml = "
         <div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
             <h3 style='margin: 0 0 12px 0; color: #2454bbff; font-size: 15px;'>Detalles de la Salida de Equipo:</h3>
             <ul style='margin: 0; padding-left: 20px; color: #334155; line-height: 1.8;'>
-                <li><strong>Equipo/Activo:</strong> $equipo</li>
-                <li><strong>No. Serie:</strong> $serie</li>
-                <li><strong>Fecha de Salida:</strong> $fecha_pres</li>
+                <li><strong>Equipo/Activo:</strong> " . htmlspecialchars($equipo) . "</li>
+                $serieLi
+                <li><strong>Fecha de Salida:</strong> " . htmlspecialchars($fecha_pres) . "</li>
         ";
         
         if (!empty($fecha_ent)) {

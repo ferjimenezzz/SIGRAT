@@ -422,7 +422,15 @@ foreach ($loans as $l) {
                     <td>
                         <div class="item-cell">
                             <i class="bi <?php echo $iconClass; ?> item-icon"></i>
-                            <div class="item-info"><h4><?php echo htmlspecialchars($loan['tipo'] . ' ' . $loan['marca']); ?></h4><p>Serie: <?php echo htmlspecialchars($loan['num_serie']); ?></p></div>
+                            <div class="item-info">
+                                <h4><?php echo htmlspecialchars($loan['tipo'] . ' ' . $loan['marca']); ?></h4>
+                                <?php 
+                                $numSerie = trim($loan['num_serie'] ?? '');
+                                if ($numSerie !== '' && strcasecmp($numSerie, 'N/A') !== 0): 
+                                ?>
+                                <p>Serie: <?php echo htmlspecialchars($numSerie); ?></p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </td>
                     <td>
@@ -798,7 +806,7 @@ function clearAllFilters() {
             <button class="close-btn" onclick="closeModal('viewModal')"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
-            <p><strong>Equipo:</strong> <span id="v_equipo"></span> (Serie: <span id="v_serie"></span>)</p>
+            <p><strong>Equipo:</strong> <span id="v_equipo"></span> <span id="v_serie_container">(Serie: <span id="v_serie"></span>)</span></p>
             <p><strong>Solicitante:</strong> <span id="v_solicitante"></span></p>
             <p><strong>Correo:</strong> <span id="v_correo"></span></p>
             <hr style="border-top:1px solid #e2e8f0; margin:16px 0;">
@@ -872,7 +880,13 @@ function clearAllFilters() {
     // Rellenar Modal de Ver
     function openViewModal(data) {
         document.getElementById('v_equipo').innerText = data.equipo;
-        document.getElementById('v_serie').innerText = data.serie;
+        const serie = (data.serie || '').trim();
+        if (serie !== '' && serie.toUpperCase() !== 'N/A') {
+            document.getElementById('v_serie').innerText = serie;
+            document.getElementById('v_serie_container').style.display = '';
+        } else {
+            document.getElementById('v_serie_container').style.display = 'none';
+        }
         document.getElementById('v_solicitante').innerText = data.solicitante;
         document.getElementById('v_correo').innerText = data.correo;
         document.getElementById('v_fechapres').innerText = data.fecha_pres;

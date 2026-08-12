@@ -98,27 +98,80 @@ $sheet->getStyle($headerRange)->applyFromArray([
 $sheet->setAutoFilter($headerRange);
 $sheet->freezePane('A' . ($startRow + 1));
 
+// Identificar columnas FOTO
+$fotoCols = [];
+$col = 'A';
+foreach ($headers as $headerText) {
+    if (strtolower(trim($headerText)) === 'foto') {
+        $fotoCols[] = $col;
+    }
+    $col++;
+}
+
 // Escribir Filas
 $currentRow = $startRow + 1;
 foreach ($rows as $index => $row) {
     $col = 'A';
     foreach ($row as $cellValue) {
-        $sheet->setCellValue($col . $currentRow, $cellValue);
-        
-        // Formato Condicional para palabras clave
-        $cellValLower = strtolower(trim($cellValue));
-        if (in_array($cellValLower, ['disponible', 'activo'])) {
-            $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FF16A34A'); // Verde
-            $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
-        } elseif (in_array($cellValLower, ['prestado'])) {
-            $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FFEA580C'); // Naranja
-            $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
-        } elseif (in_array($cellValLower, ['mantenimiento'])) {
-            $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FF2563EB'); // Azul
-            $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
-        } elseif (in_array($cellValLower, ['extraviado', 'inactivo', 'baja'])) {
-            $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FFDC2626'); // Rojo
-            $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
+        if (in_array($col, $fotoCols) && !empty($cellValue) && (filter_var($cellValue, FILTER_VALIDATE_URL) || strpos($cellValue, 'cloudinary') !== false)) {
+            // Es una URL de imagen válida
+            $sheet->setCellValue($col . $currentRow, $cellValue);
+            $sheet->getCell($col . $currentRow)->getHyperlink()->setUrl($cellValue);
+            $sheet->getStyle($col . $currentRow)->getFont()->setUnderline(true)->getColor()->setARGB('FF2563EB'); // Link azul
+            
+            // Intentar descargar e insertar la imagen en la celda
+            $ctx = stream_context_create([
+                'http' => [
+                    'timeout' => 2,
+                    'follow_location' => true
+                ]
+            ]);
+            $imgData = @file_get_contents($cellValue, false, $ctx);
+            if ($imgData !== false) {
+                $tempFile = tempnam(sys_get_temp_dir(), 'excel_img_');
+                file_put_contents($tempFile, $imgData);
+                
+                $imageSize = @getimagesize($tempFile);
+                if ($imageSize !== false) {
+                    $drawing = new Drawing();
+                    $drawing->setName('Foto');
+                    $drawing->setDescription('Foto del activo');
+                    $drawing->setPath($tempFile);
+                    
+                    // Ajustar alto de la fila para la imagen
+                    $sheet->getRowDimension($currentRow)->setRowHeight(55);
+                    
+                    $drawing->setHeight(50);
+                    $drawing->setCoordinates($col . $currentRow);
+                    $drawing->setOffsetX(5);
+                    $drawing->setOffsetY(5);
+                    $drawing->setWorksheet($sheet);
+                    
+                    register_shutdown_function(function() use ($tempFile) {
+                        @unlink($tempFile);
+                    });
+                } else {
+                    @unlink($tempFile);
+                }
+            }
+        } else {
+            $sheet->setCellValue($col . $currentRow, $cellValue);
+            
+            // Formato Condicional para palabras clave
+            $cellValLower = strtolower(trim($cellValue));
+            if (in_array($cellValLower, ['disponible', 'activo'])) {
+                $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FF16A34A'); // Verde
+                $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
+            } elseif (in_array($cellValLower, ['prestado'])) {
+                $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FFEA580C'); // Naranja
+                $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
+            } elseif (in_array($cellValLower, ['mantenimiento'])) {
+                $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FF2563EB'); // Azul
+                $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
+            } elseif (in_array($cellValLower, ['extraviado', 'inactivo', 'baja'])) {
+                $sheet->getStyle($col . $currentRow)->getFont()->getColor()->setARGB('FFDC2626'); // Rojo
+                $sheet->getStyle($col . $currentRow)->getFont()->setBold(true);
+            }
         }
         $col++;
     }
@@ -145,9 +198,13 @@ $sheet->getStyle($dataRange)->applyFromArray([
     ],
 ]);
 
-// Autoajuste de columnas
+// Autoajuste de columnas (evitando la de la foto por contener urls largas)
 for ($c = 'A'; $c <= $lastCol; $c++) {
-    $sheet->getColumnDimension($c)->setAutoSize(true);
+    if (in_array($c, $fotoCols)) {
+        $sheet->getColumnDimension($c)->setWidth(18);
+    } else {
+        $sheet->getColumnDimension($c)->setAutoSize(true);
+    }
 }
 
 // Pie de página

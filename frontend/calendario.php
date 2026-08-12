@@ -1885,8 +1885,6 @@ include 'header.php';
             </tbody>
         </table>
     </div>
-
-    </div>
 </div>
 
 <!-- ==================== SIDEBAR DE FILTROS ==================== -->

@@ -230,8 +230,11 @@ $mantenimiento = count(array_filter($assets, fn($a) => in_array($a['estatus'], [
                 <td style="color:#94a3b8; font-size:11px;"><?php echo $i++; ?></td>
                 <td>
                     <div class="asset-name"><?php echo htmlspecialchars(trim($a['marca'] . ' ' . $a['modelo'])); ?></div>
-                    <?php if (!empty($a['num_serie'])): ?>
-                        <div class="asset-serie">S/N: <?php echo htmlspecialchars($a['num_serie']); ?></div>
+                    <?php 
+                    $numSerie = trim($a['num_serie'] ?? '');
+                    if ($numSerie !== '' && strcasecmp($numSerie, 'N/A') !== 0): 
+                    ?>
+                        <div class="asset-serie">S/N: <?php echo htmlspecialchars($numSerie); ?></div>
                     <?php endif; ?>
                 </td>
                 <td><?php echo htmlspecialchars($a['tipo']); ?></td>

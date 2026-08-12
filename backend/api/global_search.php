@@ -61,7 +61,17 @@ try {
         $results[] = [
             "type" => "activo",
             "title" => $row['marca'] . " " . $row['modelo'],
-            "subtitle" => "Serie: " . $row['num_serie'] . ($row['tag_id'] ? " | TAG: " . $row['tag_id'] : ""),
+            "subtitle" => (function() use ($row) {
+                $parts = [];
+                $numSerie = trim($row['num_serie'] ?? '');
+                if ($numSerie !== '' && strcasecmp($numSerie, 'N/A') !== 0) {
+                    $parts[] = "Serie: " . $numSerie;
+                }
+                if (!empty($row['tag_id'])) {
+                    $parts[] = "TAG: " . $row['tag_id'];
+                }
+                return implode(" | ", $parts);
+            })(),
             "url" => "inventario.php" // Enruta al módulo de inventario institucional
         ];
     }

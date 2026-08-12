@@ -222,7 +222,12 @@ $finalizados = count(array_filter($loans, fn($l) => $l['estatus'] === 'Finalizad
                 <td style="color:#94a3b8; font-size:11px;"><?php echo $i++; ?></td>
                 <td>
                     <div class="asset-name"><?php echo htmlspecialchars(trim($l['tipo'] . ' ' . $l['modelo'])); ?></div>
-                    <div class="asset-serie">S/N: <?php echo htmlspecialchars($l['num_serie']); ?></div>
+                    <?php 
+                    $numSerie = trim($l['num_serie'] ?? '');
+                    if ($numSerie !== '' && strcasecmp($numSerie, 'N/A') !== 0): 
+                    ?>
+                        <div class="asset-serie">S/N: <?php echo htmlspecialchars($numSerie); ?></div>
+                    <?php endif; ?>
                 </td>
                 <td>
                     <?php if (!empty($l['espacio_nombre'])): ?>
