@@ -26,9 +26,9 @@ $filtros = [
     'estado' => $_GET['estado'] ?? null,
     'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
     'buscar_activo' => $_GET['buscar_activo'] ?? null,
+    'tipo_activo' => $_GET['tipo_activo'] ?? null,
     'usuario_id' => $_GET['usuario_id'] ?? null,
-    'metrica' => $_GET['metrica'] ?? 'reservas',
-    'limit' => $_GET['limit'] ?? 10
+    'metrica' => $_GET['metrica'] ?? 'reservas'
 ];
 
 $logs = [];
@@ -68,9 +68,13 @@ switch ($tipo_reporte) {
 
 $usuarios = $db->query("SELECT us_id, nombre, COALESCE(apellido, '') as apellido FROM usuario ORDER BY nombre, apellido")->fetchAll();
 $edificios_db = $db->query("SELECT DISTINCT edificio FROM ESPACIO WHERE edificio IS NOT NULL ORDER BY edificio")->fetchAll(PDO::FETCH_COLUMN);
+$tipos_activos_db = $db->query("SELECT DISTINCT tipo FROM activo WHERE tipo IS NOT NULL AND tipo != '' ORDER BY tipo")->fetchAll(PDO::FETCH_COLUMN);
 
 include 'header.php';
 ?>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <!-- ============================================================================ -->
@@ -293,18 +297,26 @@ include 'header.php';
                     <label>Métrica de Ordenamiento</label>
                     <select name="metrica">
                         <option value="reservas" <?php echo $filtros['metrica'] == 'reservas' ? 'selected' : ''; ?>>Cantidad de Reservas</option>
+                        <option value="horas" <?php echo $filtros['metrica'] == 'horas' ? 'selected' : ''; ?>>Horas de Uso Acumuladas</option>
                         <option value="asistencia" <?php echo $filtros['metrica'] == 'asistencia' ? 'selected' : ''; ?>>Volumen de Asistencia</option>
                     </select>
                 </div>
 
-                <div class="filter-group fg-limit" style="display:none;">
-                    <label>Cantidad de Resultados</label>
-                    <input type="number" name="limit" value="<?php echo $filtros['limit'] ?: 10; ?>" min="1" max="100">
+                <div class="filter-group fg-tipo-activo" style="display:none;">
+                    <label>Tipo de Activo</label>
+                    <select name="tipo_activo" id="tipoActivoSelect">
+                        <option value="Todos">Todos los tipos de activo</option>
+                        <?php foreach($tipos_activos_db as $t_act): ?>
+                            <option value="<?php echo htmlspecialchars($t_act); ?>" <?php echo (isset($filtros['tipo_activo']) && $filtros['tipo_activo'] == $t_act) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($t_act); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="filter-group fg-activo" style="display:none;">
-                    <label>Buscar Activo</label>
-                    <input type="text" name="buscar_activo" placeholder="Num inv o tipo..." value="<?php echo htmlspecialchars($filtros['buscar_activo'] ?? ''); ?>">
+                    <label>Buscar Activo (Inv / Marca)</label>
+                    <input type="text" name="buscar_activo" placeholder="Num inv o marca..." value="<?php echo htmlspecialchars($filtros['buscar_activo'] ?? ''); ?>">
                 </div>
             </div>
 
@@ -343,9 +355,9 @@ include 'header.php';
                     <?php elseif ($tipo_reporte == 'asistencia'): ?>
                         <tr><th>FECHA</th><th>HORARIO</th><th>ESPACIO</th><th>RESPONSABLE</th><th>ASISTENCIA</th></tr>
                     <?php elseif ($tipo_reporte == 'aulas_top'): ?>
-                        <tr><th>ESPACIO</th><th>EDIFICIO</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+                        <tr><th>ESPACIO</th><th>EDIFICIO</th><th>TOTAL RESERVAS</th><th>HORAS TOTALES DE USO</th><th>ASISTENCIA TOTAL</th></tr>
                     <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
-                        <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+                        <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>DISTRIBUCIÓN DE USO (%)</th><th>HORAS DE USO</th><th>ASISTENCIA TOTAL</th></tr>
                     <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
                         <tr><th>FECHA DE USO</th><th>HORARIO</th><th>ESPACIO / EDIFICIO</th><th>ASISTENCIA REGISTRADA</th><th>ESTADO / ASISTENCIA</th></tr>
                     <?php elseif ($tipo_reporte == 'prestamos'): ?>
@@ -354,8 +366,11 @@ include 'header.php';
                 </thead>
                 <tbody>
                     <?php if (empty($logs)): ?>
-                        <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No hay registros para este periodo.</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">No hay registros para este periodo.</td></tr>
                     <?php else: ?>
+                        <?php 
+                            $grand_total_reservas = ($tipo_reporte == 'uso_edificio') ? array_sum(array_column($logs, 'total_reservas')) : 0;
+                        ?>
                         <?php foreach ($logs as $log): ?>
                             <tr>
                             <?php if (in_array($tipo_reporte, ['actividad', 'inventario'])): 
@@ -390,11 +405,25 @@ include 'header.php';
                                 <td><b><?php echo htmlspecialchars($log['nombre_numero']); ?></b><br><small><?php echo htmlspecialchars($log['tipo']); ?></small></td>
                                 <td><?php echo htmlspecialchars($log['edificio']); ?></td>
                                 <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                                <td><b style="color: #0284c7;"><?php echo number_format((float)($log['total_horas'] ?? 0), 1); ?> hrs</b></td>
                                 <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
                             <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
+                                <?php 
+                                    $totResEd = (int)($log['total_reservas'] ?? 0);
+                                    $porcentaje = ($grand_total_reservas > 0) ? round(($totResEd / $grand_total_reservas) * 100, 1) : 0;
+                                ?>
                                 <td><b><?php echo htmlspecialchars($log['edificio'] ?: 'Sin Edificio'); ?></b></td>
                                 <td><?php echo (int)$log['total_espacios']; ?></td>
-                                <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                                <td><b><?php echo $totResEd; ?></b></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px; min-width: 140px;">
+                                        <span style="font-weight: 700; width: 45px; font-size: 12px; color: #1e293b;"><?php echo $porcentaje; ?>%</span>
+                                        <div style="flex: 1; background: #e2e8f0; border-radius: 6px; height: 8px; overflow: hidden;">
+                                            <div style="width: <?php echo $porcentaje; ?>%; background: #2563eb; height: 100%; border-radius: 6px;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><b style="color: #0284c7;"><?php echo number_format((float)($log['total_horas'] ?? 0), 1); ?> hrs</b></td>
                                 <td style="color: var(--primary);"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
                             <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
                                  <td><b><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></b></td>
@@ -476,8 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(ed) ed.style.display = 'flex';
             const met = document.querySelector('.fg-metrica');
             if(met) met.style.display = 'flex';
-            const lim = document.querySelector('.fg-limit');
-            if(lim) lim.style.display = 'flex';
         } else if(val === 'asistencia_usuario') {
             const uSel = document.querySelector('.fg-usuario-select');
             if(uSel) uSel.style.display = 'flex';
@@ -486,6 +513,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if(val === 'prestamos') {
             const uSel = document.querySelector('.fg-usuario-select');
             if(uSel) uSel.style.display = 'flex';
+            const tact = document.querySelector('.fg-tipo-activo');
+            if(tact) tact.style.display = 'flex';
             const act = document.querySelector('.fg-activo');
             if(act) act.style.display = 'flex';
             if(lblUser) lblUser.innerHTML = 'Usuario';
@@ -500,7 +529,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const uSel = document.getElementById('usuarioSelect');
                 if (!uSel || !uSel.value) {
                     e.preventDefault();
-                    alert('Por favor, selecciona un usuario de la lista desplegable antes de generar el reporte de asistencia.');
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Usuario Requerido',
+                            text: 'Por favor, selecciona un usuario de la lista desplegable antes de generar el reporte de asistencia.',
+                            confirmButtonColor: '#2563eb',
+                            confirmButtonText: 'Entendido',
+                            customClass: {
+                                popup: 'rounded-xl'
+                            }
+                        });
+                    } else {
+                        alert('Por favor, selecciona un usuario de la lista desplegable antes de generar el reporte de asistencia.');
+                    }
                     if (uSel) {
                         uSel.focus();
                         uSel.style.borderColor = '#dc2626';

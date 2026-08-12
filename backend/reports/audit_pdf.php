@@ -25,8 +25,8 @@ $filtros = [
     'estado' => $_GET['estado'] ?? null,
     'buscar_usuario' => $_GET['buscar_usuario'] ?? null,
     'buscar_activo' => $_GET['buscar_activo'] ?? null,
-    'metrica' => $_GET['metrica'] ?? 'reservas',
-    'limit' => $_GET['limit'] ?? 10
+    'tipo_activo' => $_GET['tipo_activo'] ?? null,
+    'metrica' => $_GET['metrica'] ?? 'reservas'
 ];
 
 $tipo_reporte = $_GET['tipo_reporte'] ?? 'actividad';
@@ -112,6 +112,9 @@ switch ($tipo_reporte) {
             <?php if (in_array($tipo_reporte, ['aulas_top', 'uso_edificio', 'asistencia']) && !empty($filtros['edificio']) && $filtros['edificio'] !== 'Todos'): ?>
                 <p>Filtro Edificio: <?php echo htmlspecialchars($filtros['edificio']); ?></p>
             <?php endif; ?>
+            <?php if ($tipo_reporte == 'prestamos' && !empty($filtros['tipo_activo']) && $filtros['tipo_activo'] !== 'Todos'): ?>
+                <p>Tipo de Activo: <?php echo htmlspecialchars($filtros['tipo_activo']); ?></p>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -122,9 +125,9 @@ switch ($tipo_reporte) {
             <?php elseif ($tipo_reporte == 'asistencia'): ?>
                 <tr><th>FECHA</th><th>HORARIO</th><th>ESPACIO</th><th>RESPONSABLE</th><th>ASISTENCIA</th></tr>
             <?php elseif ($tipo_reporte == 'aulas_top'): ?>
-                <tr><th>ESPACIO</th><th>EDIFICIO</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+                <tr><th>ESPACIO</th><th>EDIFICIO</th><th>TOTAL RESERVAS</th><th>HORAS TOTALES DE USO</th><th>ASISTENCIA TOTAL</th></tr>
             <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
-                <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>ASISTENCIA TOTAL</th></tr>
+                <tr><th>EDIFICIO</th><th>TOTAL ESPACIOS</th><th>TOTAL RESERVAS</th><th>DISTRIBUCIÓN (%)</th><th>HORAS DE USO</th><th>ASISTENCIA TOTAL</th></tr>
             <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
                 <tr><th>FECHA DE USO</th><th>HORARIO</th><th>ESPACIO / EDIFICIO</th><th>ASISTENCIA</th><th>ESTADO / ASISTENCIA</th></tr>
             <?php elseif ($tipo_reporte == 'prestamos'): ?>
@@ -133,8 +136,11 @@ switch ($tipo_reporte) {
         </thead>
         <tbody>
             <?php if (empty($logs)): ?>
-                <tr><td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">No hay registros para este periodo.</td></tr>
+                <tr><td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">No hay registros para este periodo.</td></tr>
             <?php else: ?>
+                <?php 
+                    $grand_total_reservas = ($tipo_reporte == 'uso_edificio') ? array_sum(array_column($logs, 'total_reservas')) : 0;
+                ?>
                 <?php foreach ($logs as $log): ?>
                     <tr>
                     <?php if (in_array($tipo_reporte, ['actividad', 'inventario'])): 
@@ -159,11 +165,18 @@ switch ($tipo_reporte) {
                         <td><b><?php echo htmlspecialchars($log['nombre_numero']); ?></b><br><small><?php echo htmlspecialchars($log['tipo']); ?></small></td>
                         <td><?php echo htmlspecialchars($log['edificio']); ?></td>
                         <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                        <td><b style="color: #0284c7;"><?php echo number_format((float)($log['total_horas'] ?? 0), 1); ?> hrs</b></td>
                         <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
                     <?php elseif ($tipo_reporte == 'uso_edificio'): ?>
+                        <?php 
+                            $totResEd = (int)($log['total_reservas'] ?? 0);
+                            $porcentaje = ($grand_total_reservas > 0) ? round(($totResEd / $grand_total_reservas) * 100, 1) : 0;
+                        ?>
                         <td><b><?php echo htmlspecialchars($log['edificio'] ?: 'Sin Edificio'); ?></b></td>
                         <td><?php echo (int)$log['total_espacios']; ?></td>
-                        <td><b><?php echo (int)$log['total_reservas']; ?></b></td>
+                        <td><b><?php echo $totResEd; ?></b></td>
+                        <td><b><?php echo $porcentaje; ?>%</b></td>
+                        <td><b style="color: #0284c7;"><?php echo number_format((float)($log['total_horas'] ?? 0), 1); ?> hrs</b></td>
                         <td style="color: #2563eb;"><b><?php echo (int)$log['total_asistencia']; ?></b> personas</td>
                     <?php elseif ($tipo_reporte == 'asistencia_usuario'): ?>
                         <td><b><?php echo date('d/m/Y', strtotime($log['fecha_uso'])); ?></b></td>

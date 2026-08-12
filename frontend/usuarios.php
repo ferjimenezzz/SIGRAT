@@ -53,18 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $apellido = $_POST['apellido'] ?? '';
         $correo = $_POST['correo'];
         $empresa = $_POST['empresa'] ?? '';
-        $rfc = $_POST['rfc_matricula'] ?? '';
         $rol_id = $_POST['rol_id'];
         $genero = $_POST['genero'] ?? 'Masculino';
         $us_id = $_POST['us_id'] ?? null;
 
         if ($us_id) {
-            $stmt = $db->prepare("UPDATE usuario SET nombre=?, apellido=?, correo=?, empresa=?, rfc_matricula=?, rol_id=?, genero=? WHERE us_id=?");
-            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $genero, $us_id]);
+            $stmt = $db->prepare("UPDATE usuario SET nombre=?, apellido=?, correo=?, empresa=?, rol_id=?, genero=? WHERE us_id=?");
+            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rol_id, $genero, $us_id]);
         } else {
             $pass = AuthController::hashPassword('123456');
-            $stmt = $db->prepare("INSERT INTO usuario (nombre, apellido, correo, empresa, rfc_matricula, rol_id, genero, contrasena, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Activo')");
-            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rfc, $rol_id, $genero, $pass]);
+            $stmt = $db->prepare("INSERT INTO usuario (nombre, apellido, correo, empresa, rol_id, genero, contrasena, estatus) VALUES (?, ?, ?, ?, ?, ?, ?, 'Activo')");
+            $stmt->execute([$nombre, $apellido, $correo, $empresa, $rol_id, $genero, $pass]);
         }
         header("Location: usuarios.php?tab=usuarios&success=1");
         exit();
@@ -167,8 +166,8 @@ $tab = $_GET['tab'] ?? 'usuarios';
             <p style="font-size: 13px; color: #64748b; font-weight: 500;">Administra usuarios y permisos del sistema</p>
         </div>
         <div style="display: flex; gap: 12px;">
-            <button onclick="window.open('../backend/reports/users_pdf.php', '_blank')" id="btn-export-pdf" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #ef4444; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="file-text" style="width: 16px;"></i> PDF</button>
-            <button onclick="exportTableToExcel('usersTable', 'Usuarios_SIGRAT')" id="btn-export-excel" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #10b981; color: #10b981; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="table" style="width: 16px;"></i> Excel</button>
+            <button onclick="handleExportPDF()" id="btn-export-pdf" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #ef4444; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="file-text" style="width: 16px;"></i> PDF</button>
+            <button onclick="handleExportExcel()" id="btn-export-excel" class="btn-secondary" style="border-radius: 8px; font-size: 12px; font-weight: 600; background: white; padding: 10px 16px; border: 1px solid #10b981; color: #10b981; cursor: pointer; display: flex; align-items: center; gap: 6px;"><i data-lucide="table" style="width: 16px;"></i> Excel</button>
             <button onclick="openUserModal()" id="btn-action-user" class="btn-primary" style="background: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; padding: 10px 16px; color: white; border: none; cursor: pointer; display: <?php echo $tab === 'usuarios' ? 'flex' : 'none'; ?>; align-items: center; gap: 6px;"><i data-lucide="plus" style="width: 16px;"></i> Nuevo usuario</button>
         </div>
     </header>
@@ -259,7 +258,8 @@ $tab = $_GET['tab'] ?? 'usuarios';
         <table style="width: 100%; border-collapse: collapse; text-align: left;" id="usersTable">
             <thead style="border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; background: #f8fafc;">
                 <tr>
-                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Usuario</th>
+                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Nombre</th>
+                    <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Correo Electrónico</th>
                     <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Rol</th>
                     <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Estado</th>
                     <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Última Conexión</th>
@@ -271,11 +271,10 @@ $tab = $_GET['tab'] ?? 'usuarios';
                 <tr class="user-row" data-role="<?php echo htmlspecialchars($u['rol_nombre'] ?? ''); ?>" data-status="<?php echo htmlspecialchars($u['estatus'] ?? ''); ?>" style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
                     <td style="padding: 16px 24px; display: flex; align-items: center; gap: 12px;">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode(($u['nombre'] ?? '') . ' ' . ($u['apellido'] ?? '')); ?>&background=random&color=fff&rounded=true&size=40" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
-                        <div>
-                            <p class="user-name" style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;"><?php echo htmlspecialchars(($u['nombre'] ?? '') . ' ' . ($u['apellido'] ?? '')); ?></p>
-                            <p class="user-email" style="font-size: 12px; color: #64748b; margin: 0;"><?php echo htmlspecialchars($u['correo'] ?? ''); ?></p>
-                            <p style="font-size: 10px; color: #94a3b8; margin: 2px 0 0 0; text-transform: uppercase; font-weight: 700;">Emp/Mat: <?php echo htmlspecialchars($u['empresa'] ?? $u['rfc_matricula'] ?? 'N/A'); ?></p>
-                        </div>
+                        <span class="user-name" style="font-size: 14px; font-weight: 700; color: #1e293b;"><?php echo htmlspecialchars(trim(($u['nombre'] ?? '') . ' ' . ($u['apellido'] ?? ''))); ?></span>
+                    </td>
+                    <td style="padding: 16px 24px;">
+                        <span class="user-email" style="font-size: 13px; color: #475569; font-weight: 500;"><?php echo htmlspecialchars($u['correo'] ?? ''); ?></span>
                     </td>
                     <td style="padding: 16px 24px;">
                         <?php 
@@ -316,30 +315,33 @@ $tab = $_GET['tab'] ?? 'usuarios';
         </table>
     </div>
 
-    <!-- Pestaña Roles (Eliminada) -->
-
     <!-- Pestaña Invitaciones -->
     <div id="tab-invitaciones" style="display: <?php echo $tab === 'invitaciones' ? 'grid' : 'none'; ?>; grid-template-columns: 2fr 1fr; gap: 32px;">
         <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); max-height: 350px; overflow: auto; align-self: start;">
-            <table style="width: 100%; border-collapse: collapse;">
+            <table style="width: 100%; border-collapse: collapse;" id="invitesTable">
                 <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
                     <tr>
                         <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Invitado</th>
+                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Correo Electrónico</th>
                         <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Código</th>
                         <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Anfitrión</th>
+                        <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; text-align: left;">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($invites as $inv): ?>
                     <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 16px 24px; font-weight: 700; color: #1e293b;"><?php echo htmlspecialchars($inv['nombre'] ?? ''); ?></td>
+                        <td style="padding: 16px 24px; color: #475569; font-size: 13px;"><?php echo htmlspecialchars($inv['correo'] ?? ''); ?></td>
                         <td style="padding: 16px 24px;">
-                            <p style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;"><?php echo htmlspecialchars($inv['nombre'] ?? ''); ?></p>
-                            <p style="font-size: 12px; color: #64748b; margin: 0;"><?php echo htmlspecialchars($inv['correo'] ?? ''); ?></p>
-                        </td>
-                        <td style="padding: 16px 24px;">
-                            <code style="background: #f1f5f9; padding: 6px 12px; border-radius: 8px; font-weight: 800; color: #1e293b; font-size: 13px;"><?php echo htmlspecialchars($inv['codigo_acceso'] ?? ''); ?></code>
+                            <code style="background: #eff6ff; color: #2563eb; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; letter-spacing: 1px;"><?php echo htmlspecialchars($inv['codigo_acceso'] ?? ''); ?></code>
                         </td>
                         <td style="padding: 16px 24px; font-size: 13px; font-weight: 700; color: #64748b;"><?php echo htmlspecialchars($inv['anfitrion_nombre'] ?? 'N/A'); ?></td>
+                        <td style="padding: 16px 24px;">
+                            <span style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block;">
+                                <?php echo htmlspecialchars($inv['estatus'] ?? 'Generado'); ?>
+                            </span>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -379,11 +381,11 @@ $tab = $_GET['tab'] ?? 'usuarios';
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre</label>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Nombre(s)</label>
                     <input type="text" name="nombre" id="us_nombre" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Apellido</label>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Apellido(s)</label>
                     <input type="text" name="apellido" id="us_apellido" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
                 </div>
             </div>
@@ -393,7 +395,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
                 <input type="email" name="correo" id="us_correo" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 32px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px;">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Rol Asignado</label>
                     <select name="rol_id" id="us_rol" required style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none; background: white;">
@@ -408,10 +410,6 @@ $tab = $_GET['tab'] ?? 'usuarios';
                         <option value="Masculino">Masculino</option>
                         <option value="Femenino">Femenino</option>
                     </select>
-                </div>
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">Matrícula / RFC</label>
-                    <input type="text" name="rfc_matricula" id="us_rfc" style="width: 100%; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-weight: 500; font-size: 14px; outline: none;">
                 </div>
             </div>
 
@@ -493,13 +491,67 @@ $tab = $_GET['tab'] ?? 'usuarios';
     roleFilter.addEventListener('change', filterTable);
     statusFilter.addEventListener('change', filterTable);
 
+    function handleExportPDF() {
+        if (currentActiveTab === 'invitaciones') {
+            window.open('../backend/reports/invitations_pdf.php', '_blank');
+        } else {
+            window.open('../backend/reports/users_pdf.php', '_blank');
+        }
+    }
+
+    function handleExportExcel() {
+        if (currentActiveTab === 'invitaciones') {
+            exportTableToExcel('invitesTable', 'Invitaciones_SIGRAT');
+        } else {
+            exportTableToExcel('usersTable', 'Usuarios_SIGRAT');
+        }
+    }
+
+    function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyToast();
+            }).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showCopyToast();
+        } catch (err) {
+            console.error('Error al copiar:', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function showCopyToast() {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '¡Código copiado al portapapeles!',
+                showConfirmButton: false,
+                timer: 2500
+            });
+        }
+    }
+
     // Modal Usuario
     function openUserModal() {
         document.getElementById('us_id').value = '';
         document.getElementById('us_nombre').value = '';
         document.getElementById('us_apellido').value = '';
         document.getElementById('us_correo').value = '';
-        document.getElementById('us_rfc').value = '';
         document.getElementById('user-modal-title').innerText = 'Nuevo Usuario';
         document.getElementById('modal-usuario').style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -515,44 +567,8 @@ $tab = $_GET['tab'] ?? 'usuarios';
         document.getElementById('us_correo').value = u.correo || '';
         document.getElementById('us_rol').value = u.rol_id;
         document.getElementById('us_genero').value = u.genero || 'Masculino';
-        document.getElementById('us_rfc').value = u.rfc_matricula || u.empresa || '';
         document.getElementById('user-modal-title').innerText = 'Editar Usuario';
         document.getElementById('modal-usuario').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    // Modal Rol
-    function openRoleModal() {
-        document.getElementById('form-rol').reset();
-        document.getElementById('rol_id').value = '';
-        document.getElementById('role-modal-title').innerText = 'Configurar Nuevo Rol';
-        document.getElementById('modal-rol').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-    function closeRoleModal() {
-        document.getElementById('modal-rol').style.display = 'none';
-        document.body.style.overflow = '';
-    }
-    function editRole(rol) {
-        document.getElementById('rol_id').value = rol.rol_id;
-        document.getElementById('nombre_rol').value = rol.nombre;
-        document.getElementById('descripcion_rol').value = rol.descripcion;
-        document.getElementById('role-modal-title').innerText = 'Editar Rol: ' + rol.nombre;
-        
-        document.querySelectorAll('.perm-check').forEach(c => c.checked = false);
-        
-        let permisos = {};
-        try { permisos = JSON.parse(rol.permisos) || {}; } catch (e) {}
-        
-        for (const mod in permisos) {
-            if (Array.isArray(permisos[mod])) {
-                permisos[mod].forEach(acc => {
-                    const check = document.querySelector(`.perm-check[data-mod="${mod}"][data-acc="${acc}"]`);
-                    if (check) check.checked = true;
-                });
-            }
-        }
-        document.getElementById('modal-rol').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
@@ -564,7 +580,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
         filterTable();
     });
 
-    // Formulario Generar Invitación (AJAX con SweetAlert)
+    // Formulario Generar Invitación (AJAX con SweetAlert y Copiar Código)
     const formInvitacion = document.getElementById('form-invitacion');
     if (formInvitacion) {
         formInvitacion.addEventListener('submit', async (e) => {
@@ -580,7 +596,7 @@ $tab = $_GET['tab'] ?? 'usuarios';
                 const data = await res.json();
                 
                 if (data.success) {
-                    // Update DOM instantly without waiting for SweetAlert confirmation
+                    // Update DOM instantly
                     const tableBody = document.querySelector('#tab-invitaciones table tbody');
                     const guestName = document.getElementById('nombre_visita').value;
                     const guestEmail = document.getElementById('correo_visita').value;
@@ -589,26 +605,43 @@ $tab = $_GET['tab'] ?? 'usuarios';
                     const newRow = document.createElement('tr');
                     newRow.style.borderBottom = '1px solid #f1f5f9';
                     newRow.innerHTML = `
+                        <td style="padding: 16px 24px; font-weight: 700; color: #1e293b;">${guestName.replace(/</g, "&lt;")}</td>
+                        <td style="padding: 16px 24px; color: #475569; font-size: 13px;">${guestEmail.replace(/</g, "&lt;")}</td>
                         <td style="padding: 16px 24px;">
-                            <p style="font-size: 14px; font-weight: 700; color: #1e293b; margin: 0;">${guestName.replace(/</g, "&lt;")}</p>
-                            <p style="font-size: 12px; color: #64748b; margin: 0;">${guestEmail.replace(/</g, "&lt;")}</p>
-                        </td>
-                        <td style="padding: 16px 24px;">
-                            <code style="background: #f1f5f9; padding: 6px 12px; border-radius: 8px; font-weight: 800; color: #1e293b; font-size: 13px;">${data.codigo}</code>
+                            <code style="background: #eff6ff; color: #2563eb; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; letter-spacing: 1px;">${data.codigo}</code>
                         </td>
                         <td style="padding: 16px 24px; font-size: 13px; font-weight: 700; color: #64748b;">${hostName}</td>
+                        <td style="padding: 16px 24px;">
+                            <span style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block;">Generado</span>
+                        </td>
                     `;
                     
-                    tableBody.prepend(newRow); // Add to top of the table
-                    document.getElementById('form-invitacion').reset(); // Clear the form
+                    if (tableBody) tableBody.prepend(newRow);
+                    document.getElementById('form-invitacion').reset();
 
-                    // Show success message
+                    // Show success modal with Copy button
                     Swal.fire({
                         icon: 'success',
-                        title: '¡Invitación Generada!',
-                        html: `El código de acceso es:<br><br><b style="font-size:24px; letter-spacing:4px; color:#2563eb;">${data.codigo}</b><br><br>Por favor, compártelo con el invitado.`,
+                        title: '¡Invitación Generada Exitosamente!',
+                        html: `
+                            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">Se ha enviado un correo electrónico a <b>${guestEmail.replace(/</g, "&lt;")}</b> con la invitación y las instrucciones de acceso.</p>
+                            <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 16px; border-radius: 12px; margin: 16px 0;">
+                                <span style="font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Código de Acceso</span>
+                                <div style="font-size: 28px; font-weight: 900; color: #2563eb; letter-spacing: 5px; margin: 6px 0;" id="modalCodeText">${data.codigo}</div>
+                            </div>
+                            <div style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 12px; display: inline-block;">
+                                ⏰ Tiempo de caducidad: 24 horas a partir de la emisión
+                            </div>
+                        `,
+                        showCancelButton: true,
                         confirmButtonColor: '#2563eb',
-                        confirmButtonText: 'Entendido'
+                        cancelButtonColor: '#10b981',
+                        confirmButtonText: 'Entendido',
+                        cancelButtonText: '📋 Copiar Código'
+                    }).then((result) => {
+                        if (result.dismiss === Swal.DismissReason.cancel) {
+                            copyToClipboard(data.codigo);
+                        }
                     });
                 } else {
                     Swal.fire({

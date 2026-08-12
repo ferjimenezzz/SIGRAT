@@ -1885,8 +1885,6 @@ include 'header.php';
             </tbody>
         </table>
     </div>
-
-    </div>
 </div>
 
 <!-- ==================== SIDEBAR DE FILTROS ==================== -->
@@ -2253,7 +2251,7 @@ include 'header.php';
                 <!-- Contenedor del plano con zoom/pan -->
                 <div class="map-pane-viewport" id="modalMapViewport">
                     <div class="map-pane-inner" id="modalMapInner">
-                        <img id="modalMapImage" src="assets/img/mapas/MAPA_PIDET_Planta_Alta.png" alt="Plano arquitectónico" style="display:block;user-select:none;" onload="onModalMapImageLoad()" draggable="false">
+                        <img id="modalMapImage" src="assets/mapas/MAPA_PIDET_Planta_Alta.png" alt="Plano arquitectónico" style="display:block;user-select:none;" onload="onModalMapImageLoad()" draggable="false">
                         <svg id="modalMapOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;" preserveAspectRatio="xMinYMin meet"></svg>
                     </div>
                 </div>

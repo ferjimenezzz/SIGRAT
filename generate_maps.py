@@ -137,10 +137,10 @@ def generate_svg_map(svg_id, svg_path_href, view_width, view_height, rooms, is_r
 
 # Generar los 4 mapas
 maps = {
-    'CIC_pa':   ('svgMap-CIC-pa',   '../frontend/img/mapas/CIC_pa.svg',   2592, 1728, CIC_PA_ROOMS),
-    'CIC_pb':   ('svgMap-CIC-pb',   '../frontend/img/mapas/CIC_pb.svg',   1224,  792, CIC_PB_ROOMS),
-    'PIDET_pa': ('svgMap-PIDET-pa', '../frontend/img/mapas/PIDET_pa.svg',  792,  612, PIDET_PA_ROOMS),
-    'PIDET_pb': ('svgMap-PIDET-pb', '../frontend/img/mapas/PIDET_pb.svg',  792,  612, PIDET_PB_ROOMS),
+    'CIC_pa':   ('svgMap-CIC-pa',   '../frontend/assets/mapas/CIC_pa.svg',   2592, 1728, CIC_PA_ROOMS),
+    'CIC_pb':   ('svgMap-CIC-pb',   '../frontend/assets/mapas/CIC_pb.svg',   1224,  792, CIC_PB_ROOMS),
+    'PIDET_pa': ('svgMap-PIDET-pa', '../frontend/assets/mapas/PIDET_pa.svg',  792,  612, PIDET_PA_ROOMS),
+    'PIDET_pb': ('svgMap-PIDET-pb', '../frontend/assets/mapas/PIDET_pb.svg',  792,  612, PIDET_PB_ROOMS),
 }
 
 output = []

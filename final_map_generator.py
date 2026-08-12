@@ -7,7 +7,7 @@ Coordenadas basadas en:
 - Texto extraído del PDF con posiciones exactas
 - Dimensiones reales de cada PDF
 
-URL de los SVGs en el servidor: ../frontend/img/mapas/
+URL de los SVGs en el servidor: ../frontend/assets/mapas/
 """
 
 def generate_svg_map(svg_id, svg_href, vw, vh, rooms, facilities=None):
@@ -215,7 +215,7 @@ PIDET_PB_FACILITIES = [
 # GENERAR EL HTML
 # ===========================================================
 
-SVG_BASE_URL = '../frontend/img/mapas/'
+SVG_BASE_URL = '../frontend/assets/mapas/'
 
 maps_config = [
     ('svgMap-CIC-pa',   'CIC_pa.svg',   2592, 1728, CIC_PA_ROOMS,   CIC_PA_FACILITIES),
