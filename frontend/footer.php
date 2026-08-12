@@ -373,13 +373,10 @@
                     
                     tds.forEach((td, index) => {
                         if (!ignoreCols.includes(index)) {
-                            let text = '';
+                            let text = td.innerText.trim().replace(/\n\s*\n/g, ' ').replace(/\n/g, ' - ');
                             let img = td.querySelector('img');
-                            if (img && img.src) {
+                            if (!text && img && img.src) {
                                 text = img.src;
-                            } else {
-                                text = td.innerText.trim().replace(/\n\s*\n/g, ' ');
-                                text = text.replace(/\n/g, ' - ');
                             }
                             rowData.push(text);
                         }
