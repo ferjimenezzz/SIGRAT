@@ -54,18 +54,27 @@ if (isset($_COOKIE['auth_token'])) {
 
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-// Restricción de navegación para el rol Maestro / Docente / Profesor
+// Restricción de navegación para el rol Maestro / Docente / Profesor / Invitado
 $userRolCurrent = isset($_SESSION['rol']) ? strtoupper(trim($_SESSION['rol'])) : '';
 $isMaestroUser = (
     strpos($userRolCurrent, 'MAESTRO') !== false || 
     strpos($userRolCurrent, 'DOCENTE') !== false || 
     strpos($userRolCurrent, 'PROFESOR') !== false
 );
+$isInvitadoUser = ($userRolCurrent === 'INVITADO');
 
 if ($isMaestroUser) {
     $allowedMaestroPages = ['calendario.php', 'aprobacion_reservas.php', 'perfil.php', 'manual_usuario.php'];
     if (!in_array($currentPage, $allowedMaestroPages)) {
         header("Location: calendario.php");
+        exit();
+    }
+}
+
+if ($isInvitadoUser) {
+    $allowedInvitadoPages = ['espacios.php', 'calendario.php', 'perfil.php', 'manual_usuario.php'];
+    if (!in_array($currentPage, $allowedInvitadoPages)) {
+        header("Location: espacios.php");
         exit();
     }
 }
@@ -91,7 +100,14 @@ if (!function_exists('hasPermission')) {
     function hasPermission($modulo, $accion = 'read') {
         if (!isset($_SESSION['rol'])) return false;
         $userRol = strtoupper(trim($_SESSION['rol']));
-        
+
+        if ($userRol === 'INVITADO') {
+            if ($modulo === 'Espacios' || $modulo === 'Calendario') {
+                return true;
+            }
+            return false;
+        }
+
         // Identificar si el usuario es Maestro / Docente / Profesor
         $isMaestro = (
             strpos($userRol, 'MAESTRO') !== false || 

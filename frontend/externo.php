@@ -24,9 +24,38 @@ $error = null;
 
 // Procesar Validación de Código
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'validate') {
-    $visitor = $inviteController->validate($_POST['codigo']);
+    $codigo = trim($_POST['codigo'] ?? '');
+    $visitor = $inviteController->validate($codigo);
     if ($visitor) {
-        $step = 2;
+        require_once '../backend/controllers/AuthController.php';
+        $auth = new Controllers\AuthController();
+
+        $visId = $visitor['vis_id'];
+        $nombre = $visitor['nombre'];
+        $correo = $visitor['correo'] ?? '';
+
+        $payload = [
+            'us_id' => 'guest_' . $visId,
+            'vis_id' => $visId,
+            'nombre' => $nombre,
+            'correo' => $correo,
+            'rol' => 'Invitado',
+            'permisos' => []
+        ];
+
+        $token = $auth->generateJWT($payload);
+        setcookie('auth_token', $token, time() + (60 * 60 * 8), '/', '', false, true);
+
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['us_id'] = 'guest_' . $visId;
+        $_SESSION['vis_id'] = $visId;
+        $_SESSION['nombre'] = $nombre;
+        $_SESSION['rol'] = 'Invitado';
+        $_SESSION['genero'] = 'Masculino';
+        $_SESSION['permisos'] = [];
+
+        header("Location: espacios.php");
+        exit();
     } else {
         $error = "Código inválido, expirado o ya utilizado.";
     }
