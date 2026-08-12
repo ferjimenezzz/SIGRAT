@@ -23,7 +23,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGRAT - Inicio</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="icon" type="image/png" href="assets/images/sigrat_logo.png">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
@@ -129,7 +130,7 @@
 
 <div class="card-sigrat">
     <div class="logos">
-        <img src="assets/images/logo_uteq.png" alt="UTEQ">
+        <img src="assets/images/sigrat_logo.png" alt="UTEQ">
         <img src="assets/images/sigrat_logo.png" alt="SIGRAT">
     </div>
 

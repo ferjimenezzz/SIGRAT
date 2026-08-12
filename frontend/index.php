@@ -1024,7 +1024,7 @@ if (isset($_SESSION['us_id'])) {
     <footer class="institutional-footer">
         <div class="inst-footer-logos">
             <div class="inst-logo-wrap">
-                <img src="assets/images/logo_uteq.png" alt="UTEQ" class="inst-logo">
+                <img src="assets/images/sigrat_logo.png" alt="UTEQ" class="inst-logo">
             </div>
             <div class="inst-logo-divider"></div>
             <div class="inst-logo-wrap">
