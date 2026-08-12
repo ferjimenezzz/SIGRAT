@@ -52,9 +52,9 @@ class Database {
             $env = parse_ini_file($envFile);
             $this->host = $env['DB_HOST'] ?? '127.0.0.1';
             $this->port = $env['DB_PORT'] ?? '5432';
-            $this->user = $env['DB_USERNAME'] ?? 'postgres';
+            $this->user = $env['DB_USERNAME'] ?? $env['DB_USER'] ?? 'postgres';
             $this->pass = $env['DB_PASSWORD'] ?? '';
-            $this->db   = $env['DB_DATABASE'] ?? 'postgres';
+            $this->db   = $env['DB_DATABASE'] ?? $env['DB_NAME'] ?? 'postgres';
         } else {
             // Fallback si no existe .env
             $this->host = '127.0.0.1';
