@@ -1219,7 +1219,7 @@ include 'header.php';
 
     /* ==================== MODAL DE NUEVA RESERVA ==================== */
     .res-modal-overlay {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
@@ -1487,9 +1487,9 @@ include 'header.php';
     /* ==================== MODAL ANCHO: NUEVA RESERVA CON MAPA ==================== */
     .res-modal-wide-card {
         background: white;
-        width: 92vw;
+        width: 95%;
         max-width: 1400px;
-        height: 92vh;
+        height: 95%;
         max-height: 920px;
         border-radius: 20px;
         box-shadow: 0 30px 80px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05);
@@ -1528,8 +1528,8 @@ include 'header.php';
             grid-template-rows: auto 1fr;
         }
         .res-modal-wide-card {
-            width: 95vw;
-            height: 95vh;
+            width: 95%;
+            height: 95%;
         }
     }
 
