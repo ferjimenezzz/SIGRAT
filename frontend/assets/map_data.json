@@ -1,6 +1,6 @@
 {
     "PIDET_alta": {
-        "image": "assets\/img\/mapas\/MAPA_PIDET_Planta_Alta.png",
+        "image": "assets\/mapas\/MAPA_PIDET_Planta_Alta.png",
         "edificio": "PIDET",
         "planta": "Planta Alta",
         "zones": [
@@ -95,7 +95,7 @@
         ]
     },
     "PIDET_baja": {
-        "image": "assets\/img\/mapas\/PIDET_p_b.png",
+        "image": "assets\/mapas\/PIDET_p_b.png",
         "edificio": "PIDET",
         "planta": "Planta Baja",
         "zones": [
@@ -181,7 +181,7 @@
         ]
     },
     "CIC_alta": {
-        "image": "assets\/img\/mapas\/PLANTA_ALTA_CIC_4_0.png",
+        "image": "assets\/mapas\/PLANTA_ALTA_CIC_4_0.png",
         "edificio": "CIC",
         "planta": "Planta Alta",
         "zones": [
@@ -286,7 +286,7 @@
         ]
     },
     "CIC_baja": {
-        "image": "assets\/img\/mapas\/PLANTA_BAJA_CIC_4_0.png",
+        "image": "assets\/mapas\/PLANTA_BAJA_CIC_4_0.png",
         "edificio": "CIC",
         "planta": "Planta Baja",
         "zones": [
