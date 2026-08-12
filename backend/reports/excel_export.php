@@ -15,16 +15,30 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['exportData'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['filters'])) {
     die("Petición inválida.");
 }
 
-$data = json_decode($_POST['exportData'], true);
+// Decodificar filtros enviados desde el frontend
+$filters = json_decode($_POST['filters'], true);
 
-$reportTitle = $data['title'] ?? 'Reporte_SIGRAT';
-$headers = $data['headers'] ?? [];
-$rows = $data['rows'] ?? [];
+// Construir la consulta SQL basada en los filtros usando el helper reutilizable
+require_once __DIR__ . '/../../helpers/InventoryQueryBuilder.php';
+$params = [];
+$sql = InventoryQueryBuilder::build($filters, $params);
 
+// Conexión PDO (ajustar credenciales según el entorno)
+$pdo = new PDO('mysql:host=localhost;dbname=SIGRAT;charset=utf8', 'db_user', 'db_pass');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Determinar encabezados a partir de los datos obtenidos
+$reportTitle = $filters['title'] ?? 'Reporte_SIGRAT';
+$headers = $rows ? array_keys($rows[0]) : [];
+
+// Crear el Spreadsheet
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle(substr(preg_replace('/[^a-zA-Z0-9_\s]/', '', $reportTitle), 0, 31));

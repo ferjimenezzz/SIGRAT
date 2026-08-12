@@ -302,12 +302,13 @@
             form.action = '../backend/reports/excel_export.php';
             form.style.display = 'none';
 
-            let input = document.createElement('input');
+let input = document.createElement('input');
             input.type = 'hidden';
-            input.name = 'exportData';
-            input.value = JSON.stringify(currentExcelExportPayload);
-
+            input.name = 'filters';
+            // Send title for report; backend will rebuild data based on filters
+            input.value = JSON.stringify({ title: currentExcelExportPayload.title });
             form.appendChild(input);
+
             document.body.appendChild(form);
             form.submit();
             document.body.removeChild(form);
