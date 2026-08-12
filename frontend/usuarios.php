@@ -562,8 +562,27 @@ $tab = $_GET['tab'] ?? 'usuarios';
     }
     function editUser(u) {
         document.getElementById('us_id').value = u.us_id;
-        document.getElementById('us_nombre').value = u.nombre || '';
-        document.getElementById('us_apellido').value = u.apellido || '';
+        
+        let nom = (u.nombre || '').trim();
+        let ape = (u.apellido || '').trim();
+
+        // Si el campo apellido está vacío y el nombre contiene espacios, desglosarlo automáticamente
+        if (!ape && nom.includes(' ')) {
+            const parts = nom.split(/\s+/);
+            if (parts.length >= 4) {
+                nom = parts.slice(0, parts.length - 2).join(' ');
+                ape = parts.slice(parts.length - 2).join(' ');
+            } else if (parts.length === 3) {
+                nom = parts[0];
+                ape = parts.slice(1).join(' ');
+            } else if (parts.length === 2) {
+                nom = parts[0];
+                ape = parts[1];
+            }
+        }
+
+        document.getElementById('us_nombre').value = nom;
+        document.getElementById('us_apellido').value = ape;
         document.getElementById('us_correo').value = u.correo || '';
         document.getElementById('us_rol').value = u.rol_id;
         document.getElementById('us_genero').value = u.genero || 'Masculino';
