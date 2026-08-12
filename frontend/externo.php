@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $_SESSION['genero'] = 'Masculino';
         $_SESSION['permisos'] = [];
 
-        header("Location: espacios.php");
+        header("Location: calendario.php");
         exit();
     } else {
         $error = "Código inválido, expirado o ya utilizado.";

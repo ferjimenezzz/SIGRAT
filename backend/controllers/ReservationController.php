@@ -50,6 +50,12 @@ class ReservationController {
         try {
             $vis_id = $data['vis_id'] ?? null;
             $us_id = $data['us_id'] ?? null;
+            if (is_string($us_id) && strpos($us_id, 'guest_') === 0) {
+                if (!$vis_id) {
+                    $vis_id = (int) str_replace('guest_', '', $us_id);
+                }
+                $us_id = null;
+            }
 
             // -------------------------------------------------------------------------
             // LÓGICA ESPECIAL: SALA MAGNA MODULAR (1, 2, 3 o 4 salas según aforo)

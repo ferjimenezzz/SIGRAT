@@ -38,10 +38,11 @@ class CalendarController {
 
     public function getEvents($edificio = null, $esp_id = null) {
         // Usamos minúsculas para compatibilidad nativa con PostgreSQL
-        $query = "SELECT r.*, e.nombre_numero, e.edificio, u.nombre as usuario_nombre
+        $query = "SELECT r.*, e.nombre_numero, e.edificio, COALESCE(u.nombre, v.nombre, 'Invitado') as usuario_nombre
                   FROM reserva r
                   JOIN espacio e ON r.esp_id = e.esp_id
                   LEFT JOIN usuario u ON r.us_id = u.us_id
+                  LEFT JOIN visita v ON r.vis_id = v.vis_id
                   WHERE r.estatus IN ('Aprobada', 'Aprobado')";
         
         $params = [];

@@ -72,9 +72,9 @@ if ($isMaestroUser) {
 }
 
 if ($isInvitadoUser) {
-    $allowedInvitadoPages = ['espacios.php', 'calendario.php', 'perfil.php', 'manual_usuario.php'];
+    $allowedInvitadoPages = ['calendario.php', 'perfil.php', 'manual_usuario.php'];
     if (!in_array($currentPage, $allowedInvitadoPages)) {
-        header("Location: espacios.php");
+        header("Location: calendario.php");
         exit();
     }
 }
@@ -102,7 +102,7 @@ if (!function_exists('hasPermission')) {
         $userRol = strtoupper(trim($_SESSION['rol']));
 
         if ($userRol === 'INVITADO') {
-            if ($modulo === 'Espacios' || $modulo === 'Calendario') {
+            if ($modulo === 'Calendario') {
                 return true;
             }
             return false;

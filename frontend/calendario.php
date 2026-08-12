@@ -21,14 +21,37 @@ $isMaestro = (
 );
 
 // 1. Obtener detalles del usuario autenticado para prellenar la reserva
-$stmtUser = $db->prepare("SELECT nombre, correo, telefono, carrera FROM usuario WHERE us_id = ?");
-$stmtUser->execute([$us_id_sesion]);
-$currentUser = $stmtUser->fetch(PDO::FETCH_ASSOC) ?: [
+$currentUser = [
     'nombre' => $_SESSION['nombre'] ?? '',
-    'correo' => '',
+    'correo' => $_SESSION['correo'] ?? '',
     'telefono' => '',
     'carrera' => $_SESSION['division'] ?? ''
 ];
+
+if (is_numeric($us_id_sesion)) {
+    try {
+        $stmtUser = $db->prepare("SELECT nombre, correo, telefono, carrera FROM usuario WHERE us_id = ?");
+        $stmtUser->execute([$us_id_sesion]);
+        $fetched = $stmtUser->fetch(PDO::FETCH_ASSOC);
+        if ($fetched) {
+            $currentUser = array_merge($currentUser, $fetched);
+        }
+    } catch (\Exception $e) {
+        error_log("Error al consultar usuario en calendario: " . $e->getMessage());
+    }
+} elseif (!empty($_SESSION['vis_id'])) {
+    try {
+        $stmtVis = $db->prepare("SELECT nombre, correo FROM visita WHERE vis_id = ?");
+        $stmtVis->execute([$_SESSION['vis_id']]);
+        $fetchedVis = $stmtVis->fetch(PDO::FETCH_ASSOC);
+        if ($fetchedVis) {
+            $currentUser['nombre'] = $fetchedVis['nombre'] ?? $currentUser['nombre'];
+            $currentUser['correo'] = $fetchedVis['correo'] ?? $currentUser['correo'];
+        }
+    } catch (\Exception $e) {
+        error_log("Error al consultar visita en calendario: " . $e->getMessage());
+    }
+}
 
 // 2. Obtener lista de espacios activos
 $spaces = $db->query("SELECT * FROM espacio WHERE estatus != 'Inactivo' ORDER BY edificio, nombre_numero")->fetchAll(PDO::FETCH_ASSOC);
@@ -4472,6 +4495,7 @@ include 'header.php';
         const tzOffset = now.getTimezoneOffset() * 60000;
         const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 10);
 
+        const userVisId = <?php echo json_encode($_SESSION['vis_id'] ?? null); ?>;
         const requestData = {
             esp_id: espId === 'SALA_MAGNA_MODULAR' ? 'SALA_MAGNA_MODULAR' : parseInt(espId),
             is_sala_magna_modular: espId === 'SALA_MAGNA_MODULAR',
@@ -4480,7 +4504,7 @@ include 'header.php';
             hora_sal: `${horaSal}:00`,
             num_alumnos: numAlumnos,
             motivo: motivo,
-            vis_id: null
+            vis_id: userVisId || null
         };
 
         requestData.is_cuatrimestre = (state.resMode === 'cuatrimestre');
