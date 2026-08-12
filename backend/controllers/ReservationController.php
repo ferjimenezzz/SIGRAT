@@ -117,6 +117,7 @@ class ReservationController {
                         if ($correo) {
                             $espacio_nombre = "PIDET - Sala Magna Modular ({$salas_requeridas} sala(s) asignadas)";
                             $this->emailService->sendReservationCreated($correo, $primer_res_id, 'Aprobada', $espacio_nombre, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']);
+                            $this->emailService->sendReservationApproved($correo, $primer_res_id, $espacio_nombre, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']);
                         }
                     } catch (\Exception $e) {
                         error_log("Error enviando correo de confirmación Sala Magna Modular: " . $e->getMessage());
@@ -256,6 +257,9 @@ class ReservationController {
                         if ($correo) {
                             $espacio_nombre = $espacio ? "{$espacio['edificio']} - {$espacio['nombre_numero']}" : "Espacio";
                             $this->emailService->sendReservationCreated($correo, $new_res_id, $estatus_inicial, $espacio_nombre, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']);
+                            if ($estatus_inicial === 'Aprobada') {
+                                $this->emailService->sendReservationApproved($correo, $new_res_id, $espacio_nombre, $data['fecha_uso'], $data['hora_ent'], $data['hora_sal']);
+                            }
                         }
                     }
                 } catch (\Exception $e) {
