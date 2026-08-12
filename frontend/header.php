@@ -290,8 +290,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
         }
 
         .sidebar-logo {
-            width: 48px;
-            height: 48px;
+            width: 38px;
+            height: 38px;
             object-fit: contain;
         }
 
@@ -1575,8 +1575,8 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
                 gap: 10px;
             }
             body.sidebar-mobile-open .sidebar-logo {
-            width: 48px;
-            height: 48px;
+            width: 38px;
+            height: 38px;
         }
             body.sidebar-mobile-open .nav-item {
                 justify-content: flex-start;
