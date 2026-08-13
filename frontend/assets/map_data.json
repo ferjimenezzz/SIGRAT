@@ -131,28 +131,28 @@
                 "x": 991,
                 "y": 500,
                 "content": "Laboratorio de Experimentacion y robotica",
-                "size": 21
+                "size": 12
             },
             {
                 "id": "txt_1783957810764",
                 "x": 1128,
                 "y": 459,
                 "content": "Automatizacion y robotica",
-                "size": 17
+                "size": 12
             },
             {
                 "id": "txt_1785861640311",
                 "x": 496,
                 "y": 706,
                 "content": "Área 1",
-                "size": 10
+                "size": 12
             },
             {
                 "id": "txt_1785861798354",
                 "x": 910,
                 "y": 493,
                 "content": "Aula Posgrado 2",
-                "size": 16
+                "size": 12
             }
         ]
     },
