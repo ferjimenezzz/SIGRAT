@@ -5179,35 +5179,39 @@ include 'header.php';
         tooltip.style.backdropFilter = 'blur(8px)';
         tooltip.style.display = 'block';
 
-        // Render off-screen first so browser calculates its real size,
-        // then reposition correctly in the next frame.
+        // Render off-screen first so browser has time to calculate real dimensions,
+        // then reposition. setTimeout(0) is more reliable than rAF for layout reads.
         tooltip.style.left = '-9999px';
         tooltip.style.top  = '-9999px';
-        requestAnimationFrame(() => moveModalTooltip(e));
+        setTimeout(() => moveModalTooltip(e), 0);
     }
     function moveModalTooltip(e) {
         if(tooltip.style.display === 'none') return;
-        const margin = 12;
-
-        // Now the tooltip is rendered, read its real size
-        const tw = tooltip.offsetWidth;
-        const th = tooltip.offsetHeight;
-
-        // Safe bounds: use viewport edges
+        const margin = 10;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
-        let x = e.clientX + 15;
-        let y = e.clientY + 15;
+        // getBoundingClientRect gives the real rendered size
+        // (more reliable than offsetWidth for position:fixed elements)
+        const rect = tooltip.getBoundingClientRect();
+        const tw = rect.width  || 220;
+        const th = rect.height || 150;
 
-        // Flip left if not enough space on the right
-        if (x + tw + margin > vw) x = e.clientX - tw - 15;
-        // Clamp so it never goes past the left edge
-        if (x < margin) x = margin;
-        // Flip above if not enough space below
-        if (y + th + margin > vh) y = e.clientY - th - 15;
-        // Clamp so it never goes above the top
-        if (y < margin) y = margin;
+        let x = e.clientX + 14;
+        let y = e.clientY + 14;
+
+        // Flip to left of cursor if not enough room on the right
+        if (x + tw + margin > vw) {
+            x = e.clientX - tw - 14;
+        }
+        // Flip above cursor if not enough room below
+        if (y + th + margin > vh) {
+            y = e.clientY - th - 14;
+        }
+
+        // Hard clamp: NEVER overflow viewport edges under any circumstance
+        x = Math.max(margin, Math.min(x, vw - tw - margin));
+        y = Math.max(margin, Math.min(y, vh - th - margin));
 
         tooltip.style.left = x + 'px';
         tooltip.style.top  = y + 'px';
