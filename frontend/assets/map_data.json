@@ -105,72 +105,53 @@
                 "points": "501,454 503,583 668,583 667,570 674,567 688,577 698,567 704,566 706,586 730,581 728,457"
             },
             {
-                "db_name": "Aula 04",
-                "esp_id": 19,
+                "db_name": "Laboratorio de Experimentacion y robotica",
+                "esp_id": 5,
                 "points": "943,451 1030,445 1071,431 1107,557 1055,571 944,583"
             },
             {
-                "db_name": "Aula 05",
-                "esp_id": 20,
+                "db_name": "Automatizacion y robotica",
+                "esp_id": 4,
                 "points": "1067,429 1110,419 1177,388 1243,497 1150,541 1110,555"
             },
             {
-                "db_name": "Aula 06",
-                "esp_id": 21,
-                "points": "1175,385 1240,337 1275,308 1263,294 1285,276 1383,382 1321,439 1242,498"
-            },
-            {
-                "db_name": "Área 1 (Talentos)",
-                "esp_id": 17,
+                "db_name": "Area 1",
+                "esp_id": 1,
                 "points": "437,674 532,647 559,776 484,793"
             },
             {
-                "db_name": "Aula 03 Posgrado 2 (Área 2)",
-                "esp_id": 18,
+                "db_name": "Aula Posgrado 2",
+                "esp_id": 3,
                 "points": "855,452 941,452 941,578 939,583 855,586"
             }
         ],
         "texts": [
             {
-                "id": "txt_1783629848461",
-                "x": 339,
-                "y": 797,
-                "content": "MAKER SPACE",
-                "size": 21
-            },
-            {
                 "id": "txt_1783957740717",
                 "x": 991,
                 "y": 500,
-                "content": "Aula 04",
+                "content": "Laboratorio de Experimentacion y robotica",
                 "size": 21
             },
             {
                 "id": "txt_1783957810764",
                 "x": 1128,
                 "y": 459,
-                "content": "Aula Automatización",
+                "content": "Automatizacion y robotica",
                 "size": 17
-            },
-            {
-                "id": "txt_1783957877850",
-                "x": 1271,
-                "y": 399,
-                "content": "Aula Óptica",
-                "size": 16
             },
             {
                 "id": "txt_1785861640311",
                 "x": 496,
                 "y": 706,
-                "content": "Área 1 (Talentos)",
+                "content": "Área 1",
                 "size": 10
             },
             {
                 "id": "txt_1785861798354",
                 "x": 910,
                 "y": 493,
-                "content": "Aula 03",
+                "content": "Aula Posgrado 2",
                 "size": 16
             }
         ]
