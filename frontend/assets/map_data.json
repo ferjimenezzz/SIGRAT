@@ -130,14 +130,14 @@
                 "id": "txt_1783957740717",
                 "x": 991,
                 "y": 500,
-                "content": "Laboratorio de Experimentacion y robotica",
+                "content": "Laboratorio de\nExperimentacion\ny robotica",
                 "size": 12
             },
             {
                 "id": "txt_1783957810764",
                 "x": 1128,
                 "y": 459,
-                "content": "Automatizacion y robotica",
+                "content": "Automatizacion\ny robotica",
                 "size": 12
             },
             {

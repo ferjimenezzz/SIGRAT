@@ -4949,7 +4949,6 @@ include 'header.php';
                 const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 textEl.setAttribute('x', t.x);
                 textEl.setAttribute('y', t.y);
-                textEl.textContent = t.content;
                 textEl.setAttribute('font-size', t.size || 16);
                 textEl.setAttribute('font-family', 'sans-serif');
                 textEl.setAttribute('font-weight', 'bold');
@@ -4961,6 +4960,25 @@ include 'header.php';
                 textEl.setAttribute('dominant-baseline', 'middle');
                 textEl.style.pointerEvents = 'none'; // Para que no bloquee los clics en los polígonos
                 textEl.style.userSelect = 'none';
+                
+                const lines = (t.content || '').split('\n');
+                if (lines.length > 1) {
+                    lines.forEach((lineText, idx) => {
+                        const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                        tspan.setAttribute('x', t.x);
+                        if (idx === 0) {
+                            const shift = -((lines.length - 1) * 0.6) + "em";
+                            tspan.setAttribute('dy', shift);
+                        } else {
+                            tspan.setAttribute('dy', '1.2em');
+                        }
+                        tspan.textContent = lineText;
+                        textEl.appendChild(tspan);
+                    });
+                } else {
+                    textEl.textContent = t.content;
+                }
+                
                 svg.appendChild(textEl);
             });
         }

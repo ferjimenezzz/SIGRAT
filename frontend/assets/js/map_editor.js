@@ -196,11 +196,9 @@ function renderTexts() {
         const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textEl.setAttribute('x', t.x);
         textEl.setAttribute('y', t.y);
-        textEl.textContent = t.content;
         textEl.setAttribute('font-size', t.size || 16);
         textEl.setAttribute('font-family', 'sans-serif');
         textEl.setAttribute('font-weight', 'bold');
-        textEl.setAttribute('fill', '#1e293b');
         textEl.setAttribute('paint-order', 'stroke fill');
         textEl.setAttribute('stroke', 'rgba(255, 255, 255, 0.9)');
         textEl.setAttribute('stroke-width', '4px');
@@ -211,6 +209,26 @@ function renderTexts() {
 
         if (t.id === selectedTextId) {
             textEl.setAttribute('fill', '#2563eb'); // Azul si está seleccionado
+        } else {
+            textEl.setAttribute('fill', '#1e293b');
+        }
+
+        const lines = (t.content || '').split('\n');
+        if (lines.length > 1) {
+            lines.forEach((lineText, idx) => {
+                const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                tspan.setAttribute('x', t.x);
+                if (idx === 0) {
+                    const shift = -((lines.length - 1) * 0.6) + "em";
+                    tspan.setAttribute('dy', shift);
+                } else {
+                    tspan.setAttribute('dy', '1.2em');
+                }
+                tspan.textContent = lineText;
+                textEl.appendChild(tspan);
+            });
+        } else {
+            textEl.textContent = t.content;
         }
 
         // Selección por click
