@@ -2314,8 +2314,8 @@ include 'header.php';
                     <div class="map-legend-item"><span style="background:rgba(139,92,246,0.35);border:2px solid #8B5CF6;"></span>Reserva especial</div>
                 </div>
 
-                <!-- Tooltip del mapa -->
-                <div id="modalMapTooltip" class="modal-map-tooltip" style="display:none;"></div>
+                <!-- Tooltip del mapa: se monta en document.body via JS para escapar del overflow:hidden del viewport -->
+
             </div>
         </div>
     </div>
@@ -5126,12 +5126,107 @@ include 'header.php';
     }
 
 
-    // Tooltip
-    const tooltip = document.getElementById('modalMapTooltip');
+    // ==========================================================================
+    // TOOLTIP DEL MAPA — Portal en document.body
+    // Razón: .map-pane-viewport tiene overflow:hidden y recortaba el tooltip.
+    // Solución: el tooltip vive en document.body con position:fixed, fuera de
+    // cualquier contenedor que pueda hacer clipping.
+    // ==========================================================================
+    let tooltip = document.getElementById('modalMapTooltip');
+    if (!tooltip) {
+        // Crear el tooltip como hijo directo de body para evitar cualquier clipping
+        tooltip = document.createElement('div');
+        tooltip.id = 'modalMapTooltip';
+        tooltip.className = 'modal-map-tooltip';
+        tooltip.style.cssText = [
+            'display:none',
+            'position:fixed',
+            'z-index:99999',
+            'pointer-events:none',
+            'background:rgba(255,255,255,0.97)',
+            'border:1px solid rgba(0,0,0,0.06)',
+            'border-radius:10px',
+            'box-shadow:0 10px 30px rgba(0,0,0,0.12)',
+            'padding:12px',
+            'backdrop-filter:blur(8px)',
+            'max-width:240px',
+            'min-width:190px',
+        ].join(';');
+        document.body.appendChild(tooltip);
+    }
+
+    // Referencia al polígono actualmente bajo el cursor (para reposicionado on-resize)
+    let _tooltipAnchorPoly = null;
+
+    /**
+     * Posiciona el tooltip usando las 4 posiciones preferidas (derecha, izquierda,
+     * abajo, arriba) respecto al BoundingClientRect del polígono SVG.
+     * Aplica Math.clamp como red de seguridad absoluta.
+     */
+    function positionTooltipByPoly(poly) {
+        if (!poly || tooltip.style.display === 'none') return;
+        const MARGIN = 12;
+        const GAP    = 10;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const anchor = poly.getBoundingClientRect();
+        const ttRect = tooltip.getBoundingClientRect();
+        const tw = ttRect.width  || tooltip.offsetWidth  || 220;
+        const th = ttRect.height || tooltip.offsetHeight || 150;
+
+        // Centro del polígono en el viewport
+        const ax = anchor.left + anchor.width  / 2;
+        const ay = anchor.top  + anchor.height / 2;
+
+        // 4 posiciones candidatas (en orden de preferencia)
+        const candidates = [
+            // 1. Derecha del espacio
+            { left: anchor.right + GAP,              top: ay - th / 2 },
+            // 2. Izquierda del espacio
+            { left: anchor.left  - tw - GAP,         top: ay - th / 2 },
+            // 3. Debajo del espacio
+            { left: ax - tw / 2,                     top: anchor.bottom + GAP },
+            // 4. Arriba del espacio
+            { left: ax - tw / 2,                     top: anchor.top - th - GAP },
+        ];
+
+        // Función que indica si una posición cabe completamente en el viewport
+        const fits = (pos) =>
+            pos.left >= MARGIN &&
+            pos.top  >= MARGIN &&
+            pos.left + tw + MARGIN <= vw &&
+            pos.top  + th + MARGIN <= vh;
+
+        // Elegir la primera posición que cabe; si ninguna, elegir la que más área visible tiene
+        let chosen = candidates.find(fits);
+
+        if (!chosen) {
+            // Calcular área visible de cada candidata y elegir la mayor
+            const visibleArea = (pos) => {
+                const x1 = Math.max(pos.left, MARGIN);
+                const y1 = Math.max(pos.top,  MARGIN);
+                const x2 = Math.min(pos.left + tw, vw - MARGIN);
+                const y2 = Math.min(pos.top  + th, vh - MARGIN);
+                return Math.max(0, x2 - x1) * Math.max(0, y2 - y1);
+            };
+            chosen = candidates.reduce((best, c) =>
+                visibleArea(c) > visibleArea(best) ? c : best
+            );
+        }
+
+        // Clamp final — red de seguridad absoluta
+        const finalLeft = Math.max(MARGIN, Math.min(chosen.left, vw - tw - MARGIN));
+        const finalTop  = Math.max(MARGIN, Math.min(chosen.top,  vh - th - MARGIN));
+
+        tooltip.style.left = finalLeft + 'px';
+        tooltip.style.top  = finalTop  + 'px';
+    }
+
     function showModalTooltip(e, label, data, estatus, isReservable) {
         const rules = getSpaceRules(data);
-        
-        let estatusColor = '#10b981'; // default verde
+
+        let estatusColor = '#10b981';
         let estatusBadge = 'Disponible';
         if (estatus === 'Ocupado') {
             estatusColor = '#ef4444';
@@ -5141,84 +5236,64 @@ include 'header.php';
             estatusBadge = 'No Disponible';
         }
 
-        const capacidadHtml = data && data.capacidad > 0 ? 
-            `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span style="color:#64748b;">Capacidad:</span>
-                <span style="font-weight:600; color:#0f172a;">${data.capacidad} pers.</span>
-            </div>` : '';
+        const capacidadHtml = data && data.capacidad > 0
+            ? `<div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                   <span style="color:#64748b;">Capacidad:</span>
+                   <span style="font-weight:600;color:#0f172a;">${data.capacidad} pers.</span>
+               </div>` : '';
 
         tooltip.innerHTML = `
-            <div style="min-width: 200px;">
-                <div style="font-weight:700; font-size:14px; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; color:#0f172a;">
+            <div>
+                <div style="font-weight:700;font-size:14px;margin-bottom:8px;border-bottom:1px solid #e2e8f0;padding-bottom:6px;color:#0f172a;">
                     ${label}
                 </div>
-                <div style="font-size:12px; margin-bottom:8px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <div style="font-size:12px;margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
                         <span style="color:#64748b;">Tipo:</span>
-                        <span style="font-weight:600; color:#0f172a;">${data ? data.tipo : 'Espacio'}</span>
+                        <span style="font-weight:600;color:#0f172a;">${data ? data.tipo : 'Espacio'}</span>
                     </div>
                     ${capacidadHtml}
-                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
                         <span style="color:#64748b;">Estado:</span>
-                        <span style="font-weight:600; color:${estatusColor};">${estatusBadge}</span>
+                        <span style="font-weight:600;color:${estatusColor};">${estatusBadge}</span>
                     </div>
                 </div>
-                <div style="background:${rules.color_tema}15; color:${rules.color_tema}; padding:8px; border-radius:6px; font-size:11px; font-weight:600; display:flex; gap:6px; align-items:start;">
+                <div style="background:${rules.color_tema}15;color:${rules.color_tema};padding:8px;border-radius:6px;font-size:11px;font-weight:600;display:flex;gap:6px;align-items:start;">
                     <i class="bi ${rules.icono}" style="margin-top:1px;"></i>
                     <span style="line-height:1.3;">${rules.mensaje_tooltip}</span>
                 </div>
-            </div>
-        `;
-        
-        // Estilos base para el tooltip container (asegurar que se vea elegante)
-        tooltip.style.padding = '12px';
-        tooltip.style.borderRadius = '10px';
-        tooltip.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-        tooltip.style.border = '1px solid rgba(0,0,0,0.05)';
-        tooltip.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        tooltip.style.backdropFilter = 'blur(8px)';
+            </div>`;
+
+        // Guardar referencia al polígono fuente para re-posicionado en resize
+        _tooltipAnchorPoly = e.target;
+
+        // Mostrar fuera de pantalla para medir tamaño real, luego posicionar
+        tooltip.style.left    = '-9999px';
+        tooltip.style.top     = '-9999px';
         tooltip.style.display = 'block';
 
-        // Render off-screen first so browser has time to calculate real dimensions,
-        // then reposition. setTimeout(0) is more reliable than rAF for layout reads.
-        tooltip.style.left = '-9999px';
-        tooltip.style.top  = '-9999px';
-        setTimeout(() => moveModalTooltip(e), 0);
+        // setTimeout(0) garantiza que el browser haya calculado el layout antes de medir
+        setTimeout(() => positionTooltipByPoly(_tooltipAnchorPoly), 0);
     }
+
+    // Durante mousemove: reposicionar según el polígono bajo el cursor
     function moveModalTooltip(e) {
-        if(tooltip.style.display === 'none') return;
-        const margin = 10;
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-
-        // getBoundingClientRect gives the real rendered size
-        // (more reliable than offsetWidth for position:fixed elements)
-        const rect = tooltip.getBoundingClientRect();
-        const tw = rect.width  || 220;
-        const th = rect.height || 150;
-
-        let x = e.clientX + 14;
-        let y = e.clientY + 14;
-
-        // Flip to left of cursor if not enough room on the right
-        if (x + tw + margin > vw) {
-            x = e.clientX - tw - 14;
-        }
-        // Flip above cursor if not enough room below
-        if (y + th + margin > vh) {
-            y = e.clientY - th - 14;
-        }
-
-        // Hard clamp: NEVER overflow viewport edges under any circumstance
-        x = Math.max(margin, Math.min(x, vw - tw - margin));
-        y = Math.max(margin, Math.min(y, vh - th - margin));
-
-        tooltip.style.left = x + 'px';
-        tooltip.style.top  = y + 'px';
+        if (tooltip.style.display === 'none') return;
+        _tooltipAnchorPoly = e.target;
+        positionTooltipByPoly(_tooltipAnchorPoly);
     }
+
     function hideModalTooltip() {
         tooltip.style.display = 'none';
+        _tooltipAnchorPoly = null;
     }
+
+    // Re-posicionar si cambia el tamaño de la ventana o el modal
+    window.addEventListener('resize', () => {
+        if (tooltip.style.display !== 'none' && _tooltipAnchorPoly) {
+            positionTooltipByPoly(_tooltipAnchorPoly);
+        }
+    });
 
     // Buscador local en el mapa con auto-foco
     window.modalHighlightMapSpace = function(query) {
