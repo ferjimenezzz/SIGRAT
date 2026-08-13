@@ -25,48 +25,48 @@
                 "points": "1261,353 1337,307 1419,463 1413,467 1401,443 1389,467 1393,483 1313,517"
             },
             {
-                "db_name": "Aula 5 Digital",
+                "db_name": "Aula Digital 5 PA",
                 "esp_id": 14,
                 "points": "1339,305 1407,253 1399,233 1443,195 1575,335 1503,405 1475,433 1415,467"
             },
             {
-                "db_name": "Área 8",
-                "esp_id": 65,
+                "db_name": "Area 8",
+                "esp_id": 8,
                 "points": "328,750 342,740 342,724 506,662 516,676 532,682 576,814 490,836 402,876"
             },
             {
-                "db_name": "Salón 1",
-                "esp_id": 7,
+                "db_name": "Aula 1",
+                "esp_id": 9,
                 "points": "802,648 910,646 920,668 934,668 934,784 800,780"
             },
             {
-                "db_name": "Sala Magna 1",
-                "esp_id": 1,
+                "db_name": "Aula Magna 1",
+                "esp_id": 15,
                 "points": "384,316 384,310 474,310 476,560 378,560"
             },
             {
-                "db_name": "Sala Magna 2",
-                "esp_id": 2,
+                "db_name": "Aula Magna 2",
+                "esp_id": 16,
                 "points": "478,557 600,563 598,307 472,307"
             },
             {
-                "db_name": "Sala Magna 3",
-                "esp_id": 3,
+                "db_name": "Aula Magna 3",
+                "esp_id": 17,
                 "points": "686,563 684,311 604,311 606,565"
             },
             {
-                "db_name": "Sala Magna 4",
-                "esp_id": 4,
+                "db_name": "Aula Magna 4",
+                "esp_id": 18,
                 "points": "770,311 770,563 696,563 690,307"
             },
             {
-                "db_name": "Área 5",
+                "db_name": "Area 5",
                 "esp_id": 6,
                 "points": "156,853 230,793 333,924 282,959 293,973 259,999"
             },
             {
-                "db_name": "Área 6",
-                "esp_id": 9,
+                "db_name": "Area 6",
+                "esp_id": 7,
                 "points": "230,793 333,922 413,873 319,739"
             }
         ],
