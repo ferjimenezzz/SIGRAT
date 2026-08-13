@@ -128,14 +128,14 @@
         "texts": [
             {
                 "id": "txt_1783957740717",
-                "x": 991,
+                "x": 1000,
                 "y": 500,
                 "content": "Laboratorio de\nExperimentacion\ny robotica",
                 "size": 12
             },
             {
                 "id": "txt_1783957810764",
-                "x": 1128,
+                "x": 1135,
                 "y": 459,
                 "content": "Automatizacion\ny robotica",
                 "size": 12
@@ -149,9 +149,9 @@
             },
             {
                 "id": "txt_1785861798354",
-                "x": 910,
+                "x": 915,
                 "y": 493,
-                "content": "Aula Posgrado 2",
+                "content": "Aula\nPosgrado 2",
                 "size": 12
             }
         ]
