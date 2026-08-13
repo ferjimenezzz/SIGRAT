@@ -543,14 +543,14 @@ container.addEventListener('mousedown', (e) => {
     
     if (currentTool === 'text') {
         const pt = getMouseCoords(e);
-        const textContent = prompt("Ingrese el texto:", "Etiqueta");
+        const textContent = prompt("Ingrese el texto (use \\n para salto de línea):", "Etiqueta");
         if (textContent && textContent.trim() !== '') {
             saveStateToUndo();
             const newText = {
                 id: 'txt_' + Date.now(),
                 x: pt.x,
                 y: pt.y,
-                content: textContent.trim(),
+                content: textContent.trim().replace(/\\n/g, '\n'),
                 size: 16
             };
             texts.push(newText);
