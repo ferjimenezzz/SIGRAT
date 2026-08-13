@@ -1,6 +1,6 @@
 {
     "PIDET_alta": {
-        "image": "assets\/mapas\/MAPA_PIDET_Planta_Alta.png",
+        "image": "assets/mapas/MAPA_PIDET_Planta_Alta.png",
         "edificio": "PIDET",
         "planta": "Planta Alta",
         "zones": [
@@ -91,11 +91,39 @@
                 "y": 765,
                 "content": "Área 8",
                 "size": 28
+            },
+            {
+                "id": "txt_1786656025222",
+                "x": 427,
+                "y": 422,
+                "content": "Aula Magna 1",
+                "size": 14
+            },
+            {
+                "id": "txt_1786656029930",
+                "x": 531,
+                "y": 421,
+                "content": "Aula Magna 2",
+                "size": 16
+            },
+            {
+                "id": "txt_1786656035245",
+                "x": 641,
+                "y": 417,
+                "content": "Aula Magna 3",
+                "size": 16
+            },
+            {
+                "id": "txt_1786656038776",
+                "x": 729,
+                "y": 418,
+                "content": "Aula Magna 4",
+                "size": 16
             }
         ]
     },
     "PIDET_baja": {
-        "image": "assets\/mapas\/PIDET_p_b.png",
+        "image": "assets/mapas/PIDET_p_b.png",
         "edificio": "PIDET",
         "planta": "Planta Baja",
         "zones": [
@@ -128,36 +156,43 @@
         "texts": [
             {
                 "id": "txt_1783957740717",
-                "x": 1000,
-                "y": 500,
+                "x": 1016,
+                "y": 510,
                 "content": "Laboratorio de\nExperimentacion\ny robotica",
                 "size": 12
             },
             {
                 "id": "txt_1783957810764",
-                "x": 1135,
-                "y": 459,
+                "x": 1146,
+                "y": 468,
                 "content": "Automatizacion\ny robotica",
                 "size": 12
             },
             {
                 "id": "txt_1785861640311",
-                "x": 496,
-                "y": 706,
+                "x": 503,
+                "y": 722,
                 "content": "Área 1",
                 "size": 12
             },
             {
                 "id": "txt_1785861798354",
-                "x": 912,
-                "y": 493,
+                "x": 898,
+                "y": 516,
                 "content": "Aula\nPosgrado 2",
                 "size": 12
+            },
+            {
+                "id": "txt_1786655302498",
+                "x": 610,
+                "y": 518,
+                "content": "Auditorio",
+                "size": 16
             }
         ]
     },
     "CIC_alta": {
-        "image": "assets\/mapas\/PLANTA_ALTA_CIC_4_0.png",
+        "image": "assets/mapas/PLANTA_ALTA_CIC_4_0.png",
         "edificio": "CIC",
         "planta": "Planta Alta",
         "zones": [
@@ -262,7 +297,7 @@
         ]
     },
     "CIC_baja": {
-        "image": "assets\/mapas\/PLANTA_BAJA_CIC_4_0.png",
+        "image": "assets/mapas/PLANTA_BAJA_CIC_4_0.png",
         "edificio": "CIC",
         "planta": "Planta Baja",
         "zones": [
