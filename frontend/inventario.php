@@ -1013,12 +1013,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <?php endforeach; ?>
                 </select>
 
-                <select id="plantaFilter" class="select-filter" style="flex: 1 1 90px; max-width: 110px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;" onchange="applyFilters()">
-                    <option value="">Planta</option>
-                    <option value="Baja">Planta Baja</option>
-                    <option value="Alta">Planta Alta</option>
-                </select>
-
                 <select id="quickSpaceFilter" class="select-filter" style="flex: 1 1 90px; max-width: 120px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;" onchange="applyFilters()">
                     <option value="">Espacio</option>
                     <?php foreach($allUniqueSpaces as $sp): ?>
@@ -2075,7 +2069,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const quickTypeFilter = document.getElementById("quickTypeFilter");
             const statusFilter = document.getElementById("statusFilter");
             const quickLocationFilter = document.getElementById("quickLocationFilter");
-            const plantaFilter = document.getElementById("plantaFilter");
             const quickSpaceFilter = document.getElementById("quickSpaceFilter");
             const drawerTypeFilter = document.getElementById("drawerTypeFilter");
             const drawerLocationFilter = document.getElementById("drawerLocationFilter");
@@ -2086,7 +2079,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             if(quickTypeFilter) quickTypeFilter.value = "";
             if(statusFilter) statusFilter.value = "";
             if(quickLocationFilter) quickLocationFilter.value = "";
-            if(plantaFilter) plantaFilter.value = "";
             if(quickSpaceFilter) quickSpaceFilter.value = "";
             if(drawerTypeFilter) drawerTypeFilter.value = "";
             if(drawerLocationFilter) drawerLocationFilter.value = "";
@@ -2194,7 +2186,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const quickTypeFilter = document.getElementById("quickTypeFilter");
             const statusFilter = document.getElementById("statusFilter");
             const quickLocationFilter = document.getElementById("quickLocationFilter");
-            const plantaFilter = document.getElementById("plantaFilter");
             const drawerTypeFilter = document.getElementById("drawerTypeFilter");
             const drawerLocationFilter = document.getElementById("drawerLocationFilter");
             const drawerRfidInput = document.getElementById("drawerRfidInput");
@@ -2214,7 +2205,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const statusVal = statusFilter ? statusFilter.value : '';
             
             const edifVal = quickLocationFilter ? quickLocationFilter.value : '';
-            const plantaVal = plantaFilter ? plantaFilter.value.toLowerCase() : '';
             const espVal = quickSpaceFilter ? quickSpaceFilter.value : '';
             const locValDrawer = drawerLocationFilter ? drawerLocationFilter.value : '';
             
@@ -2230,7 +2220,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const rowTipoExacto = row.getAttribute('data-tipo') || '';
                 const rowLoc = row.getAttribute('data-ubicacion') || '';
                 const rowEdificio = row.getAttribute('data-edificio') || '';
-                const rowPlanta = (row.getAttribute('data-planta') || '').toLowerCase();
                 
                 const matchesText = !searchVal || text.includes(searchVal);
                 
@@ -2261,7 +2250,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const matchesEdificioTop = !edifVal || rowEdificio === edifVal;
                 const matchesEdificioDrawer = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
                 const matchesEdificio = matchesEdificioTop && matchesEdificioDrawer;
-                const matchesPlanta = !plantaVal || rowPlanta === plantaVal || (plantaVal === 'baja' && (rowPlanta === '' || rowPlanta === 'baja'));
                 
                 const matchesLocTop = !espVal || rowLoc === espVal;
                 const matchesLocDrawer = !locValDrawer || rowLoc === locValDrawer;
@@ -2270,7 +2258,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const matchesRfid = !rfidVal || text.includes(rfidVal);
                 const matchesAvail = !onlyAvail || rowStatus === 'Disponible';
 
-                if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesPlanta && matchesLoc && matchesRfid && matchesAvail) {
+                if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesLoc && matchesRfid && matchesAvail) {
                     row.setAttribute('data-filtered-out', 'false');
                     matchingRows.push(row);
                 } else {
@@ -2307,7 +2295,6 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.getElementById("quickTypeFilter"), 
         document.getElementById("statusFilter"), 
         document.getElementById("quickLocationFilter"), 
-        document.getElementById("plantaFilter"),
         document.getElementById('quickSpaceFilter'),
         document.getElementById("drawerTypeFilter"), 
         document.getElementById("drawerLocationFilter"), 
