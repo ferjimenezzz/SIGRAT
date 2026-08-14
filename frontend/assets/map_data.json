@@ -73,22 +73,22 @@
         "texts": [
             {
                 "id": "txt_1785872060937",
-                "x": 227,
-                "y": 870,
+                "x": 258,
+                "y": 917,
                 "content": "Área 5",
                 "size": 24
             },
             {
                 "id": "txt_1785872128333",
-                "x": 316,
-                "y": 844,
+                "x": 319,
+                "y": 834,
                 "content": "Área 6",
                 "size": 23
             },
             {
                 "id": "txt_1785872143707",
-                "x": 442,
-                "y": 765,
+                "x": 459,
+                "y": 770,
                 "content": "Área 8",
                 "size": 28
             },
@@ -97,28 +97,70 @@
                 "x": 430,
                 "y": 425,
                 "content": "Aula\nMagna 1",
-                "size": 12
+                "size": 18
             },
             {
                 "id": "txt_1786656029930",
                 "x": 536,
                 "y": 425,
                 "content": "Aula\nMagna 2",
-                "size": 12
+                "size": 17
             },
             {
                 "id": "txt_1786656035245",
                 "x": 645,
                 "y": 425,
                 "content": "Aula\nMagna 3",
-                "size": 12
+                "size": 17
             },
             {
                 "id": "txt_1786656038776",
                 "x": 730,
                 "y": 425,
                 "content": "Aula\nMagna 4",
-                "size": 12
+                "size": 15
+            },
+            {
+                "id": "txt_1786733568352",
+                "x": 989,
+                "y": 477,
+                "content": "Aula Digital 1",
+                "size": 18
+            },
+            {
+                "id": "txt_1786733585541",
+                "x": 1115,
+                "y": 478,
+                "content": "Aula Digital 2",
+                "size": 16
+            },
+            {
+                "id": "txt_1786733592262",
+                "x": 1231,
+                "y": 458,
+                "content": "Aula Digital 3",
+                "size": 16
+            },
+            {
+                "id": "txt_1786733601268",
+                "x": 1339,
+                "y": 429,
+                "content": "Aula Digital 4",
+                "size": 16
+            },
+            {
+                "id": "txt_1786733713152",
+                "x": 1452,
+                "y": 343,
+                "content": "Aula Digital 5",
+                "size": 20
+            },
+            {
+                "id": "txt_1786733802232",
+                "x": 870,
+                "y": 727,
+                "content": "Aula 1",
+                "size": 21
             }
         ]
     },
@@ -225,15 +267,15 @@
         "texts": [
             {
                 "id": "txt_1783623395689",
-                "x": 1253,
-                "y": 2137,
+                "x": 1273,
+                "y": 2104,
                 "content": "UTEQ-SIEMENS\n PLM",
                 "size": 44
             },
             {
                 "id": "txt_1783623413186",
-                "x": 1493,
-                "y": 1957,
+                "x": 1544,
+                "y": 1979,
                 "content": "Aula 1",
                 "size": 54
             },
@@ -253,10 +295,10 @@
             },
             {
                 "id": "txt_1785862168408",
-                "x": 2892,
-                "y": 1862,
+                "x": 2850,
+                "y": 1909,
                 "content": "QSM Semiconductores",
-                "size": 17
+                "size": 40
             }
         ]
     },
@@ -299,38 +341,38 @@
         "texts": [
             {
                 "id": "txt_1783622508809",
-                "x": 1490,
-                "y": 870,
+                "x": 1495,
+                "y": 894,
                 "content": "CEPRODI",
                 "size": 31
             },
             {
                 "id": "txt_1783622570218",
-                "x": 701,
-                "y": 898,
+                "x": 707,
+                "y": 916,
                 "content": "HUAWEI",
                 "size": 31
             },
             {
                 "id": "txt_1783629286962",
-                "x": 1475,
-                "y": 593,
+                "x": 1482,
+                "y": 618,
                 "content": "AUDITORIO",
                 "size": 47
             },
             {
                 "id": "txt_1785862436843",
-                "x": 1759,
-                "y": 509,
+                "x": 1762,
+                "y": 542,
                 "content": "Ingenuity Lab \nSIEMENS",
-                "size": 13
+                "size": 27
             },
             {
                 "id": "txt_1785862529712",
-                "x": 1926,
-                "y": 393,
+                "x": 1946,
+                "y": 412,
                 "content": "Smart Factory\nUTEQ-SIEMENS",
-                "size": 13
+                "size": 27
             }
         ]
     }
