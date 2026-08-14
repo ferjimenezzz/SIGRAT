@@ -2912,7 +2912,10 @@ include 'header.php';
             
             // Vaciar y resetear campos
             document.getElementById('resEdificio').value = "PIDET";
-            document.getElementById('resEdificio').dispatchEvent(new Event('change'));
+            document.getElementById('resPlanta').value = "alta";
+            if (typeof updateResEspacioOptions === 'function') {
+                updateResEspacioOptions();
+            }
             document.getElementById('resEspacio').value = '';
             document.getElementById('resCapacidadLabel').value = "0 personas";
 
@@ -2974,21 +2977,74 @@ include 'header.php';
         if(btnExitResModal) btnExitResModal.addEventListener('click', window.closeResModal);
         if(btnCancelReserva) btnCancelReserva.addEventListener('click', window.closeResModal);
 
+        // Helper para determinar la planta (alta o baja) de un espacio
+        function getSpacePlanta(sp) {
+            if (!sp) return 'alta';
+            let p = (sp.planta || sp.nivel || '').toLowerCase().trim();
+            if (p === 'planta alta' || p === 'alta' || p === 'pa') return 'alta';
+            if (p === 'planta baja' || p === 'baja' || p === 'pb') return 'baja';
+
+            if (typeof MAP_DATA !== 'undefined' && MAP_DATA) {
+                for (const [mapKey, mapCfg] of Object.entries(MAP_DATA)) {
+                    if (mapCfg.zones && mapCfg.zones.some(z => {
+                        if (z.esp_id && z.esp_id == sp.esp_id) return true;
+                        if (z.db_name && (sp.nombre_numero || '').toLowerCase().trim() === z.db_name.toLowerCase().trim()) return true;
+                        return false;
+                    })) {
+                        const parts = mapKey.split('_');
+                        if (parts[1]) return parts[1].toLowerCase();
+                    }
+                }
+            }
+
+            const nombreLower = (sp.nombre_numero || '').toLowerCase();
+            if (nombreLower.includes('baja') || nombreLower.includes('pb') || nombreLower.includes('aula 0')) {
+                return 'baja';
+            }
+            return 'alta';
+        }
+
+        // Actualizar opciones del selector de espacio según edificio y planta elegidos
+        window.updateResEspacioOptions = function() {
+            const resEdificio = document.getElementById('resEdificio');
+            const resPlanta = document.getElementById('resPlanta');
+            const resEspacio = document.getElementById('resEspacio');
+            if (!resEdificio || !resPlanta || !resEspacio || !Array.isArray(allSpaces)) return;
+
+            const edif = resEdificio.value;
+            const planta = resPlanta.value; // 'alta' u 'baja'
+
+            const filtered = allSpaces.filter(sp => {
+                if (edif && sp.edificio !== edif) return false;
+                if (planta) {
+                    const spPlanta = getSpacePlanta(sp);
+                    if (spPlanta !== planta) return false;
+                }
+                return true;
+            });
+
+            const currentVal = resEspacio.value;
+            let opts = '<option value="">Seleccione espacio...</option>';
+            filtered.forEach(sp => {
+                opts += `<option value="${sp.esp_id}">${sp.nombre_numero} (${sp.tipo})</option>`;
+            });
+            resEspacio.innerHTML = opts;
+
+            if (currentVal && filtered.some(sp => sp.esp_id == currentVal)) {
+                resEspacio.value = currentVal;
+            } else if (!isProgrammaticMapChange) {
+                resEspacio.value = "";
+                const capLabel = document.getElementById('resCapacidadLabel');
+                if (capLabel) capLabel.value = "0 personas";
+                const eqCont2 = document.getElementById('resEquipamientoContainer');
+                if (eqCont2) eqCont2.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
+            }
+        };
+
         // Al cambiar edificio en la reserva
         if(resEdificio) {
             resEdificio.addEventListener('change', (e) => {
-                const edif = e.target.value;
-                const filtered = allSpaces.filter(sp => sp.edificio === edif);
-                
-                let opts = '<option value="">Seleccione espacio...</option>';
-                filtered.forEach(sp => {
-                    // Mostrar las Salas Magnas individualmente (Sala Magna 1, 2, 3, 4)
-                    opts += `<option value="${sp.esp_id}">${sp.nombre_numero} (${sp.tipo})</option>`;
-                });
-                resEspacio.innerHTML = opts;
-                document.getElementById('resCapacidadLabel').value = "0 personas";
-                const eqCont2 = document.getElementById('resEquipamientoContainer');
-                if (eqCont2) eqCont2.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary);">Selecciona un espacio primero...</div>';
+                updateResEspacioOptions();
             });
         }
 
@@ -4840,6 +4896,9 @@ include 'header.php';
     
     document.getElementById('resPlanta').addEventListener('change', () => {
         updateModalMapImage();
+        if (typeof updateResEspacioOptions === 'function') {
+            updateResEspacioOptions();
+        }
         // Borrar selección de espacio si cambió de planta y no fue un cambio programático
         if (!isProgrammaticMapChange) {
             document.getElementById('resEspacio').value = "";
