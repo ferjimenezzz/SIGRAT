@@ -115,6 +115,23 @@ $espacios_disp = $stats['disponibles'] ?? 0;
 $reservas_hoy = $stats['reservas_hoy'] ?? 0;
 $aprobaciones_pend = $stats['pendientes'] ?? 0;
 
+// Consulta de estadísticas para el submódulo de Lugares
+$stats_lugares = $db->query("
+    SELECT 
+        (SELECT COUNT(*) FROM lugares WHERE (eliminado = 0 OR eliminado IS NULL) AND estatus != 'Inactivo') as total_lugares,
+        (SELECT COUNT(*) FROM lugares WHERE estatus = 'Disponible' AND (eliminado = 0 OR eliminado IS NULL)) as disponibles,
+        (SELECT COUNT(*) FROM lugares WHERE edificio = 'CIC' AND (eliminado = 0 OR eliminado IS NULL)) as cic,
+        (SELECT COUNT(*) FROM lugares WHERE edificio = 'PIDET' AND (eliminado = 0 OR eliminado IS NULL)) as pidet
+")->fetch();
+
+$total_lugares = $stats_lugares['total_lugares'] ?? 0;
+$lugares_disp = $stats_lugares['disponibles'] ?? 0;
+$lugares_cic = $stats_lugares['cic'] ?? 0;
+$lugares_pidet = $stats_lugares['pidet'] ?? 0;
+
+$tiposEspacios = $spaceController->getTiposPermitidos();
+$tiposLugares = $lugarController->getTiposPermitidos();
+
 include 'header.php';
 $tab = $_GET['tab'] ?? 'espacios';
 ?>
@@ -148,7 +165,7 @@ $tab = $_GET['tab'] ?? 'espacios';
         <div id="spaceFiltersContainer" style="display: flex; align-items: center; gap: 12px; flex: 1; flex-wrap: wrap;">
             <div style="position: relative; width: 300px; max-width: 100%; flex-grow: 1;">
                 <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; color: #94a3b8;"></i>
-                <input type="text" id="searchInput" placeholder="Buscar espacio, edificio..." style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; outline: none; box-sizing: border-box;">
+                <input type="text" id="searchInput" placeholder="<?php echo $tab === 'lugares' ? 'Buscar lugar, edificio...' : 'Buscar espacio, edificio...'; ?>" style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 500; outline: none; box-sizing: border-box;">
             </div>
             
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -159,7 +176,10 @@ $tab = $_GET['tab'] ?? 'espacios';
                 </select>
                 <select id="tipoFilter" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; background: white; outline: none; cursor: pointer;">
                     <option value="">Todos los tipos</option>
-                    <?php foreach ($spaceController->getTiposPermitidos() as $tipoEnum): ?>
+                    <?php 
+                    $initialTipos = ($tab === 'lugares') ? $tiposLugares : $tiposEspacios;
+                    foreach ($initialTipos as $tipoEnum): 
+                    ?>
                     <option value="<?php echo htmlspecialchars($tipoEnum); ?>"><?php echo htmlspecialchars($tipoEnum); ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -176,7 +196,7 @@ $tab = $_GET['tab'] ?? 'espacios';
         </div>
     </div>
 
-    <!-- Tarjetas Estadísticas -->
+    <!-- Tarjetas Estadísticas de Espacios -->
     <div id="stats-espacios" style="display: <?php echo $tab === 'espacios' ? 'grid' : 'none'; ?>; grid-template-columns: repeat(4, 1fr); gap: 20px;">
         <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Total de Espacios</h4>
@@ -197,6 +217,30 @@ $tab = $_GET['tab'] ?? 'espacios';
             <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Por Aprobar</h4>
             <div style="font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px;"><?php echo $aprobaciones_pend; ?></div>
             <div style="display: inline-block; background: #fce7f3; color: #be185d; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">Pendientes</div>
+        </div>
+    </div>
+
+    <!-- Tarjetas Estadísticas de Lugares -->
+    <div id="stats-lugares" style="display: <?php echo $tab === 'lugares' ? 'grid' : 'none'; ?>; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Total de Lugares</h4>
+            <div style="font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px;"><?php echo $total_lugares; ?></div>
+            <div style="display: inline-block; background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">Registrados</div>
+        </div>
+        <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Lugares Disponibles</h4>
+            <div style="font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px;"><?php echo $lugares_disp; ?></div>
+            <div style="display: inline-block; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">Operativos</div>
+        </div>
+        <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Lugares en CIC</h4>
+            <div style="font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px;"><?php echo $lugares_cic; ?></div>
+            <div style="display: inline-block; background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">Edificio CIC</div>
+        </div>
+        <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <h4 style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px;">Lugares en PIDET</h4>
+            <div style="font-size: 32px; font-weight: 800; color: #1e293b; margin-bottom: 8px;"><?php echo $lugares_pidet; ?></div>
+            <div style="display: inline-block; background: #fff7ed; color: #ea580c; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">Edificio PIDET</div>
         </div>
     </div>
 
@@ -720,31 +764,87 @@ $tab = $_GET['tab'] ?? 'espacios';
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    let currentTab = 'espacios';
+    let currentTab = '<?php echo htmlspecialchars($tab); ?>';
+    const tiposEspacios = <?php echo json_encode($tiposEspacios); ?>;
+    const tiposLugares = <?php echo json_encode($tiposLugares); ?>;
+
+    /**
+     * Actualiza las opciones del selector de tipo y el placeholder del buscador según la pestaña activa.
+     * @param {string} tab Nombre de la pestaña ('espacios' | 'lugares' | 'calendario').
+     * @return {void}
+     */
+    function updateFiltersForTab(tab) {
+        const tipoSelect = document.getElementById('tipoFilter');
+        const searchInput = document.getElementById('searchInput');
+        
+        if (!tipoSelect) return;
+
+        // Limpiar el selector de tipos y repoblar con los tipos del submódulo activo
+        tipoSelect.innerHTML = '<option value="">Todos los tipos</option>';
+        const tipos = (tab === 'lugares') ? tiposLugares : tiposEspacios;
+        
+        tipos.forEach(tipo => {
+            const opt = document.createElement('option');
+            opt.value = tipo;
+            opt.textContent = tipo;
+            tipoSelect.appendChild(opt);
+        });
+
+        // Actualizar placeholder del buscador
+        if (searchInput) {
+            if (tab === 'lugares') {
+                searchInput.placeholder = 'Buscar lugar, edificio...';
+            } else {
+                searchInput.placeholder = 'Buscar espacio, edificio...';
+            }
+        }
+    }
+
+    /**
+     * Alterna la vista activa entre Espacios, Lugares y Calendario, actualizando tarjetas y filtros.
+     * @param {string} tab Identificador de la pestaña ('espacios', 'lugares', 'calendario').
+     * @return {void}
+     */
     function switchTab(tab) {
         currentTab = tab;
-        document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'block' : 'none';
-        document.getElementById('tab-calendario').style.display = tab === 'calendario' ? 'flex' : 'none';
-        
-        var tabLugares = document.getElementById('tab-lugares');
+
+        // Control de visibilidad de las tablas principales
+        const tabEspacios = document.getElementById('tab-espacios');
+        const tabLugares = document.getElementById('tab-lugares');
+        const tabCalendario = document.getElementById('tab-calendario');
+
+        if (tabEspacios) tabEspacios.style.display = tab === 'espacios' ? 'block' : 'none';
         if (tabLugares) tabLugares.style.display = tab === 'lugares' ? 'block' : 'none';
-        
-        var btnSpace = document.getElementById('btn-action-space');
-        var btnLugar = document.getElementById('btn-action-lugar');
-        var btnRes = document.getElementById('btn-action-res');
-        
+        if (tabCalendario) tabCalendario.style.display = tab === 'calendario' ? 'flex' : 'none';
+
+        // Control exclusivo de visibilidad de tarjetas estadísticas
+        const statsEspacios = document.getElementById('stats-espacios');
+        const statsLugares = document.getElementById('stats-lugares');
+        if (statsEspacios) statsEspacios.style.display = tab === 'espacios' ? 'grid' : 'none';
+        if (statsLugares) statsLugares.style.display = tab === 'lugares' ? 'grid' : 'none';
+
+        // Control de botones de acción en la cabecera
+        const btnSpace = document.getElementById('btn-action-space');
+        const btnLugar = document.getElementById('btn-action-lugar');
+        const btnRes = document.getElementById('btn-action-res');
+
         if (btnSpace) btnSpace.style.display = tab === 'espacios' ? 'flex' : 'none';
         if (btnLugar) btnLugar.style.display = tab === 'lugares' ? 'flex' : 'none';
         if (btnRes) btnRes.style.display = tab === 'calendario' ? 'flex' : 'none';
 
-        document.getElementById('tab-espacios').style.display = tab === 'espacios' ? 'grid' : 'none';
-        document.getElementById('tab-calendario').style.display = tab === 'calendario' ? 'flex' : 'none';
-
-        
-        document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
-        if (document.getElementById('btn-' + tab)) {
-            document.getElementById('btn-' + tab).classList.add('active');
+        // Control de visibilidad del contenedor de filtros
+        const filtersContainer = document.getElementById('spaceFiltersContainer');
+        if (filtersContainer) {
+            filtersContainer.style.display = tab === 'calendario' ? 'none' : 'flex';
         }
+
+        // Cambio visual de la pestaña seleccionada
+        document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById('btn-' + tab);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        // Actualizar opciones del filtro de tipos y placeholder
+        updateFiltersForTab(tab);
     }
 
     const inventarioFull = <?php echo json_encode($inventario); ?>;
