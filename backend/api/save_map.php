@@ -83,11 +83,25 @@ try {
     // Formatear JSON para que sea legible (pretty print)
     $json_string = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-    // Escribir archivo
-    $result = file_put_contents($json_file_path, $json_string);
+    // Intentar escritura directa
+    $result = @file_put_contents($json_file_path, $json_string);
+
+    // Fallback: Si la escritura directa falla por bloqueo de archivo en Windows, intentar mediante archivo temporal
+    if ($result === false) {
+        $temp_file = $json_file_path . '.tmp';
+        $temp_result = @file_put_contents($temp_file, $json_string);
+        if ($temp_result !== false) {
+            @unlink($json_file_path);
+            if (@rename($temp_file, $json_file_path)) {
+                $result = $temp_result;
+            }
+        }
+    }
 
     if ($result === false) {
-        throw new Exception('No se pudo escribir en el archivo map_data.json. Verifica los permisos.');
+        $err = error_get_last();
+        $detail = isset($err['message']) ? ': ' . $err['message'] : '. Verifica los permisos de escritura.';
+        throw new Exception('No se pudo escribir en el archivo map_data.json' . $detail);
     }
 
     echo json_encode([
