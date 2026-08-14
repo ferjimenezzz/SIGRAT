@@ -44136,3 +44136,43 @@ Cuerpo:
 2026-08-12 18:23:20 - GET /SIGRAT/backend/api/index.php/notifications/all?_cb=1786551799992
 >>>>>>> bebd55f (feat(auditoria): agregar horas totales a aulas mas utilizadas, distribucion % a uso por edificio, SweetAlert2 a validacion de asistencia por usuario y selector de tipos de activos a prestamos)
 Cuerpo: 
+2026-08-14 16:39:53 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725592977
+Cuerpo: 
+2026-08-14 16:39:59 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725599084
+Cuerpo: 
+2026-08-14 16:40:07 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725607586
+Cuerpo: 
+2026-08-14 16:40:09 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725609327
+Cuerpo: 
+2026-08-14 16:40:09 - GET /sigrat/backend/api/index.php/calendar/events
+Cuerpo: 
+2026-08-14 16:40:10 - POST /sigrat/backend/api/index.php/notifications/check_expiring
+Cuerpo: 
+2026-08-14 16:40:10 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725610357
+Cuerpo: 
+2026-08-14 16:40:10 - GET /sigrat/backend/api/index.php/reservations?date=2026-08-14
+Cuerpo: 
+2026-08-14 16:40:23 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725623126
+Cuerpo: 
+2026-08-14 16:40:40 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725640124
+Cuerpo: 
+2026-08-14 16:40:53 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725653125
+Cuerpo: 
+2026-08-14 16:40:59 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725659093
+Cuerpo: 
+2026-08-14 16:41:12 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725669333
+Cuerpo: 
+2026-08-14 16:41:37 - GET /sigrat/backend/api/index.php/reservations?esp_id=30&date=2026-08-14
+Cuerpo: 
+2026-08-14 16:41:39 - GET /sigrat/backend/api/index.php/reservations?esp_id=30&date=2026-08-14
+Cuerpo: 
+2026-08-14 16:41:39 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725699336
+Cuerpo: 
+2026-08-14 16:41:40 - GET /sigrat/backend/api/index.php/reservations?esp_id=30&date=2026-08-14
+Cuerpo: 
+2026-08-14 16:41:54 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725714126
+Cuerpo: 
+2026-08-14 16:41:58 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725719084
+Cuerpo: 
+2026-08-14 16:42:10 - GET /sigrat/backend/api/index.php/notifications/all?_cb=1786725730119
+Cuerpo: 
