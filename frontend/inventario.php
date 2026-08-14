@@ -44,9 +44,9 @@ $tagController = new Controllers\TagController();
 $batchController = new Controllers\BatchController();
 
 $allSpaces = $db->query("
-    SELECT esp_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM ESPACIO
+    SELECT esp_id, nombre_numero, CAST(edificio AS CHAR(50)) AS edificio, CAST(COALESCE(planta, 'Baja') AS CHAR(50)) AS planta FROM ESPACIO
     UNION ALL
-    SELECT lug_id AS esp_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM LUGARES
+    SELECT lug_id AS esp_id, nombre_numero, CAST(edificio AS CHAR(50)) AS edificio, CAST(COALESCE(planta, 'Baja') AS CHAR(50)) AS planta FROM LUGARES
     ORDER BY edificio, nombre_numero
 ")->fetchAll();
 
@@ -57,9 +57,9 @@ $availableTags = $availableTagsResponse['success'] ? $availableTagsResponse['dat
 $filtro = $_GET['filtro'] ?? null;
 $query = "
 WITH AllSpaces AS (
-    SELECT esp_id AS space_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM ESPACIO
+    SELECT esp_id AS space_id, nombre_numero, CAST(edificio AS CHAR(50)) AS edificio, CAST(COALESCE(planta, 'Baja') AS CHAR(50)) AS planta FROM ESPACIO
     UNION ALL
-    SELECT lug_id AS space_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM LUGARES
+    SELECT lug_id AS space_id, nombre_numero, CAST(edificio AS CHAR(50)) AS edificio, CAST(COALESCE(planta, 'Baja') AS CHAR(50)) AS planta FROM LUGARES
 ),
 AllAssets AS (
     SELECT act_id AS act_id, tipo, marca, modelo, num_serie, num_inv, estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'activo' AS item_type 
@@ -68,7 +68,7 @@ AllAssets AS (
     SELECT mob_id AS act_id, tipo, NULL AS marca, NULL AS modelo, NULL AS num_serie, num_inv, 'Disponible' AS estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'mobiliario' AS item_type 
     FROM MOBILIARIO
 )
-SELECT a.*, s.nombre_numero AS espacio_nombre, s.edificio 
+SELECT a.*, s.nombre_numero AS espacio_nombre, s.edificio, s.planta 
 FROM AllAssets a 
 LEFT JOIN AllSpaces s ON a.esp_asignado = s.space_id
 ";
@@ -1013,6 +1013,12 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <?php endforeach; ?>
                 </select>
 
+                <select id="plantaFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
+                    <option value="">Planta</option>
+                    <option value="Baja">Planta Baja</option>
+                    <option value="Alta">Planta Alta</option>
+                </select>
+
                 <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
                     <option value="">Espacio</option>
                     <?php foreach($allUniqueSpaces as $sp): ?>
@@ -1055,7 +1061,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                     <?php foreach ($assets as $asset): 
                         $isMobiliario = (($asset['item_type'] ?? '') === 'mobiliario');
                     ?>
-                    <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>">
+                    <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>" data-planta="<?php echo htmlspecialchars($asset['planta'] ?? ''); ?>">
                         <td style="text-align: center; vertical-align: middle;">
                             <?php if (!empty($asset['imagen_url'])): ?>
                                 <img src="<?php echo htmlspecialchars($asset['imagen_url'] ?? ''); ?>" alt="Foto" onclick="viewAssetImage('<?php echo htmlspecialchars(addslashes($asset['imagen_url'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes(($asset['tipo'] ?? '') . ' ' . ($asset['modelo'] ?? ''))); ?>', '<?php echo htmlspecialchars(addslashes($asset['num_inv'] ?? '')); ?>')" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
@@ -2059,6 +2065,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const quickTypeFilter = document.getElementById("quickTypeFilter");
             const statusFilter = document.getElementById("statusFilter");
             const quickLocationFilter = document.getElementById("quickLocationFilter");
+            const plantaFilter = document.getElementById("plantaFilter");
             const quickSpaceFilter = document.getElementById("quickSpaceFilter");
             const drawerTypeFilter = document.getElementById("drawerTypeFilter");
             const drawerLocationFilter = document.getElementById("drawerLocationFilter");
@@ -2069,6 +2076,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             if(quickTypeFilter) quickTypeFilter.value = "";
             if(statusFilter) statusFilter.value = "";
             if(quickLocationFilter) quickLocationFilter.value = "";
+            if(plantaFilter) plantaFilter.value = "";
             if(quickSpaceFilter) quickSpaceFilter.value = "";
             if(drawerTypeFilter) drawerTypeFilter.value = "";
             if(drawerLocationFilter) drawerLocationFilter.value = "";
@@ -2176,6 +2184,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const quickTypeFilter = document.getElementById("quickTypeFilter");
             const statusFilter = document.getElementById("statusFilter");
             const quickLocationFilter = document.getElementById("quickLocationFilter");
+            const plantaFilter = document.getElementById("plantaFilter");
             const drawerTypeFilter = document.getElementById("drawerTypeFilter");
             const drawerLocationFilter = document.getElementById("drawerLocationFilter");
             const drawerRfidInput = document.getElementById("drawerRfidInput");
@@ -2195,6 +2204,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             const statusVal = statusFilter ? statusFilter.value : '';
             
             const edifVal = quickLocationFilter ? quickLocationFilter.value : '';
+            const plantaVal = plantaFilter ? plantaFilter.value.toLowerCase() : '';
             const espVal = quickSpaceFilter ? quickSpaceFilter.value : '';
             const locValDrawer = drawerLocationFilter ? drawerLocationFilter.value : '';
             
@@ -2210,6 +2220,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const rowTipoExacto = row.getAttribute('data-tipo') || '';
                 const rowLoc = row.getAttribute('data-ubicacion') || '';
                 const rowEdificio = row.getAttribute('data-edificio') || '';
+                const rowPlanta = (row.getAttribute('data-planta') || '').toLowerCase();
                 
                 const matchesText = !searchVal || text.includes(searchVal);
                 
@@ -2240,6 +2251,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const matchesEdificioTop = !edifVal || rowEdificio === edifVal;
                 const matchesEdificioDrawer = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
                 const matchesEdificio = matchesEdificioTop && matchesEdificioDrawer;
+                const matchesPlanta = !plantaVal || rowPlanta === plantaVal;
                 
                 const matchesLocTop = !espVal || rowLoc === espVal;
                 const matchesLocDrawer = !locValDrawer || rowLoc === locValDrawer;
@@ -2248,7 +2260,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const matchesRfid = !rfidVal || text.includes(rfidVal);
                 const matchesAvail = !onlyAvail || rowStatus === 'Disponible';
 
-                if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesLoc && matchesRfid && matchesAvail) {
+                if (matchesText && matchesType && matchesStatus && matchesEdificio && matchesPlanta && matchesLoc && matchesRfid && matchesAvail) {
                     row.setAttribute('data-filtered-out', 'false');
                     matchingRows.push(row);
                 } else {
@@ -2285,6 +2297,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         document.getElementById("quickTypeFilter"), 
         document.getElementById("statusFilter"), 
         document.getElementById("quickLocationFilter"), 
+        document.getElementById("plantaFilter"),
         document.getElementById('quickSpaceFilter'),
         document.getElementById("drawerTypeFilter"), 
         document.getElementById("drawerLocationFilter"), 
