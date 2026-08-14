@@ -5,8 +5,17 @@ require_once '../backend/config/Database.php';
 $db = Config\Database::getConnection();
 
 // Obtener todos los espacios para poder asignarlos a los polígonos
-$stmt = $db->query("SELECT esp_id, edificio, planta, nombre_numero, tipo FROM espacio ORDER BY edificio, planta, nombre_numero");
-$spaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $db->query("SELECT esp_id, edificio, nombre_numero, tipo FROM ESPACIO WHERE estatus != 'Inactivo' ORDER BY edificio, nombre_numero");
+    $spaces = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+} catch (\Throwable $e) {
+    try {
+        $stmt = $db->query("SELECT esp_id, edificio, nombre_numero, tipo FROM espacio WHERE estatus != 'Inactivo' ORDER BY edificio, nombre_numero");
+        $spaces = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    } catch (\Throwable $e2) {
+        $spaces = [];
+    }
+}
 
 $title = "Map Builder - SIGRAT";
 include 'header.php';
