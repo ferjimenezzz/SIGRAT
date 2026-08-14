@@ -985,41 +985,41 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
             unset($spArray);
         ?>
         <!-- Barra de Filtros Rápidos -->
-        <div class="filters-bar" style="display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; overflow-x: auto;">
-            <div class="search-input-wrapper">
-                <i class="bi bi-search" style="color: #94a3b8;"></i>
-                <input type="text" id="searchInventory" placeholder="Buscar activo o serie..." style="width: 100%;" oninput="applyFilters()" onchange="applyFilters()">
+        <div class="filters-bar" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: white; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
+            <div class="search-input-wrapper" style="flex: 1 1 200px; max-width: 260px; position: relative;">
+                <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" id="searchInventory" placeholder="Buscar mobiliario o serie..." style="width: 100%; padding-left: 34px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12.5px; font-weight: 500; outline: none;" oninput="applyFilters()" onchange="applyFilters()">
             </div>
             
-            <div class="filters-selects-grid" style="display: contents;">
-                <select id="quickTypeFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
+            <div class="filters-selects-grid" style="display: flex; flex-wrap: wrap; gap: 8px; flex: 1 1 auto; align-items: center;">
+                <select id="quickTypeFilter" class="select-filter" style="flex: 1 1 90px; max-width: 125px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;" onchange="applyFilters()">
                     <option value="">Tipo de activo</option>
                     <?php foreach($tiposDB as $t): ?>
                         <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
                     <?php endforeach; ?>
                 </select>
                 
-                <select id="statusFilter" class="select-filter" style="flex: 0 1 auto; min-width: 100px;" onchange="applyFilters()">
+                <select id="statusFilter" class="select-filter" style="flex: 1 1 90px; max-width: 110px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;" onchange="applyFilters()">
                     <option value="">Estado</option>
                     <?php foreach($estadosDB as $st): ?>
                         <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
                     <?php endforeach; ?>
                 </select>
                 
-                <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter(); applyFilters();" style="flex: 0 1 auto; min-width: 110px;">
+                <select id="quickLocationFilter" class="select-filter" onchange="updateSpaceFilter(); applyFilters();" style="flex: 1 1 90px; max-width: 110px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;">
                     <option value="">Ubicación</option>
                     <?php foreach($edificiosDB as $ed): ?>
                         <option value="<?php echo htmlspecialchars($ed); ?>"><?php echo htmlspecialchars($ed); ?></option>
                     <?php endforeach; ?>
                 </select>
 
-                <select id="plantaFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
+                <select id="plantaFilter" class="select-filter" style="flex: 1 1 90px; max-width: 110px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;" onchange="applyFilters()">
                     <option value="">Planta</option>
                     <option value="Baja">Planta Baja</option>
                     <option value="Alta">Planta Alta</option>
                 </select>
 
-                <select id="quickSpaceFilter" class="select-filter" style="flex: 0 1 auto; min-width: 110px;" onchange="applyFilters()">
+                <select id="quickSpaceFilter" class="select-filter" style="flex: 1 1 90px; max-width: 120px; height: 36px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: #475569; padding: 0 8px;" onchange="applyFilters()">
                     <option value="">Espacio</option>
                     <?php foreach($allUniqueSpaces as $sp): ?>
                         <option value="<?php echo htmlspecialchars($sp); ?>"><?php echo htmlspecialchars($sp); ?></option>
@@ -1027,8 +1027,8 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </select>
             </div>
 
-            <button type="button" class="btn-outline filters-clear-btn" id="clearFiltersTopBtn" onclick="clearAllFilters()" style="padding: 8px 16px; border-radius: 8px; flex: 0 0 auto; white-space: nowrap;">
-                <i class="bi bi-eraser"></i> Limpiar filtros
+            <button type="button" class="btn-outline filters-clear-btn" id="clearFiltersTopBtn" onclick="clearAllFilters()" style="height: 36px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #475569; border: 1px solid #e2e8f0; background: white; cursor: pointer; white-space: nowrap; flex: 0 0 auto;">
+                <i class="bi bi-eraser"></i> Limpiar
             </button>
         </div>
 
@@ -1059,9 +1059,19 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 </thead>
                 <tbody>
                     <?php foreach ($assets as $asset): 
-                        $isMobiliario = (($asset['item_type'] ?? '') === 'mobiliario');
+                        $tLower = strtolower($asset['tipo'] ?? '');
+                        $furnitureKeywords = ['silla', 'mesa', 'escritorio', 'pizarrón', 'pizarron', 'mobiliario', 'estante', 'archivero', 'gabinete', 'podium', 'tarima', 'anaquel', 'banco', 'pantalla', 'sillon', 'sillón', 'butaca'];
+                        $isMobKeyword = false;
+                        foreach ($furnitureKeywords as $kw) {
+                            if (strpos($tLower, $kw) !== false) {
+                                $isMobKeyword = true;
+                                break;
+                            }
+                        }
+                        $isMobiliario = (($asset['item_type'] ?? '') === 'mobiliario') || $isMobKeyword;
+                        $plantaVal = !empty($asset['planta']) ? $asset['planta'] : 'Baja';
                     ?>
-                    <tr data-status="<?php echo htmlspecialchars($asset['estatus']); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>" data-planta="<?php echo htmlspecialchars($asset['planta'] ?? ''); ?>">
+                    <tr data-status="<?php echo htmlspecialchars($asset['estatus'] ?? 'Disponible'); ?>" data-tipo-cat="<?php echo $isMobiliario ? 'Mobiliario' : 'Equipo'; ?>" data-tipo="<?php echo htmlspecialchars($asset['tipo'] ?? ''); ?>" data-ubicacion="<?php echo htmlspecialchars($asset['espacio_nombre'] ?? ''); ?>" data-edificio="<?php echo htmlspecialchars($asset['edificio'] ?? ''); ?>" data-planta="<?php echo htmlspecialchars($plantaVal); ?>">
                         <td style="text-align: center; vertical-align: middle;">
                             <?php if (!empty($asset['imagen_url'])): ?>
                                 <img src="<?php echo htmlspecialchars($asset['imagen_url'] ?? ''); ?>" alt="Foto" onclick="viewAssetImage('<?php echo htmlspecialchars(addslashes($asset['imagen_url'] ?? '')); ?>', '<?php echo htmlspecialchars(addslashes(($asset['tipo'] ?? '') . ' ' . ($asset['modelo'] ?? ''))); ?>', '<?php echo htmlspecialchars(addslashes($asset['num_inv'] ?? '')); ?>')" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
@@ -2251,7 +2261,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
                 const matchesEdificioTop = !edifVal || rowEdificio === edifVal;
                 const matchesEdificioDrawer = selectedEdificios.length === 0 || selectedEdificios.includes(rowEdificio);
                 const matchesEdificio = matchesEdificioTop && matchesEdificioDrawer;
-                const matchesPlanta = !plantaVal || rowPlanta === plantaVal;
+                const matchesPlanta = !plantaVal || rowPlanta === plantaVal || (plantaVal === 'baja' && (rowPlanta === '' || rowPlanta === 'baja'));
                 
                 const matchesLocTop = !espVal || rowLoc === espVal;
                 const matchesLocDrawer = !locValDrawer || rowLoc === locValDrawer;
