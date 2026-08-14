@@ -118,10 +118,10 @@ $aprobaciones_pend = $stats['pendientes'] ?? 0;
 // Consulta de estadísticas para el submódulo de Lugares
 $stats_lugares = $db->query("
     SELECT 
-        (SELECT COUNT(*) FROM lugares WHERE (eliminado = 0 OR eliminado IS NULL) AND estatus != 'Inactivo') as total_lugares,
-        (SELECT COUNT(*) FROM lugares WHERE estatus = 'Disponible' AND (eliminado = 0 OR eliminado IS NULL)) as disponibles,
-        (SELECT COUNT(*) FROM lugares WHERE edificio = 'CIC' AND (eliminado = 0 OR eliminado IS NULL)) as cic,
-        (SELECT COUNT(*) FROM lugares WHERE edificio = 'PIDET' AND (eliminado = 0 OR eliminado IS NULL)) as pidet
+        (SELECT COUNT(*) FROM lugares WHERE (eliminado = false OR eliminado IS NULL) AND estatus != 'Inactivo') as total_lugares,
+        (SELECT COUNT(*) FROM lugares WHERE estatus = 'Disponible' AND (eliminado = false OR eliminado IS NULL)) as disponibles,
+        (SELECT COUNT(*) FROM lugares WHERE edificio = 'CIC' AND (eliminado = false OR eliminado IS NULL)) as cic,
+        (SELECT COUNT(*) FROM lugares WHERE edificio = 'PIDET' AND (eliminado = false OR eliminado IS NULL)) as pidet
 ")->fetch();
 
 $total_lugares = $stats_lugares['total_lugares'] ?? 0;
