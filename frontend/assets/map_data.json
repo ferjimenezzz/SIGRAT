@@ -25,48 +25,48 @@
                 "points": "1261,353 1337,307 1419,463 1413,467 1401,443 1389,467 1393,483 1313,517"
             },
             {
-                "db_name": "Aula 5 Digital",
+                "db_name": "Aula Digital 5 PA",
                 "esp_id": 14,
                 "points": "1339,305 1407,253 1399,233 1443,195 1575,335 1503,405 1475,433 1415,467"
             },
             {
-                "db_name": "Área 8",
-                "esp_id": 65,
+                "db_name": "Area 8",
+                "esp_id": 8,
                 "points": "328,750 342,740 342,724 506,662 516,676 532,682 576,814 490,836 402,876"
             },
             {
-                "db_name": "Salón 1",
-                "esp_id": 7,
+                "db_name": "Aula 1",
+                "esp_id": 9,
                 "points": "802,648 910,646 920,668 934,668 934,784 800,780"
             },
             {
-                "db_name": "Sala Magna 1",
-                "esp_id": 1,
+                "db_name": "Aula Magna 1",
+                "esp_id": 15,
                 "points": "384,316 384,310 474,310 476,560 378,560"
             },
             {
-                "db_name": "Sala Magna 2",
-                "esp_id": 2,
+                "db_name": "Aula Magna 2",
+                "esp_id": 16,
                 "points": "478,557 600,563 598,307 472,307"
             },
             {
-                "db_name": "Sala Magna 3",
-                "esp_id": 3,
+                "db_name": "Aula Magna 3",
+                "esp_id": 17,
                 "points": "686,563 684,311 604,311 606,565"
             },
             {
-                "db_name": "Sala Magna 4",
-                "esp_id": 4,
+                "db_name": "Aula Magna 4",
+                "esp_id": 18,
                 "points": "770,311 770,563 696,563 690,307"
             },
             {
-                "db_name": "Área 5",
+                "db_name": "Area 5",
                 "esp_id": 6,
                 "points": "156,853 230,793 333,924 282,959 293,973 259,999"
             },
             {
-                "db_name": "Área 6",
-                "esp_id": 9,
+                "db_name": "Area 6",
+                "esp_id": 7,
                 "points": "230,793 333,922 413,873 319,739"
             }
         ],
@@ -197,59 +197,37 @@
         "planta": "Planta Alta",
         "zones": [
             {
-                "db_name": "Sala IBM",
-                "esp_id": 28,
+                "db_name": "Laboratorio de inteligencia artificial IBM Cognitiva",
+                "esp_id": 23,
                 "points": "2728,1096 2996,1098 3290,1064 3356,1434 3326,1452 3316,1492 3010,1528 2726,1526"
             },
             {
-                "db_name": "Laboratorio CISCO",
-                "esp_id": 29,
-                "points": "3292,1065 3517,1000 3752,885 3932,1175 3857,1210 3897,1280 3697,1385 3692,1370 3672,1380 3677,1390 3462,1455 3442,1375 3367,1400"
-            },
-            {
-                "db_name": "UNAM",
-                "esp_id": 24,
-                "points": "583,2341 735,2213 759,2225 803,2217 771,2165 985,2011 1011,2029 1061,2025 1259,2341 1063,2487 863,2655"
-            },
-            {
-                "db_name": "Aula Siemens",
-                "esp_id": 26,
+                "db_name": "UTEQ-SIEMENS PLM",
+                "esp_id": 25,
                 "points": "1071,2015 1087,2003 1099,1989 1099,1967 1101,1943 1335,1829 1489,2221 1267,2333"
             },
             {
-                "db_name": "Aula CIC Alta",
-                "esp_id": 30,
+                "db_name": "Aula 1",
+                "esp_id": 21,
                 "points": "1341,1827 1579,1751 1595,1779 1627,1789 1649,1789 1723,2153 1499,2227"
             },
             {
-                "db_name": "Laboratorio Intel",
-                "esp_id": 27,
-                "points": "1733,1101 2318,1101 2328,1531 1723,1531"
-            },
-            {
-                "db_name": "Aula Proyectos",
-                "esp_id": 40,
+                "db_name": "Aula 2",
+                "esp_id": 22,
                 "points": "3761,882 3972,724 4158,564 4215,622 4221,622 4449,876 4232,1050 4044,1207 4029,1196 4004,1187 3984,1184 3961,1193 3981,1242"
             },
             {
-                "db_name": "QSM Semiconductores",
-                "esp_id": 31,
+                "db_name": "QSM SEMICONDUCTORES",
+                "esp_id": 24,
                 "points": "2728,1688 2998,1686 2996,2112 2724,2116"
             }
         ],
         "texts": [
             {
-                "id": "txt_1783623368998",
-                "x": 848,
-                "y": 2375,
-                "content": "UNAM",
-                "size": 60
-            },
-            {
                 "id": "txt_1783623395689",
                 "x": 1253,
                 "y": 2137,
-                "content": "SIEMENS",
+                "content": "UTEQ-SIEMENS\n PLM",
                 "size": 44
             },
             {
@@ -260,24 +238,10 @@
                 "size": 54
             },
             {
-                "id": "txt_1783623431506",
-                "x": 2003,
-                "y": 1252,
-                "content": "INTEL",
-                "size": 60
-            },
-            {
                 "id": "txt_1783623466928",
                 "x": 3018,
                 "y": 1321,
                 "content": "IBM",
-                "size": 60
-            },
-            {
-                "id": "txt_1783623623646",
-                "x": 3530,
-                "y": 1186,
-                "content": "CISCO",
                 "size": 60
             },
             {
@@ -302,38 +266,33 @@
         "planta": "Planta Baja",
         "zones": [
             {
-                "db_name": "Embebidos",
-                "esp_id": 33,
+                "db_name": "Acceso Lab.\n Robotica",
+                "esp_id": 20,
                 "points": "342,1085 411,1025 431,1028 445,1022 434,1005 522,939 542,942 571,937 651,1082 468,1234"
             },
             {
-                "db_name": "Gevernova",
-                "esp_id": 35,
-                "points": "757,519 1120,522 1117,711 780,714 777,699 762,691 754,688 754,662 734,642 734,631 740,614 754,608"
-            },
-            {
                 "db_name": "CEPRODI",
-                "esp_id": 37,
+                "esp_id": 27,
                 "points": "1318,786 1445,788 1471,788 1475,813 1489,807 1500,789 1520,814 1528,808 1531,783 1687,786 1686,984 1321,984"
             },
             {
-                "db_name": "Aula Huawei",
-                "esp_id": 34,
+                "db_name": "Huawei",
+                "esp_id": 29,
                 "points": "567,933 573,927 581,919 579,904 689,850 798,813 804,822 821,835 829,830 864,996 755,1032 655,1081"
             },
             {
                 "db_name": "Auditorio",
-                "esp_id": 36,
+                "esp_id": 26,
                 "points": "1320,516 1448,516 1577,505 1634,488 1677,659 1671,659 1657,668 1657,682 1646,668 1634,665 1634,685 1451,713 1368,710 1360,696 1351,696 1348,713 1337,696 1326,690"
             },
             {
-                "db_name": "Ingenuity Labs-SIEMENS",
-                "esp_id": 38,
+                "db_name": "Ingenuity Lab\n UTEQ-SIEMENS",
+                "esp_id": 28,
                 "points": "1631,485 1686,472 1790,421 1893,585 1886,586 1868,566 1861,578 1861,601 1762,648 1683,676"
             },
             {
-                "db_name": "Centro de Innovación Siemens",
-                "esp_id": 39,
+                "db_name": "Smart Factory\n UTEQ-SIEMENS",
+                "esp_id": 30,
                 "points": "1790,417 1878,353 1934,305 1978,273 2098,415 1942,549 1920,521 1910,547 1914,563 1904,553 1886,553 1878,553"
             }
         ],
@@ -349,22 +308,15 @@
                 "id": "txt_1783622538735",
                 "x": 487,
                 "y": 1047,
-                "content": "EMBEBIDOS",
+                "content": "Acceso Lab.\n Robotica\n cambiar de lugar",
                 "size": 25
             },
             {
                 "id": "txt_1783622570218",
                 "x": 701,
                 "y": 898,
-                "content": "AULA HUAWEI",
+                "content": "HUAWEI",
                 "size": 31
-            },
-            {
-                "id": "txt_1783629244594",
-                "x": 930,
-                "y": 580,
-                "content": "GE VERNOVA",
-                "size": 45
             },
             {
                 "id": "txt_1783629286962",
@@ -377,14 +329,14 @@
                 "id": "txt_1785862436843",
                 "x": 1759,
                 "y": 509,
-                "content": "Ingenuity Lab SIEMENS",
+                "content": "Ingenuity Lab \nSIEMENS",
                 "size": 13
             },
             {
                 "id": "txt_1785862529712",
                 "x": 1926,
                 "y": 393,
-                "content": "Centro de Innovación SIEMENS",
+                "content": "Smart Factory\nUTEQ-SIEMENS",
                 "size": 13
             }
         ]

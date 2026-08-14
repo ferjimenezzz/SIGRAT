@@ -73,7 +73,7 @@ include 'header.php';
                     <div id="textPropertiesPanel" style="display: none;">
                         <h6 class="fw-bold mb-3 text-primary">Propiedades del Texto</h6>
                         <label class="form-label text-muted small">Contenido:</label>
-                        <input type="text" id="textContentInput" class="form-control form-control-sm mb-2" onkeyup="updateSelectedTextContent(this.value)">
+                        <textarea id="textContentInput" class="form-control form-control-sm mb-2" rows="3" onkeyup="updateSelectedTextContent(this.value)"></textarea>
                         
                         <label class="form-label text-muted small">Tamaño de letra:</label>
                         <input type="range" id="textSizeInput" class="form-range mb-3" min="10" max="60" value="16" oninput="updateSelectedTextSize(this.value)">
