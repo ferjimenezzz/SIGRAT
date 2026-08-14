@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function populateSpaceAssigner() {
     spaceAssigner.innerHTML = '<option value="">-- Sin asignar --</option>';
     
+    if (typeof allSpaces === 'undefined' || !Array.isArray(allSpaces)) return;
+
     // Obtener edificio y planta del mapa actual
     const config = MAP_DATA[currentMapKey];
     if (!config) return;
@@ -61,21 +63,36 @@ function populateSpaceAssigner() {
     const mapEdificio = mapParts[0].toLowerCase().trim();
     const mapPlanta = mapParts.length > 1 ? (mapParts[1] === 'alta' ? 'planta alta' : 'planta baja') : '';
 
-    // Filtrado: mismo edificio + (misma planta OR planta null/vacía)
-    const filteredSpaces = allSpaces.filter(sp => {
+    // Filtrado flexible: mismo edificio (o coincidencia parcial)
+    let filteredSpaces = allSpaces.filter(sp => {
         const dbEdif = (sp.edificio || '').toLowerCase().trim();
         const dbPlan = (sp.planta || '').toLowerCase().trim();
         
-        if (dbEdif !== mapEdificio) return false;
-        // Incluir espacios de la planta exacta O espacios sin planta asignada (generales del edificio)
-        return dbPlan === mapPlanta || dbPlan === '';
+        if (!dbEdif) return true; // Si el espacio no tiene edificio en BD, incluirlo
+
+        const matchEdif = dbEdif === mapEdificio || dbEdif.includes(mapEdificio) || mapEdificio.includes(dbEdif);
+        if (!matchEdif) return false;
+
+        if (!dbPlan) return true;
+
+        const matchPlan = dbPlan === mapPlanta || 
+                          dbPlan.includes(mapPlanta.replace('planta ', '')) || 
+                          mapPlanta.includes(dbPlan.replace('planta ', ''));
+        return matchPlan;
     });
+
+    // Fallback: Si el filtrado estricto devuelve 0 resultados, mostrar TODOS los espacios disponibles en la BD
+    if (filteredSpaces.length === 0) {
+        filteredSpaces = allSpaces;
+    }
 
     filteredSpaces.forEach(sp => {
         const opt = document.createElement('option');
         opt.value = sp.nombre_numero;
-        opt.textContent = `${sp.nombre_numero} (${sp.tipo})`;
-        opt.dataset.search = sp.nombre_numero.toLowerCase() + ' ' + sp.tipo.toLowerCase();
+        const edifTag = sp.edificio ? ` - ${sp.edificio}` : '';
+        const tipoTag = sp.tipo ? ` (${sp.tipo})` : '';
+        opt.textContent = `${sp.nombre_numero}${tipoTag}${edifTag}`;
+        opt.dataset.search = (sp.nombre_numero + ' ' + (sp.tipo || '') + ' ' + (sp.edificio || '')).toLowerCase();
         opt.dataset.espid = sp.esp_id;
         spaceAssigner.appendChild(opt);
     });
