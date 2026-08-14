@@ -42,53 +42,72 @@ class Database {
     private $db;
 
     /**
+     * Parsea un archivo .env de forma robusta ignorando caracteres especiales en las contraseñas.
+     * @param string $filePath Ruta absoluta del archivo .env.
+     * @return array Arreglo asociativo con las variables leídas.
+     */
+    private static function parseEnvFile($filePath) {
+        $env = [];
+        if (!file_exists($filePath)) {
+            return $env;
+        }
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || strpos($line, '#') === 0) {
+                continue;
+            }
+            if (strpos($line, '=') !== false) {
+                list($key, $val) = explode('=', $line, 2);
+                $key = trim($key);
+                $val = trim($val);
+                if ((strpos($val, '"') === 0 && substr($val, -1) === '"') || (strpos($val, "'") === 0 && substr($val, -1) === "'")) {
+                    $val = substr($val, 1, -1);
+                }
+                $env[$key] = $val;
+            }
+        }
+        return $env;
+    }
+
+    /**
      * Constructor privado para evitar instanciación directa externa (Patrón Singleton).
      * Configura el Data Source Name (DSN) y establece las opciones de seguridad del protocolo PDO.
      */
     private function __construct() {
-        // Cargar credenciales desde el archivo .env
+        // Cargar credenciales desde el archivo .env usando la función robusta
         $envFile = __DIR__ . '/../../.env';
-        if (file_exists($envFile)) {
-            $env = parse_ini_file($envFile);
-            $this->host = $env['DB_HOST'] ?? '127.0.0.1';
-            $this->port = $env['DB_PORT'] ?? '5432';
-            $this->user = $env['DB_USERNAME'] ?? $env['DB_USER'] ?? 'postgres';
-            $this->pass = $env['DB_PASSWORD'] ?? '';
-            $this->db   = $env['DB_DATABASE'] ?? $env['DB_NAME'] ?? 'postgres';
-        } else {
-            // Fallback si no existe .env
-            $this->host = '127.0.0.1';
-            $this->port = '5432';
-            $this->user = 'postgres';
-            $this->pass = '';
-            $this->db   = 'postgres';
-        }
+        $env = self::parseEnvFile($envFile);
+
+        $driver     = strtolower($env['DB_DRIVER'] ?? (($env['DB_PORT'] ?? '') === '3306' ? 'mysql' : 'pgsql'));
+        $this->host = $env['DB_HOST'] ?? '127.0.0.1';
+        $this->port = $env['DB_PORT'] ?? ($driver === 'mysql' ? '3306' : '5432');
+        $this->user = $env['DB_USERNAME'] ?? $env['DB_USER'] ?? ($driver === 'mysql' ? 'root' : 'postgres');
+        $this->pass = $env['DB_PASSWORD'] ?? '';
+        $this->db   = $env['DB_DATABASE'] ?? $env['DB_NAME'] ?? 'sigrat_db';
 
         try {
-            // Construcción del DSN para PostgreSQL. NOTA: Se remueve sslmode=require si la bd local no tiene SSL.
-            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db}";
+            // Construcción del DSN según el driver configurado (pgsql o mysql)
+            if ($driver === 'mysql') {
+                $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->db};charset=utf8mb4";
+            } else {
+                $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db}";
+            }
             
-            // Instanciación del objeto PDO con opciones de blindaje arquitectónico
+            // Instanciación del objeto PDO con opciones de seguridad
             $this->conn = new PDO(
                 $dsn,
                 $this->user,
                 $this->pass,
                 [
-                    // PDO::ATTR_ERRMODE: Lanza excepciones en caso de error para evitar fallos silenciosos o fugas de datos
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    
-                    // PDO::ATTR_DEFAULT_FETCH_MODE: Estandariza la obtención de datos como arreglos asociativos puros
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    
-                    // PDO::ATTR_EMULATE_PREPARES: Se establece en true para compatibilidad con PgBouncer/Supabase Pooler (Transaction Mode)
-                    // que no soporta prepared statements a través de múltiples transacciones.
                     PDO::ATTR_EMULATE_PREPARES => true,
                 ]
             );
         } catch (PDOException $e) {
-            // Enmascaramiento y registro del error de base de datos para no exponer credenciales ni estructura en stdout
-            error_log("Supabase Auth Error: " . $e->getMessage());
-            die(json_encode(["error" => "Error de Autenticación Cloud: " . $e->getMessage()]));
+            error_log("Database Connection Error: " . $e->getMessage());
+            die(json_encode(["error" => "Error de Conexión a Base de Datos: " . $e->getMessage()]));
         }
     }
 

@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Importar el controlador de autenticación para verificación criptográfica de tokens
-require_once '../backend/controllers/AuthController.php';
+require_once __DIR__ . '/../backend/controllers/AuthController.php';
 use Controllers\AuthController;
 
 // ============================================================================

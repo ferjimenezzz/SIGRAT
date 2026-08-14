@@ -9,12 +9,12 @@
 // SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
 // ============================================================================
 
-require_once 'seguridad.php';
-require_once '../backend/config/Database.php';
-require_once '../backend/controllers/AssetController.php';
-require_once '../backend/controllers/SpaceController.php';
-require_once '../backend/controllers/TagController.php';
-require_once '../backend/controllers/BatchController.php';
+require_once __DIR__ . '/seguridad.php';
+require_once __DIR__ . '/../backend/config/Database.php';
+require_once __DIR__ . '/../backend/controllers/AssetController.php';
+require_once __DIR__ . '/../backend/controllers/SpaceController.php';
+require_once __DIR__ . '/../backend/controllers/TagController.php';
+require_once __DIR__ . '/../backend/controllers/BatchController.php';
 
 $db = Config\Database::getConnection();
 
@@ -44,9 +44,9 @@ $tagController = new Controllers\TagController();
 $batchController = new Controllers\BatchController();
 
 $allSpaces = $db->query("
-    SELECT esp_id, nombre_numero, edificio::varchar FROM ESPACIO
+    SELECT esp_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM ESPACIO
     UNION ALL
-    SELECT lug_id AS esp_id, nombre_numero, edificio::varchar FROM LUGARES
+    SELECT lug_id AS esp_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM LUGARES
     ORDER BY edificio, nombre_numero
 ")->fetchAll();
 
@@ -57,9 +57,9 @@ $availableTags = $availableTagsResponse['success'] ? $availableTagsResponse['dat
 $filtro = $_GET['filtro'] ?? null;
 $query = "
 WITH AllSpaces AS (
-    SELECT esp_id AS space_id, nombre_numero, edificio::varchar FROM ESPACIO
+    SELECT esp_id AS space_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM ESPACIO
     UNION ALL
-    SELECT lug_id AS space_id, nombre_numero, edificio::varchar FROM LUGARES
+    SELECT lug_id AS space_id, nombre_numero, CAST(edificio AS CHAR) AS edificio FROM LUGARES
 ),
 AllAssets AS (
     SELECT act_id AS act_id, tipo, marca, modelo, num_serie, num_inv, estatus, tag_id, esp_asignado, imagen_url, descripcion, responsable, nivel, 'activo' AS item_type 
@@ -926,8 +926,11 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
 <!-- Barra de Pestañas y Acciones Globales -->
 <div class="tabs-row" style="display: flex; justify-content: space-between; align-items: center;">
     <div class="tabs-container">
-        <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab active"><i class="bi bi-laptop"></i> ACTIVOS (EQUIPOS)</button>
-        <button onclick="switchAssetTab('mobiliario')" id="tab-mobiliario" class="btn-tab"><i class="bi bi-tablet-landscape"></i> MOBILIARIO</button>
+        <!-- 
+        MÓDULO DE ACTIVOS (EQUIPOS) - COMENTADO SEGÚN REQUERIMIENTO (NO BORRADO)
+        <button onclick="switchAssetTab('inventario')" id="tab-inventario" class="btn-tab"><i class="bi bi-laptop"></i> ACTIVOS (EQUIPOS)</button>
+        -->
+        <button onclick="switchAssetTab('mobiliario')" id="tab-mobiliario" class="btn-tab active"><i class="bi bi-tablet-landscape"></i> MOBILIARIO</button>
     </div>
     <div style="display: flex; gap: 8px; align-items: center;">
         <button type="button" class="btn-outline" id="filtersBtn" onclick="toggleFiltersPanel()" style="height: 40px; border-radius: 8px; font-weight: 700; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px;">
@@ -1573,7 +1576,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
 
-    let activeCategoryTab = 'inventario';
+    let activeCategoryTab = 'mobiliario'; // Pestaña por defecto: 'mobiliario' (el botón 'inventario/activos' ha sido comentado)
     let currentPage = 1;
     let itemsPerPage = 8;
     document.addEventListener("DOMContentLoaded", function() {
@@ -1605,7 +1608,7 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
     }
 
     function switchAssetTab(tab) {
-        if (tab === 'mantenimiento') tab = 'mobiliario';
+        if (tab === 'mantenimiento' || tab === 'inventario') tab = 'mobiliario';
         activeCategoryTab = tab;
         
         const btnNewText = document.getElementById('btnNewAssetText');
@@ -1650,10 +1653,10 @@ $pctCat4 = $totalAssets > 0 ? ($categories['Otros'] / $totalAssets) * 100 : 0;
         }
     }
 
-    // Mantener la pestaña activa después de recargar si viene en el GET
+    // Mantener la pestaña activa después de recargar si viene en el GET (defecto a 'mobiliario')
     const urlParams = new URLSearchParams(window.location.search);
-    let activeTab = urlParams.get('tab') || 'inventario';
-    if (activeTab === 'mantenimiento') activeTab = 'mobiliario';
+    let activeTab = urlParams.get('tab') || 'mobiliario';
+    if (activeTab === 'mantenimiento' || activeTab === 'inventario') activeTab = 'mobiliario';
     switchAssetTab(activeTab);
 
 

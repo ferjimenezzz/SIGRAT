@@ -8,11 +8,11 @@
 // SECCIÓN 1: INICIALIZACIÓN, MIDDLEWARE DE SEGURIDAD Y SESIONES
 // ============================================================================
 
-require_once 'seguridad.php';
-require_once '../backend/config/Database.php';
-require_once '../backend/controllers/SpaceController.php';
-require_once '../backend/controllers/ReservationController.php';
-require_once '../backend/controllers/LugarController.php';
+require_once __DIR__ . '/seguridad.php';
+require_once __DIR__ . '/../backend/config/Database.php';
+require_once __DIR__ . '/../backend/controllers/SpaceController.php';
+require_once __DIR__ . '/../backend/controllers/ReservationController.php';
+require_once __DIR__ . '/../backend/controllers/LugarController.php';
 
 $db = Config\Database::getConnection();
 
