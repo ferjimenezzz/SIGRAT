@@ -94,31 +94,31 @@
             },
             {
                 "id": "txt_1786656025222",
-                "x": 427,
-                "y": 422,
-                "content": "Aula\n Magna 1",
-                "size": 14
+                "x": 430,
+                "y": 425,
+                "content": "Aula\nMagna 1",
+                "size": 12
             },
             {
                 "id": "txt_1786656029930",
-                "x": 531,
-                "y": 421,
-                "content": "Aula\n Magna 2",
-                "size": 16
+                "x": 536,
+                "y": 425,
+                "content": "Aula\nMagna 2",
+                "size": 12
             },
             {
                 "id": "txt_1786656035245",
-                "x": 641,
-                "y": 417,
-                "content": "Aula\n Magna 3",
-                "size": 16
+                "x": 645,
+                "y": 425,
+                "content": "Aula\nMagna 3",
+                "size": 12
             },
             {
                 "id": "txt_1786656038776",
-                "x": 729,
-                "y": 418,
-                "content": "Aula\n Magna 4",
-                "size": 16
+                "x": 730,
+                "y": 425,
+                "content": "Aula\nMagna 4",
+                "size": 12
             }
         ]
     },
