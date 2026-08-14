@@ -96,28 +96,28 @@
                 "id": "txt_1786656025222",
                 "x": 427,
                 "y": 422,
-                "content": "Aula Magna 1",
+                "content": "Aula\n Magna 1",
                 "size": 14
             },
             {
                 "id": "txt_1786656029930",
                 "x": 531,
                 "y": 421,
-                "content": "Aula Magna 2",
+                "content": "Aula\n Magna 2",
                 "size": 16
             },
             {
                 "id": "txt_1786656035245",
                 "x": 641,
                 "y": 417,
-                "content": "Aula Magna 3",
+                "content": "Aula\n Magna 3",
                 "size": 16
             },
             {
                 "id": "txt_1786656038776",
                 "x": 729,
                 "y": 418,
-                "content": "Aula Magna 4",
+                "content": "Aula\n Magna 4",
                 "size": 16
             }
         ]
