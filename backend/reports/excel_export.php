@@ -23,26 +23,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['filters'])) {
 set_time_limit(0);
 ini_set('memory_limit', '512M');
 
-// Decodificar filtros enviados desde el frontend
-$filters = json_decode($_POST['filters'], true);
-
-// Reutilizar la conexión Singleton del proyecto (PostgreSQL / Supabase)
-require_once __DIR__ . '/../config/Database.php';
-$pdo = Config\Database::getConnection();
-
-// Construir la consulta SQL basada en los filtros usando el helper reutilizable
-require_once __DIR__ . '/../helpers/InventoryQueryBuilder.php';
-$params = [];
-$sql = InventoryQueryBuilder::build($filters, $params);
-
-// Ejecutar la consulta y obtener todos los registros
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Determinar encabezados a partir de los datos obtenidos
+// Decodificar filtros y datos enviados desde el frontend
+$filters = json_decode($_POST['filters'], true) ?: [];
 $reportTitle = $filters['title'] ?? 'Reporte_SIGRAT';
-$headers = $rows ? array_keys($rows[0]) : [];
+
+if (!empty($filters['headers']) && isset($filters['rows']) && is_array($filters['rows'])) {
+    // Si se enviaron las filas y encabezados ya filtrados desde la interfaz web (Usuarios, Invitaciones, etc.)
+    $headers = $filters['headers'];
+    $rows = $filters['rows'];
+} else {
+    // Fallback: reconstruir la consulta SQL para inventario si no se enviaron filas explícitas
+    require_once __DIR__ . '/../config/Database.php';
+    $pdo = Config\Database::getConnection();
+    require_once __DIR__ . '/../helpers/InventoryQueryBuilder.php';
+    $params = [];
+    $sql = InventoryQueryBuilder::build($filters, $params);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $headers = $rows ? array_keys($rows[0]) : [];
+}
 
 // Crear el Spreadsheet
 $spreadsheet = new Spreadsheet();
