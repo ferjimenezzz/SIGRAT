@@ -119,48 +119,6 @@
                 "y": 425,
                 "content": "Aula\nMagna 4",
                 "size": 12
-            },
-            {
-                "id": "txt_ad1",
-                "x": 1013,
-                "y": 500,
-                "content": "Aula\nDigital 1",
-                "size": 13
-            },
-            {
-                "id": "txt_ad2",
-                "x": 1144,
-                "y": 490,
-                "content": "Aula\nDigital 2",
-                "size": 13
-            },
-            {
-                "id": "txt_ad3",
-                "x": 1253,
-                "y": 455,
-                "content": "Aula\nDigital 3",
-                "size": 13
-            },
-            {
-                "id": "txt_ad4",
-                "x": 1366,
-                "y": 425,
-                "content": "Aula\nDigital 4",
-                "size": 13
-            },
-            {
-                "id": "txt_ad5",
-                "x": 1444,
-                "y": 328,
-                "content": "Aula 5\nDigital",
-                "size": 14
-            },
-            {
-                "id": "txt_a1",
-                "x": 883,
-                "y": 699,
-                "content": "Aula 1",
-                "size": 16
             }
         ]
     },
@@ -259,7 +217,7 @@
                 "points": "3761,882 3972,724 4158,564 4215,622 4221,622 4449,876 4232,1050 4044,1207 4029,1196 4004,1187 3984,1184 3961,1193 3981,1242"
             },
             {
-                "db_name": "QSM \nSEMICONDUCTORES",
+                "db_name": "QSM SEMICONDUCTORES",
                 "esp_id": 24,
                 "points": "2728,1688 2998,1686 2996,2112 2724,2116"
             }
