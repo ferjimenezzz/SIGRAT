@@ -19,7 +19,7 @@ $isMaestro = (
     strpos($userRolCurrent, 'DOCENTE') !== false || 
     strpos($userRolCurrent, 'PROFESOR') !== false
 );
-$isInvitado = ($userRolCurrent === 'INVITADO');
+$isInvitado = ($userRolCurrent === 'INVITADO' || $userRolCurrent === 'VISITA' || strpos($userRolCurrent, 'VISIT') !== false);
 $hideSidebar = ($isMaestro || $isInvitado);
 
 // 1. Obtener detalles del usuario autenticado para prellenar la reserva
@@ -2395,6 +2395,8 @@ include 'header.php';
     const allAssets = <?php echo json_encode($assets); ?>;
     const sessionUserId = <?php echo json_encode($us_id_sesion); ?>;
     const isUserAdmin = <?php echo json_encode($isAdmin); ?>;
+    const isUserMaestro = <?php echo json_encode($isMaestro); ?>;
+    const isUserInvitado = <?php echo json_encode($isInvitado); ?>;
     let isProgrammaticMapChange = false;
     window.reservationsForSelectedDate = [];
     window.lastLoadedDate = "";
@@ -2453,6 +2455,17 @@ include 'header.php';
         rules.es_reservable = !(rawRes === false || rawRes === 'f' || rawRes === 0 || rawRes === 'false' || rawRes === null || rawRes === '');
         
         const acceso = (spaceData.acceso || '').toLowerCase();
+        
+        // Bloqueo exclusivo para roles Maestro e Invitado en espacios restringidos/administrador
+        if ((typeof isUserMaestro !== 'undefined' && isUserMaestro || typeof isUserInvitado !== 'undefined' && isUserInvitado) && (acceso === 'restringido' || acceso === 'administrador')) {
+            rules.tipo_acceso = 'Acceso Restringido (No Reservable)';
+            rules.mensaje_tooltip = 'Este espacio tiene acceso restringido y no está disponible para reservación.';
+            rules.mensaje_toast_seleccion = 'Este espacio con acceso restringido no está disponible para tu rol.';
+            rules.es_reservable = false;
+            rules.icono = 'bi-lock-fill';
+            rules.color_tema = '#64748b'; // Gris
+            return rules;
+        }
         const tipo = (spaceData.tipo || '').toLowerCase();
         const responsable = spaceData.responsable || '';
         const nombre = spaceData.nombre_numero || 'Espacio';
@@ -3020,6 +3033,13 @@ include 'header.php';
                     const spPlanta = getSpacePlanta(sp);
                     if (spPlanta !== planta) return false;
                 }
+                const acceso = (sp.acceso || '').toLowerCase();
+                if ((typeof isUserMaestro !== 'undefined' && isUserMaestro || typeof isUserInvitado !== 'undefined' && isUserInvitado) && (acceso === 'restringido' || acceso === 'administrador')) {
+                    return false;
+                }
+                const raw = sp.es_reservable;
+                const reservable = !(raw === false || raw === 'f' || raw === 0 || raw === 'false' || raw === null || raw === '');
+                if (!reservable) return false;
                 return true;
             });
 
@@ -4937,6 +4957,8 @@ include 'header.php';
             // Etiqueta viene EXCLUSIVAMENTE de la BD. Si no hay match, mostrar db_name como fallback.
             const label = spaceData ? spaceData.nombre_numero : (zone.db_name || 'Sin asignar');
 
+            const acceso = spaceData ? (spaceData.acceso || 'general').toLowerCase() : 'general';
+
             // ─────────────────────────────────────────────────────
             // es_reservable: PostgreSQL puede enviar true/false/"t"/"f"/1/0
             // Usamos comparación explícita contra valores falsy
@@ -4948,7 +4970,9 @@ include 'header.php';
                 esReservable = !(raw === false || raw === 'f' || raw === 0 || raw === 'false' || raw === null || raw === '');
             }
 
-            const acceso = spaceData ? spaceData.acceso : 'general';
+            if ((typeof isUserMaestro !== 'undefined' && isUserMaestro || typeof isUserInvitado !== 'undefined' && isUserInvitado) && (acceso === 'restringido' || acceso === 'administrador')) {
+                esReservable = false;
+            }
             const baseStyle = getBaseStyle(estatus, esReservable, acceso, zone.db_name);
             const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
             poly.setAttribute('points', zone.points);
@@ -5114,8 +5138,10 @@ include 'header.php';
     }
 
     function getBaseStyle(estatus, isReservable, acceso, dbName) {
-        if (!isReservable) {
-            // Privado (Gris Oscuro #374151)
+        const isRestrictedForUser = (typeof isUserMaestro !== 'undefined' && isUserMaestro || typeof isUserInvitado !== 'undefined' && isUserInvitado) && (acceso === 'restringido' || acceso === 'administrador');
+
+        if (!isReservable || isRestrictedForUser) {
+            // Privado / Bloqueado (Gris Oscuro #374151)
             return { 
                 fill: 'rgba(55, 65, 81, 0.35)', 
                 stroke: '#374151',
