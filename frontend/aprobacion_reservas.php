@@ -397,41 +397,50 @@ function ReservationApprovalApp() {
     }
   };
 
+  const [sortOrder, setSortOrder] = useState("DESC"); // "DESC": Recientes primero, "ASC": Antiguas primero
+
   const handleClearFilters = () => {
     setSearchTerm("");
     setSelectedSpaceFilter("ALL");
     setStartDateFilter("");
     setEndDateFilter("");
+    setSortOrder("DESC");
   };
 
-  const filteredReservations = reservations.filter(row => {
-    // Filter text search
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      const idMatch = !isMaestroOrVisita && row.re_id && row.re_id.toString().includes(term);
-      const userMatch = !isMaestroOrVisita && row.usuario_nombre && row.usuario_nombre.toLowerCase().includes(term);
-      const spaceMatch = row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(term);
-      if (!(idMatch || userMatch || spaceMatch)) return false;
-    }
+  const filteredReservations = reservations
+    .filter(row => {
+      // Filter text search
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const idMatch = !isMaestroOrVisita && row.re_id && row.re_id.toString().includes(term);
+        const userMatch = !isMaestroOrVisita && row.usuario_nombre && row.usuario_nombre.toLowerCase().includes(term);
+        const spaceMatch = row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(term);
+        if (!(idMatch || userMatch || spaceMatch)) return false;
+      }
 
-    // Filter space
-    if (selectedSpaceFilter !== "ALL") {
-      const selectedSpace = spaces.find(s => s.esp_id == selectedSpaceFilter);
-      const spaceNameMatch = selectedSpace && row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(selectedSpace.nombre_numero.toLowerCase());
-      const spaceIdMatch = row.esp_id != null && row.esp_id == selectedSpaceFilter;
-      if (!spaceIdMatch && !spaceNameMatch) return false;
-    }
+      // Filter space
+      if (selectedSpaceFilter !== "ALL") {
+        const selectedSpace = spaces.find(s => s.esp_id == selectedSpaceFilter);
+        const spaceNameMatch = selectedSpace && row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(selectedSpace.nombre_numero.toLowerCase());
+        const spaceIdMatch = row.esp_id != null && row.esp_id == selectedSpaceFilter;
+        if (!spaceIdMatch && !spaceNameMatch) return false;
+      }
 
-    // Filter fecha (Start & End Date range or single date)
-    if (startDateFilter) {
-      if (row.fecha_uso < startDateFilter) return false;
-    }
-    if (endDateFilter) {
-      if (row.fecha_uso > endDateFilter) return false;
-    }
+      // Filter fecha (Start & End Date range or single date)
+      if (startDateFilter) {
+        if (row.fecha_uso < startDateFilter) return false;
+      }
+      if (endDateFilter) {
+        if (row.fecha_uso > endDateFilter) return false;
+      }
 
-    return true;
-  });
+      return true;
+    })
+    .sort((a, b) => {
+      const dateTimeA = new Date(`${a.fecha_uso}T${a.hora_ent || '00:00:00'}`).getTime();
+      const dateTimeB = new Date(`${b.fecha_uso}T${b.hora_ent || '00:00:00'}`).getTime();
+      return sortOrder === "DESC" ? dateTimeB - dateTimeA : dateTimeA - dateTimeB;
+    });
 
   return React.createElement("div", { style: { marginTop: 10, fontFamily: "Inter, sans-serif", display: "flex", flexDirection: "column", alignItems: "flex-end" } }, 
     error && React.createElement(Alert, { severity: "error", sx: { mb: 3, width: "100%" } }, error), 
@@ -448,11 +457,11 @@ function ReservationApprovalApp() {
             value: searchTerm, 
             onChange: (e) => setSearchTerm(e.target.value), 
             InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
-            sx: { minWidth: "200px", maxWidth: "240px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
+            sx: { minWidth: "180px", maxWidth: "220px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
           }),
 
           // Filtro por Espacio
-          React.createElement(FormControl, { size: "small", sx: { minWidth: "180px", maxWidth: "220px" } },
+          React.createElement(FormControl, { size: "small", sx: { minWidth: "170px", maxWidth: "200px" } },
             React.createElement(Select, {
               value: selectedSpaceFilter,
               onChange: (e) => setSelectedSpaceFilter(e.target.value),
@@ -464,6 +473,18 @@ function ReservationApprovalApp() {
             )
           ),
 
+          // Ordenamiento por Fecha/Tiempo
+          React.createElement(FormControl, { size: "small", sx: { minWidth: "180px", maxWidth: "210px" } },
+            React.createElement(Select, {
+              value: sortOrder,
+              onChange: (e) => setSortOrder(e.target.value),
+              sx: { borderRadius: "10px", backgroundColor: "#f8fafc", fontSize: "13px", color: "#334155", '& fieldset': { borderColor: "#e2e8f0" } }
+            },
+              React.createElement(MenuItem, { value: "DESC" }, "Más recientes primero"),
+              React.createElement(MenuItem, { value: "ASC" }, "Más antiguas primero")
+            )
+          ),
+
           // Filtro Fecha Inicio / Fecha Específica
           React.createElement(TextField, {
             type: "date",
@@ -471,7 +492,7 @@ function ReservationApprovalApp() {
             value: startDateFilter,
             onChange: (e) => setStartDateFilter(e.target.value),
             InputLabelProps: { shrink: true },
-            sx: { width: "150px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+            sx: { width: "140px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
           }),
 
           // Filtro Fecha Fin (Rango)
@@ -481,11 +502,11 @@ function ReservationApprovalApp() {
             value: endDateFilter,
             onChange: (e) => setEndDateFilter(e.target.value),
             InputLabelProps: { shrink: true },
-            sx: { width: "150px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+            sx: { width: "140px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
           }),
 
           // Botón Limpiar Filtros
-          (searchTerm || selectedSpaceFilter !== "ALL" || startDateFilter || endDateFilter) && React.createElement(Button, {
+          (searchTerm || selectedSpaceFilter !== "ALL" || startDateFilter || endDateFilter || sortOrder !== "DESC") && React.createElement(Button, {
             variant: "text",
             size: "small",
             onClick: handleClearFilters,
