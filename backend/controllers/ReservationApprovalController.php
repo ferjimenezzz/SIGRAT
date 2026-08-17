@@ -252,7 +252,7 @@ class ReservationApprovalController
         $isGroup = (strpos($reservationId, 'grp_') === 0 || !ctype_digit($reservationId));
         $idCol = $isGroup ? 'group_id' : 're_id';
 
-        $stmt = $this->pdo->prepare("SELECT re_id, status, estatus FROM reserva WHERE $idCol = :id FOR UPDATE");
+        $stmt = $this->pdo->prepare("SELECT re_id, status, estatus, esp_id, fecha_uso, hora_ent, hora_sal FROM reserva WHERE $idCol = :id FOR UPDATE");
         $stmt->execute([':id' => $reservationId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($rows)) throw new Exception('Reservation not found');
@@ -298,7 +298,9 @@ class ReservationApprovalController
                             $usuario['correo'],
                             $espacioNombre,
                             $reason ?? '',
-                            $fechasGroup
+                            $fechasGroup,
+                            $firstRow['hora_ent'] ?? '',
+                            $firstRow['hora_sal'] ?? ''
                         );
                     } else {
                         $this->emailService->sendReservationRejected(
@@ -306,7 +308,9 @@ class ReservationApprovalController
                             $firstRow['re_id'],
                             $reason ?? '',
                             $espacioNombre,
-                            $firstRow['fecha_uso'] ?? ''
+                            $firstRow['fecha_uso'] ?? '',
+                            $firstRow['hora_ent'] ?? '',
+                            $firstRow['hora_sal'] ?? ''
                         );
                     }
                 }
@@ -322,7 +326,7 @@ class ReservationApprovalController
         $idCol = $isGroup ? 'group_id' : 're_id';
 
         $where = $isAdmin ? "$idCol = :id" : "$idCol = :id AND us_id = :uid";
-        $stmt = $this->pdo->prepare("SELECT re_id, status FROM reserva WHERE $where FOR UPDATE");
+        $stmt = $this->pdo->prepare("SELECT re_id, status, estatus, esp_id, fecha_uso, hora_ent, hora_sal FROM reserva WHERE $where FOR UPDATE");
         
         $params = [':id' => $reservationId];
         if (!$isAdmin) $params[':uid'] = $userId;
@@ -363,7 +367,9 @@ class ReservationApprovalController
                             $usuario['correo'],
                             $espacioNombre,
                             $reason ?? '',
-                            $fechasGroup
+                            $fechasGroup,
+                            $firstRow['hora_ent'] ?? '',
+                            $firstRow['hora_sal'] ?? ''
                         );
                     } else {
                         $this->emailService->sendReservationCancelled(
@@ -371,7 +377,9 @@ class ReservationApprovalController
                             $firstRow['re_id'],
                             $reason ?? '',
                             $espacioNombre,
-                            $firstRow['fecha_uso'] ?? ''
+                            $firstRow['fecha_uso'] ?? '',
+                            $firstRow['hora_ent'] ?? '',
+                            $firstRow['hora_sal'] ?? ''
                         );
                     }
                 }

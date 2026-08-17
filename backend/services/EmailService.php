@@ -338,13 +338,25 @@ class EmailService {
      * @summary Envía correo cuando una reserva individual o masiva es rechazada.
      */
 
-    public function sendReservationRejected($to, $re_id, $motivo = '', $espacio_nombre = '', $fecha_uso = '') {
+    public function sendReservationRejected($to, $re_id, $motivo = '', $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
         $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
         $subject = "Reserva Rechazada - $nombreEspacio";
         $motivoHtml = $motivo ? "<div style='background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #991b1b;'><strong>Motivo del rechazo:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
+        
+        $detallesHtml = "
+        <div style='background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #991b1b; font-size: 15px;'>Detalles de la Reserva Solicitada:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #7f1d1d; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($fecha_uso ? "<li><strong>Fecha:</strong> $fecha_uso</li>" : "") . "
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+            </ul>
+        </div>";
+
         $contentHtml = "
             <h2 style='color: #ef4444; margin-top: 0; font-size: 20px;'>Reserva No Autorizada</h2>
-            <p>Lamentamos informarte que tu solicitud de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong>" . ($fecha_uso ? " (para la fecha $fecha_uso)" : "") . " ha sido <strong style='color: #ef4444;'>rechazada</strong>.</p>
+            <p>Lamentamos informarte que tu solicitud de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> ha sido <strong style='color: #ef4444;'>rechazada</strong>.</p>
+            $detallesHtml
             $motivoHtml
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
@@ -353,7 +365,7 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
-    public function sendBulkReservationRejected($to, $espacio_nombre, $motivo = '', $fechas = []) {
+    public function sendBulkReservationRejected($to, $espacio_nombre, $motivo = '', $fechas = [], $hora_ent = '', $hora_sal = '') {
         $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
         $subject = "Reserva Rechazada (Múltiples Días) - $nombreEspacio";
         $motivoHtml = $motivo ? "<div style='background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #991b1b;'><strong>Motivo del rechazo:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
@@ -363,12 +375,23 @@ class EmailService {
             $listaFechas .= "<li style='margin-bottom: 6px;'>Fecha: <strong>" . htmlspecialchars($f) . "</strong></li>";
         }
 
+        $detallesHtml = "
+        <div style='background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #991b1b; font-size: 15px;'>Detalles de las Fechas Solicitadas:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #7f1d1d; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+                <li><strong>Total de días:</strong> " . count($fechas) . " día(s)</li>
+            </ul>
+        </div>";
+
         $contentHtml = "
             <h2 style='color: #ef4444; margin-top: 0; font-size: 20px;'>Reservas No Autorizadas</h2>
             <p>Lamentamos informarte que tus solicitudes de reserva por múltiples días para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> (" . count($fechas) . " día/s) han sido <strong style='color: #ef4444;'>rechazadas</strong>.</p>
             <ul style='padding-left: 20px; color: #334155;'>
                 $listaFechas
             </ul>
+            $detallesHtml
             $motivoHtml
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
@@ -385,13 +408,25 @@ class EmailService {
      * @summary Envía correo cuando una reserva individual o masiva es cancelada.
      */
 
-    public function sendReservationCancelled($to, $re_id, $motivo = '', $espacio_nombre = '', $fecha_uso = '') {
+    public function sendReservationCancelled($to, $re_id, $motivo = '', $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
         $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
         $subject = "Reserva Cancelada - $nombreEspacio";
         $motivoHtml = $motivo ? "<div style='background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #92400e;'><strong>Motivo de cancelación:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
+        
+        $detallesHtml = "
+        <div style='background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #92400e; font-size: 15px;'>Detalles de la Reserva Cancelada:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #b45309; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($fecha_uso ? "<li><strong>Fecha:</strong> $fecha_uso</li>" : "") . "
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+            </ul>
+        </div>";
+
         $contentHtml = "
             <h2 style='color: #f59e0b; margin-top: 0; font-size: 20px;'>Reserva Cancelada</h2>
-            <p>Te informamos que tu reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong>" . ($fecha_uso ? " (para la fecha $fecha_uso)" : "") . " ha sido <strong style='color: #f59e0b;'>cancelada</strong>.</p>
+            <p>Te informamos que tu reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> ha sido <strong style='color: #f59e0b;'>cancelada</strong>.</p>
+            $detallesHtml
             $motivoHtml
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
@@ -400,7 +435,7 @@ class EmailService {
         return $this->sendEmail($to, $subject, $body);
     }
 
-    public function sendBulkReservationCancelled($to, $espacio_nombre, $motivo = '', $fechas = []) {
+    public function sendBulkReservationCancelled($to, $espacio_nombre, $motivo = '', $fechas = [], $hora_ent = '', $hora_sal = '') {
         $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
         $subject = "Reserva Cancelada (Múltiples Días) - $nombreEspacio";
         $motivoHtml = $motivo ? "<div style='background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #92400e;'><strong>Motivo de cancelación:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
@@ -410,12 +445,23 @@ class EmailService {
             $listaFechas .= "<li style='margin-bottom: 6px;'>Fecha: <strong>" . htmlspecialchars($f) . "</strong></li>";
         }
 
+        $detallesHtml = "
+        <div style='background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #92400e; font-size: 15px;'>Detalles de las Fechas Canceladas:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #b45309; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+                <li><strong>Total de días:</strong> " . count($fechas) . " día(s)</li>
+            </ul>
+        </div>";
+
         $contentHtml = "
             <h2 style='color: #f59e0b; margin-top: 0; font-size: 20px;'>Reservas Canceladas</h2>
             <p>Te informamos que tus reservas por múltiples días para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> (" . count($fechas) . " día/s) han sido <strong style='color: #f59e0b;'>canceladas</strong>.</p>
             <ul style='padding-left: 20px; color: #334155;'>
                 $listaFechas
             </ul>
+            $detallesHtml
             $motivoHtml
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
