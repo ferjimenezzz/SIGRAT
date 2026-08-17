@@ -79,9 +79,10 @@ function handleReservationApproval(string $method, string $path)
         strpos($userRol, 'DOCENTE') !== false || 
         strpos($userRol, 'PROFESOR') !== false
     );
-    // Para el Maestro, $isAdmin es false para que getByStatus y cancel filtren únicamente SUS propias reservas (us_id)
-    $isAdmin = (strpos($userRol, 'ADMIN') !== false || $userRol === 'SUPER ADMINISTRADOR') && !$isMaestro;
-    $canManageApprovals = $isAdmin || $isMaestro;
+    $isVisita = ($userRol === 'INVITADO' || $userRol === 'VISITA' || strpos($userRol, 'VISIT') !== false);
+    // Para Maestro y Visita, $isAdmin es false para que getByStatus y cancel me filtren únicamente SUS propias reservas (us_id)
+    $isAdmin = (strpos($userRol, 'ADMIN') !== false || $userRol === 'SUPER ADMINISTRADOR') && !($isMaestro || $isVisita);
+    $canManageApprovals = $isAdmin || $isMaestro || $isVisita;
 
     // Permitir acceso a administradores, maestros/docentes y personal autorizado.
     $allowedActions = ['cancel', 'pending', 'approved', 'cancelled', 'approve', 'reject'];
