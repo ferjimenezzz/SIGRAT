@@ -457,11 +457,11 @@ function ReservationApprovalApp() {
             value: searchTerm, 
             onChange: (e) => setSearchTerm(e.target.value), 
             InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
-            sx: { minWidth: "180px", maxWidth: "220px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
+            sx: { width: "170px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
           }),
 
           // Filtro por Espacio
-          React.createElement(FormControl, { size: "small", sx: { minWidth: "170px", maxWidth: "200px" } },
+          React.createElement(FormControl, { size: "small", sx: { width: "160px" } },
             React.createElement(Select, {
               value: selectedSpaceFilter,
               onChange: (e) => setSelectedSpaceFilter(e.target.value),
@@ -474,14 +474,14 @@ function ReservationApprovalApp() {
           ),
 
           // Ordenamiento por Fecha/Tiempo
-          React.createElement(FormControl, { size: "small", sx: { minWidth: "180px", maxWidth: "210px" } },
+          React.createElement(FormControl, { size: "small", sx: { width: "175px" } },
             React.createElement(Select, {
               value: sortOrder,
               onChange: (e) => setSortOrder(e.target.value),
               sx: { borderRadius: "10px", backgroundColor: "#f8fafc", fontSize: "13px", color: "#334155", '& fieldset': { borderColor: "#e2e8f0" } }
             },
-              React.createElement(MenuItem, { value: "DESC" }, "Más recientes primero"),
-              React.createElement(MenuItem, { value: "ASC" }, "Más antiguas primero")
+              React.createElement(MenuItem, { value: "DESC" }, "De nuevas a antiguas"),
+              React.createElement(MenuItem, { value: "ASC" }, "De antiguas a nuevas")
             )
           ),
 
@@ -492,7 +492,7 @@ function ReservationApprovalApp() {
             value: startDateFilter,
             onChange: (e) => setStartDateFilter(e.target.value),
             InputLabelProps: { shrink: true },
-            sx: { width: "140px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+            sx: { width: "130px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
           }),
 
           // Filtro Fecha Fin (Rango)
@@ -502,7 +502,7 @@ function ReservationApprovalApp() {
             value: endDateFilter,
             onChange: (e) => setEndDateFilter(e.target.value),
             InputLabelProps: { shrink: true },
-            sx: { width: "140px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+            sx: { width: "130px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
           }),
 
           // Botón Limpiar Filtros
