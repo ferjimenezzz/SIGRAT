@@ -81,7 +81,7 @@ class ReservationApprovalController
             $params[':uid'] = $userId;
         }
 
-        // Fetch all matching
+        // Fetch all matching ordered by ID descending (newest first)
         $stmt = $this->pdo->prepare("
             SELECT r.re_id, r.esp_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.status, r.estatus, r.group_id, r.cancel_reason,
                    u.nombre AS usuario_nombre, e.nombre_numero AS espacio_nombre
@@ -89,7 +89,7 @@ class ReservationApprovalController
             LEFT JOIN usuario u ON r.us_id = u.us_id
             LEFT JOIN espacio e ON r.esp_id = e.esp_id
             WHERE $where
-            ORDER BY r.fecha_uso DESC, r.hora_ent DESC
+            ORDER BY r.re_id DESC
             LIMIT 500
         ");
         $stmt->execute($params);
@@ -112,21 +112,27 @@ class ReservationApprovalController
         }
         unset($row);
 
-        // Grouping logic in PHP
+        // Grouping logic in PHP preserving sort_id for absolute creation ordering
         $grouped = [];
         $result = [];
         foreach ($rows as $row) {
+            $rowId = (int)$row['re_id'];
             if (!empty($row['group_id'])) {
                 $gid = $row['group_id'];
                 if (!isset($grouped[$gid])) {
                     $grouped[$gid] = $row;
                     $grouped[$gid]['re_id'] = $gid; // Use group_id as the ID for frontend to act upon
+                    $grouped[$gid]['sort_id'] = $rowId;
                     $grouped[$gid]['fechas_agrupadas'] = [$row['fecha_uso']];
                     $grouped[$gid]['fecha_uso'] = 'Múltiples fechas';
                 } else {
                     $grouped[$gid]['fechas_agrupadas'][] = $row['fecha_uso'];
+                    if ($rowId > $grouped[$gid]['sort_id']) {
+                        $grouped[$gid]['sort_id'] = $rowId;
+                    }
                 }
             } else {
+                $row['sort_id'] = $rowId;
                 $result[] = $row;
             }
         }
@@ -136,6 +142,11 @@ class ReservationApprovalController
             $group['fecha_uso'] = "Múltiples fechas ($count días)";
             $result[] = $group;
         }
+
+        // Ordenar todo el resultado por sort_id DESC (reservas más nuevas arriba, más viejas abajo)
+        usort($result, function($a, $b) {
+            return ($b['sort_id'] ?? 0) <=> ($a['sort_id'] ?? 0);
+        });
 
         return $result;
     }
