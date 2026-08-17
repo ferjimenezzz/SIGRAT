@@ -434,9 +434,9 @@ function ReservationApprovalApp() {
     error && React.createElement(Alert, { severity: "error", sx: { mb: 3, width: "100%" } }, error), 
 
     // BARRA DE FILTROS SUPERIOR
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "12px", width: "100%", marginBottom: "16px" } }, 
-      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" } }, 
-        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" } },
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "16px", width: "100%", marginBottom: "16px" } }, 
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", flexWrap: "wrap", gap: "12px" } }, 
+        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", flex: 1 } },
           React.createElement(TextField, { 
             id: "tutorial-search", 
             placeholder: isMaestroOrVisita ? "Buscar espacio..." : "Buscar ID, usuario o espacio...", 
@@ -445,11 +445,11 @@ function ReservationApprovalApp() {
             value: searchTerm, 
             onChange: (e) => setSearchTerm(e.target.value), 
             InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
-            sx: { width: "240px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
+            sx: { minWidth: "200px", maxWidth: "240px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
           }),
 
           // Filtro por Espacio
-          React.createElement(FormControl, { size: "small", sx: { width: "200px" } },
+          React.createElement(FormControl, { size: "small", sx: { minWidth: "180px", maxWidth: "220px" } },
             React.createElement(Select, {
               value: selectedSpaceFilter,
               onChange: (e) => setSelectedSpaceFilter(e.target.value),
@@ -467,10 +467,8 @@ function ReservationApprovalApp() {
             size: "small",
             value: startDateFilter,
             onChange: (e) => setStartDateFilter(e.target.value),
-            helperText: "",
             InputLabelProps: { shrink: true },
-            placeholder: "Fecha desde",
-            sx: { width: "160px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+            sx: { width: "150px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
           }),
 
           // Filtro Fecha Fin (Rango)
@@ -480,7 +478,7 @@ function ReservationApprovalApp() {
             value: endDateFilter,
             onChange: (e) => setEndDateFilter(e.target.value),
             InputLabelProps: { shrink: true },
-            sx: { width: "160px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+            sx: { width: "150px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
           }),
 
           // Botón Limpiar Filtros
@@ -488,20 +486,20 @@ function ReservationApprovalApp() {
             variant: "text",
             size: "small",
             onClick: handleClearFilters,
-            sx: { color: "#ef4444", fontWeight: 700, textTransform: "none", fontSize: "12px" }
+            sx: { color: "#ef4444", fontWeight: 700, textTransform: "none", fontSize: "12px", whiteSpace: "nowrap" }
           }, React.createElement("i", { className: "bi bi-x-circle", style: { marginRight: "4px" } }), "Limpiar Filtros"),
 
           React.createElement(Button, {
             variant: "outlined",
             size: "small",
             onClick: () => fetchReservations(currentTab === 0 ? "pending" : currentTab === 1 ? "approved" : "cancelled"),
-            sx: { borderRadius: "10px", height: "40px", borderColor: "#e2e8f0", color: "#475569", fontWeight: 700, textTransform: "none", '&:hover': { borderColor: "#cbd5e1", backgroundColor: "#f8fafc" } }
+            sx: { borderRadius: "10px", height: "40px", borderColor: "#e2e8f0", color: "#475569", fontWeight: 700, textTransform: "none", flexShrink: 0, '&:hover': { borderColor: "#cbd5e1", backgroundColor: "#f8fafc" } }
           }, React.createElement("i", { className: "bi bi-arrow-clockwise", style: { marginRight: "6px", fontSize: "14px" } }), "Actualizar")
         ), 
-        React.createElement(Tabs, { id: "tutorial-tabs", value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, 
-          React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px" } }), 
-          React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px" } }), 
-          React.createElement(Tab, { label: "Canceladas", sx: { fontWeight: 800, fontSize: "14px" } })
+        React.createElement(Tabs, { id: "tutorial-tabs", value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { flexShrink: 0, '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, 
+          React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px", minWidth: "auto", px: 2 } }), 
+          React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px", minWidth: "auto", px: 2 } }), 
+          React.createElement(Tab, { label: "Canceladas", sx: { fontWeight: 800, fontSize: "14px", minWidth: "auto", px: 2 } })
         )
       )
     ), 
