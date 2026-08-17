@@ -158,31 +158,41 @@ class ReservationApprovalController
 
             $targetEspId = $newEspId ? $newEspId : $rows[0]['esp_id'];
 
-            foreach ($rows as $row) {
-                if ($row['status'] !== 'pending' && $row['estatus'] !== 'Pendiente') {
-                    throw new Exception('Solo las reservas pendientes pueden ser aprobadas.');
-                }
-                $overlapStmt = $this->pdo->prepare("SELECT COUNT(*) FROM reserva WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND (status = 'approved' OR estatus = 'Aprobada') AND hora_ent < :hora_sal AND hora_sal > :hora_ent");
-                $overlapStmt->execute([':esp_id' => $targetEspId, ':fecha_uso' => $row['fecha_uso'], ':hora_sal' => $row['hora_sal'], ':hora_ent' => $row['hora_ent']]);
+            // Filtrar únicamente las fechas que permanecen pendientes en la solicitud
+            $pendingRows = array_filter($rows, function($r) {
+                $st = strtolower(trim($r['status'] ?? ''));
+                $est = strtolower(trim($r['estatus'] ?? ''));
+                return ($st === 'pending' || $est === 'pendiente');
+            });
+
+            if (empty($pendingRows)) {
+                throw new Exception('No hay fechas pendientes por aprobar en esta solicitud (pueden haber expirado o sido procesadas).');
+            }
+
+            $targetEspId = $newEspId ? $newEspId : $rows[0]['esp_id'];
+
+            foreach ($pendingRows as $row) {
+                $overlapStmt = $this->pdo->prepare("SELECT COUNT(*) FROM reserva WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND (status = 'approved' OR estatus = 'Aprobada') AND hora_ent < :hora_sal AND hora_sal > :hora_ent AND re_id != :re_id AND (group_id IS NULL OR group_id != :id)");
+                $overlapStmt->execute([':esp_id' => $targetEspId, ':fecha_uso' => $row['fecha_uso'], ':hora_sal' => $row['hora_sal'], ':hora_ent' => $row['hora_ent'], ':re_id' => $row['re_id'], ':id' => $reservationId]);
                 if ($overlapStmt->fetchColumn() > 0) {
                     throw new Exception('El espacio seleccionado ya cuenta con una reservación aprobada para la fecha ' . $row['fecha_uso']);
                 }
             }
 
-            // Update status to approved, and update space if changed
-            $update = $this->pdo->prepare("UPDATE reserva SET status = 'approved', estatus = 'Aprobada', esp_id = :esp_id, approved_by = :admin, approved_at = NOW() WHERE $idCol = :id");
+            // Actualizar a Aprobada únicamente las reservaciones pendientes del grupo
+            $update = $this->pdo->prepare("UPDATE reserva SET status = 'approved', estatus = 'Aprobada', esp_id = :esp_id, approved_by = :admin, approved_at = NOW() WHERE $idCol = :id AND (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente')");
             $update->execute([':esp_id' => $targetEspId, ':admin' => $adminId, ':id' => $reservationId]);
             $this->logAction($adminId, 'Aprobó reserva(s) ' . $reservationId . ($newEspId ? " (Reasignada a espacio $newEspId)" : ""), 'reserva');
 
             require_once __DIR__ . '/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
 
-            foreach ($rows as $row) {
-                // Automatically reject overlapping pending reservations
+            foreach ($pendingRows as $row) {
+                // Rechazar automáticamente reservaciones pendientes que se empalmen
                 $rejectStmt = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = 'Rechazo automático por empalme', approved_by = :admin, approved_at = NOW() WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND (status = 'pending' OR estatus = 'Pendiente') AND hora_ent < :hora_sal AND hora_sal > :hora_ent AND re_id != :id");
                 $rejectStmt->execute([':admin' => $adminId, ':esp_id' => $targetEspId, ':fecha_uso' => $row['fecha_uso'], ':hora_sal' => $row['hora_sal'], ':hora_ent' => $row['hora_ent'], ':id' => $row['re_id']]);
 
-                // Notify user
+                // Notificar al usuario
                 try {
                     $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
                     $stmtUser->execute([':id' => $row['re_id']]);
@@ -216,18 +226,24 @@ class ReservationApprovalController
         $stmt->execute([':id' => $reservationId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($rows)) throw new Exception('Reservation not found');
-        foreach ($rows as $row) {
-            if ($row['status'] !== 'pending' && $row['estatus'] !== 'Pendiente') throw new Exception('Only pending reservations can be rejected');
+        $pendingRows = array_filter($rows, function($r) {
+            $st = strtolower(trim($r['status'] ?? ''));
+            $est = strtolower(trim($r['estatus'] ?? ''));
+            return ($st === 'pending' || $est === 'pendiente');
+        });
+
+        if (empty($pendingRows)) {
+            throw new Exception('No hay fechas pendientes por rechazar en esta solicitud.');
         }
 
-        $update = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = :reason, approved_by = :admin, approved_at = NOW() WHERE $idCol = :id");
+        $update = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = :reason, approved_by = :admin, approved_at = NOW() WHERE $idCol = :id AND (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente')");
         $update->execute([':reason' => $reason, ':admin' => $adminId, ':id' => $reservationId]);
         $this->logAction($adminId, 'Rechazó reserva(s) ' . $reservationId . ($reason ? ': ' . $reason : ''), 'reserva');
 
         try {
             require_once __DIR__ . '/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
-            foreach ($rows as $row) {
+            foreach ($pendingRows as $row) {
                 $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
                 $stmtUser->execute([':id' => $row['re_id']]);
                 $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
