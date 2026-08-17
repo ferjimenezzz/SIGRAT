@@ -69,8 +69,13 @@ class CalendarController {
      */
 
     public function getEventsFiltered($edificio = null, $esp_id = null, $tipo = null, $fecha_inicio = null, $fecha_fin = null, $us_id = null, $status = null) {
-        // 1. Auto-cancel expired pending reservations, ajustado a hora de México
-        $this->db->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente') AND (fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date OR (fecha_uso = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date AND hora_sal <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::time))");
+        // 1. Auto-cancelar reservaciones pendientes expiradas (compatibilidad MySQL y SQL estándar)
+        try {
+            $this->db->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente') AND (fecha_uso < CURDATE() OR (fecha_uso = CURDATE() AND hora_sal <= CURRENT_TIME()))");
+        } catch (\PDOException $e) {
+            // Fallback por si la versión del motor de BD difiere
+            error_log("Error en auto-cancelación del calendario: " . $e->getMessage());
+        }
 
         $query = "SELECT r.*, e.nombre_numero, e.tipo as espacio_tipo, e.edificio, e.capacidad as espacio_capacidad, u.nombre as usuario_nombre, u.correo as usuario_correo
                   FROM reserva r
@@ -100,12 +105,14 @@ class CalendarController {
             $params[] = $fecha_fin;
         }
         if ($us_id) {
-            $query .= " AND r.us_id = ?";
+            // Permitir ver reservaciones aprobadas de cualquier usuario (para consultar ocupación real) más las reservaciones propias del usuario en cualquier estado
+            $query .= " AND (r.estatus IN ('Aprobada', 'Aprobado') OR r.status = 'approved' OR r.us_id = ?)";
             $params[] = (int)$us_id;
         }
         if ($status) {
-            // Estatus puede ser Aprobada, Pendiente, Rechazada
-            $query .= " AND r.estatus = ?";
+            // Estatus puede ser Aprobada, Pendiente, Rechazada (soporte para estatus y status)
+            $query .= " AND (r.estatus = ? OR r.status = ?)";
+            $params[] = $status;
             $params[] = $status;
         }
         

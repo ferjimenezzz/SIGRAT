@@ -2914,14 +2914,14 @@ include 'header.php';
          function openResModal(defaultDate = null) {
             window.lastLoadedDate = "";
             // Rellenar fecha seleccionada
-            const todayStr = defaultDate || new Date().toISOString().split('T')[0];
+            const todayStr = defaultDate || formatDateLocal(new Date());
             document.getElementById('resFecha').value = todayStr;
             document.getElementById('resFechaInicio').value = todayStr;
             
             // Calcular fecha fin (hoy + 7 días por defecto para facilidad)
             const dFin = new Date(todayStr + 'T00:00:00');
             dFin.setDate(dFin.getDate() + 7);
-            document.getElementById('resFechaFin').value = dFin.toISOString().split('T')[0];
+            document.getElementById('resFechaFin').value = formatDateLocal(dFin);
             
             // Vaciar y resetear campos
             document.getElementById('resEdificio').value = "PIDET";
@@ -4046,6 +4046,15 @@ include 'header.php';
         renderActiveCalendar();
     }
 
+    // FUNCIÓN AUXILIAR: Formato de fecha YYYY-MM-DD en hora local
+    function formatDateLocal(d) {
+        if (!d || !(d instanceof Date) || isNaN(d.getTime())) return '';
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
     // ----------------------------------------------------
     // FUNCIÓN DE FILTRADO LOCAL DE EVENTOS Y ESPACIOS
     // ----------------------------------------------------
@@ -4082,8 +4091,10 @@ include 'header.php';
                 if (state.filters.status === 'Pendiente' && evStatus !== 'Pendiente' && evStatus !== 'pending') return false;
             }
 
-            // Filtro de Horario
-            if (ev.hora_ent < state.filters.hora_inicio || ev.hora_sal > state.filters.hora_fin) {
+            // Filtro de Horario (normalizado a HH:MM para evitar truncamiento con HH:MM:SS)
+            const hEnt = (ev.hora_ent || '').substring(0, 5);
+            const hSal = (ev.hora_sal || '').substring(0, 5);
+            if (hEnt < state.filters.hora_inicio || hSal > state.filters.hora_fin) {
                 return false;
             }
 
@@ -4178,7 +4189,7 @@ include 'header.php';
         }
 
         const filteredEvents = getFilteredEvents();
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = formatDateLocal(new Date());
 
         // Crear elementos HTML
         cells.forEach(cell => {
@@ -4186,7 +4197,7 @@ include 'header.php';
             cellEl.className = 'month-day-cell';
             if (!cell.currentMonth) cellEl.classList.add('other-month');
             
-            const cellDateStr = cell.date.toISOString().split('T')[0];
+            const cellDateStr = formatDateLocal(cell.date);
             if (cellDateStr === todayStr) cellEl.classList.add('today');
 
             // Número de día
@@ -4267,7 +4278,7 @@ include 'header.php';
         weekDates.forEach((wDate, idx) => {
             const dayNum = wDate.getDate();
             const monthShort = mesesEsp[wDate.getMonth()].substring(0,3);
-            const isToday = wDate.toISOString().split('T')[0] === new Date().toISOString().split('T')[0];
+            const isToday = formatDateLocal(wDate) === formatDateLocal(new Date());
             const activeCircle = isToday ? 'style="background:var(--active-blue); color:white; border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center;"' : '';
             
             headerHtml += `<th>
@@ -4304,7 +4315,7 @@ include 'header.php';
             // Columnas de días
             weekDates.forEach(wDate => {
                 const dayTd = document.createElement('td');
-                const dateStr = wDate.toISOString().split('T')[0];
+                const dateStr = formatDateLocal(wDate);
 
                 const cellContainer = document.createElement('div');
                 cellContainer.className = 'week-cell-slots-container';
@@ -4371,7 +4382,7 @@ include 'header.php';
         const filteredSpaces = getFilteredSpaces();
         
         const d = state.currentDate;
-        const dateStr = d.toISOString().split('T')[0];
+        const dateStr = formatDateLocal(d);
 
         // Reservas de hoy (de la fecha actual de navegación)
         const todayEvents = filteredEvents.filter(ev => ev.fecha_uso === dateStr);

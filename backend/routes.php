@@ -41,7 +41,7 @@ function handleReservationApproval(string $method, string $path)
     if (in_array($reservationId, ['pending', 'approved', 'cancelled']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $action = $reservationId;
         $reservationId = null;
-    } elseif ((!ctype_digit($reservationId) && strpos($reservationId, 'grp_') !== 0) || !in_array($action, ['approve', 'reject', 'cancel'])) {
+    } elseif (empty($reservationId) || !in_array($action, ['approve', 'reject', 'cancel'])) {
         return false; // Formato de ID o acción no válidos
     }
 

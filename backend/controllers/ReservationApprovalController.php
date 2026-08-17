@@ -50,8 +50,12 @@ class ReservationApprovalController
      */
     public function getByStatus(int $userId, bool $isAdmin, string $status = 'pending'): array
     {
-        // 1. Auto-cancel expired pending reservations (sólo si ya pasó la fecha de uso o el horario final en el día de hoy, ajustado a hora de México)
-        $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente') AND (fecha_uso < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date OR (fecha_uso = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::date AND hora_sal <= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Mexico_City')::time))");
+        // 1. Auto-cancelar reservaciones pendientes expiradas (compatibilidad MySQL y SQL estándar)
+        try {
+            $this->pdo->exec("UPDATE reserva SET status = 'cancelled', estatus = 'Cancelada', cancel_reason = 'Expirada automáticamente por falta de aprobación a tiempo' WHERE (LOWER(status) = 'pending' OR LOWER(estatus) = 'pendiente') AND (fecha_uso < CURDATE() OR (fecha_uso = CURDATE() AND hora_sal <= CURRENT_TIME()))");
+        } catch (\Exception $e) {
+            error_log("Error auto-cancelación en ReservationApprovalController: " . $e->getMessage());
+        }
 
         // 2. Fetch based on status
         if ($status === 'cancelled') {
@@ -141,7 +145,7 @@ class ReservationApprovalController
         try {
             $this->pdo->beginTransaction();
 
-            $isGroup = strpos($reservationId, 'grp_') === 0;
+            $isGroup = (strpos($reservationId, 'grp_') === 0 || !ctype_digit($reservationId));
             $idCol = $isGroup ? 'group_id' : 're_id';
 
             // Verify reservation exists and is pending
@@ -205,7 +209,7 @@ class ReservationApprovalController
 
     public function reject(string $reservationId, int $adminId, ?string $reason = null): void
     {
-        $isGroup = strpos($reservationId, 'grp_') === 0;
+        $isGroup = (strpos($reservationId, 'grp_') === 0 || !ctype_digit($reservationId));
         $idCol = $isGroup ? 'group_id' : 're_id';
 
         $stmt = $this->pdo->prepare("SELECT re_id, status, estatus FROM reserva WHERE $idCol = :id FOR UPDATE");
@@ -241,7 +245,7 @@ class ReservationApprovalController
 
     public function cancel(string $reservationId, int $userId, bool $isAdmin, string $reason): void
     {
-        $isGroup = strpos($reservationId, 'grp_') === 0;
+        $isGroup = (strpos($reservationId, 'grp_') === 0 || !ctype_digit($reservationId));
         $idCol = $isGroup ? 'group_id' : 're_id';
 
         $where = $isAdmin ? "$idCol = :id" : "$idCol = :id AND us_id = :uid";
