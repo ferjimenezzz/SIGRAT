@@ -193,24 +193,22 @@ class EmailService {
      */
 
     public function sendReservationCreated($to, $re_id, $estatus, $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
-        $subject = "Confirmación de solicitud de reserva #$re_id";
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Confirmación de solicitud de reserva - $nombreEspacio";
         
-        $detallesHtml = "";
-        if ($espacio_nombre) {
-            $detallesHtml = "
-            <div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
-                <h3 style='margin: 0 0 12px 0; color: #1E335F; font-size: 15px;'>Detalles de la Solicitud:</h3>
-                <ul style='margin: 0; padding-left: 20px; color: #334155; line-height: 1.8;'>
-                    <li><strong>Lugar:</strong> $espacio_nombre</li>
-                    <li><strong>Fecha:</strong> $fecha_uso</li>
-                    <li><strong>Horario:</strong> $hora_ent - $hora_sal</li>
-                </ul>
-            </div>";
-        }
+        $detallesHtml = "
+        <div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #1E335F; font-size: 15px;'>Detalles de la Solicitud:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #334155; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($fecha_uso ? "<li><strong>Fecha:</strong> $fecha_uso</li>" : "") . "
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+            </ul>
+        </div>";
 
         $contentHtml = "
             <h2 style='color: #1E335F; margin-top: 0; font-size: 20px;'>Notificación del Sistema de Reservas</h2>
-            <p>Tu solicitud de reserva con el folio <strong style='color: #1E335F;'>#$re_id</strong> ha sido registrada en el sistema.</p>
+            <p>Tu solicitud de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> ha sido registrada en el sistema.</p>
             $detallesHtml
             <p>El estatus actual de tu solicitud es: <span style='background-color: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 6px; font-weight: bold;'>$estatus</span>.</p>
             <p>Si el estatus es Pendiente, un administrador revisará tu solicitud y te notificará por este mismo medio una vez que sea autorizada o rechazada.</p>
@@ -227,46 +225,36 @@ class EmailService {
 // ============================================================================
     /**
      * @summary Envía correo de confirmación para reservas múltiples.
-     * 
-     * @param string $to Correo del usuario.
-     * @param array $re_ids Array de IDs de reservas.
-     * @param array $fechas Array de fechas correspondientes.
-     * @param string $estatus Estatus inicial.
-     * @param string $espacio_nombre Nombre del espacio (opcional).
-     * @param string $hora_ent Hora de entrada (opcional).
-     * @param string $hora_sal Hora de salida (opcional).
      */
 
     public function sendBulkReservationCreated($to, $re_ids, $fechas, $estatus, $espacio_nombre = '', $hora_ent = '', $hora_sal = '') {
-        $subject = "Confirmación de solicitudes de reserva múltiples";
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Confirmación de solicitud de reserva múltiple - $nombreEspacio";
         
         $listaReservas = "";
-        for ($i = 0; $i < count($re_ids); $i++) {
-            $fechaStr = isset($fechas[$i]) ? $fechas[$i] : '';
-            $listaReservas .= "<li style='margin-bottom: 6px;'>Reserva <strong style='color: #1E335F;'>#" . $re_ids[$i] . "</strong> para el día <strong>" . $fechaStr . "</strong></li>";
+        foreach ($fechas as $fechaStr) {
+            $listaReservas .= "<li style='margin-bottom: 6px;'>Fecha solicitada: <strong>" . htmlspecialchars($fechaStr) . "</strong></li>";
         }
 
-        $detallesHtml = "";
-        if ($espacio_nombre) {
-            $detallesHtml = "
-            <div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
-                <h3 style='margin: 0 0 12px 0; color: #1E335F; font-size: 15px;'>Detalles Compartidos:</h3>
-                <ul style='margin: 0; padding-left: 20px; color: #334155; line-height: 1.8;'>
-                    <li><strong>Lugar:</strong> $espacio_nombre</li>
-                    <li><strong>Horario:</strong> $hora_ent - $hora_sal</li>
-                </ul>
-            </div>";
-        }
+        $detallesHtml = "
+        <div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #1E335F; font-size: 15px;'>Detalles de la Solicitud:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #334155; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+                <li><strong>Total de días:</strong> " . count($fechas) . " día(s)</li>
+            </ul>
+        </div>";
 
         $contentHtml = "
-            <h2 style='color: #1E335F; margin-top: 0; font-size: 20px;'>Notificación de Reservas Múltiples</h2>
-            <p>Tus solicitudes de reserva han sido registradas en el sistema exitosamente:</p>
+            <h2 style='color: #1E335F; margin-top: 0; font-size: 20px;'>Notificación de Reserva por Múltiples Días</h2>
+            <p>Tus solicitudes de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> han sido registradas exitosamente para los siguientes días:</p>
             <ul style='padding-left: 20px; color: #334155;'>
                 $listaReservas
             </ul>
             $detallesHtml
-            <p>El estatus actual de estas solicitudes es: <span style='background-color: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 6px; font-weight: bold;'>$estatus</span>.</p>
-            <p>Si el estatus es Pendiente, un administrador revisará tus solicitudes y te notificará por este mismo medio.</p>
+            <p>El estatus actual de tus solicitudes es: <span style='background-color: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 6px; font-weight: bold;'>$estatus</span>.</p>
+            <p>Un administrador revisará tu solicitud y te notificará por este mismo medio.</p>
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
         ";
@@ -276,34 +264,63 @@ class EmailService {
 
 
 // ============================================================================
-// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationApproved)
+// SECCIÓN 6: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationApproved & sendBulkReservationApproved)
 // ============================================================================
     /**
-     * @summary Envía correo cuando una reserva es autorizada.
-     * 
-     * @param string $to Correo del usuario.
-     * @param int $re_id ID de la reserva.
+     * @summary Envía correo cuando una reserva individual o masiva es autorizada.
      */
 
     public function sendReservationApproved($to, $re_id, $espacio_nombre = '', $fecha_uso = '', $hora_ent = '', $hora_sal = '') {
-        $subject = "Reserva Aprobada #$re_id";
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Reserva Aprobada - $nombreEspacio";
         
-        $detallesHtml = "";
-        if ($espacio_nombre) {
-            $detallesHtml = "
-            <div style='background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
-                <h3 style='margin: 0 0 12px 0; color: #166534; font-size: 15px;'>Detalles de la Reserva Autorizada:</h3>
-                <ul style='margin: 0; padding-left: 20px; color: #15803d; line-height: 1.8;'>
-                    <li><strong>Lugar:</strong> $espacio_nombre</li>
-                    <li><strong>Fecha:</strong> $fecha_uso</li>
-                    <li><strong>Horario:</strong> $hora_ent - $hora_sal</li>
-                </ul>
-            </div>";
-        }
+        $detallesHtml = "
+        <div style='background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #166534; font-size: 15px;'>Detalles de la Reserva Autorizada:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #15803d; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($fecha_uso ? "<li><strong>Fecha:</strong> $fecha_uso</li>" : "") . "
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+            </ul>
+        </div>";
 
         $contentHtml = "
             <h2 style='color: #10b981; margin-top: 0; font-size: 20px;'>¡Tu reserva ha sido Aprobada!</h2>
-            <p>Nos complace informarte que tu solicitud de reserva con el folio <strong style='color: #1E335F;'>#$re_id</strong> ha sido <strong style='color: #10b981;'>autorizada</strong>.</p>
+            <p>Nos complace informarte que tu solicitud de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> ha sido <strong style='color: #10b981;'>autorizada</strong>.</p>
+            $detallesHtml
+            <p>Por favor, asegúrate de cumplir con los lineamientos institucionales y los horarios de uso del espacio asignado.</p>
+            <br>
+            <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
+        ";
+        $body = $this->wrapEmailTemplate($subject, $contentHtml);
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    public function sendBulkReservationApproved($to, $espacio_nombre, $fechas = [], $hora_ent = '', $hora_sal = '') {
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Reserva Aprobada (Múltiples Días) - $nombreEspacio";
+        
+        $listaFechas = "";
+        foreach ($fechas as $f) {
+            $listaFechas .= "<li style='margin-bottom: 6px;'>Fecha aprobada: <strong>" . htmlspecialchars($f) . "</strong></li>";
+        }
+
+        $detallesHtml = "
+        <div style='background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px 20px; margin: 20px 0;'>
+            <h3 style='margin: 0 0 12px 0; color: #166534; font-size: 15px;'>Detalles de las Fechas Autorizadas:</h3>
+            <ul style='margin: 0; padding-left: 20px; color: #15803d; line-height: 1.8;'>
+                <li><strong>Lugar:</strong> $nombreEspacio</li>
+                " . ($hora_ent && $hora_sal ? "<li><strong>Horario:</strong> $hora_ent - $hora_sal</li>" : "") . "
+                <li><strong>Total de días:</strong> " . count($fechas) . " día(s)</li>
+            </ul>
+        </div>";
+
+        $contentHtml = "
+            <h2 style='color: #10b981; margin-top: 0; font-size: 20px;'>¡Tus reservas por múltiples días han sido Aprobadas!</h2>
+            <p>Nos complace informarte que tus solicitudes de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> han sido <strong style='color: #10b981;'>autorizadas</strong> para los siguientes días:</p>
+            <ul style='padding-left: 20px; color: #15803d;'>
+                $listaFechas
+            </ul>
             $detallesHtml
             <p>Por favor, asegúrate de cumplir con los lineamientos institucionales y los horarios de uso del espacio asignado.</p>
             <br>
@@ -315,22 +332,43 @@ class EmailService {
 
 
 // ============================================================================
-// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationRejected)
+// SECCIÓN 7: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationRejected & sendBulkReservationRejected)
 // ============================================================================
     /**
-     * @summary Envía correo cuando una reserva es rechazada.
-     * 
-     * @param string $to Correo del usuario.
-     * @param int $re_id ID de la reserva.
-     * @param string $motivo Motivo del rechazo (opcional).
+     * @summary Envía correo cuando una reserva individual o masiva es rechazada.
      */
 
-    public function sendReservationRejected($to, $re_id, $motivo = '') {
-        $subject = "Reserva Rechazada #$re_id";
-        $motivoHtml = $motivo ? "<div style='background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #991b1b;'><strong>Motivo del rechazo:</strong> $motivo</div>" : "";
+    public function sendReservationRejected($to, $re_id, $motivo = '', $espacio_nombre = '', $fecha_uso = '') {
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Reserva Rechazada - $nombreEspacio";
+        $motivoHtml = $motivo ? "<div style='background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #991b1b;'><strong>Motivo del rechazo:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
         $contentHtml = "
             <h2 style='color: #ef4444; margin-top: 0; font-size: 20px;'>Reserva No Autorizada</h2>
-            <p>Lamentamos informarte que tu solicitud de reserva con el folio <strong style='color: #1E335F;'>#$re_id</strong> ha sido <strong style='color: #ef4444;'>rechazada</strong>.</p>
+            <p>Lamentamos informarte que tu solicitud de reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong>" . ($fecha_uso ? " (para la fecha $fecha_uso)" : "") . " ha sido <strong style='color: #ef4444;'>rechazada</strong>.</p>
+            $motivoHtml
+            <br>
+            <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
+        ";
+        $body = $this->wrapEmailTemplate($subject, $contentHtml);
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    public function sendBulkReservationRejected($to, $espacio_nombre, $motivo = '', $fechas = []) {
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Reserva Rechazada (Múltiples Días) - $nombreEspacio";
+        $motivoHtml = $motivo ? "<div style='background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #991b1b;'><strong>Motivo del rechazo:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
+        
+        $listaFechas = "";
+        foreach ($fechas as $f) {
+            $listaFechas .= "<li style='margin-bottom: 6px;'>Fecha: <strong>" . htmlspecialchars($f) . "</strong></li>";
+        }
+
+        $contentHtml = "
+            <h2 style='color: #ef4444; margin-top: 0; font-size: 20px;'>Reservas No Autorizadas</h2>
+            <p>Lamentamos informarte que tus solicitudes de reserva por múltiples días para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> (" . count($fechas) . " día/s) han sido <strong style='color: #ef4444;'>rechazadas</strong>.</p>
+            <ul style='padding-left: 20px; color: #334155;'>
+                $listaFechas
+            </ul>
             $motivoHtml
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
@@ -341,22 +379,43 @@ class EmailService {
 
 
 // ============================================================================
-// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationCancelled)
+// SECCIÓN 8: LÓGICA DE NEGOCIO Y OPERACIÓN (sendReservationCancelled & sendBulkReservationCancelled)
 // ============================================================================
     /**
-     * @summary Envía correo cuando una reserva es cancelada.
-     * 
-     * @param string $to Correo del usuario.
-     * @param int $re_id ID de la reserva.
-     * @param string $motivo Motivo de la cancelación (opcional).
+     * @summary Envía correo cuando una reserva individual o masiva es cancelada.
      */
 
-    public function sendReservationCancelled($to, $re_id, $motivo = '') {
-        $subject = "Reserva Cancelada #$re_id";
-        $motivoHtml = $motivo ? "<div style='background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #92400e;'><strong>Motivo de cancelación:</strong> $motivo</div>" : "";
+    public function sendReservationCancelled($to, $re_id, $motivo = '', $espacio_nombre = '', $fecha_uso = '') {
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Reserva Cancelada - $nombreEspacio";
+        $motivoHtml = $motivo ? "<div style='background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #92400e;'><strong>Motivo de cancelación:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
         $contentHtml = "
             <h2 style='color: #f59e0b; margin-top: 0; font-size: 20px;'>Reserva Cancelada</h2>
-            <p>Te informamos que la reserva con el folio <strong style='color: #1E335F;'>#$re_id</strong> ha sido <strong style='color: #f59e0b;'>cancelada</strong>.</p>
+            <p>Te informamos que tu reserva para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong>" . ($fecha_uso ? " (para la fecha $fecha_uso)" : "") . " ha sido <strong style='color: #f59e0b;'>cancelada</strong>.</p>
+            $motivoHtml
+            <br>
+            <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>
+        ";
+        $body = $this->wrapEmailTemplate($subject, $contentHtml);
+        return $this->sendEmail($to, $subject, $body);
+    }
+
+    public function sendBulkReservationCancelled($to, $espacio_nombre, $motivo = '', $fechas = []) {
+        $nombreEspacio = $espacio_nombre ?: "Espacio Reservado";
+        $subject = "Reserva Cancelada (Múltiples Días) - $nombreEspacio";
+        $motivoHtml = $motivo ? "<div style='background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 15px 0; border-radius: 4px; color: #92400e;'><strong>Motivo de cancelación:</strong> " . htmlspecialchars($motivo) . "</div>" : "";
+        
+        $listaFechas = "";
+        foreach ($fechas as $f) {
+            $listaFechas .= "<li style='margin-bottom: 6px;'>Fecha: <strong>" . htmlspecialchars($f) . "</strong></li>";
+        }
+
+        $contentHtml = "
+            <h2 style='color: #f59e0b; margin-top: 0; font-size: 20px;'>Reservas Canceladas</h2>
+            <p>Te informamos que tus reservas por múltiples días para el espacio <strong style='color: #1E335F;'>$nombreEspacio</strong> (" . count($fechas) . " día/s) han sido <strong style='color: #f59e0b;'>canceladas</strong>.</p>
+            <ul style='padding-left: 20px; color: #334155;'>
+                $listaFechas
+            </ul>
             $motivoHtml
             <br>
             <p style='margin-bottom: 0;'>Atentamente,<br><strong>Equipo SIGRAT</strong></p>

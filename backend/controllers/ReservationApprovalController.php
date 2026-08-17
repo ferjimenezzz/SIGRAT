@@ -187,25 +187,55 @@ class ReservationApprovalController
             require_once __DIR__ . '/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
 
+            // Rechazar automáticamente reservaciones pendientes de otros usuarios que se empalmen en cada fecha
             foreach ($pendingRows as $row) {
-                // Rechazar automáticamente reservaciones pendientes que se empalmen
                 $rejectStmt = $this->pdo->prepare("UPDATE reserva SET status = 'rejected', estatus = 'Rechazada', cancel_reason = 'Rechazo automático por empalme', approved_by = :admin, approved_at = NOW() WHERE esp_id = :esp_id AND fecha_uso = :fecha_uso AND (status = 'pending' OR estatus = 'Pendiente') AND hora_ent < :hora_sal AND hora_sal > :hora_ent AND re_id != :id");
                 $rejectStmt->execute([':admin' => $adminId, ':esp_id' => $targetEspId, ':fecha_uso' => $row['fecha_uso'], ':hora_sal' => $row['hora_sal'], ':hora_ent' => $row['hora_ent'], ':id' => $row['re_id']]);
+            }
 
-                // Notificar al usuario
-                try {
-                    $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
-                    $stmtUser->execute([':id' => $row['re_id']]);
-                    $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
-                    if ($usuario) {
-                        $notifCtrl->createNotification($usuario['us_id'], 'Reserva', 'Tu reserva #' . $row['re_id'] . ' ha sido aprobada.', 'espacios.php');
-                        if ($usuario['correo']) {
-                            $this->emailService->sendReservationApproved($usuario['correo'], $row['re_id']);
+            // Obtener nombre del espacio y datos del usuario solicitante para enviar UN ÚNICO correo y notificación
+            try {
+                $stmtEsp = $this->pdo->prepare("SELECT nombre_numero, edificio FROM espacio WHERE esp_id = :esp_id");
+                $stmtEsp->execute([':esp_id' => $targetEspId]);
+                $espInfo = $stmtEsp->fetch(PDO::FETCH_ASSOC);
+                $espacioNombre = $espInfo ? trim(($espInfo['edificio'] ?? '') . ' - ' . ($espInfo['nombre_numero'] ?? 'Espacio'), ' -') : 'Espacio';
+
+                $firstRow = reset($pendingRows);
+                $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
+                $stmtUser->execute([':id' => $firstRow['re_id']]);
+                $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+                if ($usuario) {
+                    $countDays = count($pendingRows);
+                    $msgNotif = ($countDays > 1)
+                        ? "Tu reserva por $countDays días para \"$espacioNombre\" ha sido aprobada."
+                        : "Tu reserva para \"$espacioNombre\" ({$firstRow['fecha_uso']}) ha sido aprobada.";
+                    $notifCtrl->createNotification($usuario['us_id'], 'Reserva', $msgNotif, 'espacios.php');
+
+                    if (!empty($usuario['correo'])) {
+                        if ($countDays > 1) {
+                            $fechasGroup = array_values(array_unique(array_column($pendingRows, 'fecha_uso')));
+                            $this->emailService->sendBulkReservationApproved(
+                                $usuario['correo'],
+                                $espacioNombre,
+                                $fechasGroup,
+                                $firstRow['hora_ent'] ?? '',
+                                $firstRow['hora_sal'] ?? ''
+                            );
+                        } else {
+                            $this->emailService->sendReservationApproved(
+                                $usuario['correo'],
+                                $firstRow['re_id'],
+                                $espacioNombre,
+                                $firstRow['fecha_uso'] ?? '',
+                                $firstRow['hora_ent'] ?? '',
+                                $firstRow['hora_sal'] ?? ''
+                            );
                         }
                     }
-                } catch (Exception $e) {
-                    error_log("Error notificando aprobación: " . $e->getMessage());
                 }
+            } catch (Exception $e) {
+                error_log("Error enviando correo o notificación de aprobación: " . $e->getMessage());
             }
 
             $this->pdo->commit();
@@ -243,15 +273,42 @@ class ReservationApprovalController
         try {
             require_once __DIR__ . '/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
-            foreach ($pendingRows as $row) {
-                $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
-                $stmtUser->execute([':id' => $row['re_id']]);
-                $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
-                if ($usuario) {
-                    $msg = 'Tu reserva #' . $row['re_id'] . ' ha sido rechazada.';
-                    if ($reason) $msg .= ' Motivo: ' . $reason;
-                    $notifCtrl->createNotification($usuario['us_id'], 'Reserva', $msg, 'espacios.php');
-                    if ($usuario['correo']) $this->emailService->sendReservationRejected($usuario['correo'], $row['re_id'], $reason);
+
+            $firstRow = reset($pendingRows);
+            $stmtEsp = $this->pdo->prepare("SELECT e.nombre_numero, e.edificio FROM reserva r JOIN espacio e ON r.esp_id = e.esp_id WHERE r.re_id = :id");
+            $stmtEsp->execute([':id' => $firstRow['re_id']]);
+            $espInfo = $stmtEsp->fetch(PDO::FETCH_ASSOC);
+            $espacioNombre = $espInfo ? trim(($espInfo['edificio'] ?? '') . ' - ' . ($espInfo['nombre_numero'] ?? 'Espacio'), ' -') : 'Espacio';
+
+            $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
+            $stmtUser->execute([':id' => $firstRow['re_id']]);
+            $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+            if ($usuario) {
+                $countDays = count($pendingRows);
+                $msgNotif = ($countDays > 1)
+                    ? "Tu reserva por $countDays días para \"$espacioNombre\" ha sido rechazada." . ($reason ? " Motivo: $reason" : "")
+                    : "Tu reserva para \"$espacioNombre\" ({$firstRow['fecha_uso']}) ha sido rechazada." . ($reason ? " Motivo: $reason" : "");
+                $notifCtrl->createNotification($usuario['us_id'], 'Reserva', $msgNotif, 'espacios.php');
+
+                if (!empty($usuario['correo'])) {
+                    if ($countDays > 1) {
+                        $fechasGroup = array_values(array_unique(array_column($pendingRows, 'fecha_uso')));
+                        $this->emailService->sendBulkReservationRejected(
+                            $usuario['correo'],
+                            $espacioNombre,
+                            $reason ?? '',
+                            $fechasGroup
+                        );
+                    } else {
+                        $this->emailService->sendReservationRejected(
+                            $usuario['correo'],
+                            $firstRow['re_id'],
+                            $reason ?? '',
+                            $espacioNombre,
+                            $firstRow['fecha_uso'] ?? ''
+                        );
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -281,15 +338,42 @@ class ReservationApprovalController
         try {
             require_once __DIR__ . '/NotificationController.php';
             $notifCtrl = new \Controllers\NotificationController();
-            foreach ($rows as $row) {
-                $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
-                $stmtUser->execute([':id' => $row['re_id']]);
-                $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
-                if ($usuario) {
-                    $msg = 'Tu reserva #' . $row['re_id'] . ' ha sido cancelada.';
-                    if ($reason) $msg .= ' Motivo: ' . $reason;
-                    $notifCtrl->createNotification($usuario['us_id'], 'Reserva', $msg, 'espacios.php');
-                    if ($usuario['correo']) $this->emailService->sendReservationCancelled($usuario['correo'], $row['re_id'], $reason);
+
+            $firstRow = reset($rows);
+            $stmtEsp = $this->pdo->prepare("SELECT e.nombre_numero, e.edificio FROM reserva r JOIN espacio e ON r.esp_id = e.esp_id WHERE r.re_id = :id");
+            $stmtEsp->execute([':id' => $firstRow['re_id']]);
+            $espInfo = $stmtEsp->fetch(PDO::FETCH_ASSOC);
+            $espacioNombre = $espInfo ? trim(($espInfo['edificio'] ?? '') . ' - ' . ($espInfo['nombre_numero'] ?? 'Espacio'), ' -') : 'Espacio';
+
+            $stmtUser = $this->pdo->prepare("SELECT r.us_id, u.correo FROM reserva r JOIN usuario u ON r.us_id = u.us_id WHERE r.re_id = :id");
+            $stmtUser->execute([':id' => $firstRow['re_id']]);
+            $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+            if ($usuario) {
+                $countDays = count($rows);
+                $msgNotif = ($countDays > 1)
+                    ? "Tu reserva por $countDays días para \"$espacioNombre\" ha sido cancelada." . ($reason ? " Motivo: $reason" : "")
+                    : "Tu reserva para \"$espacioNombre\" ({$firstRow['fecha_uso']}) ha sido cancelada." . ($reason ? " Motivo: $reason" : "");
+                $notifCtrl->createNotification($usuario['us_id'], 'Reserva', $msgNotif, 'espacios.php');
+
+                if (!empty($usuario['correo'])) {
+                    if ($countDays > 1) {
+                        $fechasGroup = array_values(array_unique(array_column($rows, 'fecha_uso')));
+                        $this->emailService->sendBulkReservationCancelled(
+                            $usuario['correo'],
+                            $espacioNombre,
+                            $reason ?? '',
+                            $fechasGroup
+                        );
+                    } else {
+                        $this->emailService->sendReservationCancelled(
+                            $usuario['correo'],
+                            $firstRow['re_id'],
+                            $reason ?? '',
+                            $espacioNombre,
+                            $firstRow['fecha_uso'] ?? ''
+                        );
+                    }
                 }
             }
         } catch (Exception $e) {
