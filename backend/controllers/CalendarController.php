@@ -37,13 +37,15 @@ class CalendarController {
      */
 
     public function getEvents($edificio = null, $esp_id = null) {
-        // Usamos minúsculas para compatibilidad nativa con PostgreSQL
+        // Usamos minúsculas para compatibilidad nativa con PostgreSQL / MySQL
         $query = "SELECT r.*, e.nombre_numero, e.edificio, COALESCE(u.nombre, v.nombre, 'Invitado') as usuario_nombre
                   FROM reserva r
                   JOIN espacio e ON r.esp_id = e.esp_id
                   LEFT JOIN usuario u ON r.us_id = u.us_id
                   LEFT JOIN visita v ON r.vis_id = v.vis_id
-                  WHERE r.estatus IN ('Aprobada', 'Aprobado')";
+                  WHERE r.estatus IN ('Aprobada', 'Aprobado')
+                    AND LOWER(r.status) NOT IN ('cancelled', 'cancelada')
+                    AND LOWER(r.estatus) NOT IN ('cancelled', 'cancelada')";
         
         $params = [];
         if ($edificio) {
@@ -81,7 +83,7 @@ class CalendarController {
                   FROM reserva r
                   JOIN espacio e ON r.esp_id = e.esp_id
                   LEFT JOIN usuario u ON r.us_id = u.us_id
-                  WHERE 1=1";
+                  WHERE LOWER(r.status) NOT IN ('cancelled', 'cancelada') AND LOWER(r.estatus) NOT IN ('cancelled', 'cancelada')";
         
         $params = [];
         if ($edificio) {

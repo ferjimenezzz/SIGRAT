@@ -4060,6 +4060,12 @@ include 'header.php';
     // ----------------------------------------------------
     function getFilteredEvents() {
         return state.events.filter(ev => {
+            // Excluir automáticamente cualquier reserva cancelada
+            const stClean = (ev.estatus || ev.status || '').toString().toLowerCase().trim();
+            if (stClean === 'cancelled' || stClean === 'cancelada') {
+                return false;
+            }
+
             // Filtro por búsqueda de texto
             if (state.searchQuery) {
                 const sName = ev.nombre_numero.toLowerCase();
