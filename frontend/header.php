@@ -61,7 +61,7 @@ $isMaestroUser = (
     strpos($userRolCurrent, 'DOCENTE') !== false || 
     strpos($userRolCurrent, 'PROFESOR') !== false
 );
-$isInvitadoUser = ($userRolCurrent === 'INVITADO');
+$isInvitadoUser = ($userRolCurrent === 'INVITADO' || $userRolCurrent === 'VISITA' || strpos($userRolCurrent, 'VISIT') !== false);
 
 if ($isMaestroUser) {
     $allowedMaestroPages = ['calendario.php', 'aprobacion_reservas.php', 'perfil.php', 'manual_usuario.php'];
@@ -72,7 +72,7 @@ if ($isMaestroUser) {
 }
 
 if ($isInvitadoUser) {
-    $allowedInvitadoPages = ['calendario.php', 'perfil.php', 'manual_usuario.php'];
+    $allowedInvitadoPages = ['calendario.php', 'aprobacion_reservas.php', 'perfil.php', 'manual_usuario.php'];
     if (!in_array($currentPage, $allowedInvitadoPages)) {
         header("Location: calendario.php");
         exit();
@@ -101,8 +101,8 @@ if (!function_exists('hasPermission')) {
         if (!isset($_SESSION['rol'])) return false;
         $userRol = strtoupper(trim($_SESSION['rol']));
 
-        if ($userRol === 'INVITADO') {
-            if ($modulo === 'Calendario') {
+        if ($userRol === 'INVITADO' || $userRol === 'VISITA' || strpos($userRol, 'VISIT') !== false) {
+            if ($modulo === 'Calendario' || $modulo === 'Aprobaciones') {
                 return true;
             }
             return false;
@@ -1974,7 +1974,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Sin rol';
 
             <?php if (hasPermission('Aprobaciones')): ?>
             <a href="aprobacion_reservas.php" class="nav-item <?php echo $currentPage == 'aprobacion_reservas.php' ? 'active' : ''; ?>">
-                <i class="bi bi-check2-square"></i> <span>Aprobaciones</span>
+                <i class="bi bi-check2-square"></i> <span><?php echo ($isMaestroUser || $isInvitadoUser) ? 'Mis Aprobaciones' : 'Aprobaciones'; ?></span>
             </a>
             <?php endif; ?>
 

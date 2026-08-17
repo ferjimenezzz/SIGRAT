@@ -15,6 +15,10 @@ $isMaestroDocente = isset($_SESSION['rol']) && (
     strpos(strtoupper($_SESSION['rol']), 'DOCENTE') !== false || 
     strpos(strtoupper($_SESSION['rol']), 'PROFESOR') !== false
 );
+
+$userRolCur = isset($_SESSION['rol']) ? strtoupper(trim($_SESSION['rol'])) : '';
+$isVisitaUser = ($userRolCur === 'INVITADO' || $userRolCur === 'VISITA' || strpos($userRolCur, 'VISIT') !== false);
+$isMaestroOrVisita = ($isMaestroDocente || $isVisitaUser);
 ?>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
@@ -26,10 +30,10 @@ $isMaestroDocente = isset($_SESSION['rol']) && (
     <header style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 4px;">
-                <?php echo $isMaestroDocente ? 'Mis Reservas de Espacios' : 'Aprobaciones de Reservas'; ?>
+                <?php echo $isMaestroOrVisita ? 'Mis Aprobaciones' : 'Aprobaciones de Reservas'; ?>
             </h1>
             <p style="font-size: 13px; color: #64748b; font-weight: 500;">
-                <?php echo $isMaestroDocente ? 'Consulta el estado de tus solicitudes y gestiona tus cancelaciones' : 'Gestión de solicitudes pendientes de aprobación'; ?>
+                <?php echo $isMaestroOrVisita ? 'Consulta el estado de tus solicitudes y gestiona tus cancelaciones' : 'Gestión de solicitudes pendientes de aprobación'; ?>
             </p>
         </div>
     </header>
@@ -64,9 +68,12 @@ $isMaestroDocente = isset($_SESSION['rol']) && (
 <!-- Script React adaptado -->
 <script>
 const isMaestro = <?php echo json_encode($isMaestroDocente); ?>;
+const isVisita = <?php echo json_encode($isVisitaUser); ?>;
+const isMaestroOrVisita = <?php echo json_encode($isMaestroOrVisita); ?>;
 const canApprove = <?php echo json_encode(isset($_SESSION["rol"]) ? ($_SESSION["rol"] === "Super Administrador" || $_SESSION["rol"] === "Administrador") : false); ?>;
 window.canApprove = canApprove;
 window.isMaestro = isMaestro;
+window.isVisita = isVisita;
 
 const {
   useState,
@@ -103,14 +110,14 @@ const {
 const TutorialGuide = window.TutorialGuide;
 const tutorialSteps = [
   {
-    title: isMaestro ? "¡Mis Reservas de Espacios!" : "¡Bienvenido a Aprobaciones!",
-    description: isMaestro ? "En este módulo puedes visualizar únicamente tus reservas de espacios, revisar su estado y cancelarlas cuando lo requieras." : "Este recorrido interactivo te guiará en el uso del módulo de aprobación de reservas.",
+    title: isMaestroOrVisita ? "¡Mis Aprobaciones!" : "¡Bienvenido a Aprobaciones!",
+    description: isMaestroOrVisita ? "En este módulo puedes visualizar únicamente tus reservas de espacios, revisar su estado y cancelarlas cuando lo requieras." : "Este recorrido interactivo te guiará en el uso del módulo de aprobación de reservas.",
     position: "center"
   },
   {
     target: "#tutorial-search",
-    title: "Buscador Inteligente",
-    description: isMaestro ? "Filtra tus reservas buscando por el <b>espacio</b> solicitado." : "Filtra reservas al instante buscando por el <b>ID</b>, el nombre del <b>usuario</b> o el <b>espacio</b> solicitado.",
+    title: "Buscador e Filtros Avanzados",
+    description: isMaestroOrVisita ? "Filtra tus reservas buscando por <b>espacio</b>, fecha específica o por un rango de fechas." : "Filtra reservas al instante buscando por el <b>ID</b>, el nombre del <b>usuario</b>, el <b>espacio</b> solicitado o rango de fechas.",
     position: "bottom"
   },
   {
@@ -122,7 +129,7 @@ const tutorialSteps = [
   {
     target: "#tutorial-table",
     title: "Listado de Reservas",
-    description: isMaestro ? "Visualiza el espacio, fecha y hora, estado y el motivo por el cual fue cancelada la reserva." : "En esta tabla se consolida la información detallada de cada solicitud.",
+    description: isMaestroOrVisita ? "Visualiza el espacio, fecha y hora, estado y el motivo por el cual fue cancelada la reserva." : "En esta tabla se consolida la información detallada de cada solicitud.",
     position: "top"
   }
 ];
@@ -133,6 +140,9 @@ function ReservationApprovalApp() {
   const [error, setError] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSpaceFilter, setSelectedSpaceFilter] = useState("ALL");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -236,13 +246,13 @@ function ReservationApprovalApp() {
   };
 
   const handleCancel = async (id) => {
-    const swalTitle = isMaestro ? "Cancelar Mi Reserva" : "Cancelar Reserva";
-    const swalOptionsHtml = isMaestro ? `
+    const swalTitle = isMaestroOrVisita ? "Cancelar Mi Reserva" : "Cancelar Reserva";
+    const swalOptionsHtml = isMaestroOrVisita ? `
         <div style="text-align: left; margin-top: 10px;">
-          <label style="font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block; color: #334155;">Selecciona el motivo de cancelación (Docente/Maestro):</label>
+          <label style="font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block; color: #334155;">Selecciona el motivo de cancelación:</label>
           <select id="swal-select" class="swal2-select" style="display: flex; width: 100%; margin: 0; padding: 10px; font-size: 15px;">
-            <option value="Cambio de horario o clase">Cambio de horario o clase</option>
-            <option value="Imprevisto académico / Ausencia del docente">Imprevisto académico / Ausencia del docente</option>
+            <option value="Cambio de horario o clase">Cambio de horario o actividad</option>
+            <option value="Imprevisto personal / Ausencia">Imprevisto personal / Ausencia</option>
             <option value="Actividad reprogramada o suspendida">Actividad reprogramada o suspendida</option>
             <option value="Ya no requiero el espacio reservado">Ya no requiero el espacio reservado</option>
             <option value="Otro">Otro (Especificar)</option>
@@ -387,40 +397,112 @@ function ReservationApprovalApp() {
     }
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedSpaceFilter("ALL");
+    setStartDateFilter("");
+    setEndDateFilter("");
+  };
+
   const filteredReservations = reservations.filter(row => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    const idMatch = !isMaestro && row.re_id && row.re_id.toString().includes(term);
-    const userMatch = !isMaestro && row.usuario_nombre && row.usuario_nombre.toLowerCase().includes(term);
-    const spaceMatch = row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(term);
-    return idMatch || userMatch || spaceMatch;
+    // Filter text search
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const idMatch = !isMaestroOrVisita && row.re_id && row.re_id.toString().includes(term);
+      const userMatch = !isMaestroOrVisita && row.usuario_nombre && row.usuario_nombre.toLowerCase().includes(term);
+      const spaceMatch = row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(term);
+      if (!(idMatch || userMatch || spaceMatch)) return false;
+    }
+
+    // Filter space
+    if (selectedSpaceFilter !== "ALL") {
+      if (row.esp_id != selectedSpaceFilter) return false;
+    }
+
+    // Filter fecha (Start & End Date range or single date)
+    if (startDateFilter) {
+      if (row.fecha_uso < startDateFilter) return false;
+    }
+    if (endDateFilter) {
+      if (row.fecha_uso > endDateFilter) return false;
+    }
+
+    return true;
   });
 
   return React.createElement("div", { style: { marginTop: 10, fontFamily: "Inter, sans-serif", display: "flex", flexDirection: "column", alignItems: "flex-end" } }, 
     error && React.createElement(Alert, { severity: "error", sx: { mb: 3, width: "100%" } }, error), 
-    React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "16px" } }, 
-      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "10px" } },
-        React.createElement(TextField, { 
-          id: "tutorial-search", 
-          placeholder: isMaestro ? "Buscar espacio..." : "Buscar ID, usuario o espacio...", 
-          variant: "outlined", 
-          size: "small", 
-          value: searchTerm, 
-          onChange: (e) => setSearchTerm(e.target.value), 
-          InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
-          sx: { width: "300px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
-        }),
-        React.createElement(Button, {
-          variant: "outlined",
-          size: "small",
-          onClick: () => fetchReservations(currentTab === 0 ? "pending" : currentTab === 1 ? "approved" : "cancelled"),
-          sx: { borderRadius: "10px", height: "40px", borderColor: "#e2e8f0", color: "#475569", fontWeight: 700, textTransform: "none", '&:hover': { borderColor: "#cbd5e1", backgroundColor: "#f8fafc" } }
-        }, React.createElement("i", { className: "bi bi-arrow-clockwise", style: { marginRight: "6px", fontSize: "14px" } }), "Actualizar")
-      ), 
-      React.createElement(Tabs, { id: "tutorial-tabs", value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, 
-        React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px" } }), 
-        React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px" } }), 
-        React.createElement(Tab, { label: "Canceladas", sx: { fontWeight: 800, fontSize: "14px" } })
+
+    // BARRA DE FILTROS SUPERIOR
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "12px", width: "100%", marginBottom: "16px" } }, 
+      React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" } }, 
+        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" } },
+          React.createElement(TextField, { 
+            id: "tutorial-search", 
+            placeholder: isMaestroOrVisita ? "Buscar espacio..." : "Buscar ID, usuario o espacio...", 
+            variant: "outlined", 
+            size: "small", 
+            value: searchTerm, 
+            onChange: (e) => setSearchTerm(e.target.value), 
+            InputProps: { startAdornment: React.createElement(InputAdornment, { position: "start" }, React.createElement("i", { className: "bi bi-search", style: { fontSize: "15px", color: "#94a3b8" } })) }, 
+            sx: { width: "240px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", overflow: "hidden", '& fieldset': { borderColor: "#e2e8f0" }, '&:hover fieldset': { borderColor: "#cbd5e1" }, '&.Mui-focused fieldset': { borderColor: "#2563eb" } }, '& .MuiOutlinedInput-input': { backgroundColor: "transparent" } } 
+          }),
+
+          // Filtro por Espacio
+          React.createElement(FormControl, { size: "small", sx: { width: "200px" } },
+            React.createElement(Select, {
+              value: selectedSpaceFilter,
+              onChange: (e) => setSelectedSpaceFilter(e.target.value),
+              displayEmpty: true,
+              sx: { borderRadius: "10px", backgroundColor: "#f8fafc", fontSize: "13px", color: "#334155", '& fieldset': { borderColor: "#e2e8f0" } }
+            },
+              React.createElement(MenuItem, { value: "ALL" }, "Todos los Espacios"),
+              spaces.map(s => React.createElement(MenuItem, { key: s.esp_id, value: s.esp_id }, `${s.nombre_numero} (${s.edificio})`))
+            )
+          ),
+
+          // Filtro Fecha Inicio / Fecha Específica
+          React.createElement(TextField, {
+            type: "date",
+            size: "small",
+            value: startDateFilter,
+            onChange: (e) => setStartDateFilter(e.target.value),
+            helperText: "",
+            InputLabelProps: { shrink: true },
+            placeholder: "Fecha desde",
+            sx: { width: "160px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+          }),
+
+          // Filtro Fecha Fin (Rango)
+          React.createElement(TextField, {
+            type: "date",
+            size: "small",
+            value: endDateFilter,
+            onChange: (e) => setEndDateFilter(e.target.value),
+            InputLabelProps: { shrink: true },
+            sx: { width: "160px", '& .MuiOutlinedInput-root': { borderRadius: "10px", backgroundColor: "#f8fafc", '& fieldset': { borderColor: "#e2e8f0" } } }
+          }),
+
+          // Botón Limpiar Filtros
+          (searchTerm || selectedSpaceFilter !== "ALL" || startDateFilter || endDateFilter) && React.createElement(Button, {
+            variant: "text",
+            size: "small",
+            onClick: handleClearFilters,
+            sx: { color: "#ef4444", fontWeight: 700, textTransform: "none", fontSize: "12px" }
+          }, React.createElement("i", { className: "bi bi-x-circle", style: { marginRight: "4px" } }), "Limpiar Filtros"),
+
+          React.createElement(Button, {
+            variant: "outlined",
+            size: "small",
+            onClick: () => fetchReservations(currentTab === 0 ? "pending" : currentTab === 1 ? "approved" : "cancelled"),
+            sx: { borderRadius: "10px", height: "40px", borderColor: "#e2e8f0", color: "#475569", fontWeight: 700, textTransform: "none", '&:hover': { borderColor: "#cbd5e1", backgroundColor: "#f8fafc" } }
+          }, React.createElement("i", { className: "bi bi-arrow-clockwise", style: { marginRight: "6px", fontSize: "14px" } }), "Actualizar")
+        ), 
+        React.createElement(Tabs, { id: "tutorial-tabs", value: currentTab, onChange: (e, newValue) => setCurrentTab(newValue), sx: { '& .MuiTabs-flexContainer': { justifyContent: 'flex-end' } } }, 
+          React.createElement(Tab, { label: "Pendientes", sx: { fontWeight: 800, fontSize: "14px" } }), 
+          React.createElement(Tab, { label: "Aprobadas", sx: { fontWeight: 800, fontSize: "14px" } }), 
+          React.createElement(Tab, { label: "Canceladas", sx: { fontWeight: 800, fontSize: "14px" } })
+        )
       )
     ), 
     React.createElement(Paper, { id: "tutorial-table", elevation: 0, sx: { width: "100%", borderRadius: 3, overflow: "hidden", border: "1px solid #e2e8f0" } }, 
@@ -428,8 +510,8 @@ function ReservationApprovalApp() {
         React.createElement(Table, { stickyHeader: true }, 
           React.createElement(TableHead, null, 
             React.createElement(TableRow, null, 
-              !isMaestro && React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ID"), 
-              !isMaestro && React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "USUARIO"), 
+              !isMaestroOrVisita && React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ID"), 
+              !isMaestroOrVisita && React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "USUARIO"), 
               React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ESPACIO"), 
               React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "FECHA Y HORA"), 
               React.createElement(TableCell, { sx: { fontWeight: 800, color: "#64748b", fontSize: "12px" } }, "ESTADO"), 
@@ -438,13 +520,13 @@ function ReservationApprovalApp() {
           ), 
           React.createElement(TableBody, null, 
             filteredReservations.length === 0 ? React.createElement(TableRow, null, 
-              React.createElement(TableCell, { colSpan: isMaestro ? 4 : 6, align: "center", sx: { py: 5, color: "#94a3b8" } }, 
+              React.createElement(TableCell, { colSpan: isMaestroOrVisita ? 4 : 6, align: "center", sx: { py: 5, color: "#94a3b8" } }, 
                 currentTab === 0 ? "No hay solicitudes pendientes" : currentTab === 1 ? "No hay reservas aprobadas" : "No hay reservas canceladas"
               )
             ) : filteredReservations.map((row) => 
               React.createElement(TableRow, { key: row.re_id, hover: true, sx: { "&:last-child td, &:last-child th": { border: 0 } } }, 
-                !isMaestro && React.createElement(TableCell, { sx: { fontWeight: 800, color: "#94a3b8" } }, typeof row.re_id === 'string' && row.re_id.startsWith('grp_') ? row.re_id.substring(4, 10) : "#" + row.re_id), 
-                !isMaestro && React.createElement(TableCell, { sx: { fontWeight: 700 } }, row.usuario_nombre || "Desconocido"), 
+                !isMaestroOrVisita && React.createElement(TableCell, { sx: { fontWeight: 800, color: "#94a3b8" } }, typeof row.re_id === 'string' && row.re_id.startsWith('grp_') ? row.re_id.substring(4, 10) : "#" + row.re_id), 
+                !isMaestroOrVisita && React.createElement(TableCell, { sx: { fontWeight: 700 } }, row.usuario_nombre || "Desconocido"), 
                 React.createElement(TableCell, { sx: { fontWeight: 700, color: "#334155" } }, row.espacio_nombre || "Desconocido"), 
                 React.createElement(TableCell, null, 
                   React.createElement("div", { style: { fontWeight: 800 } }, row.fecha_uso), 
