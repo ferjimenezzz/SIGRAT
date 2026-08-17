@@ -111,18 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Recargar datos frescos siempre
 $usuarioInfo = getUsuario($db, $us_id);
 
-// Intentar obtener la fecha de creación real (si existe el campo)
-$fechaRegistro = 'Sin registrar';
-if (!empty($usuarioInfo['fecha_registro'])) {
-    $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-    $ts = strtotime($usuarioInfo['fecha_registro']);
-    $fechaRegistro = date('j', $ts) . ' de ' . $meses[date('n', $ts)-1] . ' de ' . date('Y', $ts);
-} elseif (!empty($usuarioInfo['ultima_conexion'])) {
-    // Fallback: usar ultima_conexion
-    $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-    $ts = strtotime($usuarioInfo['ultima_conexion']);
-    $fechaRegistro = date('j', $ts) . ' de ' . $meses[date('n', $ts)-1] . ' de ' . date('Y', $ts);
-}
 
 include 'header.php';
 ?>
@@ -244,15 +232,6 @@ include 'header.php';
                     <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">No se puede modificar</div>
                 </div>
 
-                <!-- Fecha Registro (bloqueado) -->
-                <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: none;">Fecha de registro</label>
-                    <div style="position: relative;">
-                        <input type="text" value="<?php echo htmlspecialchars($fechaRegistro); ?>" class="form-control" style="background: #f8fafc; color: #94a3b8; padding-right: 40px;" readonly>
-                        <i class="bi bi-lock" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #cbd5e1; font-size: 15px;"></i>
-                    </div>
-                    <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">No se puede modificar</div>
-                </div>
 
             </div>
 
