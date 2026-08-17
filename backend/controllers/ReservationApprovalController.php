@@ -83,7 +83,7 @@ class ReservationApprovalController
 
         // Fetch all matching
         $stmt = $this->pdo->prepare("
-            SELECT r.re_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.status, r.estatus, r.group_id, r.cancel_reason,
+            SELECT r.re_id, r.esp_id, r.fecha_uso, r.hora_ent, r.hora_sal, r.status, r.estatus, r.group_id, r.cancel_reason,
                    u.nombre AS usuario_nombre, e.nombre_numero AS espacio_nombre
             FROM reserva r
             LEFT JOIN usuario u ON r.us_id = u.us_id

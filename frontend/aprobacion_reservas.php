@@ -416,7 +416,10 @@ function ReservationApprovalApp() {
 
     // Filter space
     if (selectedSpaceFilter !== "ALL") {
-      if (row.esp_id != selectedSpaceFilter) return false;
+      const selectedSpace = spaces.find(s => s.esp_id == selectedSpaceFilter);
+      const spaceNameMatch = selectedSpace && row.espacio_nombre && row.espacio_nombre.toLowerCase().includes(selectedSpace.nombre_numero.toLowerCase());
+      const spaceIdMatch = row.esp_id != null && row.esp_id == selectedSpaceFilter;
+      if (!spaceIdMatch && !spaceNameMatch) return false;
     }
 
     // Filter fecha (Start & End Date range or single date)
